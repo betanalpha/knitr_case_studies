@@ -1,0 +1,56 @@
+---
+title: "Identifying Mixture Models"
+author: "Michael Betancourt"
+date: "January 2017"
+output:
+  html_document:
+    fig_caption: yes
+    theme: cerulean
+---
+
+Mixture models suffer from combinatorical degeneracies which complicates
+inferential computation.  In order to avoid serious challenges we have to
+identify the model with strong prior information.
+
+# Label Switching
+
+Mixture likelihood.
+
+Invariance under relabeling of the mixture components.
+
+Computational consequences.  Multimodal posterior difficult to sample,
+although predictive distribution is the same for any of the modes.
+
+# Prior Identification
+
+Strong prior information to isolate each component to specific regions
+of parameter space.  Useful when each component is meant to serve a
+particular purpose.
+
+Otherwise, if any additional prior information is symmetric with respect
+to the labels then we identify a unique labeling by ordering the components.
+
+Invariance of predictive distribution.
+
+# A Gaussian Mixture Models
+
+Inherent symmetry of likelihood and priors.
+
+Models and fits with and without ordering.
+
+# Additional Challenges For Adjacent Components
+
+Problems arise in either case when any of the components are similar according
+to the posterior.  In this case we get a bowtie that is very hard to sample,
+especially in the corners.
+
+# Discussion
+
+Mixture models are awkward to use unless complemented with appropriate prior
+information.  If the components cannot be identified a priori then a single
+labeling can be enforced by imposing an ordering constraint.
+
+If the data cannot isolate the components then the posterior will be pathological
+regardless if we apply the ordering or not.  Moreover, an ordering removes only
+the explicit labeling degeneracy.  Even with an ordering mixture models can
+exhibit strong multimodalities which will still frustrate accurate fits.

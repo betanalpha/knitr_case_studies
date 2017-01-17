@@ -1,0 +1,63 @@
+---
+title: "The Consequences of the Shape of Weakly Informative Prior"
+author: "Michael Betancourt"
+date: "January 2017"
+output:
+  html_document:
+    fig_caption: yes
+    theme: cerulean
+---
+
+Weakly informative priors are not rigorously defined, but all definitions
+share some common features.  In general, a weakly informative prior will
+separate the model configuration space into components that can be reasoned
+about independently.  They will then identify a scale above which we do
+not expect the data to support model configurations.  Identifying this scale
+is facilitated by considering the units in which the parameters are most
+naturally defined in the experimental design -- an experiment considering
+nanoscale measurements isn't putting much probability on a kiloscale result!
+
+The variation in weakly informative prior specifications is in the shape
+of the prior that encodes the chosen scale.  For example, we could have
+a Gaussian or a Cauchy or anything in between with a Student-t.
+
+If the scale is well-chosen and the truth lies below then the exact shape
+has little influence on the resulting posterior.  The shape plays a much
+more decisive role, however, when the scale is poorly-chosen.
+
+# Successful Use of Light Tailed Priors
+
+Collinear logistic regression.  Weakly informative prior regularizes the
+posterior and admits reasonable computation and robust inferences.
+
+# The Failure Mode of Light Tails
+
+Poorly chosen Gaussian prior.  Keeps posterior within the bulk of the prior
+despite the tension with the data.
+
+# Successful Use of Heavy Tailed Priors
+
+Collinear logistic regression.  Weakly informative prior regularizes the
+posterior and admits okay computation and robust inferences.  The heavy
+tail, however, puts a nontrivial amount of posterior mass into the tails
+which can stress computation.  This is especially common in more sophisticated
+models, such as those based on ordinary differential equations.
+
+# The Failure Mode of Heavy Tails
+
+Poorly chosen Cauchy prior.  Allows posterior to leak out into the tails
+of the prior, more readily displaying the tension between the prior and
+the likelihood.
+
+# Discussion
+
+An important consequence of the exact shape of a weakly informative prior is
+the behavior when the chosen scale conflicts with the data.  The tension is much
+easier to see in heavy tailed priors, but those priors also allow the posterior
+to explore lots of extreme values even when the scale is well-chosen.
+
+There is no unambiguous superior option.  Lighter tails are often useful for
+complex models where sojourns into the tails requires huge amounts of computation
+to evaluate the likelihood, although care must be taken when verifying the validity
+of the chosen scale.  Heavy tailed priors are easier to validate but are best
+when the likelihood is well-behaved even out in the tails.

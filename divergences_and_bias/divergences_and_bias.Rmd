@@ -1,0 +1,342 @@
+---
+title: "Diagnosing Biased Inference with Divergences"
+author: "Michael Betancourt"
+date: "January 2017"
+output:
+  html_document:
+    fig_caption: yes
+    theme: cerulean
+---
+
+Markov chain Monte Carlo (MCMC) computes estimates for expectations with respect
+to a given target distribution, but these estimates are guaranteed to be
+accurate only _asymptotically_ as the chain grows to be infinitely large.  
+If we want MCMC estimator to converge to the true expectation values fast
+enough to be useful in practice then we need to ensure that strong ergodicity
+conditions hold.  In particular, _geometric ergodicity_ between a Markov
+transition and a target distribution guarantees that MCMC estimators follow
+a central limit theorem which ensures not only that they converge quickly but
+also that we can empirically quantify that converge using the MCMC standard
+error.
+
+Unfortunately validating geometric ergodicity theoretically is infeasible in
+any nontrivial problem and we must instead rely on empirical diagnostics that
+identity obstructions to geometric ergodicity and hence well-behaved MCMC
+estimators.  For a general Markov transition and target distribution, the best
+diagnostic is the split $\hat{R}$ statistic over an ensemble of Markov chains
+initialized from diffuse points in parameter space.  To do any better would
+require exploiting the structure of a particular transition or target
+distribution.
+
+Hamiltonian Monte Carlo is especially powerful in this regard as its failures
+to be geometrically ergodic with respect to any target distribution manifest
+in distinct behaviors that developed into sensitive diagnostics.  One of
+these are _divergences_ that indicate the Markov chain has encountered regions
+of high curvature in the posterior which it cannot explore, biasing the
+resulting MCMC estimators.
+
+In this case study I will show how divergences arise in hierarchical models
+and identify the corresponding bias.  I will also show how those pathologies
+can be mediated by utilizing an alternative implementation of the same model.
+
+# The Eight Schools Model
+
+Consider the infamous Eight Schools hierarchical model __reference__,
+
+$$\mu \sim \mathcal{N}(0, 10)$$
+
+$$\tau \sim \text{Half-Cauchy}(0, 10)$$
+
+$$\theta_{n} \sim \mathcal{N}(\mu, \tau)$$
+
+$$y_{n} \sim \mathcal{N}(\theta_{n}, \sigma_{n})$$,
+
+where $n \in \left\{0, \ldots, 8 \right\}$ and each
+$\left\{ y_{n}, \sigma_{n} \right\}$ are given as data.  
+
+Inferring the hierarchical hyperparameters, $\mu$ and $\sigma$, together with
+the group-level parameters, $\theta_{1}, \ldots, \theta_{8}$, allows the model
+to pool data across the groups and reduce their posterior variance.  At least
+it will if we can accurate explore the joint posterior with MCMC.
+
+# A Centered Eight Schools Implementation
+
+The Eight Schools model is straightforward to directly implement as Stan
+program,
+```{r}
+writeLines(readLines("eight_schools_cp.stan"))
+```
+
+Unfortunately, this direct implementation, known as a _centered
+parameterization_, suffers from exactly the pathologies that obstruct geometric
+ergodicity and hence bias MCMC estimators.
+
+## Running Stan With Default Settings
+
+For this case study let's try to fit this model with RStan using just a single
+chain,
+```{r}
+library(rstan)
+rstan_options(auto_write = TRUE)
+
+c_light <- c("#DCBCBC")
+c_light_highlight <- c("#C79999")
+c_mid <- c("#B97C7C")
+c_mid_highlight <- c("#A25050")
+c_dark <- c("#8F2727")
+c_dark_highlight <- c("#7C0000")
+
+common_breaks=12 * (0:50) / 50 - 6
+```
+
+```{r}
+input_data <- read_rdump("eight_schools.data.R")
+
+fit_cp <- stan(file='eight_schools_cp.stan', data=input_data,
+            iter=2000, chains=1, seed=483892929)
+```
+
+For this lone chain split $\hat{R}$ doesn't indicate any problems,
+```{r}
+print(fit)
+```
+and the trace plots look fine, for example,
+```{r}
+plot(nondiv_params_cp$iter, log(nondiv_params_cp$tau),
+xlab="Iteration", ylab="log(tau)", col=1, pch=16, cex=0.8)
+points(div_params_cp$iter, log(div_params_cp$tau), col=2, pch=16, cex=0.8)
+```
+If we had we run multiple chains for long enough, however, then we would
+eventually have seen the chains occasionally freeze and the ensemble exhibit
+large values of split $\hat{R}$.  Because it is not extremely sensitive to
+pathologies, split $\hat{R}$ typically requires many long chains to identify
+fitting problems.
+
+On the other hand, divergences are extremely sensitive to these pathologies.
+Almost 1% of the iterations in our lone Markov chain ended with a divergence
+```{r}
+divergent <- get_sampler_params(fit, inc_warmup=FALSE)[[1]][,'divergent__']
+sum(divergent)
+```
+Even with a single short chain these divergences are able to identity problems
+and advise skepticism of any resulting MCMC estimators.
+
+Can we identify the pathological neighborhood from the divergences?
+```{r}
+params_cp <- as.data.frame(extract(fit_cp, permuted=FALSE))
+names(params_cp) <- gsub("chain:1.", "", names(params_cp), fixed = TRUE)
+names(params_cp) <- gsub("[", ".", names(params_cp), fixed = TRUE)
+names(params_cp) <- gsub("]", "", names(params_cp), fixed = TRUE)
+
+divergent <- get_sampler_params(fit_cp, inc_warmup=FALSE)[[1]][,'divergent__']
+params_cp$divergent <- divergent
+params_cp$iter <- 1:1000
+
+div_params_cp <- params_cp[params_cp$divergent == 1,]
+nondiv_params_cp <- params_cp[params_cp$divergent == 0,]
+
+plot(nondiv_params_cp$theta.1, log(nondiv_params_cp$tau),
+xlab="theta.1", ylab="log(tau)", col=1, pch=16, cex=0.8)
+points(div_params_cp$theta.1, log(div_params_cp$tau), col=2, pch=16, cex=0.8)
+```
+There are hints of issues at smaller values of sigma, but to get a better
+understanding we need to run the chain longer.
+
+If we run a longer chain than we can even use these divergences to locate
+where the pathologies are hiding in our model.  Because divergent transitions
+tend to end close to the problematic neighborhoods, we can identify the suspect
+regions by comparing the divergent transitions over the non-divergent transitions,
+```{r}
+fit_cp <- stan(file='eight_schools_cp.stan', data=input_data,
+            iter=11000, warmup=1000, chains=1, seed=483892929)
+
+params_cp <- as.data.frame(extract(fit_cp, permuted=FALSE))
+names(params_cp) <- gsub("chain:1.", "", names(params_cp), fixed = TRUE)
+names(params_cp) <- gsub("[", ".", names(params_cp), fixed = TRUE)
+names(params_cp) <- gsub("]", "", names(params_cp), fixed = TRUE)
+
+divergent <- get_sampler_params(fit_cp, inc_warmup=FALSE)[[1]][,'divergent__']
+params_cp$divergent <- divergent
+params_cp$iter <- 1:10000
+
+div_params_cp <- params_cp[params_cp$divergent == 1,]
+nondiv_params_cp <- params_cp[params_cp$divergent == 0,]
+
+plot(nondiv_params_cp$theta.1, log(nondiv_params_cp$tau),
+xlab="theta.1", ylab="log(tau)", col=1, pch=16, cex=0.8)
+points(div_params_cp$theta.1, log(div_params_cp$tau), col=2, pch=16, cex=0.8)
+```
+
+With this longer chain we also see the sticking behavior that eventually
+manifests in poor split Rhats,
+```{r}
+plot(nondiv_params_cp$iter, log(nondiv_params_cp$tau),
+xlab="Iteration", ylab="log(tau)", col=1, pch=16, cex=0.8)
+points(div_params_cp$iter, log(div_params_cp$tau), col=2, pch=16, cex=0.8)
+```
+
+In these plots we can see that the Eight Schools model manifests the infamous
+funnel characteristic of centered parameterizations without enough data.  In
+the neck of the funnel the posterior concentrates into an extremely narrow
+volume of parameter space which the Markov chain is unable to explore, biasing
+the resulting inferences to larger values of $\tau$.  This issue is discussed
+at depth in __the HMC for Hier paper__.
+
+## Adjusting Stan's Adaptation Routine
+
+Divergences arise in Hamiltonian Monte Carlo when the numerical trajectories
+that generate each transition encounter regions of parameter space with
+length-scales smaller than the discretization of the symplectic integrator,
+$\epsilon$.  Consequently we should be able to reduce the affect of a
+pathological neighborhood, and hence the number of divergences, by decreasing
+the integrator step size.
+
+In Stan the step size is determined automatically by a tuning algorithm in
+warmup, but we can coerce smaller step sizes by tweaking the configuration
+of that algorithm.  In particular, we want to increase the ```adapt_delta```
+parameter from its default value of 0.8 closer to its maximum of 1.
+
+```{r}
+fit_cp85 <- stan(file='eight_schools_cp.stan', data=input_data,
+                 iter=11000, warmup=1000, chains=1, seed=483892929,
+                 control=list(adapt_delta=0.85))
+
+fit_cp90 <- stan(file='eight_schools_cp.stan', data=input_data,
+                 iter=11000, warmup=1000, chains=1, seed=483892929,
+                 control=list(adapt_delta=0.90))
+
+fit_cp95 <- stan(file='eight_schools_cp.stan', data=input_data,
+                 iter=11000, warmup=1000, chains=1, seed=483892929,
+                 control=list(adapt_delta=0.95))
+
+fit_cp99 <- stan(file='eight_schools_cp.stan', data=input_data,
+                 iter=11000, warmup=1000, chains=1, seed=483892929,
+                 control=list(adapt_delta=0.99))
+
+p85 <- hist(log(extract(fit_cp85)$tau), main="", xlab="log(tau)", breaks=common_breaks)
+p90 <- hist(log(extract(fit_cp90)$tau), main="", xlab="log(tau)", breaks=common_breaks)
+p95 <- hist(log(extract(fit_cp95)$tau), main="", xlab="log(tau)", breaks=common_breaks)
+p99 <- hist(log(extract(fit_cp99)$tau), main="", xlab="log(tau)", breaks=common_breaks)
+
+plot(p85, col=adjustcolor(c_dark_highlight, alpha.f=0.25))
+plot(p99, col=adjustcolor(c_mid, alpha.f=0.25), add=T)
+```
+
+```{r}
+params_cp99 <- as.data.frame(extract(fit_cp99, permuted=FALSE))
+
+plot(params_cp99$theta.1, log(params_cp99$tau),
+xlab="theta.1", ylab="log(tau)", col=1, pch=16, cex=0.8)
+points(params_cp$theta.1, log(params_cp$tau), col=2, pch=16, cex=0.8)
+```
+
+```{r}
+adapt_delta=c(0.85, 0.90, 0.95, 0.99)
+divergences=c(sum(get_sampler_params(fit_cp85, inc_warmup=FALSE)[[1]][,'divergent__']),
+              sum(get_sampler_params(fit_cp90, inc_warmup=FALSE)[[1]][,'divergent__']),
+              sum(get_sampler_params(fit_cp95, inc_warmup=FALSE)[[1]][,'divergent__']),
+              sum(get_sampler_params(fit_cp99, inc_warmup=FALSE)[[1]][,'divergent__']))
+
+plot(adapt_delta, divergences,
+     xlab="Adept Delta",
+     ylab="Number of Divergences", ylim=c(0, 400),
+     col=c_dark, type="l")
+points(adapt_delta, divergences, col=c_mid, pch=16, cex=0.8)
+```
+
+Divergences aren't going away!  Reducing the step size just lets the sampler
+see more and more pathologies.
+
+```{r}
+params_cp99 <- as.data.frame(extract(fit_cp99, permuted=FALSE))
+names(params_cp99) <- gsub("chain:1.", "", names(params_cp99), fixed = TRUE)
+names(params_cp99) <- gsub("[", ".", names(params_cp99), fixed = TRUE)
+names(params_cp99) <- gsub("]", "", names(params_cp99), fixed = TRUE)
+
+divergent <- get_sampler_params(fit_cp99, inc_warmup=FALSE)[[1]][,'divergent__']
+params_cp99$divergent <- divergent
+
+div_params_cp99 <- params_cp99[params_cp99$divergent == 1,]
+nondiv_params_cp99 <- params_cp99[params_cp99$divergent == 0,]
+
+plot(nondiv_params_cp99$theta.1, log(nondiv_params_cp99$tau),
+xlab="theta.1", ylab="log(tau)", col=1, pch=16, cex=0.8)
+points(div_params_cp99$theta.1, log(div_params_cp99$tau), col=2, pch=16, cex=0.8)
+```
+
+# Implemented with a Non-Centered Parameterization
+
+Reducing the step size doesn't seem to help -- it only reveals further
+problems.  Fortunately, there is another way to implement a hierarchical
+model that doesn't suffer from these nasty pathologies.
+
+In a non-centered parameterization we do not try to fit the group-level
+parameters directly, rather we fit a latent Gaussian variable from which
+we can recover the group-level parameters.  This indirect implementation is
+called a __non-centered parameterization__, although it is not formally a
+reparameterization of the centered parameterization implementation of the
+model.
+
+Stan program,
+```{r}
+writeLines(readLines("eight_schools_ncp.stan"))
+```
+
+Code for running chains.
+```{r}
+fit_ncp <- stan(file='eight_schools_ncp.stan', data=input_data,
+            iter=11000, warmup=1000, chains=1, seed=483892929)
+```
+
+No divergences,
+```{r}
+divergent <- get_sampler_params(fit_ncp, inc_warmup=FALSE)[[1]][,'divergent__']
+sum(divergent)
+```
+
+Plot of log sigma histogram compared to above.  No bias!
+
+```{r}
+p_ncp <- hist(log(extract(fit_ncp)$tau), main="", xlab="log(tau)", breaks=common_breaks)
+
+plot(p85, col=adjustcolor(c_dark_highlight, alpha.f=0.25))
+plot(p99, col=adjustcolor(c_mid, alpha.f=0.25), add=T)
+plot(p_ncp, col=adjustcolor(c_light, alpha.f=0.25), add=T)
+```
+
+```{r}
+mean(log(extract(fit_cp)$tau))
+mean(log(extract(fit_cp99)$tau))
+mean(log(extract(fit_ncp)$tau))
+```
+
+# Discussion
+
+Trying to fit hierarchical models with sparse data and a centered parameterization
+leads to divergences indicative of biased MCMC estimators.  Indeed inspection of
+the estimates of log sigma show that the Markov chain is not able to explore
+the small values of the hierarchical variation supported by the posterior.
+
+The ultimate importance of this bias, however, depends on the application.  If
+trying to make inferences on the logarithmic scale then this bias is huge and
+will devastate to the quality of the inferences.  Often, however, the hierarchical
+standard deviation is marginalized and only the linear scale matters.  In that case
+the pathological region of the posterior is compressed into a very small area of
+sigma and biases are subsequently reduced.  
+```{r}
+p_cp <- hist(extract(fit_cp)$tau, main="", xlab="tau", breaks=0:40)
+p_ncp <- hist(extract(fit_ncp)$tau, main="", xlab="tau", breaks=0:40)
+
+plot(p_cp, col=adjustcolor(c_dark_highlight, alpha.f=0.25))
+plot(p_ncp, col=adjustcolor(c_light, alpha.f=0.25), add=T)
+```
+__Look at marginal posterior for theta1 and y1 to see the difference.
+Should be relatively small and noticeable only when running with so
+many iterations that the MCMC variation is small__
+Consequently biases are often not evident when looking at marginal or predictive
+distributions.
+
+Whether or not the biases matter in a given application, however, depends on the
+particular details of that application.  With a very careful and challenging analysis
+such a bias can be quantified and deemed acceptable on a case by case basis, but
+the only way to ensure robust inferences generally is to avoid divergences altogether!
