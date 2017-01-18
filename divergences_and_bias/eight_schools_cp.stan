@@ -11,8 +11,8 @@ parameters {
 }
 
 model {
-  mu ~ normal(0, 10);
-  tau ~ cauchy(0, 10);
+  mu ~ normal(0, 5);
+  tau ~ cauchy(0, 5);
   theta ~ normal(mu, tau);
   y ~ normal(theta, sigma);
 }
