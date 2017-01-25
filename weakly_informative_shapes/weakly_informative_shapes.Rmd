@@ -1,5 +1,5 @@
 ---
-title: "The Consequences of the Shape of Weakly Informative Prior"
+title: "How the Shape of a Weakly Informative Prior Effects Inferences"
 author: "Michael Betancourt"
 date: "January 2017"
 output:
@@ -8,40 +8,296 @@ output:
     theme: cerulean
 ---
 
-Weakly informative priors are not rigorously defined, but all definitions
-share some common features.  In general, a weakly informative prior will
-separate the model configuration space into components that can be reasoned
-about independently.  They will then identify a scale above which we do
-not expect the data to support model configurations.  Identifying this scale
+Weakly-informed priors are a somewhat vague concept where the user identifies
+appropriate scales in a given analysis and uses those scales to introduce
+important regularization into the analysis.  Exactly how those scales are
+utilized, however, is ill-defined and the implementation of weakly-informative
+priors can consequently be quite ambiguous for practitioners.
+
+In this case study I will consider two approaches for implementing
+weakly-informative priors and demonstrate how the specific properties of each
+effect the resulting analysis.  
+
+# Collinear Regression
+
+Weakly-informative priors are especially critical when the inferences are
+impaired with non-identifiable likelihoods, such as a collinear regression.
+To that end, let's say that we are analyzing a small company and we want to
+model how much daily rainfall, $x$, affects daily income, $y$, using only
+a single datum.
+
+For this study we will simulate data assuming that the company typically makes
+a few thousand dollars, or kilodollars (k$), per day without any rain and that
+a heavy rainfall of a few centimeters per day can severely curtain our income,
+```{r}
+library(rstan)
+rstan_options(auto_write = TRUE)
+```
+```{r}
+alpha <- 1    # k$
+beta <- -0.25 # k$ / cm
+sigma <- 1    # k$
+
+x <- runif(1, 0, 2)                    # cm
+y <- rnorm(1, beta * x + alpha, sigma) # k$
+
+stan_rdump(c("x", "y"), file="collinear_regression.data.R")
+```
+
+Assuming that both rainfall and income are sufficiently large, we can ignore
+the fact that they are positive quantities and model their relationship with
+a linear regression,
+```{r}
+writeLines(readLines("regression_no_prior.stan"))
+```
+
+Let's fit this linear regression in Stan using a very long Markov chain to
+ensure precise quantification of our posterior distribution,
+```{r, cache=TRUE}
+input_data <- read_rdump("collinear_regression.data.R")
+
+fit <- stan(file='regression_no_prior.stan', data=input_data,
+            iter=11000, warmup=1000, chains=1, seed=483892929)
+```
+
+Unfortunately, this naive linear regression blows up,
+```{r}
+print(fit)
+```
+
+with the Markov chain meandering towards extreme values of the intercept
+and slope,
+```{r}
+c_light <- c("#DCBCBC")
+c_light_highlight <- c("#C79999")
+c_mid <- c("#B97C7C")
+c_mid_highlight <- c("#A25050")
+c_dark <- c("#8F2727")
+c_dark_highlight <- c("#7C0000")
+```
+```{r}
+params <- as.data.frame(extract(fit, permuted=FALSE))
+names(params) <- gsub("chain:1.", "", names(params), fixed = TRUE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params$alpha, params$beta, col=c_dark, pch=16, cex=0.8,
+     xlab="alpha (k$)",
+     ylab="beta (k$ / cm)")
+```
+
+In hindsight this poor fit isn't unexpected.  With only a single data point
+the three-dimensional likelihood is non-identified, and with flat priors on all
+of our parameters the posterior becomes ill-posed.  If we want to regularize
+our inferences then we need to incorporate better prior information into our
+analysis.
+
+# Diffuse Does Not Mean Non-informative!
+
+Why is the prior information contained in a flat prior so useless in our
+collinear regression?  Although flat priors are often motivated as being
+"non-informative", they are actually very informative and pull the posterior
+towards extreme values that can bias our inferences.
+
+To see this, consider a flat prior for the intercept, $\alpha$, and the
+question of how much prior probability mass is in the interval
+$-1 \le \alpha \le 1$.  Because we can't normalize the prior there is no
+well-defined answer, but we can at least consider the mass inside the interval
+relative to the mass outside of the interval which is, well, infinite!  Hence
+there is infinitely more prior mass that pulls inferences outside of the
+interval $-1 \le \alpha \le 1$.
+
+This logic, however, is exactly the same for the the interval
+$-10 \le \alpha \le 10$, the $-100 \le \alpha \le 100$, and in fact any
+finite interval.  The flat prior favors the exterior of the interval, pulling
+our posterior and any resulting inferences towards extreme values.
+
+Although it is tempting to blame this pathological behavior on the fact that
+flat priors are not well-defined probability distributions and hence cannot be
+normalized, the behavior is not unique to flat priors.  This bias towards
+extreme values is characteristic of any prior that is very diffuse and places
+significant probability mass at large values.  In practice, priors such as
+$\alpha \sim U(-1000, 1000)$ and $\alpha \sim \mathcal{N}(0, 1000)$ can
+bias our inferences as strongly as a flat prior.
+
+The real issue is that these diffuse priors are _incoherent_ with our actual
+prior beliefs.  For example, basic physical and economic constraints limit the
+reasonable values of our parameters, and besides our linear model isn't even
+valid for negative parameter values.  Diffuse priors pull the posterior towards
+these extreme values, conflicting with even the most basic prior information.
+
+Ultimately the misconception about diffuse priors being non-informative comes
+from reasoning about priors _relative_ to the likelihood.  Because diffuse
+priors distribute probability across such a large region of parameter space,
+likelihoods that identify much smaller regions of parameter space quickly
+overwhelm the prior distribution and dominate the posterior distribution.  Hence
+diffuse priors supposedly "let the data speak for themselves".  
+
+In complex models, however, it typically takes a significant amount of data for
+the likelihood to be able to identify a necessarily small region of parameter
+space.  The more expensive and sparse the data _and_ the more complex the
+likelihood, the more informative diffuse priors will be.  If we want to make
+reasonable inferences in these models then we need better prior distributions
+that are actually coherent with our prior beliefs.
+
+# Weakly-Informative Priors
+
+Need to regularize the parameters with a prior distribution, in particular a
+prior distribution that is coherent with our actual prior knowledge.  There
+are various schemes for trying to design such a coherent prior, but here we
+will focus on _weakly-informative priors_ that introduce a minimal amount of
+information to help regularize our inferences.
+
+The first step in constructing a weakly-informative prior is breaking out our
+model configuration space into components about which
+we can easily reason.  In our linear regression this is straightforward because
+our parameterization provides just such a decomposition.
+The intercept, alpha, gives the base income without any rainfall.  The slope,
+beta, controls how much rainfall affects income, and the measurement variation,
+sigma, quantifies the inherent variability of daily income.
+
+Next we need to define a parameterization of these components such that zero
+becomes a reasonable default.  For example, alpha has a good parameterization
+because zero base income is a reasonable default.  
+
+Next we need to identify scales for each of these components that quantify
+reasonable values.  Component values above this scale are considered extreme
+while values below this scale are considered reasonable.
+Identifying this scale
 is facilitated by considering the units in which the parameters are most
 naturally defined in the experimental design -- an experiment considering
 nanoscale measurements isn't putting much probability on a kiloscale result!
 
-The variation in weakly informative prior specifications is in the shape
-of the prior that encodes the chosen scale.  For example, we could have
-a Gaussian or a Cauchy or anything in between with a Student-t.
+Finally we need to complement this scale with a shape to define a well-posed
+probability distribution.  For example, we could take a normal distribution
+or a Cauchy distribution with a heavier tail.  Or we could interpolate
+between these options with a Student-t distribution with a finite degrees of
+freedom.  Recently there has even been some work in formalizing criteria that
+automatically select shapes.  
 
-If the scale is well-chosen and the truth lies below then the exact shape
-has little influence on the resulting posterior.  The shape plays a much
-more decisive role, however, when the scale is poorly-chosen.
+$$\mu \sim \mathcal{N}(0, 5)$$
 
-# Successful Use of Light Tailed Priors
+Here, however, we will focus on the gaussian and Cauchy priors to see how the
+different shapes qualitatively affect the resulting inferences.
+
+# Regularizing with Light-Tailed Weakly Informed Priors
 
 Collinear logistic regression.  Weakly informative prior regularizes the
 posterior and admits reasonable computation and robust inferences.
+
+```{r}
+writeLines(readLines("regression_gauss_wi_prior.stan"))
+```
+
+```{r, cache=TRUE}
+gauss_fit <- stan(file='regression_gauss_wi_prior.stan', data=input_data,
+                  iter=11000, warmup=1000, chains=1, seed=483892929)
+```
+
+```{r}
+print(gauss_fit)
+```
+
+```{r}
+gauss_params <- as.data.frame(extract(gauss_fit, permuted=FALSE))
+names(gauss_params) <- gsub("chain:1.", "", names(gauss_params), fixed = TRUE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(gauss_params$alpha, gauss_params$beta,
+     col=c_dark, pch=16, cex=0.8,
+     xlab="alpha [log(k$)]", ylab="beta [log(k$) / log(cm)]")
+points(c(alpha), c(beta), col=c_light, pch=16, cex=0.8)
+```
+
+```{r}
+par(mfrow=c(1, 3))
+
+alpha_breaks=10 * (0:50) / 50 - 5
+hist(gauss_params$alpha, main="", xlab="alpha [log(k$)]", breaks=alpha_breaks,
+     col=c_dark, border=c_dark_highlight,
+     xlim=c(-5, 5))
+abline(v=alpha, col=c_light, lty=1, lwd=3)
+
+beta_breaks=10 * (0:50) / 50 - 5
+hist(gauss_params$beta, main="", xlab="beta [log(k$) / log(cm)]", breaks=beta_breaks,
+     col=c_dark, border=c_dark_highlight,
+     xlim=c(-5, 5))
+abline(v=beta, col=c_light, lty=1, lwd=3)
+
+sigma_breaks=5 * (0:50) / 50
+hist(gauss_params$sigma, main="", xlab="sigma [log(k$)]", breaks=sigma_breaks,
+     col=c_dark, border=c_dark_highlight,
+     xlim=c(0, 5))
+abline(v=sigma, col=c_light, lty=1, lwd=3)
+```
+
+# Regularizing with Heavy-Tailed Weakly Informed Priors
+
+Collinear logistic regression.  Weakly informative prior regularizes the
+posterior and admits okay computation and robust inferences.
+```{r}
+writeLines(readLines("regression_cauchy_wi_prior.stan"))
+```
+
+```{r, cache=TRUE}
+cauchy_fit <- stan(file='regression_cauchy_wi_prior.stan', data=input_data,
+                  iter=11000, warmup=1000, chains=1, seed=483892929)
+```
+
+```{r}
+print(cauchy_fit)
+```
+
+```{r}
+cauchy_params <- as.data.frame(extract(cauchy_fit, permuted=FALSE))
+names(cauchy_params) <- gsub("chain:1.", "", names(cauchy_params), fixed = TRUE)
+
+par(mfrow=c(1, 3))
+
+alpha_breaks=20 * (0:50) / 50 - 10
+hist(cauchy_params$alpha[abs(cauchy_params$alpha) < 10],
+     main="", xlab="alpha [log(k$)]", breaks=alpha_breaks,
+     col=c_dark, border=c_dark_highlight,
+     xlim=c(-10, 10))
+abline(v=alpha, col=c_light, lty=1, lwd=3)
+
+beta_breaks=200 * (0:50) / 50 - 100
+hist(cauchy_params$beta[abs(cauchy_params$beta) < 100],
+     main="", xlab="beta [log(k$) / log(cm)]", breaks=beta_breaks,
+     col=c_dark, border=c_dark_highlight,
+     xlim=c(-100, 100))
+abline(v=beta, col=c_light, lty=1, lwd=3)
+
+sigma_breaks=25 * (0:50) / 50
+hist(cauchy_params$sigma[cauchy_params$sigma < 25],
+     main="", xlab="sigma [log(k$)]", breaks=sigma_breaks,
+     col=c_dark, border=c_dark_highlight,
+     xlim=c(0, 25))
+abline(v=sigma, col=c_light, lty=1, lwd=3)
+```
+
+The heavy
+tail, however, puts a nontrivial amount of posterior mass into the tails
+which can stress computation.  This is especially common in more sophisticated
+models, such as those based on ordinary differential equations.
+
+```{r}
+beta_breaks=200 * (0:100) / 100 - 100
+gauss_hist <- hist(gauss_params$beta, breaks=beta_breaks, plot=FALSE)
+cauchy_hist <- hist(cauchy_params$beta[abs(cauchy_params$beta) < 100],
+                    breaks=beta_breaks, plot=FALSE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(cauchy_hist, col=c_light, border=c_light_highlight,
+     main="", xlab="beta [log(k$) / log(cm)]")
+plot(gauss_hist, col=c_dark, border=c_dark_highlight, add=T)
+legend("topright", c("Gauss", "Cauchy"), fill=c(c_dark, c_light), bty="n")
+```
+
 
 # The Failure Mode of Light Tails
 
 Poorly chosen Gaussian prior.  Keeps posterior within the bulk of the prior
 despite the tension with the data.
-
-# Successful Use of Heavy Tailed Priors
-
-Collinear logistic regression.  Weakly informative prior regularizes the
-posterior and admits okay computation and robust inferences.  The heavy
-tail, however, puts a nontrivial amount of posterior mass into the tails
-which can stress computation.  This is especially common in more sophisticated
-models, such as those based on ordinary differential equations.
 
 # The Failure Mode of Heavy Tails
 
