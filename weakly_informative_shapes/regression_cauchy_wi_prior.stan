@@ -1,6 +1,7 @@
 data {
-  real x; // Rainfall in cm
-  real y; // Income in k$
+  int<lower=1> N;
+  vector[N] x; // Rainfall in cm
+  vector[N] y; // Income in k$
 }
 
 parameters {

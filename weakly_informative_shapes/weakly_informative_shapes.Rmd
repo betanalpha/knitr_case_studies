@@ -38,10 +38,11 @@ alpha <- 1    # k$
 beta <- -0.25 # k$ / cm
 sigma <- 1    # k$
 
-x <- runif(1, 0, 2)                    # cm
-y <- rnorm(1, beta * x + alpha, sigma) # k$
+N <- 1
+x <- array(runif(N, 0, 2), dim=N)                    # cm
+y <- array(rnorm(N, beta * x + alpha, sigma), dim=N) # k$
 
-stan_rdump(c("x", "y"), file="collinear_regression.data.R")
+stan_rdump(c("N", "x", "y"), file="collinear_regression.data.R")
 ```
 
 Assuming that both rainfall and income are sufficiently large, we can ignore
@@ -240,19 +241,19 @@ names(gauss_params) <- gsub("chain:1.", "", names(gauss_params), fixed = TRUE)
 par(mfrow=c(1, 3))
 
 alpha_breaks=10 * (0:50) / 50 - 5
-hist(gauss_params$alpha, main="", xlab="alpha [log(k$)]", breaks=alpha_breaks,
+hist(gauss_params$alpha, main="", xlab="alpha (k$)", breaks=alpha_breaks,
      col=c_dark, border=c_dark_highlight,
      xlim=c(-5, 5))
 abline(v=alpha, col=c_light, lty=1, lwd=3)
 
 beta_breaks=10 * (0:50) / 50 - 5
-hist(gauss_params$beta, main="", xlab="beta [log(k$) / log(cm)]", breaks=beta_breaks,
+hist(gauss_params$beta, main="", xlab="beta (k$ / cm)", breaks=beta_breaks,
      col=c_dark, border=c_dark_highlight,
      xlim=c(-5, 5))
 abline(v=beta, col=c_light, lty=1, lwd=3)
 
 sigma_breaks=5 * (0:50) / 50
-hist(gauss_params$sigma, main="", xlab="sigma [log(k$)]", breaks=sigma_breaks,
+hist(gauss_params$sigma, main="", xlab="sigma (k$)", breaks=sigma_breaks,
      col=c_dark, border=c_dark_highlight,
      xlim=c(0, 5))
 abline(v=sigma, col=c_light, lty=1, lwd=3)
@@ -290,21 +291,21 @@ par(mfrow=c(1, 3))
 
 alpha_breaks=20 * (0:50) / 50 - 10
 hist(cauchy_params$alpha[abs(cauchy_params$alpha) < 10],
-     main="", xlab="alpha [log(k$)]", breaks=alpha_breaks,
+     main="", xlab="alpha (k$)", breaks=alpha_breaks,
      col=c_dark, border=c_dark_highlight,
      xlim=c(-10, 10))
 abline(v=alpha, col=c_light, lty=1, lwd=3)
 
 beta_breaks=200 * (0:50) / 50 - 100
 hist(cauchy_params$beta[abs(cauchy_params$beta) < 100],
-     main="", xlab="beta [log(k$) / log(cm)]", breaks=beta_breaks,
+     main="", xlab="beta (k$ / cm)", breaks=beta_breaks,
      col=c_dark, border=c_dark_highlight,
      xlim=c(-100, 100))
 abline(v=beta, col=c_light, lty=1, lwd=3)
 
 sigma_breaks=25 * (0:50) / 50
 hist(cauchy_params$sigma[cauchy_params$sigma < 25],
-     main="", xlab="sigma [log(k$)]", breaks=sigma_breaks,
+     main="", xlab="sigma (k$)", breaks=sigma_breaks,
      col=c_dark, border=c_dark_highlight,
      xlim=c(0, 25))
 abline(v=sigma, col=c_light, lty=1, lwd=3)
@@ -320,7 +321,7 @@ cauchy_hist <- hist(cauchy_params$beta[abs(cauchy_params$beta) < 100],
 
 par(mar = c(4, 4, 0.5, 0.5))
 plot(cauchy_hist, col=c_light, border=c_light_highlight,
-     main="", xlab="beta [log(k$) / log(cm)]")
+     main="", xlab="beta (k$ / cm")
 plot(gauss_hist, col=c_dark, border=c_dark_highlight, add=T)
 legend("topright", c("Gauss", "Cauchy"), fill=c(c_dark, c_light), bty="n")
 ```
@@ -338,7 +339,7 @@ care in practice.
 
 The differing behavior of weakly-informative priors with different shapes
 becomes particularly striking when the scales are poorly-chosen, and the
-likelihood strongly favors parameter values above the scales.  
+likelihood strongly favors conflicting parameter values.
 
 To demonstrate this difference, let's simulate a larger data set where the
 true intercept is above the scale of our chosen units,
@@ -347,22 +348,87 @@ alpha <- 10    # k$
 beta <- -0.25 # k$ / cm
 sigma <- 1    # k$
 
-x <- runif(10, 0, 2)                    # cm
-y <- rnorm(10, beta * x + alpha, sigma) # k$
+N <- 10
+x <- runif(N, 0, 2)                    # cm
+y <- rnorm(N, beta * x + alpha, sigma) # k$
 
-stan_rdump(c("x", "y"), file="linear_regression.data.R")
+stan_rdump(c("N", "x", "y"), file="wrong_scale.data.R")
 ```
+
+How this tension between the weakly-informative prior and the likelihood
+manifests in the posterior is extremely sensitive to the exact shape of the
+weakly-informative prior.
 
 # The Failure Mode of Light Tails
 
-Poorly chosen Gaussian prior.  Keeps posterior within the bulk of the prior
-despite the tension with the data.
+Let's first consider the relatively light tail of a gaussian prior
+distribution,
+```{r, cache=TRUE}
+input_data <- read_rdump("wrong_scale.data.R")
+
+gauss_fit <- stan(file='regression_gauss_wi_prior.stan', data=input_data,
+                  iter=11000, warmup=1000, chains=1, seed=483892929)
+```
+
+The light tail strongly penalizes parameter values above the chosen scale,
+preventing the posterior from assigning any nontrivial probability mass to
+the more extreme values favored by the likelihood,
+```{r}
+gauss_params <- as.data.frame(extract(gauss_fit, permuted=FALSE))
+names(gauss_params) <- gsub("chain:1.", "", names(gauss_params), fixed = TRUE)
+
+alpha_breaks=20 * (0:100) / 100 - 10
+post_hist <- hist(gauss_params$alpha, breaks=alpha_breaks, plot=FALSE)
+prior_hist <- hist(rnorm(10000, 0, 1), breaks=alpha_breaks, plot=FALSE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(prior_hist, col=c_light, border=c_light_highlight,
+     main="", xlab="alpha (k$)")
+plot(post_hist, col=c_dark, border=c_dark_highlight, add=T)
+legend("topright", c("Posterior", "Prior"), fill=c(c_dark, c_light), bty="n")
+```
+
+Instead of contracting within the prior, the posterior ends up concentrating at
+the boundary of the bulk of the prior mass, a few standard deviations away from
+the prior mean.  This behavior is not immediately pathological and so
+practitioners must take care to verify that their posteriors are actually
+contracting and not accumulating near the tails of the prior.
 
 # The Failure Mode of Heavy Tails
 
-Poorly chosen Cauchy prior.  Allows posterior to leak out into the tails
-of the prior, more readily displaying the tension between the prior and
-the likelihood.
+The heavier tail of the Cauchy prior behaves very differently to a poorly-chosen
+scale distribution,
+```{r, cache=TRUE}
+input_data <- read_rdump("wrong_scale.data.R")
+
+cauchy_fit <- stan(file='regression_cauchy_wi_prior.stan', data=input_data,
+                  iter=11000, warmup=1000, chains=1, seed=483892929)
+```
+
+The light tail strongly penalizes parameter values above the chosen scale,
+preventing the posterior from assigning any nontrivial probability mass to
+the more extreme values favored by the likelihood,
+
+Heavier tail less regularization allows the posterior to leak into the tail
+of the prior,
+```{r}
+cauchy_params <- as.data.frame(extract(cauchy_fit, permuted=FALSE))
+names(cauchy_params) <- gsub("chain:1.", "", names(cauchy_params), fixed = TRUE)
+
+alpha_breaks=50 * (0:100) / 100 - 25
+post_hist <- hist(cauchy_params$alpha, breaks=alpha_breaks, plot=FALSE)
+prior_draws <- rcauchy(10000, 0, 1)
+prior_hist <- hist(prior_draws[abs(prior_draws) < 25], breaks=alpha_breaks, plot=FALSE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(prior_hist, col=c_light, border=c_light_highlight,
+     main="", xlab="alpha (k$)", ylim=c(0, 3000))
+plot(post_hist, col=c_dark, border=c_dark_highlight, add=T)
+legend("topright", c("Posterior", "Prior"), fill=c(c_dark, c_light), bty="n")
+```
+
+Again doesn't contract, but now the tension manifests in a much stronger
+pathology.
 
 # Discussion
 
