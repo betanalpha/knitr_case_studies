@@ -137,7 +137,9 @@ $(document).ready(function () {
 ## rstan_options(auto_write = TRUE)
 ## options(mc.cores = parallel::detectCores())</code></pre>
 <pre class="r"><code>rstan_options(auto_write = TRUE)</code></pre>
-<pre class="r"><code>alpha &lt;- 1    # k$
+<pre class="r"><code>set.seed(689934)
+
+alpha &lt;- 1    # k$
 beta &lt;- -0.25 # k$ / cm
 sigma &lt;- 1    # k$
 
@@ -533,6 +535,48 @@ Weakly informative priors are particularly well-suited to this task, identifying
 <p>Lighter tailed priors, such as a Gaussian distribution, induce strong regularization towards the chosen scales. If the scales are consistent with the measurements then this regularization yields well-behaved posteriors that facilitate statistical computation. If the scales are poorly-chosen, however, then the regularization biases the resulting inferences as would any poor assumption in the model.</p>
 <p>Heavier tailed priors induce weaker regularization which allows the posterior to assign significant probability mass above the chosen scale where the computation of the model may become slow or even unstable. On the other hand, the weaker regularization does not bias the model as strongly when the scales are inconsistent with the measurements.</p>
 <p>Because accurate and fast statistical computation is critical to any analysis, we in the Stan Development Team have come to favor the lighter tails of a weakly informative prior with a Gaussian shape as the most robust default. The scale of that prior then becomes another assumption that must be carefully analyzed in order the verify the accuracy of the resulting inferences.</p>
+</div>
+<div id="original-computing-environment" class="section level1">
+<h1>Original Computing Environment</h1>
+<pre class="r"><code>devtools::session_info(&quot;rstan&quot;)</code></pre>
+<pre><code>## Session info --------------------------------------------------------------</code></pre>
+<pre><code>##  setting  value                       
+##  version  R version 3.3.2 (2016-10-31)
+##  system   x86_64, darwin13.4.0        
+##  ui       X11                         
+##  language (EN)                        
+##  collate  en_US.UTF-8                 
+##  tz       America/New_York            
+##  date     2017-01-30</code></pre>
+<pre><code>## Packages ------------------------------------------------------------------</code></pre>
+<pre><code>##  package      * version   date       source        
+##  assertthat     0.1       2013-12-06 CRAN (R 3.3.0)
+##  BH             1.62.0-1  2016-11-19 CRAN (R 3.3.2)
+##  colorspace     1.3-2     2016-12-14 CRAN (R 3.3.2)
+##  dichromat      2.0-0     2013-01-24 CRAN (R 3.3.0)
+##  digest         0.6.11    2017-01-03 CRAN (R 3.3.2)
+##  ggplot2      * 2.2.1     2016-12-30 CRAN (R 3.3.2)
+##  gridExtra      2.2.1     2016-02-29 CRAN (R 3.3.0)
+##  gtable         0.2.0     2016-02-26 CRAN (R 3.3.0)
+##  inline         0.3.14    2015-04-13 CRAN (R 3.3.0)
+##  labeling       0.3       2014-08-23 CRAN (R 3.3.0)
+##  lattice        0.20-34   2016-09-06 CRAN (R 3.3.2)
+##  lazyeval       0.2.0     2016-06-12 CRAN (R 3.3.0)
+##  magrittr       1.5       2014-11-22 CRAN (R 3.3.0)
+##  MASS           7.3-45    2016-04-21 CRAN (R 3.3.2)
+##  Matrix         1.2-7.1   2016-09-01 CRAN (R 3.3.2)
+##  munsell        0.4.3     2016-02-13 CRAN (R 3.3.0)
+##  plyr           1.8.4     2016-06-08 CRAN (R 3.3.0)
+##  RColorBrewer   1.1-2     2014-12-07 CRAN (R 3.3.0)
+##  Rcpp           0.12.8    2016-11-17 CRAN (R 3.3.2)
+##  RcppEigen      0.3.2.9.0 2016-08-21 CRAN (R 3.3.0)
+##  reshape2       1.4.2     2016-10-22 CRAN (R 3.3.0)
+##  rstan        * 2.14.1    2016-12-28 CRAN (R 3.3.2)
+##  scales         0.4.1     2016-11-09 CRAN (R 3.3.2)
+##  StanHeaders  * 2.14.0-1  2017-01-09 CRAN (R 3.3.2)
+##  stringi        1.1.2     2016-10-01 CRAN (R 3.3.0)
+##  stringr        1.1.0     2016-08-19 CRAN (R 3.3.0)
+##  tibble         1.2       2016-08-26 CRAN (R 3.3.0)</code></pre>
 </div>
 
 

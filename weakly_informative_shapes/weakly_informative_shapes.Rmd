@@ -34,6 +34,8 @@ library(rstan)
 rstan_options(auto_write = TRUE)
 ```
 ```{r}
+set.seed(689934)
+
 alpha <- 1    # k$
 beta <- -0.25 # k$ / cm
 sigma <- 1    # k$
@@ -459,3 +461,9 @@ we in the Stan Development Team have come to favor the lighter tails of a
 weakly informative prior with a Gaussian shape as the most robust default.
 The scale of that prior then becomes another assumption that must be carefully
 analyzed in order the verify the accuracy of the resulting inferences.
+
+# Original Computing Environment
+
+```{r}
+devtools::session_info("rstan")
+```
