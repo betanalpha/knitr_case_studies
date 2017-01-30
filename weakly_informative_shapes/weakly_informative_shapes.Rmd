@@ -8,27 +8,27 @@ output:
     theme: cerulean
 ---
 
-Weakly-informed priors are a somewhat vague concept where the user identifies
-appropriate scales in a given analysis and uses those scales to introduce
-important regularization into the analysis.  Exactly how those scales are
-utilized, however, is ill-defined and the implementation of weakly-informative
-priors can consequently be quite ambiguous for practitioners.
+Weakly informative priors are an appealing modeling technique where the modeler
+identifies appropriate scales in a given analysis and uses those scales to
+introduce principled regularization into the analysis.  Exactly how those scales
+are utilized, however, is not explicitly defined.  Consequently the actual
+implementation of weakly informative priors can be ambiguous for practitioners.
 
 In this case study I will consider two approaches for implementing
-weakly-informative priors and demonstrate how the specific properties of each
+weakly informative priors and demonstrate how the specific properties of each
 effect the resulting analysis.  
 
-# Collinear Regression
+# Poorly Informed Regression
 
-Weakly-informative priors are especially critical when the inferences are
-impaired with non-identifiable likelihoods, such as a collinear regression.
-To that end, let's say that we are analyzing a small company and we want to
-model how much daily rainfall, $x$, affects daily income, $y$, using only
-a single datum.
+Weakly informative priors are especially critical when inferences are impaired
+with only weakly identifiable likelihoods, such those arising from models with
+sparse data.  To that end, let's say that we are analyzing a small company and
+we want to model how much daily rainfall, $x$, affects daily income, $y$, using
+only a few measurements.
 
 For this study we will simulate data assuming that the company typically makes
 a few thousand dollars, or kilodollars (k$), per day without any rain and that
-a heavy rainfall of a few centimeters per day can severely curtain our income,
+a heavy rainfall of a few centimeters per day can severely curtain income,
 ```{r}
 library(rstan)
 rstan_options(auto_write = TRUE)
@@ -38,16 +38,16 @@ alpha <- 1    # k$
 beta <- -0.25 # k$ / cm
 sigma <- 1    # k$
 
-N <- 1
+N <- 5
 x <- array(runif(N, 0, 2), dim=N)                    # cm
 y <- array(rnorm(N, beta * x + alpha, sigma), dim=N) # k$
 
-stan_rdump(c("N", "x", "y"), file="collinear_regression.data.R")
+stan_rdump(c("N", "x", "y"), file="weakly_informed_regression.data.R")
 ```
 
-Assuming that both rainfall and income are sufficiently large, we can ignore
-the fact that they are positive quantities and model their relationship with
-a linear regression,
+Assuming that the typical values of both rainfall and income are sufficiently
+large, we can ignore the fact that they are positive quantities and model their
+relationship with a linear regression,
 ```{r}
 writeLines(readLines("regression_no_prior.stan"))
 ```
@@ -55,19 +55,19 @@ writeLines(readLines("regression_no_prior.stan"))
 Let's fit this linear regression in Stan using a very long Markov chain to
 ensure precise quantification of our posterior distribution,
 ```{r, cache=TRUE}
-input_data <- read_rdump("collinear_regression.data.R")
+input_data <- read_rdump("weakly_informed_regression.data.R")
 
 fit <- stan(file='regression_no_prior.stan', data=input_data,
             iter=11000, warmup=1000, chains=1, seed=483892929)
 ```
 
-Unfortunately, this naive linear regression blows up,
+Unfortunately, the resulting posterior distribution is extremely diffuse
+and places significant probability on extreme parameter values,
 ```{r}
 print(fit)
 ```
 
-with the Markov chain meandering towards extreme values of the intercept
-and slope,
+The intercept and slope are particularly bad,
 ```{r}
 c_light <- c("#DCBCBC")
 c_light_highlight <- c("#C79999")
@@ -86,45 +86,47 @@ plot(params$alpha, params$beta, col=c_dark, pch=16, cex=0.8,
      ylab="beta (k$ / cm)")
 ```
 
-In hindsight this poor fit isn't unexpected.  With only a single data point
-the three-dimensional likelihood is non-identified, and with flat priors on all
-of our parameters the posterior becomes ill-posed.  If we want to regularize
-our inferences then we need to incorporate better prior information into our
-analysis.
+meandering far past the typically-positive values that we had assumed.
+
+In hindsight this awkward fit isn't unexpected.  The few data points only
+weakly inform the posterior which is then dominated by the flat priors.  If we
+want to regularize our inferences then we need to incorporate better prior
+information into our analysis.
 
 # Diffuse Does Not Mean Non-informative!
 
 Why is the prior information contained in a flat prior so useless in our
-collinear regression?  Although flat priors are often motivated as being
-"non-informative", they are actually very informative and pull the posterior
+weakly informed regression?  Although flat priors are often motivated as being
+"non-informative", they are actually quite informative and pull the posterior
 towards extreme values that can bias our inferences.
 
 To see this, consider a flat prior for the intercept, $\alpha$, and the
 question of how much prior probability mass is in the interval
 $-1 \le \alpha \le 1$.  Because we can't normalize the prior there is no
 well-defined answer, but we can at least consider the mass inside the interval
-relative to the mass outside of the interval which is, well, infinite!  Hence
+relative to the mass outside of the interval, which is, well, infinite!  Hence
 there is infinitely more prior mass that pulls inferences outside of the
 interval $-1 \le \alpha \le 1$.
 
 This logic, however, is exactly the same for the the interval
-$-10 \le \alpha \le 10$, the $-100 \le \alpha \le 100$, and in fact any
-finite interval.  The flat prior favors the exterior of the interval, pulling
-our posterior and any resulting inferences towards extreme values.
+$-10 \le \alpha \le 10$, the interval $-100 \le \alpha \le 100$, and in fact
+_any_ finite interval.  The flat prior favors the exterior of the any finite
+interval, pulling the posterior and any resulting inferences towards extreme
+values.
 
 Although it is tempting to blame this pathological behavior on the fact that
 flat priors are not well-defined probability distributions and hence cannot be
 normalized, the behavior is not unique to flat priors.  This bias towards
-extreme values is characteristic of any prior that is very diffuse and places
-significant probability mass at large values.  In practice, priors such as
-$\alpha \sim U(-1000, 1000)$ and $\alpha \sim \mathcal{N}(0, 1000)$ can
-bias our inferences as strongly as a flat prior.
+extreme values is characteristic of any prior that is extremely diffuse and
+places significant probability mass at large values.  In practice, priors such
+as $\alpha \sim U(-1000, 1000)$ and $\alpha \sim \mathcal{N}(0, 1000)$ can
+bias our inferences just as strongly as a flat prior.
 
 The real issue is that these diffuse priors are _incoherent_ with our actual
 prior beliefs.  For example, basic physical and economic constraints limit the
-reasonable values of our parameters, and besides our linear model isn't even
-valid for negative parameter values.  Diffuse priors pull the posterior towards
-these extreme values, conflicting with even the most basic prior information.
+reasonable values of our parameters, and the linear model isn't even valid for
+negative parameter values!  Diffuse priors pull the posterior towards these
+extreme values, conflicting with even the most basic prior information.
 
 Ultimately the misconception about diffuse priors being non-informative comes
 from reasoning about priors _relative_ to the likelihood.  Because diffuse
@@ -140,85 +142,86 @@ likelihood, the more informative diffuse priors will be.  If we want to make
 reasonable inferences in these models then we need better prior distributions
 that are actually coherent with our prior beliefs.
 
-# Weakly-Informative Priors
+# Weakly Informative Priors
 
-Weakly-informative priors introduce _scale_ information to regularize
+Weakly informative priors introduce _scale_ information to regularize
 inferences.  Scales are straightforward to reason about in applied problems,
 especially when units are carefully laid out, and they provide just enough
 information to regularize non-identified or weakly-identified likelihoods
 without strongly biasing the inferences to a narrow region of parameter space.
-In order to construct weakly-informative priors we need to first decompose
+In order to construct weakly informative priors we need to first decompose
 our model configuration space, define default values, identify scales, then
 choose an explicit shape for our prior.
 
-Before we can reason about scales we need to decompose our model configuration
-space into components.  In other words, we need to find a parameterization of
-our model configuration space where the parameters are particularly meaningful.  
-For example, the parameterization we have used in our linear regression is
-ideal as the intercept, slope, and measurement variability have intuitive
-interpretations.  The intercept, $\alpha$, determines the base income without
-any rainfall, the slope, $\beta$, controls how a change in rainfall affects
-income, and the measurement variation, $\sigma$, quantifies the natural
-variability of daily income.
+Before we can reason about the scales themselves, we need to decompose our model
+configuration space into interpretable components.  In other words, we need to
+find a parameterization of our model configuration space where the parameters
+are particularly meaningful.  For example, the parameterization we have used in
+our linear regression is ideal as the intercept, slope, and measurement
+variability have intuitive interpretations: the intercept, $\alpha$, determines
+the base income without any rainfall, the slope, $\beta$, controls how a change
+in rainfall affects income, and the measurement variation, $\sigma$, quantifies
+the natural variability of daily income.
 
 Next we need to modify this initial parameterization such that zero becomes
 a reasonable default for our model.  This might require, for example, inverting
-the individual parameters, if in the initial parameterization infinity is a more
+the individual parameters if in the initial parameterization infinity is a more
 natural default than zero.  The parameterization of our linear regression is
 again already well-suited as a vanishing intercept, slope, or measurement
 variability corresponds to a trivial system with no income or weather
 interactions.
 
 Once we have identified the appropriate parameterization we can determine
-the scales coherent with our prior knowledge of the system.  Each scale softly
+the scales coherent with our prior knowledge of the system.  Each scale
 partitions the parameters into extreme values above and reasonable values below.
 Perhaps the most straightforward way to reason about scales is to identify the
 units that one would use to describe the system of interest before the
 measurement.  If we are building an experiment to study nanoscale effects then
-we wouldn't use kiloscale units, right?  Well we also wouldn't put any
+we wouldn't use kiloscale units, right?  Well we also wouldn't want to put any
 significant prior probability on kiloscale effect sizes.  In practice it is
 easier to make one last reparameterization into these natural units so that
-all of our scales are around unity.
+all of our scales are of order unity.
 
-Finally we complete the specification of a weakly-informative prior by
-complementing the scales with a shape to determine a probability distribution.
-If we define the scale as $\delta$, then we could for example, take a uniform
-distribution, $$\theta \sim U (-\delta, \delta),$$
-but such an extreme cutoff removes not only extreme values far above the scale
+Finally we complete the specification of a weakly informative prior by
+complementing the scales with a shape to determine an explicit probability
+distribution.  If we define the scale as $\delta$, then we could for example,
+take a uniform distribution, $$\theta \sim U (-\delta, \delta),$$.  Such an
+extreme cutoff, however, removes not only extreme values far above the scale
 but also the reasonable values just above the scale.  What we really want is a
 shape that softly concentrates below the scale, such as a normal distribution,
 $$\theta \sim \mathcal{N}(0, \delta),$$
 a Cauchy distribution,
 $$\theta \sim \mathrm{Cauchy}(0, \delta),$$
 or even a Student-t distribution interpolating between the two.  If the
-parameter of interest is positive then we typically truncate these distributions
+parameter of interest is positive then we can  truncate these distributions
 at zero.
 
 If we have chosen appropriate units then the scales reduce to unity and all of
-our weakly-informative priors take a form like $\theta \sim \mathcal{N}(0, 1)$
+our weakly informative priors take a form like $\theta \sim \mathcal{N}(0, 1)$
 or $\theta \sim \mathrm{Cauchy}(0, 1)$.  It is important to note however, that
-these unit-scale priors alone do specify a weakly-informative priors!  _They are
-weakly-informative only when our parameters have appropriate units._
+these unit-scale priors alone do specify a weakly informative priors!  _They are
+weakly informative only when our parameters have appropriate units._
 
 In any case, all of these distributions strongly favor values within a few
 factors of the scale while disfavoring those values much further away.  Although
 there is recent work being done to develop formal criteria for selecting the
-exact shape of the prior distribution, we will instead consider the exact shape
-of a weakly-informative prior qualitatively affects the resulting inferences.
+exact shape of the prior distribution, here we will consider only how the exact
+shape of a weakly informative prior qualitatively affects the resulting
+inferences.
 
-# Weakly-informative Priors Under Well-Chosen Scales
+# Weakly Informative Priors Under Well-Chosen Scales
 
-When the scales are well-chosen all weakly-informative priors behave similarly,
+When the scales are well-chosen all weakly informative priors behave similarly,
 regularizing the posterior by penalizing extreme parameter values.  The exact
-shape of a weakly-informative prior, however, does introduce some important
+shape of a weakly informative prior, however, does introduce some important
 differences in how strong that regularization is.
 
-# Light-Tailed Weakly Informed Priors
+# Light-Tailed Weakly Informative Priors
 
-Let's first consider a relatively light-tailed weakly-informative prior that
-utilizes gaussian and half-gaussian distributions.  Because we simulated the
-data already in natural units, the weakly-informative priors are given simply
-by unit-scale gaussians,
+Let's first consider a relatively light-tailed weakly informative prior that
+utilizes Gaussian and half-Gaussian distributions.  Because we simulated the
+data already in natural units, the weakly informative priors are given simply
+by unit-scale Gaussians,
 ```{r}
 writeLines(readLines("regression_gauss_wi_prior.stan"))
 ```
@@ -259,12 +262,12 @@ hist(gauss_params$sigma, main="", xlab="sigma (k$)", breaks=sigma_breaks,
 abline(v=sigma, col=c_light, lty=1, lwd=3)
 ```
 
-Given that we simulated so little data, our posterior is in fact dominated by
-the weakly-informative priors.  Because these priors were chosen to be coherent
+Given that we simulated so little data, the posterior is strongly affected by
+the weakly informative priors.  Because these priors were chosen to be coherent
 with our prior information, however, even a prior-dominated posterior yields
 reasonable inferences!
 
-# Heavy-Tailed Weakly Informed Priors
+# Heavy-Tailed Weakly Informative Priors
 
 To contrast, let's now consider the more heavily-tailed priors given by
 Cauchy and half-Cauchy distributions.  Once again our prescient choice of units
@@ -277,7 +280,7 @@ cauchy_fit <- stan(file='regression_cauchy_wi_prior.stan', data=input_data,
                   iter=11000, warmup=1000, chains=1, seed=483892929)
 ```
 
-and once again the weakly-informative prior sufficiently regularizes our
+and once again the weakly informative prior adequately regularizes our
 inferences,
 ```{r}
 print(cauchy_fit)
@@ -296,11 +299,11 @@ hist(cauchy_params$alpha[abs(cauchy_params$alpha) < 10],
      xlim=c(-10, 10))
 abline(v=alpha, col=c_light, lty=1, lwd=3)
 
-beta_breaks=200 * (0:50) / 50 - 100
-hist(cauchy_params$beta[abs(cauchy_params$beta) < 100],
+beta_breaks=20 * (0:50) / 50 - 10
+hist(cauchy_params$beta[abs(cauchy_params$beta) < 10],
      main="", xlab="beta (k$ / cm)", breaks=beta_breaks,
      col=c_dark, border=c_dark_highlight,
-     xlim=c(-100, 100))
+     xlim=c(-10, 10))
 abline(v=beta, col=c_light, lty=1, lwd=3)
 
 sigma_breaks=25 * (0:50) / 50
@@ -311,12 +314,12 @@ hist(cauchy_params$sigma[cauchy_params$sigma < 25],
 abline(v=sigma, col=c_light, lty=1, lwd=3)
 ```
 
-Relative to the gaussian prior, however, the Cauchy prior places a nontrivial
+Relative to the Gaussian prior, however, the Cauchy prior places a nontrivial
 amount of posterior mass into the tails, far above the given scale,
 ```{r}
-beta_breaks=200 * (0:100) / 100 - 100
+beta_breaks=20 * (0:100) / 100 - 10
 gauss_hist <- hist(gauss_params$beta, breaks=beta_breaks, plot=FALSE)
-cauchy_hist <- hist(cauchy_params$beta[abs(cauchy_params$beta) < 100],
+cauchy_hist <- hist(cauchy_params$beta[abs(cauchy_params$beta) < 10],
                     breaks=beta_breaks, plot=FALSE)
 
 par(mar = c(4, 4, 0.5, 0.5))
@@ -328,18 +331,18 @@ legend("topright", c("Gauss", "Cauchy"), fill=c(c_dark, c_light), bty="n")
 
 This weaker regularization can seriously impact computational performance,
 especially in models that utilize special functions that become difficult or
-impossible to compute for extreme inputs, such as ODE solvers or gaussian
-processes.  Although the Cauchy prior forces most of the posterior within the
-specified scale, the heavy tail allows for the occasional extreme value that
-stresses the special functions and drastically hinder computational performance.
-Consequently, heavy-tailed weakly-informative priors must be employed with
-care in practice.
+impossible to compute for extreme inputs, such as ODE solvers or Gaussian
+process densities.  Although the Cauchy prior forces most of the posterior
+within the specified scale, the heavy tail allows for the occasional extreme
+value that stresses the evaluation of the special functions and can drastically
+hinder computational performance.  Consequently, heavy-tailed weakly informative
+priors must be employed with care in practice.
 
-# Weakly-informative Priors Under Poorly-Chosen Scales
+# Weakly Informative Priors Under Poorly-Chosen Scales
 
-The differing behavior of weakly-informative priors with different shapes
+The differing behavior of weakly informative priors with different shapes
 becomes particularly striking when the scales are poorly-chosen, and the
-likelihood strongly favors conflicting parameter values.
+likelihood strongly favors parameter values that conflict with the priors.
 
 To demonstrate this difference, let's simulate a larger data set where the
 true intercept is above the scale of our chosen units,
@@ -355,13 +358,13 @@ y <- rnorm(N, beta * x + alpha, sigma) # k$
 stan_rdump(c("N", "x", "y"), file="wrong_scale.data.R")
 ```
 
-How this tension between the weakly-informative prior and the likelihood
+How this tension between the weakly informative prior and the likelihood
 manifests in the posterior is extremely sensitive to the exact shape of the
-weakly-informative prior.
+weakly informative prior.
 
 # The Failure Mode of Light Tails
 
-Let's first consider the relatively light tail of a gaussian prior
+Let's first consider the relatively light tail of a Gaussian prior
 distribution,
 ```{r, cache=TRUE}
 input_data <- read_rdump("wrong_scale.data.R")
@@ -389,15 +392,15 @@ legend("topright", c("Posterior", "Prior"), fill=c(c_dark, c_light), bty="n")
 ```
 
 Instead of contracting within the prior, the posterior ends up concentrating at
-the boundary of the bulk of the prior mass, a few standard deviations away from
-the prior mean.  This behavior is not immediately pathological and so
-practitioners must take care to verify that their posteriors are actually
-contracting and not accumulating near the tails of the prior.
+the boundary of the bulk of the prior, a few standard deviations away from zero.  
+This behavior may not be obviously pathological and so practitioners must take
+care to verify that their posteriors are actually contracting and not
+accumulating near the tails of the prior.
 
 # The Failure Mode of Heavy Tails
 
-The heavier tail of the Cauchy prior behaves very differently to a poorly-chosen
-scale distribution,
+The heavier tail of the Cauchy prior responds very differently to a
+poorly-chosen scale,
 ```{r, cache=TRUE}
 input_data <- read_rdump("wrong_scale.data.R")
 
@@ -405,12 +408,8 @@ cauchy_fit <- stan(file='regression_cauchy_wi_prior.stan', data=input_data,
                   iter=11000, warmup=1000, chains=1, seed=483892929)
 ```
 
-The light tail strongly penalizes parameter values above the chosen scale,
-preventing the posterior from assigning any nontrivial probability mass to
-the more extreme values favored by the likelihood,
-
-Heavier tail less regularization allows the posterior to leak into the tail
-of the prior,
+With much heavier tails, the Cauchy prior allows the posterior to leak past
+the chosen scale and concentrate around the true value,
 ```{r}
 cauchy_params <- as.data.frame(extract(cauchy_fit, permuted=FALSE))
 names(cauchy_params) <- gsub("chain:1.", "", names(cauchy_params), fixed = TRUE)
@@ -424,21 +423,39 @@ par(mar = c(4, 4, 0.5, 0.5))
 plot(prior_hist, col=c_light, border=c_light_highlight,
      main="", xlab="alpha (k$)", ylim=c(0, 3000))
 plot(post_hist, col=c_dark, border=c_dark_highlight, add=T)
+abline(v=alpha, col=c_light, lty=1, lwd=3)
 legend("topright", c("Posterior", "Prior"), fill=c(c_dark, c_light), bty="n")
 ```
 
-Again doesn't contract, but now the tension manifests in a much stronger
-pathology.
+Not only does the weaker regularization allow the posterior to concentrate
+around the true value, the tension between the prior and the likelihood becomes
+much easier to visually and quantitatively identify.  Careful analysis is still
+recommended, but less critical.
 
 # Discussion
 
-An important consequence of the exact shape of a weakly informative prior is
-the behavior when the chosen scale conflicts with the data.  The tension is much
-easier to see in heavy tailed priors, but those priors also allow the posterior
-to explore lots of extreme values even when the scale is well-chosen.
+When building sophisticated models, principled priors that quantify principled
+prior information are critical to ensuring reasonable inferences.  
+Weakly informative priors are particularly well-suited to this task,
+identifying natural scales in the problem to regularize the information
+extracted from the likelihood.  The exact shape of those priors, however, has
+important practical consequences.
 
-There is no unambiguous superior option.  Lighter tails are often useful for
-complex models where sojourns into the tails requires huge amounts of computation
-to evaluate the likelihood, although care must be taken when verifying the validity
-of the chosen scale.  Heavy tailed priors are easier to validate but are best
-when the likelihood is well-behaved even out in the tails.
+Lighter tailed priors, such as a Gaussian distribution, induce strong
+regularization towards the chosen scales.  If the scales are consistent with the
+measurements then this regularization yields well-behaved posteriors that
+facilitate statistical computation.  If the scales are poorly-chosen, however,
+then the regularization biases the resulting inferences as would any poor
+assumption in the model.  
+
+Heavier tailed priors induce weaker regularization which allows the posterior
+to assign significant probability mass above the chosen scale where the
+computation of the model may become slow or even unstable.  On the other hand,
+the weaker regularization does not bias the model as strongly when the scales
+are inconsistent with the measurements.  
+
+Because accurate and fast statistical computation is critical to any analysis,
+we in the Stan Development Team have come to favor the lighter tails of a
+weakly informative prior with a Gaussian shape as the most robust default.
+The scale of that prior then becomes another assumption that must be carefully
+analyzed in order the verify the accuracy of the resulting inferences.
