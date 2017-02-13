@@ -366,8 +366,7 @@ f (\beta_{\sigma^{-1}(1)}, \ldots, \beta_{\sigma^{-1}(N)}) \cdot
 \pi (\lambda_{\sigma^{-1}(1)}, \ldots, \lambda_{\sigma^{-1}(N)}),
 \end{align*}
 $$
-and then we exploit the permutation-invariance of the function of the integrand
-to give,
+and then we exploit the permutation-invariance of the integrand to give
 $$
 \begin{align*}
 \mathbb{E}_{\pi} [ f ]
@@ -404,6 +403,7 @@ N! \sum_{n = 1}^{N} \theta_n \, \pi (\alpha_n) \cdot
 f (\alpha_1, \ldots, \alpha_N) \cdot
 \pi' (\alpha_1, \ldots, \alpha_N, \theta_1, \ldots, \theta_N).
 \end{align*}
+$$
 
 Once again
 $$
@@ -473,11 +473,11 @@ To illustrate the pathologies of Bayesian mixture models, and their potential
 resolutions, let's consider a relatively simple example where the likelihood
 is given by a mixture of two Gaussians,
 $$
-\pi(y_1, \ldots, y_N \mid \mu_1, \sigma1, \mu_2, \sigma2, \theta_1, \theta_2)
+\pi(y_1, \ldots, y_N \mid \mu_1, \sigma_1, \mu_2, \sigma_2, \theta_1, \theta_2)
 =
-sum_{n = 1}^{N}
+\sum_{n = 1}^{N}
 \theta_1 \mathcal{N} (y_n \mid \mu_1, \sigma_1)
-+ \theta_2 \mathcal{N} (y_n \mid mu_2, \sigma_2).
++ \theta_2 \mathcal{N} (y_n \mid \mu_2, \sigma_2).
 $$
 Note that the mixture is applied to each datum individually -- our model assumes
 that each measurement is drawn from one of the components independently as
@@ -722,7 +722,10 @@ stan_rdump(c("N", "y"), file="collapse_mix.data.R")
 ```
 
 Before fitting the joint model over the component parameters and the mixture
-weights, let's try to fix conditioned on a single mixture weight,
+weights, let's try to fix conditioned on a single mixture weight.  Note that we
+will be using just a single chain in this section as the posteriors will all be
+unimodal, but in practice one should always multiple chains to enhance
+diagnostic power.
 ```{r, cache=TRUE}
 theta <- 0.25
 stan_rdump(c("N", "y", "theta"), file="collapse_mix.data.R")
@@ -787,7 +790,7 @@ These conditional posteriors are not ideal, but they can be adequately fit with
 the state-of-the-art samplers in Stan.  Unfortunately, when we try to fit the
 mixture weight jointly with the component parameters the conditional pathologies
 aggregate into something worse.
-```{r}
+```{r, cache=TRUE}
 singular_fit <- stan(file='gauss_mix.stan', data=input_data,
                  chains=1, iter=11000, warmup=1000, seed=483892929)
 ```
@@ -827,11 +830,27 @@ bias it -- there are no divergences or other failing diagnostics,
 ```{r}
 sum(get_sampler_params(singular_fit, inc_warmup=FALSE)[[1]][,'divergent__'])
 ```
-Still, care must be taken in practice to ensure that the posterior geometry does
-not become too pathologic for Stan to accurately fit.
+Consequently we can easily overcome the slower exploration by running longer
+or, even better, running multiple chains.  Still, care must be taken in practice
+to ensure that the posterior geometry does not become too pathologic for Stan to
+accurately fit.
 
-In order to avoid the bowtie geometry entirely we need to ensure that the
-components are sufficiently separated.  If this such separation is not induced
+Moreover, imposing a parameter ordering simply cuts the bowtie in half,
+maintaining the potentially pathological geometry,
+```{r, , cache=TRUE}
+singular_fit <- stan(file='gauss_mix_ordered_prior.stan', data=input_data,
+                 chains=1, iter=11000, warmup=1000, seed=483892929)
+
+params1 <- as.data.frame(extract(singular_fit, permuted=FALSE)[,1,])
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params1$"mu[1]", params1$"mu[2]", col=c_dark_highlight, pch=16, cex=0.8,
+     xlab="mu1", xlim=c(-3, 3), ylab="mu2", ylim=c(-3, 3))
+lines(0.08*(1:100) - 4, 0.08*(1:100) - 4, col="grey", lw=2)
+```
+
+In order to avoid the bowtie geometry entirely we would need to ensure that the
+components are sufficiently separated.  If this separation is not induced
 by the likelihood then it could be enforced with a prescient choice of prior,
 in particular one that "repels" the components from each other without
 sacrificing permutation-invariance.  The development of such repulsive priors
