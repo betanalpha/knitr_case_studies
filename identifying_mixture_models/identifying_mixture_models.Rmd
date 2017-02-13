@@ -1,59 +1,867 @@
 ---
 title: "Identifying Mixture Models"
 author: "Michael Betancourt"
-date: "January 2017"
+date: "February 2017"
 output:
   html_document:
     fig_caption: yes
     theme: cerulean
 ---
 
-Mixture models suffer from combinatorical degeneracies which complicates
-inferential computation.  In order to avoid serious challenges we have to
-identify the model with strong prior information.
+Mixture modeling is a powerful modeling technique that integrates multiple data
+generating processes together.  Unfortunately mixture models inherently suffer
+from combinatorical non-identifiabilities that frustrate accurate computation,
+even in relatively simple implementations.  In order to utilize mixture models
+reliably in practice we need to complement them with strong and principled prior
+information.  
 
-# Label Switching
+# Label Degeneracies
 
-Mixture likelihood.
+A general mixture model takes the form of a weighted sum over component
+probability distributions,
+$$
+\pi (\alpha_1, \ldots, \alpha_N \mid \theta_1, \ldots, \theta_N) =
+\sum_{n = 1}^{N} \theta_{n} \pi_{n} (\alpha_{n}),
+$$
+where the mixture weights, $\theta_1, \ldots, \theta_N$, form an $N$-dimensional
+simplex satisfying
+$$ 0 \le \theta_{n} \le 1, \, \sum_{n = 1}^{N} \theta_{n} = 1,$$  
+and each component distribution features its own distinct parameters. Typically
+we do not know the mixture weights exactly, in which case we consider the joint
+model,
+$$
+\begin{align*}
+\pi(\alpha_1, \ldots, \alpha_N, \theta_1, \ldots, \theta_N)
+&=
+\pi (\alpha_1, \ldots, \alpha_N \mid \theta_1, \ldots, \theta_N) \,
+\pi(\theta_1, \ldots, \theta_N)
+\\
+&= \sum_{n = 1}^{N} \theta_{n} \, \pi_{n}(\alpha_{n})
+   \cdot \pi(\theta_1, \ldots, \theta_N).
+\end{align*}
+$$
 
-Invariance under relabeling of the mixture components.
+When the individual component distributions $\pi_{n} (\alpha_{n})$ are distinct,
+the unique characteristics of each informs the corresponding parameters
+$\alpha_{n}$ independently and the mixture is straightforward to fit.
+Circumstances become much more dire, however, when the components are identical,
+$\pi_{n} (\alpha_{n}) = \pi (\alpha_{n})$.  In this case there is a fundamental
+ambiguity as to which parameters $\alpha_{n}$ are associated with each component
+in the mixture.
 
-Computational consequences.  Multimodal posterior difficult to sample,
-although predictive distribution is the same for any of the modes.
+Formally, let $\sigma$ denote a permutation of the indices in our mixture,
+$$
+(1, \ldots, N)
+\rightarrow
+( \sigma(1), \ldots, \sigma(N)).
+$$
+When the component distributions are identical and the distribution over the
+simplex is invariant to permutations of the indices,
+$$
+\pi(\theta_1, \ldots, \theta_N) =
+\pi(\theta_{\sigma(1)}, \ldots, \theta_{\sigma(N)}),
+$$
+then the joint distribution will also be is invariant to permutations of the
+indices,
+$$
+\begin{align*}
+\pi(\alpha_{\sigma(1)}, \ldots, \alpha_{\sigma(N)},
+    \theta_{\sigma(1)}, \ldots, \theta_{\sigma(N)})
+&= \sum_{n = 1}^{N} \theta_{\sigma(n)} \,
+   \pi(\alpha_{\sigma(n)})
+   \cdot \pi(\theta_{\sigma(1)}, \ldots, \theta_{\sigma(N)})
+\\
+&= \sum_{n' = 1}^{N} \theta_{n'} \, \pi(\alpha_{n'})
+   \cdot \pi(\theta_{\sigma(1)}, \ldots, \theta_{\sigma(N)})
+   \\
+&= \sum_{n' = 1}^{N} \theta_{n'} \, \pi(\alpha_{n'})
+   \cdot \pi(\theta_1, \ldots, \theta_N)
+\\
+&= \pi(\alpha_1, \ldots, \alpha_N, \theta_1, \ldots, \theta_N).
+\end{align*}
+$$
+In other words, the model is the same regardless of how we label the mixture
+components with explicit indices.
 
-# Prior Identification
+Because of this labeling degeneracy, or non-identifiability, the joint
+distribution will be multimodal with a mode for each of the possible labelings.
+For a mixture with $N$ identical components there are $N!$ possible labelings
+and hence any degenerate mixture model will exhibit at least $N!$ modes.
 
-Strong prior information to isolate each component to specific regions
-of parameter space.  Useful when each component is meant to serve a
-particular purpose.
+Consequently, even for a relatively small number of components the joint
+distribution will have too many modes for any statistical algorithm to
+accurately quantify.  For example, if we applied Markov chain Monte Carlo then
+any chain will be able to explore one of the modes but it will not be able to
+transition _between_ the modes, at least not within in any finite running time.
 
-Otherwise, if any additional prior information is symmetric with respect
-to the labels then we identify a unique labeling by ordering the components.
+# Identifying Degenerate Mixtures
 
-Invariance of predictive distribution.
+The nature of these degeneracies, however, immediately suggests that it might be
+possible to avoid this multimodality entirely.  In particular, if the model
+can't discriminate between labelings then shouldn't our inferences also not be
+able to discriminate between them?  And if our inferences are invariant to the
+labeling then we should be able to ignore all of the degenerate labelings and
+compute our inferences with just one distinguished label.
 
-# A Gaussian Mixture Models
+Indeed this intuition is correct, although actually distinguishing one label to
+the neglect of the others is a nontrivial technical challenge.  In this section
+we'll investigate the geometry of labelings and show how it naturally motivates
+a means of isolating a single labeling and removing the labeling degeneracy,
+and the multimodality it induces, entirely.
 
-Inherent symmetry of likelihood and priors.
+## The Geometry of Labelings
 
-Models and fits with and without ordering.
+Recall that a labeling is characterized by the assignment of indices to the
+components in our mixture.  Permuting the indices yields a new set of indices
+and hence a new labeling of our mixture model.  Consequently a natural way to
+distinguish the labelings is to a choose a standard set of indices,
+$\alpha_1, \ldots, \alpha_N$, and tag each labeling with the permutation that
+maps to the correct indices, $\alpha_{\sigma(1)}, \ldots, \alpha_{\sigma(N)}$.
+The standard indices are themselves tagged with the identity permutation.
 
-# Additional Challenges For Adjacent Components
+In general it is difficult to classify these permutations, but when the
+component parameters, $\alpha_n$, are scalar then we can exploit their unique
+_ordering_ to identify permutations and hence labelings.  For example, if we
+choose the standard labeling such that the parameter values are ordered,
+$\alpha_1 \le  \ldots \le \alpha_N$, then any permutation will yield a new
+ordering of the parameters,
+$\alpha_{\sigma(1)} \le \ldots \le \alpha_{\sigma(N)}$.  In other words, the
+ordering of the scalar parameters identifies each labeling.
 
-Problems arise in either case when any of the components are similar according
-to the posterior.  In this case we get a bowtie that is very hard to sample,
-especially in the corners.
+This identification also has a welcome geometric interpretation.  The region of
+parameter space satisfying a given ordering constraint, such as
+$\alpha_1 \le  \ldots \le \alpha_N$, defines a square pyramid with an apex
+point at zero.  The $N$-dimensional parameter space neatly decomposes into $N!$
+of these pyramids, each with a distinct ordering and hence association with a
+distinct labeling.  
+
+Our degenerate mixture model _aliases_ across each of these pyramids in
+parameter space.  In other words, if we were given the mixture distribution
+restricted to one of these pyramids then we could reconstruct the entire mixture
+distribution by simply rotating that restricted distribution into each of the
+other $N! - 1$ pyramids; as we do this we also map the bulk of the restricted
+distribution into each pyramid, creating exactly the expected $N!$
+multimodality.  By construction those rotations are exactly given by permuting
+the parameter indices and reordering the corresponding parameter values.  
+
+By this same logic, however, we should be able to reduce inferences over our
+degenerate mixture model to inferences restricted to one of these pyramids.
+Moreover, that restriction can be immediately satisfied by enforcing a
+particular ordering of the scalar parameter values.
+
+## Fitting with Parameter Ordering
+
+In probability theory all inferences are given by expectations of certain
+functions with respect to our given model.  Consequently, if we want to show
+that our inferences can be recovered from those with an enforced ordering then
+we have to show that we can recover the corresponding expectation values.  To
+do this we will make one final assumption and consider expectations of only
+those functions, $f$, that are themselves invariant to the given labeling,
+$$
+f(\alpha_1, \ldots, \alpha_N) =
+f(\alpha_{\sigma(1)}, \ldots, \alpha_{\sigma(N)}).
+$$
+
+Here we will first demonstrate that we can recover inferences from an ordered
+fit in two dimensions to outline the necessary strategy before moving onto
+the general case.
+
+### Two-Dimensional Case
+
+In the two-component case we have two parameters, $\alpha_1$ and $\alpha_2$,
+and two mixture weights, $\theta_1$ and $\theta_2 = 1 - \theta_1$.
+
+We begin with the desired expectation and decompose it over the two pyramids
+that arise in the two-dimensional parameter space,
+$$
+\begin{align*}
+\mathbb{E}_{\pi} [ f ]
+&=
+\int \mathrm{d} \theta_1 \mathrm{d} \theta_2
+     \mathrm{d} \alpha_1 \mathrm{d} \alpha_2 \cdot
+f (\alpha_1, \alpha_2) \cdot
+( \theta_1 \pi (\alpha_1) + \theta_2 \pi (\alpha_2) ) \,
+\pi (\theta_1 ,\theta_2)
+\\
+&= \quad
+\int_{\alpha_1 < \alpha_2} \mathrm{d} \theta_1 \mathrm{d} \theta_2
+     \mathrm{d} \alpha_1 \mathrm{d} \alpha_2 \cdot
+f (\alpha_1, \alpha_2) \cdot
+( \theta_1 \pi (\alpha_1) + \theta_2 \pi (\alpha_2) ) \,
+\pi (\theta_1 ,\theta_2)
+\\
+&\quad +
+\int_{\alpha_2 < \alpha_1} \mathrm{d} \theta_1 \mathrm{d} \theta_2
+     \mathrm{d} \alpha_1 \mathrm{d} \alpha_2 \cdot
+f (\alpha_1, \alpha_2) \cdot
+( \theta_1 \pi (\alpha_1) + \theta_2 \pi (\alpha_2) ) \,
+\pi (\theta_1 ,\theta_2).
+\end{align*}
+$$
+
+We want to manipulate the second term into something that looks like the
+first, which we can accomplish with a reording of the parameters,
+$(\alpha_1, \alpha_2) \rightarrow (\beta_2, \beta_1)$ and
+$(\theta_1, \theta_2) \rightarrow (\lambda_2, \lambda_1)$, that rotates the
+second pyramid into the first.  This gives
+$$
+\begin{align*}
+\mathbb{E}_{\pi} [ f ]
+&= \quad
+\int_{\alpha_1 < \alpha_2} \mathrm{d} \theta_1 \mathrm{d} \theta_2
+    \mathrm{d} \alpha_1 \mathrm{d} \alpha_2 \cdot
+f (\alpha_1, \alpha_2) \cdot
+( \theta_1 \pi (\alpha_1) + \theta_2 \pi (\alpha_2) ) \,
+\pi (\theta_1 ,\theta_2)
+\\
+&\quad +
+\int_{\beta_1 < \beta_2} \mathrm{d} \lambda_2 \mathrm{d} \lambda_1
+    \mathrm{d} \beta_2 \mathrm{d} \beta_1 \cdot
+f (\beta_2, \beta_1) \cdot
+( \lambda_2 \pi (\beta_2) + \lambda_1 \pi (\beta_1) ) \,
+\pi (\lambda_2 ,\lambda_1)
+\\
+&= \quad
+\int_{\alpha_1 < \alpha_2} \mathrm{d} \theta_1 \mathrm{d} \theta_2
+    \mathrm{d} \alpha_1 \mathrm{d} \alpha_2 \cdot
+f (\alpha_1, \alpha_2) \cdot
+( \theta_1 \pi (\alpha_1) + \theta_2 \pi (\alpha_2) ) \,
+\pi (\theta_1 ,\theta_2)
+\\
+&\quad +
+\int_{\beta_1 < \beta_2} \mathrm{d} \lambda_1 \mathrm{d} \lambda_2
+    \mathrm{d} \beta_1 \mathrm{d} \beta_2 \cdot
+f (\beta_2, \beta_1) \cdot
+(  \lambda_1 \pi (\beta_1) + \lambda_2 \pi (\beta_2) ) \,
+\pi (\lambda_2 ,\lambda_1).
+\end{align*}
+$$
+
+Now we exploit the permutation-invariance of $f$ and
+$\pi(\theta_1, \ldots, \theta_n)$ to massage the second term to be equivalent
+to the first,
+$$
+\begin{align*}
+\mathbb{E}_{\pi} [ f ]
+&= \quad
+\int_{\alpha_1 < \alpha_2} \mathrm{d} \theta_1 \mathrm{d} \theta_2
+    \mathrm{d} \alpha_1 \mathrm{d} \alpha_2 \cdot
+f (\alpha_1, \alpha_2) \cdot
+( \theta_1 \pi (\alpha_1) + \theta_2 \pi (\alpha_2) ) \,
+\pi (\theta_1 ,\theta_2)
+\\
+&\quad +
+\int_{\beta_1 < \beta_2} \mathrm{d} \lambda_1 \mathrm{d} \lambda_2
+    \mathrm{d} \beta_1 \mathrm{d} \beta_2 \cdot
+f (\beta_1, \beta_2) \cdot
+(  \lambda_1 \pi (\beta_1) + \lambda_2 \pi (\beta_2) ) \,
+\pi (\lambda_1 ,\lambda_2)
+\\
+&=
+2 \int_{\alpha_1 < \alpha_2} \mathrm{d} \theta_1 \mathrm{d} \theta_2
+    \mathrm{d} \alpha_1 \mathrm{d} \alpha_2 \cdot
+f (\alpha_1, \alpha_2) \cdot
+( \theta_1 \pi (\alpha_1) + \theta_2 \pi (\alpha_2) ) \,
+\pi (\theta_1 ,\theta_2)
+\\
+&=
+\int_{\alpha_1 < \alpha_2} \mathrm{d} \theta_1 \mathrm{d} \theta_2
+    \mathrm{d} \alpha_1 \mathrm{d} \alpha_2 \cdot
+f (\alpha_1, \alpha_2) \cdot
+2 ( \theta_1 \pi (\alpha_1) + \theta_2 \pi (\alpha_2) ) \,
+\pi (\theta_1 ,\theta_2)
+\\
+&=
+\int_{\alpha_1 < \alpha_2} \mathrm{d} \theta_1 \mathrm{d} \theta_2
+    \mathrm{d} \alpha_1 \mathrm{d} \alpha_2 \cdot
+f (\alpha_1, \alpha_2) \cdot
+\pi' (\alpha_1, \alpha_2, \theta_1, \theta_2).
+\end{align*}
+$$
+
+$\pi' (\alpha_1, \alpha_2, \theta_1, \theta_2)$, however, is exactly the joint
+density restricted to the pyramid defined by the standard ordering, so we
+finally have
+$$
+\mathbb{E}_{\pi} [ f ] = \mathbb{E}_{\pi'} [ f ].
+$$
+In words, taking an expectation over the pyramid defined by the standard
+ordering yields the same value as the expectation taken over the entire
+parameter space.  Only the distribution over that one pyramid is no longer
+multimodal.
+
+### General Case
+
+The general case follows almost exactly once we use permutations of the standard
+ordering to identify each pyramid of the $N!$ pyramids.  Writing $\Sigma'$ as
+the set of all $N! - 1$ label permutations except for the identify, the
+desired expectation decomposes as
+$$
+\begin{align*}
+\mathbb{E}_{\pi} [ f ]
+&=
+\int \prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+f (\alpha_1, \ldots, \alpha_N) \cdot
+\sum_{n = 1}^{N} \theta_n \, \pi (\alpha_n) \cdot
+\pi (\theta_1, \ldots, \theta_N)
+\\
+&= \quad
+\int_{\alpha_1 < \ldots < \alpha_N}
+\prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+f (\alpha_1, \ldots, \alpha_N) \cdot
+\sum_{n = 1}^{N} \theta_n \, \pi (\alpha_n) \cdot
+\pi (\theta_1, \ldots, \theta_N)
+\\
+&\quad + \sum_{\sigma \in \Sigma'}
+\int_{\alpha_{\sigma(1)} < \ldots < \alpha_{\sigma(N)}}
+\prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+f (\alpha_1, \ldots, \alpha_N) \cdot
+\sum_{n = 1}^{N} \theta_n \, \pi (\alpha_n) \cdot
+\pi (\theta_1, \ldots, \theta_N).
+\end{align*}
+$$
+
+In the permuted terms we apply the transformations
+$$
+(\alpha_{\sigma(1)}, \ldots, \alpha_{\sigma(N)})
+\rightarrow (\beta_1, \ldots, \beta_N)
+$$
+and
+$$
+(\theta_{\sigma(1)}, \ldots, \theta_{\sigma(N)})
+\rightarrow (\lambda_1, \ldots, \lambda_N)
+$$
+to give
+$$
+\begin{align*}
+\mathbb{E}_{\pi} [ f ]
+&= \quad
+\int_{\alpha_1 < \ldots < \alpha_N}
+\prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+f (\alpha_1, \ldots, \alpha_N) \cdot
+\sum_{n = 1}^{N} \theta_n \, \pi (\alpha_n) \cdot
+\pi (\theta_1, \ldots, \theta_N)
+\\
+&\quad + \sum_{\sigma \in \Sigma'}
+\int_{\beta_1 < \ldots < \beta_2}
+\prod_{n = 1}^{N}
+\mathrm{d} \lambda_{\sigma^{-1}(n)} \mathrm{d} \beta_{\sigma^{-1}(n)} \cdot
+f (\beta_{\sigma^{-1}(1)}, \ldots, \beta_{\sigma^{-1}(N)}) \cdot
+\sum_{n = 1}^{N} \lambda_{\sigma^{-1}(n)} \, \pi (\beta_{\sigma^{-1}(n)}) \cdot
+\pi (\lambda_{\sigma^{-1}(1)}, \ldots, \lambda_{\sigma^{-1}(N)})
+\\
+&= \quad
+\int_{\alpha_1 < \ldots < \alpha_N}
+\prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+f (\alpha_1, \ldots, \alpha_N) \cdot
+\sum_{n = 1}^{N} \theta_n \, \pi (\alpha_n) \cdot
+\pi (\theta_1, \ldots, \theta_N)
+\\
+&\quad + \sum_{\sigma \in \Sigma'}
+\int_{\beta_1 < \ldots < \beta_2}
+\prod_{n' = 1}^{N}
+\mathrm{d} \lambda_{n'} \mathrm{d} \beta_{n'} \cdot
+f (\beta_{\sigma^{-1}(1)}, \ldots, \beta_{\sigma^{-1}(N)}) \cdot
+\sum_{n' = 1}^{N} \lambda_{n'} \, \pi (\beta_{n'}) \cdot
+\pi (\lambda_{\sigma^{-1}(1)}, \ldots, \lambda_{\sigma^{-1}(N)}),
+\end{align*}
+$$
+and then we exploit the permutation-invariance of the function of the integrand
+to give,
+$$
+\begin{align*}
+\mathbb{E}_{\pi} [ f ]
+&= \quad
+\int_{\alpha_1 < \ldots < \alpha_N}
+\prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+f (\alpha_1, \ldots, \alpha_N) \cdot
+\sum_{n = 1}^{N} \theta_n \, \pi (\alpha_n) \cdot
+\pi (\theta_1, \ldots, \theta_N)
+\\
+&\quad + \sum_{\sigma \in \Sigma'}
+\int_{\beta_1 < \ldots < \beta_2}
+\prod_{n' = 1}^{N}
+\mathrm{d} \lambda_{n'} \mathrm{d} \beta_{n'} \cdot
+f (\beta_1, \ldots, \beta_N) \cdot
+\sum_{n' = 1}^{N} \lambda_{n'} \, \pi (\beta_{n'}) \cdot
+\pi (\lambda_1, \ldots, \lambda_N)
+\\
+&= N!
+\int_{\alpha_1 < \ldots < \alpha_N}
+\prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+f (\alpha_1, \ldots, \alpha_N) \cdot
+\sum_{n = 1}^{N} \theta_n \, \pi (\alpha_n) \cdot
+\pi (\theta_1, \ldots, \theta_N)
+\\
+&= \int_{\alpha_1 < \ldots < \alpha_N}
+\prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+f (\alpha_1, \ldots, \alpha_N) \cdot
+N! \sum_{n = 1}^{N} \theta_n \, \pi (\alpha_n) \cdot
+\pi (\theta_1, \ldots, \theta_N)
+\\
+&= \int_{\alpha_1 < \ldots < \alpha_N}
+\prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+f (\alpha_1, \ldots, \alpha_N) \cdot
+\pi' (\alpha_1, \ldots, \alpha_N, \theta_1, \ldots, \theta_N).
+\end{align*}
+
+Once again
+$$
+\pi' (\alpha_1, \ldots, \alpha_N, \theta_1, \ldots, \theta_N)
+=
+N! \sum_{n = 1}^{N} \theta_n \, \pi (\alpha_n) \cdot
+\pi (\theta_1, \ldots, \theta_N)
+$$
+is exactly the joint density confined to the pyramid given by the standard
+ordering.  Consequently, in general we can exactly recover the desired
+expectation by integrating over only the region of parameter space satisfying
+the chosen ordering constraint.
+
+While the ordering is limited to scalar parameters, it still proves useful when
+the component distributions are multivariate.  Although we cannot order the
+multivariate parameters themselves, ordering any one of the parameters is
+sufficient to break the labeling degeneracy for the entire mixture.  
+
+# Application to Bayesian Mixture Models
+
+Mixture models most typically arise in Bayesian inference when we model the
+likelihood as a mixture of data generating processes,
+$$ \pi (y \mid \alpha_1, \ldots, \alpha_N, \theta_1, \ldots, \theta_N)
+= \sum_{n = 1}^{N} \theta_{n} \pi (y | \alpha_{n} ).$$
+
+Complementing the likelihood with a joint prior,
+$$\pi(\alpha_1, \ldots, \alpha_N) \pi(\theta_1, \ldots, \theta_N),$$
+then gives the posterior,
+$$
+\pi (\alpha_1, \ldots, \alpha_N) \pi(\theta_1, \ldots, \theta_N \mid y )
+\propto \pi(\alpha_1, \ldots, \alpha_N, \theta_1, \ldots, \theta_N)
+\sum_{n = 1}^{N} \theta_{n} \pi (y | \alpha_{n} ).
+$$
+The posterior has almost exactly the same from as the mixture distribution
+presented above, save for the inclusion of the prior over the component
+parameters, $\pi(\alpha_1, \ldots, \alpha_N)$, which results in every
+component distribution being dependent on all of the component parameters.
+
+The considerations above, however, carry over immediately if the prior is also
+invariant to labelings,
+$$\pi(\alpha_1, \ldots, \alpha_N) =
+  \pi(\alpha_{\sigma(1)}, \ldots, \alpha_{\sigma(N)}).$$
+Consequently the posterior will suffer from a labeling degeneracy only when
+the prior is permutation-invariant, and in that case we can avoid computational
+issues by imposing a standard ordering.
+
+Alternatively, we might be able to avoid the labeling degeneracy altogether by
+employing a prior that is not permutation-invariant.  This is especially useful
+when the each component of the likelihood is responsible for a specific purpose,
+for example when each component corresponds to subpopulations with distinct
+behaviors about which we have prior information.  If this principled prior
+information is sufficiently strong then it can compel the components to respect
+those responsibilities and prevent any labeling degeneracy in the first place.
+
+In hindsight, we can also interpret the ordering constraint as part of the
+prior specification of $\alpha_1, \ldots, \alpha_N$.  From this perspective
+prior information is _critical_ to ensuring that mixture models can be
+accurately fit.  If we have information that distinguishes the mixture
+components from each other then the a prior incorporating that information will
+ensure a well-behaved posterior, but even if we have only information that is
+does not distinguish between the mixture components then we can employ a prior
+that supports only a single ordering to avoid the label degeneracies.
+
+# A Bayesian Mixture Model Example
+
+To illustrate the pathologies of Bayesian mixture models, and their potential
+resolutions, let's consider a relatively simple example where the likelihood
+is given by a mixture of two Gaussians,
+$$
+\pi(y_1, \ldots, y_N \mid \mu_1, \sigma1, \mu_2, \sigma2, \theta_1, \theta_2)
+=
+sum_{n = 1}^{N}
+\theta_1 \mathcal{N} (y_n \mid \mu_1, \sigma_1)
++ \theta_2 \mathcal{N} (y_n \mid mu_2, \sigma_2).
+$$
+Note that the mixture is applied to each datum individually -- our model assumes
+that each measurement is drawn from one of the components independently as
+opposed to the entire dataset being drawn from one of the components as a whole.
+
+We begin by simulating some data from this mixture with the two Gaussian
+components well-separated relative to their standard deviations,
+```{r}
+library(rstan)
+rstan_options(auto_write = TRUE)
+```
+```{r}
+set.seed(689934)
+
+N <- 1000
+mu <- c(-2.75, 2.75);
+sigma <- c(1, 1);
+lambda <- 0.4
+z <- rbinom(N, 1, lambda) + 1;
+y <- rnorm(N, mu[z], sigma[z]);
+
+stan_rdump(c("N", "y"), file="mix.data.R")
+```
+
+Let's now consider a Bayesian fit of this model, first with labeling
+degeneracies and then with various attempted resolutions.
+
+## A Degenerate Implementation
+
+As discussed above, in order to ensure that the labeling degeneracies persist
+in the posterior distribution we need permutation-invariant priors.  We can,
+for example, accomplish this by assigning the identical priors to the Gaussian
+parameters,
+$$
+\mu_1, \mu_2 \sim \mathcal{N} (0, 2), \,
+\sigma_1, \sigma_2 \sim \text{Half-}\mathcal{N} (0, 2),
+$$
+and a symmetric Beta distribution to the mixture weight,
+$$
+\theta_1 \sim \text{Be} (5, 5).
+$$
+```{r}
+writeLines(readLines("gauss_mix.stan"))
+```
+
+Equivalently we could also have defined $\theta$ as a two-dimensional simplex
+with a $\text{Dir}(5, 5)$ prior which would yield the same exact model.
+
+Aware of the labeling degeneracy, let's go ahead and fit this Bayesian mixture
+model in Stan,
+```{r, cache=TRUE}
+input_data <- read_rdump("mix.data.R")
+
+degenerate_fit <- stan(file='gauss_mix.stan', data=input_data,
+                       chains=4, seed=483892929)
+```
+
+The split Rhat is atrocious, indicating that the chains are not exploring the
+same regions of parameter space.
+```{r}
+print(degenerate_fit)
+```
+Indeed this is to be expected as the individual chains find and then explore
+one of the two degenerate modes independently of the others,
+```{r}
+c_light <- c("#DCBCBC")
+c_light_highlight <- c("#C79999")
+c_mid <- c("#B97C7C")
+c_mid_highlight <- c("#A25050")
+c_dark <- c("#8F2727")
+c_dark_highlight <- c("#7C0000")
+```
+```{r}
+params1 <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,1,])
+params2 <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,2,])
+params3 <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,3,])
+params4 <- as.data.frame(extract(degenerate_fit, permuted=FALSE)[,4,])
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params1$"mu[1]", params1$"mu[2]", col=c_dark_highlight, pch=16, cex=0.8,
+     xlab="mu1", xlim=c(-3, 3), ylab="mu2", ylim=c(-3, 3))
+points(params2$"mu[1]", params2$"mu[2]", col=c_dark, pch=16, cex=0.8)
+points(params3$"mu[1]", params3$"mu[2]", col=c_mid_highlight, pch=16, cex=0.8)
+points(params4$"mu[1]", params4$"mu[2]", col=c_mid, pch=16, cex=0.8)
+lines(0.08*(1:100) - 4, 0.08*(1:100) - 4, col="grey", lw=2)
+```
+
+This degenerate example is a particularly nice demonstration of the importance
+of running multiple chains in any MCMC analysis.  If we had run just one chain
+then we would have had no indication of the multimodality in our the posterior
+and the incompleteness of our fits!
+
+## Breaking the Labeling Degeneracy with Asymmetric Priors
+
+Our first potential resolution of the labeling degeneracy is to tweak the
+priors to no longer be permutation invariant.  With no reason to expect that
+the standard deviations will vary between the two components, we will instead
+adjust the priors for the means to strongly favor $\mu_1$ positive and $\mu_2$
+negative,
+```{r}
+writeLines(readLines("gauss_mix_asym_prior.stan"))
+```
+
+Running in Stan
+```{r, cache=TRUE}
+asym_fit <- stan(file='gauss_mix_asym_prior.stan', data=input_data,
+                 chains=4, seed=483892929)
+```
+we see that split Rhat still looks terrible,
+```{r}
+print(asym_fit)
+```
+
+Investigating the fit output we see that despite our strong, asymmetric prior
+the posterior distribution is still multimodal and the disfavored mode is still
+capturing chains,
+```{r}
+params1 <- as.data.frame(extract(asym_fit, permuted=FALSE)[,1,])
+params2 <- as.data.frame(extract(asym_fit, permuted=FALSE)[,2,])
+params3 <- as.data.frame(extract(asym_fit, permuted=FALSE)[,3,])
+params4 <- as.data.frame(extract(asym_fit, permuted=FALSE)[,4,])
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params1$"mu[1]", params1$"mu[2]", col=c_dark_highlight, pch=16, cex=0.8,
+     xlab="mu1", xlim=c(-3, 3), ylab="mu2", ylim=c(-3, 3))
+points(params2$"mu[1]", params2$"mu[2]", col=c_dark, pch=16, cex=0.8)
+points(params3$"mu[1]", params3$"mu[2]", col=c_mid_highlight, pch=16, cex=0.8)
+points(params4$"mu[1]", params4$"mu[2]", col=c_mid, pch=16, cex=0.8)
+lines(0.08*(1:100) - 4, 0.08*(1:100) - 4, col="grey", lw=2)
+```
+
+This example clearly demonstrates the subtle challenge of trying to resolve
+labeling degeneracy with asymmetric prior distributions.  When there are many
+data the mixture likelihood will be very informative and it can easily overwhelm
+even strong prior information.  The posterior will no longer be symmetric
+between the degenerate modes, but the disfavored modes will still have
+sufficiently significant posterior mass to require exploration in the fit.
+
+Reducing the amount data, however, reduces the influence of the likelihood and
+makes it easier to corral the mixture components in principled directions.  With
+a smaller data set,
+```{r, cache=TRUE}
+N <- 100
+mu <- c(-2.75, 2.75);
+sigma <- c(1, 1);
+lambda <- 0.4
+z <- rbinom(N, 1, lambda) + 1;
+y <- rnorm(N, mu[z], sigma[z]);
+
+stan_rdump(c("N", "y"), file="mix_low.data.R")
+input_low_data <- read_rdump("mix_low.data.R")
+
+asym_fit <- stan(file='gauss_mix_asym_prior.stan', data=input_low_data,
+                 chains=4, seed=483892929)
+```
+we achieve a much better fit,
+```{r}
+print(asym_fit)
+```
+All of our chains converge to the favored mode and our inference become
+well-behaved,
+```{r}
+params1 <- as.data.frame(extract(asym_fit, permuted=FALSE)[,1,])
+params2 <- as.data.frame(extract(asym_fit, permuted=FALSE)[,2,])
+params3 <- as.data.frame(extract(asym_fit, permuted=FALSE)[,3,])
+params4 <- as.data.frame(extract(asym_fit, permuted=FALSE)[,4,])
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params1$"mu[1]", params1$"mu[2]", col=c_dark_highlight, pch=16, cex=0.8,
+     xlab="mu1", xlim=c(-3, 3), ylab="mu2", ylim=c(-3, 3))
+points(params2$"mu[1]", params2$"mu[2]", col=c_dark, pch=16, cex=0.8)
+points(params3$"mu[1]", params3$"mu[2]", col=c_mid_highlight, pch=16, cex=0.8)
+points(params4$"mu[1]", params4$"mu[2]", col=c_mid, pch=16, cex=0.8)
+lines(0.08*(1:100) - 4, 0.08*(1:100) - 4, col="grey", lw=2)
+```
+
+Still, extreme care must be taken when using this approach to ensure that the
+priors are strong enough to suppress the labeling degeneracy.  In particular,
+running multiple chains is critical to identifying insufficiently strong priors.
+
+## Breaking the Labeling Degeneracy by Enforcing an Ordering
+
+The alternative strategy is to keep the symmetric priors but impose an ordering
+on one of the component parameters.  Following a similar logic that motivated
+tweaking the component means above, we'll order the means here.  Fortunately,
+imposing such an order in Stan could not be easier -- as we have to do is
+employ the ```ordered``` type,
+```{r}
+writeLines(readLines("gauss_mix_ordered_prior.stan"))
+```
+
+Running the model in Stan
+```{r, cache=TRUE}
+ordered_fit <- stan(file='gauss_mix_ordered_prior.stan', data=input_data,
+                    chains=4, seed=483892929)
+```
+we immediately recover a better fit,
+```{r}
+print(ordered_fit)
+```
+with all of the chains exploring the mode satisfying the standard ordering
+$$\mu_1 \le \mu_2,$$
+```{r}
+params1 <- as.data.frame(extract(ordered_fit, permuted=FALSE)[,1,])
+params2 <- as.data.frame(extract(ordered_fit, permuted=FALSE)[,2,])
+params3 <- as.data.frame(extract(ordered_fit, permuted=FALSE)[,3,])
+params4 <- as.data.frame(extract(ordered_fit, permuted=FALSE)[,4,])
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params1$"mu[1]", params1$"mu[2]", col=c_dark_highlight, pch=16, cex=0.8,
+     xlab="mu1", xlim=c(-3, 3), ylab="mu2", ylim=c(-3, 3))
+points(params2$"mu[1]", params2$"mu[2]", col=c_dark, pch=16, cex=0.8)
+points(params3$"mu[1]", params3$"mu[2]", col=c_mid_highlight, pch=16, cex=0.8)
+points(params4$"mu[1]", params4$"mu[2]", col=c_mid, pch=16, cex=0.8)
+lines(0.08*(1:100) - 4, 0.08*(1:100) - 4, col="grey", lw=2)
+```
+
+Contrast the immediate success achieved by ordering with the subtleties required
+to get the asymmetric priors to yield a good fit.
+
+# Singular Components and Computational Issues
+
+Unfortunately, there is one more pathology hidden in mixture models that can
+seriously compromise the accuracy of a fit.  If two of the mixture components
+overlap then the resulting posterior manifests a particularly nasty geometry
+that is difficult to explore.  This overlap is especially common when there
+are more components in the mixture than needed to capture the structure in the
+data, and excess components are forced to collapse into the necessary
+components.  
+
+To see this let's simulate a measurement where the two mixture components are
+located less than a standard deviation away from each other,
+```{r}
+N <- 1000
+mu <- c(-0.75, 0.75);
+sigma <- c(1, 1);
+lambda <- 0.4
+z <- rbinom(N, 1, lambda) + 1;
+y <- rnorm(N, mu[z], sigma[z]);
+
+stan_rdump(c("N", "y"), file="collapse_mix.data.R")
+```
+
+Before fitting the joint model over the component parameters and the mixture
+weights, let's try to fix conditioned on a single mixture weight,
+```{r, cache=TRUE}
+theta <- 0.25
+stan_rdump(c("N", "y", "theta"), file="collapse_mix.data.R")
+
+input_data <- read_rdump("collapse_mix.data.R")
+
+singular_fit <- stan(file='gauss_mix_given_theta.stan', data=input_data,
+                 chains=1, iter=11000, warmup=1000, seed=483892929)
+```
+Because the components are so close together they can move around to yield
+similar fits to the data, and the multimodal non-identifiability from the
+labeling degeneracy collapses into a strong continuous non-identifiability,
+```{r}
+params25 <- as.data.frame(extract(singular_fit, permuted=FALSE)[,1,])
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params25$"mu[1]", params25$"mu[2]", col=c_dark_highlight, pch=16, cex=0.8,
+     xlab="mu1", xlim=c(-3, 3), ylab="mu2", ylim=c(-3, 3))
+lines(0.08*(1:100) - 4, 0.08*(1:100) - 4, col="grey", lw=2)
+```
+
+Interestingly, as we change the mixture weight the non-identifiability rotates
+around parameter space,
+```{r, cache=TRUE}
+theta <- 0.5
+stan_rdump(c("N", "y", "theta"), file="collapse_mix.data.R")
+
+input_data <- read_rdump("collapse_mix.data.R")
+
+singular_fit <- stan(file='gauss_mix_given_theta.stan', data=input_data,
+                 chains=1, iter=11000, warmup=1000, seed=483892929)
+
+params50 <- as.data.frame(extract(singular_fit, permuted=FALSE)[,1,])
+```
+
+```{r, cache=TRUE}
+theta <- 0.75
+stan_rdump(c("N", "y", "theta"), file="collapse_mix.data.R")
+
+input_data <- read_rdump("collapse_mix.data.R")
+
+singular_fit <- stan(file='gauss_mix_given_theta.stan', data=input_data,
+                 chains=1, iter=11000, warmup=1000, seed=483892929)
+
+params75 <- as.data.frame(extract(singular_fit, permuted=FALSE)[,1,])
+```
+
+```{r}
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params25$"mu[1]", params25$"mu[2]", col=c_dark_highlight, pch=16, cex=0.8,
+     xlab="mu1", xlim=c(-3, 3), ylab="mu2", ylim=c(-3, 3))
+points(params50$"mu[1]", params50$"mu[2]", col=c_mid_highlight, pch=16, cex=0.8)
+points(params75$"mu[1]", params75$"mu[2]", col=c_light_highlight, pch=16, cex=0.8)
+
+lines(0.08*(1:100) - 4, 0.08*(1:100) - 4, col="grey", lw=2)
+
+legend("topleft", c("Theta = 0.25", "Theta = 0.5", "Theta = 0.75"),
+       fill=c(c_dark_highlight, c_mid_highlight, c_light_highlight), bty="n")
+```
+
+These conditional posteriors are not ideal, but they can be adequately fit with
+the state-of-the-art samplers in Stan.  Unfortunately, when we try to fit the
+mixture weight jointly with the component parameters the conditional pathologies
+aggregate into something worse.
+```{r}
+singular_fit <- stan(file='gauss_mix.stan', data=input_data,
+                 chains=1, iter=11000, warmup=1000, seed=483892929)
+```
+
+The problem is that the collapsing components do not inform the mixture weights
+particularly well, and the posterior is changed little from the prior,
+```{r}
+params1 <- as.data.frame(extract(singular_fit, permuted=FALSE)[,1,])
+
+breaks=(0:100) / 100
+prior_hist <- hist(rbeta(10000, 5, 5), breaks=breaks, plot=FALSE)
+post_hist <- hist(params1$theta, breaks=breaks, plot=FALSE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(prior_hist, col=c_light, border=c_light_highlight,
+     main="", xlab="theta")
+plot(post_hist, col=c_dark, border=c_dark_highlight, add=T)
+legend("topright", c("Posterior", "Prior"), fill=c(c_dark, c_light), bty="n")
+```
+
+Consequently the joint posterior simply aggregates the conditional posteriors
+together, resulting in a "bowtie" geometry,
+```{r}
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params1$"mu[1]", params1$"mu[2]", col=c_dark_highlight, pch=16, cex=0.8,
+     xlab="mu1", xlim=c(-3, 3), ylab="mu2", ylim=c(-3, 3))
+lines(0.08*(1:100) - 4, 0.08*(1:100) - 4, col="grey", lw=2)
+```
+
+The sharp corners of the bowtie slow exploration, resulting in relatively few
+effective samples per iteration for the component means,
+```{r}
+print(singular_fit)
+```
+For this particular model the bowtie geometry slows exploration but does not
+bias it -- there are no divergences or other failing diagnostics,
+```{r}
+sum(get_sampler_params(singular_fit, inc_warmup=FALSE)[[1]][,'divergent__'])
+```
+Still, care must be taken in practice to ensure that the posterior geometry does
+not become too pathologic for Stan to accurately fit.
+
+In order to avoid the bowtie geometry entirely we need to ensure that the
+components are sufficiently separated.  If this such separation is not induced
+by the likelihood then it could be enforced with a prescient choice of prior,
+in particular one that "repels" the components from each other without
+sacrificing permutation-invariance.  The development of such repulsive priors
+is an active topic of research.
 
 # Discussion
 
-Mixture models are awkward to use unless complemented with appropriate prior
-information.  If the components cannot be identified a priori then a single
-labeling can be enforced by imposing an ordering constraint.
+The labeling non-identifiability inherent to degenerate mixture models yields
+multimodal distributions that even the most start-of-the-art computational
+algorithms cannot fit.  In order to ensure accurate fits we need to break the
+labeling degeneracy in some way.
 
-If the data cannot isolate the components then the posterior will be pathological
-regardless if we apply the ordering or not.  Moreover, an ordering removes only
-the explicit labeling degeneracy.  Even with an ordering mixture models can
-exhibit strong multimodalities which will still frustrate accurate fits.
+From the perspective of Bayesian mixture models we can break this degeneracy
+by complementing the mixture likelihood with an asymmetric prior information.
+A principled prior that assigns each mixture component to a specific
+responsibility will break the degeneracy, but unless that prior is incredibly
+strong the modes corresponding to disfavored assignments will maintain enough
+posterior to require exploration.  Alternatively, a prior that enforces a
+standard parameter ordering exactly removes the labeling degeneracy without
+compromising inferences.
+
+Even with the labeling degeneracy removed, however, mixture models can still
+be troublesome to fit.  As components begin to collapse into each other, for
+example, the posterior geometry becomes more and more pathological.
+Furthermore, mixture models often exhibit multimodalities beyond just those
+induced by the labeling degeneracy.  Resolving the degeneracy does not eliminate
+these tangible modes and the computational issues they beget.  
+
+As with so many modeling techniques, mixture models can be powerful in practice
+provided that they are employed with great care.
 
 # Original Computing Environment
 
