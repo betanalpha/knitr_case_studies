@@ -1,5 +1,5 @@
 ---
-title: "How the Shape of a Weakly Informative Prior Effects Inferences"
+title: "How the Shape of a Weakly Informative Prior Affects Inferences"
 author: "Michael Betancourt"
 date: "January 2017"
 output:
@@ -15,21 +15,21 @@ are utilized, however, is not explicitly defined.  Consequently the actual
 implementation of weakly informative priors can be ambiguous for practitioners.
 
 In this case study I will consider two approaches for implementing
-weakly informative priors and demonstrate how the specific properties of each
-effect the resulting analysis.  
+weakly informative priors and demonstrate each effects the resulting analysis.  
 
 # Poorly Informed Regression
 
-Weakly informative priors are especially critical when inferences are impaired
-with only weakly identifiable likelihoods, such those arising from models with
-sparse data.  To that end, let's say that we are analyzing a small company and
-we want to model how much daily rainfall, $x$, affects daily income, $y$, using
-only a few measurements.
+Weakly informative priors are especially critical when inferences are hindered
+with only weakly identifiable likelihoods, such as those arising from models
+with sparse data.  
 
-For this study we will simulate data assuming that the company typically makes
-a few thousand dollars, or kilodollars (k$), per day without any rain and that
-a heavy rainfall of a few centimeters per day can severely curtain income,
-```{r}
+To that end, let's say that we are analyzing a small company and we want to
+model how much daily rainfall, $x$, affects daily income, $y$, using only a few
+measurements.  For this study we will simulate data assuming that the company
+typically makes a few thousand dollars, or kilodollars (k$), per day without any
+rain and that a heavy rainfall of a few centimeters per day can severely curtail
+income,
+```{r, comment=NA}
 library(rstan)
 rstan_options(auto_write = TRUE)
 ```
@@ -50,13 +50,13 @@ stan_rdump(c("N", "x", "y"), file="weakly_informed_regression.data.R")
 Assuming that the typical values of both rainfall and income are sufficiently
 large, we can ignore the fact that they are positive quantities and model their
 relationship with a linear regression,
-```{r}
+```{r, comment=NA}
 writeLines(readLines("regression_no_prior.stan"))
 ```
 
-Let's fit this linear regression in Stan using a very long Markov chain to
+We can then fit this linear regression in Stan using a very long Markov chain to
 ensure precise quantification of our posterior distribution,
-```{r, cache=TRUE}
+```{r, cache=TRUE, comment=NA}
 input_data <- read_rdump("weakly_informed_regression.data.R")
 
 fit <- stan(file='regression_no_prior.stan', data=input_data,
@@ -65,11 +65,12 @@ fit <- stan(file='regression_no_prior.stan', data=input_data,
 
 Unfortunately, the resulting posterior distribution is extremely diffuse
 and places significant probability on extreme parameter values,
-```{r}
+```{r, comment=NA}
 print(fit)
 ```
 
-The intercept and slope are particularly bad,
+The intercept and slope are particularly bad, with the Markov chain meandering
+far past the positive values that we had assumed,
 ```{r}
 c_light <- c("#DCBCBC")
 c_light_highlight <- c("#C79999")
@@ -88,8 +89,6 @@ plot(params$alpha, params$beta, col=c_dark, pch=16, cex=0.8,
      ylab="beta (k$ / cm)")
 ```
 
-meandering far past the typically-positive values that we had assumed.
-
 In hindsight this awkward fit isn't unexpected.  The few data points only
 weakly inform the posterior which is then dominated by the flat priors.  If we
 want to regularize our inferences then we need to incorporate better prior
@@ -106,9 +105,10 @@ To see this, consider a flat prior for the intercept, $\alpha$, and the
 question of how much prior probability mass is in the interval
 $-1 \le \alpha \le 1$.  Because we can't normalize the prior there is no
 well-defined answer, but we can at least consider the mass inside the interval
-relative to the mass outside of the interval, which is, well, infinite!  Hence
-there is infinitely more prior mass that pulls inferences outside of the
-interval $-1 \le \alpha \le 1$.
+relative to the mass outside of the interval, which is, well, _infinite_!  In
+other words, there there is infinitely more prior mass that pulls inferences
+outside of the interval $-1 \le \alpha \le 1$ than prior mass pulling inferences
+into the interval.
 
 This logic, however, is exactly the same for the the interval
 $-10 \le \alpha \le 10$, the interval $-100 \le \alpha \le 100$, and in fact
@@ -141,8 +141,8 @@ In complex models, however, it typically takes a significant amount of data for
 the likelihood to be able to identify a necessarily small region of parameter
 space.  The more expensive and sparse the data _and_ the more complex the
 likelihood, the more informative diffuse priors will be.  If we want to make
-reasonable inferences in these models then we need better prior distributions
-that are actually coherent with our prior beliefs.
+reasonable inferences in these models then we need more principled prior
+distributions that are actually coherent with our prior beliefs.
 
 # Weakly Informative Priors
 
@@ -150,30 +150,32 @@ Weakly informative priors introduce _scale_ information to regularize
 inferences.  Scales are straightforward to reason about in applied problems,
 especially when units are carefully laid out, and they provide just enough
 information to regularize non-identified or weakly-identified likelihoods
-without strongly biasing the inferences to a narrow region of parameter space.
+without strongly biasing the posterior away from reasonable parameter values.
 In order to construct weakly informative priors we need to first decompose
-our model configuration space, define default values, identify scales, then
-choose an explicit shape for our prior.
+our model into components, define default values, identify scales, then choose
+an explicit shape for our prior.
 
-Before we can reason about the scales themselves, we need to decompose our model
-configuration space into interpretable components.  In other words, we need to
-find a parameterization of our model configuration space where the parameters
-are particularly meaningful.  For example, the parameterization we have used in
-our linear regression is ideal as the intercept, slope, and measurement
-variability have intuitive interpretations: the intercept, $\alpha$, determines
-the base income without any rainfall, the slope, $\beta$, controls how a change
-in rainfall affects income, and the measurement variation, $\sigma$, quantifies
-the natural variability of daily income.
+We cannot define scales, let alone reason about them, until we first decompose
+our model into interpretable components.  In other words, we need to find a
+parameterization of our model where the parameters are particularly meaningful.
+The parameterization we have used in our linear regression, for example, is
+ideal as the intercept, slope, and measurement variability have intuitive
+interpretations: the intercept, $\alpha$, determines the base income without any
+rainfall, the slope, $\beta$, controls how a change in rainfall  affects income,
+and the measurement variation, $\sigma$, quantifies the natural variability of
+daily income.
 
-Next we need to modify this initial parameterization such that zero becomes
-a reasonable default for our model.  This might require, for example, inverting
-the individual parameters if in the initial parameterization infinity is a more
-natural default than zero.  The parameterization of our linear regression is
-again already well-suited as a vanishing intercept, slope, or measurement
-variability corresponds to a trivial system with no income or weather
-interactions.
+Next we need to identify a reasonable default for our model and modify the
+initial parameterization such that this default is at zero.  For example, this
+modification might require inverting the individual parameters if in the initial
+parameterization infinity is a more natural default than zero.  Identifying an
+appropriate default in the first place follows similar logic to constructing a
+null hypothesis in frequentist methodologies.  The  parameterization of our
+linear regression is again already well-suited as a vanishing intercept, slope,
+or measurement variability corresponds to a trivial system with no income or
+weather interactions.  
 
-Once we have identified the appropriate parameterization we can determine
+Once we have identified an appropriate parameterization we can determine
 the scales coherent with our prior knowledge of the system.  Each scale
 partitions the parameters into extreme values above and reasonable values below.
 Perhaps the most straightforward way to reason about scales is to identify the
@@ -187,21 +189,22 @@ all of our scales are of order unity.
 Finally we complete the specification of a weakly informative prior by
 complementing the scales with a shape to determine an explicit probability
 distribution.  If we define the scale as $\delta$, then we could for example,
-take a uniform distribution, $$\theta \sim U (-\delta, \delta),$$.  Such an
+take a uniform distribution, $$\theta \sim U (-\delta, \delta).$$  Such an
 extreme cutoff, however, removes not only extreme values far above the scale
-but also the reasonable values just above the scale.  What we really want is a
-shape that softly concentrates below the scale, such as a normal distribution,
+but also the relatively reasonable values just above the scale.  What we really
+want is a shape that softly concentrates below the scale, such as a normal
+distribution,
 $$\theta \sim \mathcal{N}(0, \delta),$$
 a Cauchy distribution,
 $$\theta \sim \mathrm{Cauchy}(0, \delta),$$
 or even a Student-t distribution interpolating between the two.  If the
-parameter of interest is positive then we can  truncate these distributions
-at zero.
+parameter of interest is positive then we can truncate these distributions at
+zero.
 
 If we have chosen appropriate units then the scales reduce to unity and all of
 our weakly informative priors take a form like $\theta \sim \mathcal{N}(0, 1)$
 or $\theta \sim \mathrm{Cauchy}(0, 1)$.  It is important to note however, that
-these unit-scale priors alone do specify a weakly informative priors!  _They are
+these unit-scale priors alone do specify a weakly informative prior!  _They are
 weakly informative only when our parameters have appropriate units._
 
 In any case, all of these distributions strongly favor values within a few
@@ -224,16 +227,16 @@ Let's first consider a relatively light-tailed weakly informative prior that
 utilizes Gaussian and half-Gaussian distributions.  Because we simulated the
 data already in natural units, the weakly informative priors are given simply
 by unit-scale Gaussians,
-```{r}
+```{r, comment=NA}
 writeLines(readLines("regression_gauss_wi_prior.stan"))
 ```
-```{r, cache=TRUE}
+```{r, cache=TRUE, comment=NA}
 gauss_fit <- stan(file='regression_gauss_wi_prior.stan', data=input_data,
                   iter=11000, warmup=1000, chains=1, seed=483892929)
 ```
 
 We now have no problem fitting the model,
-```{r}
+```{r, comment=NA}
 print(gauss_fit)
 ```
 
@@ -274,17 +277,17 @@ reasonable inferences!
 To contrast, let's now consider the more heavily-tailed priors given by
 Cauchy and half-Cauchy distributions.  Once again our prescient choice of units
 admits unit-scale distributions,
-```{r}
+```{r, comment=NA}
 writeLines(readLines("regression_cauchy_wi_prior.stan"))
 ```
-```{r, cache=TRUE}
+```{r, cache=TRUE, comment=NA}
 cauchy_fit <- stan(file='regression_cauchy_wi_prior.stan', data=input_data,
                   iter=11000, warmup=1000, chains=1, seed=483892929)
 ```
 
 and once again the weakly informative prior adequately regularizes our
 inferences,
-```{r}
+```{r, comment=NA}
 print(cauchy_fit)
 ```
 
@@ -326,7 +329,7 @@ cauchy_hist <- hist(cauchy_params$beta[abs(cauchy_params$beta) < 10],
 
 par(mar = c(4, 4, 0.5, 0.5))
 plot(cauchy_hist, col=c_light, border=c_light_highlight,
-     main="", xlab="beta (k$ / cm")
+     main="", xlab="beta (k$ / cm)")
 plot(gauss_hist, col=c_dark, border=c_dark_highlight, add=T)
 legend("topright", c("Gauss", "Cauchy"), fill=c(c_dark, c_light), bty="n")
 ```
@@ -368,7 +371,7 @@ weakly informative prior.
 
 Let's first consider the relatively light tail of a Gaussian prior
 distribution,
-```{r, cache=TRUE}
+```{r, cache=TRUE, comment=NA}
 input_data <- read_rdump("wrong_scale.data.R")
 
 gauss_fit <- stan(file='regression_gauss_wi_prior.stan', data=input_data,
@@ -393,17 +396,18 @@ plot(post_hist, col=c_dark, border=c_dark_highlight, add=T)
 legend("topright", c("Posterior", "Prior"), fill=c(c_dark, c_light), bty="n")
 ```
 
-Instead of contracting within the prior, the posterior ends up concentrating at
-the boundary of the bulk of the prior, a few standard deviations away from zero.  
-This behavior may not be obviously pathological and so practitioners must take
-care to verify that their posteriors are actually contracting and not
-accumulating near the tails of the prior.
+Instead of contracting within the prior the posterior ends up concentrating at
+at the given scale where the prior transitions from its bulk to its tail, here a
+few standard deviations away from zero.  Because this behavior may not be
+obviously pathological,  practitioners must take care to verify that their
+posteriors are actually contracting and not accumulating around the given
+scales.
 
 # The Failure Mode of Heavy Tails
 
 The heavier tail of the Cauchy prior responds very differently to a
 poorly-chosen scale,
-```{r, cache=TRUE}
+```{r, cache=TRUE, comment=NA}
 input_data <- read_rdump("wrong_scale.data.R")
 
 cauchy_fit <- stan(file='regression_cauchy_wi_prior.stan', data=input_data,
@@ -431,20 +435,20 @@ legend("topright", c("Posterior", "Prior"), fill=c(c_dark, c_light), bty="n")
 
 Not only does the weaker regularization allow the posterior to concentrate
 around the true value, the tension between the prior and the likelihood becomes
-much easier to visually and quantitatively identify.  Careful analysis is still
-recommended, but less critical.
+much easier to identify both visually and quantitatively.  Careful analysis is
+still recommended, but less critical.
 
 # Discussion
 
 When building sophisticated models, principled priors that quantify principled
-prior information are critical to ensuring reasonable inferences.  
-Weakly informative priors are particularly well-suited to this task,
-identifying natural scales in the problem to regularize the information
-extracted from the likelihood.  The exact shape of those priors, however, has
-important practical consequences.
+prior information are critical to ensuring reasonable inferences. Weakly
+informative priors are particularly well-suited to this task, identifying
+natural scales in the problem to regularize the information extracted from the
+likelihood.  The exact shape of those priors, however, has important practical
+consequences.
 
 Lighter tailed priors, such as a Gaussian distribution, induce strong
-regularization towards the chosen scales.  If the scales are consistent with the
+regularization towards the given scales.  If the scales are consistent with the
 measurements then this regularization yields well-behaved posteriors that
 facilitate statistical computation.  If the scales are poorly-chosen, however,
 then the regularization biases the resulting inferences as would any poor
@@ -457,13 +461,17 @@ the weaker regularization does not bias the model as strongly when the scales
 are inconsistent with the measurements.  
 
 Because accurate and fast statistical computation is critical to any analysis,
-we in the Stan Development Team have come to favor the lighter tails of a
+we on the Stan Development Team have come to favor the lighter tails of a
 weakly informative prior with a Gaussian shape as the most robust default.
 The scale of that prior then becomes another assumption that must be carefully
 analyzed in order the verify the accuracy of the resulting inferences.
 
 # Original Computing Environment
 
-```{r}
+```{r, comment=NA}
+writeLines(readLines(file.path(Sys.getenv("HOME"), ".R/Makevars")))
+```
+
+```{r, comment=NA}
 devtools::session_info("rstan")
 ```
