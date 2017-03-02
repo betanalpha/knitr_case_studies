@@ -60,7 +60,7 @@ ensure precise quantification of our posterior distribution,
 input_data <- read_rdump("weakly_informed_regression.data.R")
 
 fit <- stan(file='regression_no_prior.stan', data=input_data,
-            iter=11000, warmup=1000, chains=1, seed=483892929)
+            iter=11000, warmup=1000, chains=1, seed=483892929, refresh=11000)
 ```
 
 Unfortunately, the resulting posterior distribution is extremely diffuse
@@ -232,7 +232,8 @@ writeLines(readLines("regression_gauss_wi_prior.stan"))
 ```
 ```{r, cache=TRUE, comment=NA}
 gauss_fit <- stan(file='regression_gauss_wi_prior.stan', data=input_data,
-                  iter=11000, warmup=1000, chains=1, seed=483892929)
+                  iter=11000, warmup=1000, chains=1, seed=483892929,
+                  refresh=11000)
 ```
 
 We now have no problem fitting the model,
@@ -251,19 +252,19 @@ par(mfrow=c(1, 3))
 alpha_breaks=10 * (0:50) / 50 - 5
 hist(gauss_params$alpha, main="", xlab="alpha (k$)", breaks=alpha_breaks,
      col=c_dark, border=c_dark_highlight,
-     xlim=c(-5, 5))
+     xlim=c(-5, 5), yaxt='n', ann=FALSE)
 abline(v=alpha, col=c_light, lty=1, lwd=3)
 
 beta_breaks=10 * (0:50) / 50 - 5
 hist(gauss_params$beta, main="", xlab="beta (k$ / cm)", breaks=beta_breaks,
      col=c_dark, border=c_dark_highlight,
-     xlim=c(-5, 5))
+     xlim=c(-5, 5), yaxt='n', ann=FALSE)
 abline(v=beta, col=c_light, lty=1, lwd=3)
 
 sigma_breaks=5 * (0:50) / 50
 hist(gauss_params$sigma, main="", xlab="sigma (k$)", breaks=sigma_breaks,
      col=c_dark, border=c_dark_highlight,
-     xlim=c(0, 5))
+     xlim=c(0, 5), yaxt='n', ann=FALSE)
 abline(v=sigma, col=c_light, lty=1, lwd=3)
 ```
 
@@ -282,7 +283,8 @@ writeLines(readLines("regression_cauchy_wi_prior.stan"))
 ```
 ```{r, cache=TRUE, comment=NA}
 cauchy_fit <- stan(file='regression_cauchy_wi_prior.stan', data=input_data,
-                  iter=11000, warmup=1000, chains=1, seed=483892929)
+                  iter=11000, warmup=1000, chains=1, seed=483892929,
+                  refresh=11000)
 ```
 
 and once again the weakly informative prior adequately regularizes our
@@ -301,21 +303,21 @@ alpha_breaks=20 * (0:50) / 50 - 10
 hist(cauchy_params$alpha[abs(cauchy_params$alpha) < 10],
      main="", xlab="alpha (k$)", breaks=alpha_breaks,
      col=c_dark, border=c_dark_highlight,
-     xlim=c(-10, 10))
+     xlim=c(-10, 10), yaxt='n', ann=FALSE)
 abline(v=alpha, col=c_light, lty=1, lwd=3)
 
 beta_breaks=20 * (0:50) / 50 - 10
 hist(cauchy_params$beta[abs(cauchy_params$beta) < 10],
      main="", xlab="beta (k$ / cm)", breaks=beta_breaks,
      col=c_dark, border=c_dark_highlight,
-     xlim=c(-10, 10))
+     xlim=c(-10, 10), yaxt='n', ann=FALSE)
 abline(v=beta, col=c_light, lty=1, lwd=3)
 
 sigma_breaks=25 * (0:50) / 50
 hist(cauchy_params$sigma[cauchy_params$sigma < 25],
      main="", xlab="sigma (k$)", breaks=sigma_breaks,
      col=c_dark, border=c_dark_highlight,
-     xlim=c(0, 25))
+     xlim=c(0, 25), yaxt='n', ann=FALSE)
 abline(v=sigma, col=c_light, lty=1, lwd=3)
 ```
 
@@ -329,7 +331,7 @@ cauchy_hist <- hist(cauchy_params$beta[abs(cauchy_params$beta) < 10],
 
 par(mar = c(4, 4, 0.5, 0.5))
 plot(cauchy_hist, col=c_light, border=c_light_highlight,
-     main="", xlab="beta (k$ / cm)")
+     main="", xlab="beta (k$ / cm)", yaxt='n', ann=FALSE)
 plot(gauss_hist, col=c_dark, border=c_dark_highlight, add=T)
 legend("topright", c("Gauss", "Cauchy"), fill=c(c_dark, c_light), bty="n")
 ```
@@ -375,7 +377,8 @@ distribution,
 input_data <- read_rdump("wrong_scale.data.R")
 
 gauss_fit <- stan(file='regression_gauss_wi_prior.stan', data=input_data,
-                  iter=11000, warmup=1000, chains=1, seed=483892929)
+                  iter=11000, warmup=1000, chains=1, seed=483892929,
+                  refresh=11000)
 ```
 
 The light tail strongly penalizes parameter values above the chosen scale,
@@ -391,7 +394,7 @@ prior_hist <- hist(rnorm(10000, 0, 1), breaks=alpha_breaks, plot=FALSE)
 
 par(mar = c(4, 4, 0.5, 0.5))
 plot(prior_hist, col=c_light, border=c_light_highlight,
-     main="", xlab="alpha (k$)")
+     main="", xlab="alpha (k$)", yaxt='n', ann=FALSE)
 plot(post_hist, col=c_dark, border=c_dark_highlight, add=T)
 legend("topright", c("Posterior", "Prior"), fill=c(c_dark, c_light), bty="n")
 ```
@@ -411,7 +414,8 @@ poorly-chosen scale,
 input_data <- read_rdump("wrong_scale.data.R")
 
 cauchy_fit <- stan(file='regression_cauchy_wi_prior.stan', data=input_data,
-                  iter=11000, warmup=1000, chains=1, seed=483892929)
+                  iter=11000, warmup=1000, chains=1, seed=483892929,
+                  refresh=11000)
 ```
 
 With much heavier tails, the Cauchy prior allows the posterior to leak past
@@ -427,7 +431,7 @@ prior_hist <- hist(prior_draws[abs(prior_draws) < 25], breaks=alpha_breaks, plot
 
 par(mar = c(4, 4, 0.5, 0.5))
 plot(prior_hist, col=c_light, border=c_light_highlight,
-     main="", xlab="alpha (k$)", ylim=c(0, 3000))
+     main="", xlab="alpha (k$)", ylim=c(0, 3000), yaxt='n', ann=FALSE)
 plot(post_hist, col=c_dark, border=c_dark_highlight, add=T)
 abline(v=alpha, col=c_light, lty=1, lwd=3)
 legend("topright", c("Posterior", "Prior"), fill=c(c_dark, c_light), bty="n")
@@ -465,6 +469,10 @@ we on the Stan Development Team have come to favor the lighter tails of a
 weakly informative prior with a Gaussian shape as the most robust default.
 The scale of that prior then becomes another assumption that must be carefully
 analyzed in order the verify the accuracy of the resulting inferences.
+
+# Acknowledgements
+
+I thank Bob Carpenter many helpful comments.
 
 # Original Computing Environment
 
