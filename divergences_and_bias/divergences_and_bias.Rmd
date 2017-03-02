@@ -9,15 +9,21 @@ output:
     theme: cerulean
 ---
 
-Markov chain Monte Carlo (MCMC) estimates expectations with respect to a given
-target distribution,
-$$\mathbb{E}_{\pi} [ f ] = \int \mathrm{d}q \, \pi (q) \, f(q),$$
+Markov chain Monte Carlo (MCMC) approximates expectations with respect to a
+given target distribution,
+$$
+\mathbb{E}_{\pi} [ f ] = \int \mathrm{d}q \, \pi (q) \, f(q),
+$$
 using the states of a Markov chain, $\{q_{0}, \ldots, q_{N} \}$,
-$$\mathbb{E}_{\pi} [ f ] \approx
-\hat{f}_{N} = \frac{1}{N + 1} \sum_{n = 0}^{N} f(q_{n}).$$
+$$
+\mathbb{E}_{\pi} [ f ] \approx
+\hat{f}_{N} = \frac{1}{N + 1} \sum_{n = 0}^{N} f(q_{n}).
+$$
 These estimators, however, are guaranteed to be accurate only _asymptotically_
 as the chain grows to be infinitely long,
-$$ \lim_{N \rightarrow \infty} \hat{f}_{N} = \mathbb{E}_{\pi} [ f ].$$
+$$
+\lim_{N \rightarrow \infty} \hat{f}_{N} = \mathbb{E}_{\pi} [ f ].
+$$
 
 To be useful in applied analyses, we need MCMC estimators to converge to the
 true expectation values sufficiently quickly that they are reasonably accurate
@@ -31,27 +37,29 @@ quantify their precision using the MCMC standard error.
 
 Unfortunately, proving geometric ergodicity theoretically is infeasible for
 any nontrivial problem.  Instead we must rely on empirical diagnostics that
-identity obstructions to geometric ergodicity, and hence well-behaved MCMC
+identify obstructions to geometric ergodicity, and hence well-behaved MCMC
 estimators.  For a general Markov transition and target distribution, the best
-diagnostic is the split $\hat{R}$ statistic over an ensemble of Markov chains
-initialized from diffuse points in parameter space; to do any better we need to
-exploit the particular structure of a given transition or target distribution.
+known diagnostic is the split $\hat{R}$ statistic over an ensemble of Markov
+chains initialized from diffuse points in parameter space; to do any better we
+need to exploit the particular structure of a given transition or target
+distribution.
 
-Hamiltonian Monte Carlo is especially powerful in this regard as its failures
-to be geometrically ergodic with respect to any target distribution manifest
-in distinct behaviors that have been developed into sensitive diagnostics.  One
-of these behaviors is the apperance of _divergences_ that indicate the
-Hamiltonian Markov chain has encountered regions of high curvature in the target
-distribution which it cannot adequately explore.
+Hamiltonian Monte Carlo, for example, is especially powerful in this regard as
+its failures to be geometrically ergodic with respect to any target distribution
+manifest in distinct behaviors that have been developed into sensitive
+diagnostics.  One of these behaviors is the appearance of _divergences_ that
+indicate the Hamiltonian Markov chain has encountered regions of high curvature
+in the target distribution which it cannot adequately explore.
 
 In this case study I will show how divergences signal bias in the fitting of
 hierarchical models and how they can be used to study the underlying
-pathologies.  I will also show how those pathologies can be mediated by
+pathologies.  I will also show how those pathologies can be mitigated by
 utilizing an alternative implementation of the same model.
 
 # The Eight Schools Model
 
-Let's consider the Eight Schools hierarchical model [@Rubin:1981],
+Let's consider a hierarchical model of the the Eight Schools dataset
+[@Rubin:1981],
 
 $$\mu \sim \mathcal{N}(0, 5)$$
 
@@ -61,7 +69,7 @@ $$\theta_{n} \sim \mathcal{N}(\mu, \tau)$$
 
 $$y_{n} \sim \mathcal{N}(\theta_{n}, \sigma_{n}),$$
 
-where $n \in \left\{0, \ldots, 8 \right\}$ and each
+where $n \in \left\{1, \ldots, 8 \right\}$ and the
 $\left\{ y_{n}, \sigma_{n} \right\}$ are given as data.  
 
 Inferring the hierarchical hyperparameters, $\mu$ and $\sigma$, together with
@@ -74,7 +82,7 @@ biases MCMC estimation.
 In this case study we'll first examine the direct _centered_ parameterization of
 the Eight Schools model and see how divergences identify this bias before there
 are any other indications of problems.  We'll then use these divergences to
-study the source of the bias and motivate the necessary fix, a reimplementing
+study the source of the bias and motivate the necessary fix, a reimplementation
 of the model with a _non-centered_ parameterization.  For a more thorough
 discussion of the geometry of centered and non-centered parameterizations of
 hierarchical models see @BetancourtEtAl:2015.
@@ -117,7 +125,7 @@ the model in RStan using just a single short chain,
 input_data <- read_rdump("eight_schools.data.R")
 
 fit_cp <- stan(file='eight_schools_cp.stan', data=input_data,
-            iter=1200, warmup=500, chains=1, seed=483892929)
+            iter=1200, warmup=500, chains=1, seed=483892929, refresh=1200)
 ```
 Although this scenario may appear superficial, it is not uncommon for users to
 use short chains when prototyping their analysis, or even for their final
@@ -128,8 +136,11 @@ effective sample size per iteration is reasonable,
 ```{r, comment=NA}
 print(fit_cp)
 ```
-Moreover, the trace plots all look fine. For example, we seem to be exploring
-$\log \tau$ reasonably well,
+Moreover, the trace plots all look fine. Let's consider, for example, the
+hierarchical standard deviation, $\tau$ or, more specifically, its logarithm,
+$\log \tau$.  Because $\tau$ is constrained to be positive, its logarithm will
+allow us to better resolve behavior for small values.  Indeed the chains seems
+to be exploring both small and large values reasonably well,
 ```{r}
 params_cp <- as.data.frame(extract(fit_cp, permuted=FALSE))
 names(params_cp) <- gsub("chain:1.", "", names(params_cp), fixed = TRUE)
@@ -199,7 +210,8 @@ the Eight Schools model, let's run a much longer chain to see how the problems
 more obviously manifest,
 ```{r, cache=TRUE, comment=NA}
 fit_cp80 <- stan(file='eight_schools_cp.stan', data=input_data,
-                 iter=11000, warmup=1000, chains=1, seed=483892929)
+                 iter=11000, warmup=1000, chains=1, seed=483892929,
+                refresh=11000)
 ```
 Even with so many more iterations, split $\hat{R}$ does not indicate any
 serious issues,
@@ -267,7 +279,7 @@ points(div_params_cp$theta.1, log(div_params_cp$tau),
        col="green", pch=16, cex=0.8)
 ```
 
-## Mediating Divergences By Adjusting Stan's Adaptation Routine
+## Mitigating Divergences by Adjusting Stan's Adaptation Routine
 
 Divergences in Hamiltonian Monte Carlo arise when the Hamiltonian transition
 encounters regions of extremely large curvature, such as the opening of the
@@ -290,26 +302,26 @@ ultimately remove the divergences entirely.  If we do not have geometric
 ergodicity, however, then decreasing the step size will not completely remove
 the divergences.
 
-In Stan the step size is tuned automatically during warm up, but we can coerce
-smaller step sizes by tweaking the configuration of Stan's adaptation routine.  
-In particular, we can increase the ```adapt_delta``` parameter from its default
-value of 0.8 closer to its maximum value of 1.
+Within Stan the step size is tuned automatically during warm up, but we can
+coerce smaller step sizes by tweaking the configuration of Stan's adaptation
+routine.  In particular, we can increase the ```adapt_delta``` parameter from
+ its default value of 0.8 closer to its maximum value of 1.
 ```{r, cache=TRUE, comment=NA}
 fit_cp85 <- stan(file='eight_schools_cp.stan', data=input_data,
                  iter=11000, warmup=1000, chains=1, seed=483892929,
-                 control=list(adapt_delta=0.85))
+                 refresh=11000, control=list(adapt_delta=0.85))
 
 fit_cp90 <- stan(file='eight_schools_cp.stan', data=input_data,
                  iter=11000, warmup=1000, chains=1, seed=483892929,
-                 control=list(adapt_delta=0.90))
+                 refresh=11000, control=list(adapt_delta=0.90))
 
 fit_cp95 <- stan(file='eight_schools_cp.stan', data=input_data,
                  iter=11000, warmup=1000, chains=1, seed=483892929,
-                 control=list(adapt_delta=0.95))
+                 refresh=11000, control=list(adapt_delta=0.95))
 
 fit_cp99 <- stan(file='eight_schools_cp.stan', data=input_data,
                  iter=11000, warmup=1000, chains=1, seed=483892929,
-                 control=list(adapt_delta=0.99))
+                 refresh=11000, control=list(adapt_delta=0.99))
 ```
 
 Despite increasing ```adapt_delta``` and decreasing step size,
@@ -341,11 +353,11 @@ plot(adapt_delta, div_scan, xlab="Adapt Delta", ylab="Number of Divergences",
 points(adapt_delta, div_scan, col=c_dark, pch=16, cex=0.8)
 ```
 
-indicating that the Hamiltonian transition is not geometrically ergodic with
+This indicates that the Hamiltonian transition is not geometrically ergodic with
 respect to the centered implementation of the Eight Schools model.  Indeed, this
 is expected given the observed bias.
 
-This behavior also has a nice geometric intuition.  The smaller we decrease the
+This behavior also has a nice geometric intuition.  The more we decrease the
 step size the more the Hamiltonian Markov chain can explore the neck of the
 funnel.  Consequently, the marginal posterior distribution for $\log \tau$
 stretches further and further towards negative values with the decreasing step
@@ -358,10 +370,11 @@ p_cp90 <- hist(log(extract(fit_cp90)$tau), breaks=common_breaks, plot=FALSE)
 p_cp99 <- hist(log(extract(fit_cp99)$tau), breaks=common_breaks, plot=FALSE)
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(p_cp99, col=c_dark, main="", xlab="log(tau)")
+plot(p_cp99, col=c_dark, main="", xlab="log(tau)", yaxt='n', ann=FALSE)
 plot(p_cp90, col=c_mid, add=T)
 plot(p_cp80, col=c_light, add=T)
-legend("topleft", c("CP, delta=0.80", "CP, delta=0.90", "CP, delta=0.99"),
+legend("topleft",
+       c("Centered, delta=0.80", "Centered, delta=0.90", "Centered, delta=0.99"),
        fill=c(c_light, c_mid, c_dark), bty="n")
 ```
 
@@ -390,7 +403,7 @@ points(div_params_cp99$theta.1, log(div_params_cp99$tau),
 ```
 
 The improved exploration is evident when comparing the samples, here without
-labeling the divergences, from the nominal chain and the
+labeling the divergences, from the chain with the default settings and the
 the ```adapt_delta=0.99``` chain,
 ```{r}
 par(mar = c(4, 4, 0.5, 0.5))
@@ -398,12 +411,12 @@ plot(params_cp99$theta.1, log(params_cp99$tau),
      xlab="theta.1", ylab="log(tau)", xlim=c(-20, 50), ylim=c(-6,4),
      col=c_dark, pch=16, cex=0.8)
 points(params_cp80$theta.1, log(params_cp80$tau), col=c_light, pch=16, cex=0.8)
-legend("bottomright", c("CP, delta=0.80", "CP, delta=0.99"),
+legend("bottomright", c("Centered, delta=0.80", "Centered, delta=0.99"),
        fill=c(c_light, c_dark), border="white", bty="n")
 ```
 
 That said, the improved exploration given by decreasing the step size does
-not restore geometric ergodicity.  While the bias does decrease with decreasing
+not realize geometric ergodicity.  While the bias does decrease with decreasing
 step size,
 ```{r}
 params_cp90 <- as.data.frame(extract(fit_cp90, permuted=FALSE))
@@ -419,7 +432,8 @@ plot(10*(1:1000), running_means_cp80, col=c_light, pch=16, cex=0.8, ylim=c(0, 2)
 points(10*(1:1000), running_means_cp90, col=c_mid, pch=16, cex=0.8)
 points(10*(1:1000), running_means_cp99, col=c_dark, pch=16, cex=0.8)
 abline(h=0.7657852, col="grey", lty="dashed", lwd=3)
-legend("bottomright", c("CP, delta=0.80", "CP, delta=0.90", "CP, delta=0.99"),
+legend("bottomright",
+       c("Centered, delta=0.80", "Centered, delta=0.90", "Centered, delta=0.99"),
        fill=c(c_light, c_mid, c_dark), border="white", bty="n")
 ```
 
@@ -447,7 +461,7 @@ $$\theta_{n} = \mu + \tau \cdot \tilde{\theta}_{n}.$$
 
 Because we are actively sampling from different parameters, we should expect,
 and indeed observe, a very different posterior distribution.  Formally a
-non-centered implementation is not actually a reparamterization of the centered
+non-centered implementation is not actually a reparameterization of the centered
 implementation, but the terms "centered parameterization" and "non-centered
 parameterization" have persisted in the literature and so I will use them here.
 
@@ -460,7 +474,8 @@ writeLines(readLines("eight_schools_ncp.stan"))
 Running the new model in Stan,
 ```{r, cached=TRUE, comment=NA}
 fit_ncp80 <- stan(file='eight_schools_ncp.stan', data=input_data,
-                  iter=11000, warmup=1000, chains=1, seed=483892929)
+                  iter=11000, warmup=1000, chains=1, seed=483892929,
+                  refresh=11000)
 ```
 we see that the effective sample size per iteration has drastically improved,
 ```{r, comment=NA}
@@ -509,7 +524,7 @@ size,
 ```{r, cached=TRUE, comment=NA}
 fit_ncp90 <- stan(file='eight_schools_ncp.stan', data=input_data,
                   iter=11000, warmup=1000, chains=1, seed=483892929,
-                  control=list(adapt_delta=0.90))
+                  refresh=11000, control=list(adapt_delta=0.90))
 ```
 
 ```{r, comment=NA}
@@ -532,7 +547,8 @@ plot(params_ncp90$theta.1, log(params_ncp90$tau),
      col=c_dark_highlight, pch=16, cex=0.8)
 points(params_cp99$theta.1, log(params_cp99$tau), col=c_dark, pch=16, cex=0.8)
 points(params_cp90$theta.1, log(params_cp90$tau), col=c_mid, pch=16, cex=0.8)
-legend("bottomright", c("CP, delta=0.90", "CP, delta=0.99", "NCP, delta=0.90"),
+legend("bottomright", c("Centered, delta=0.90", "Centered, delta=0.99",
+                        "Non-Centered, delta=0.90"),
        fill=c(c_mid, c_dark, c_dark_highlight), border="white", bty="n")
 ```
 
@@ -540,11 +556,12 @@ legend("bottomright", c("CP, delta=0.90", "CP, delta=0.99", "NCP, delta=0.90"),
 p_ncp90 <- hist(log(params_ncp90$tau), breaks=common_breaks, plot=FALSE)
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(p_ncp90, col=c_dark_highlight, main="", xlab="log(tau)")
+plot(p_ncp90, col=c_dark_highlight, main="", xlab="log(tau)", yaxt='n', ann=FALSE)
 plot(p_cp99, col=c_dark, add=T)
 plot(p_cp90, col=c_mid, add=T)
 
-legend("topleft", c("CP, delta=0.90", "CP, delta=0.99", "NCP, delta=0.90"),
+legend("topleft", c("Centered, delta=0.90", "Centered, delta=0.99",
+                    "Non-Centered, delta=0.90"),
        fill=c(c_mid, c_dark, c_dark_highlight), bty="n")
 ```
 
@@ -559,17 +576,17 @@ plot(10*(1:1000), running_means_cp90, col=c_mid, pch=16, cex=0.8, ylim=c(0, 2),
 points(10*(1:1000), running_means_cp99, col=c_dark, pch=16, cex=0.8)
 points(10*(1:1000), running_means_ncp, col=c_dark_highlight, pch=16, cex=0.8)
 abline(h=0.7657852, col="grey", lty="dashed", lwd=3)
-legend("bottomright", c("CP, delta=0.90", "CP, delta=0.99", "NCP, delta=0.90"),
+legend("bottomright", c("Centered, delta=0.90", "Centered, delta=0.99",
+                        "Non-Centered, delta=0.90"),
        fill=c(c_mid, c_dark, c_dark_highlight), border="white", bty="n")
 ```
 
-# Why Wasn't Biased Estimation Previously Identified?
+# Why wasn't Biased Estimation Previously Identified?
 
-By analyzing the Eight Schools model we have seen that hierarchical models
-implemented with a centered parameterization impede the geometric ergodicity of
-Hamiltonian Monte Carlo, at least when the data are not extremely informative.  
-The ultimate importance of the resulting bias, however, depends on the
-specific application.  
+We have seen in these examples that hierarchical models implemented with a
+centered parameterization impede the geometric ergodicity of Hamiltonian Monte
+Carlo, at least when the data are not extremely informative.  The ultimate
+importance of the resulting bias, however, depends on the specific application.  
 
 If we are interested in the behavior of $\log \tau$ then this bias will be
 serious and affect the quality of any inferences drawn from the fit.  Often,
@@ -584,9 +601,10 @@ p_cp <- hist(params_cp90$tau[params_cp90$tau < 20], breaks=breaks, plot=FALSE)
 p_ncp <- hist(params_ncp90$tau[params_ncp90$tau < 20], breaks=breaks, plot=FALSE)
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(p_ncp, col=c_dark_highlight, main="", xlab="tau")
+plot(p_ncp, col=c_dark_highlight, main="", xlab="tau",
+     yaxt='n', ann=FALSE, ylim=c(0, 1000))
 plot(p_cp, col=c_mid, add=T)
-legend("topright", c("CP, delta=0.90", "NCP, delta=0.90"),
+legend("topright", c("Centered, delta=0.90", "Non-Centered, delta=0.90"),
        fill=c(c_mid, c_dark_highlight), bty="n")
 ```
 ```{r}
@@ -598,7 +616,7 @@ plot(10*(1:1000), running_means_cp, col=c_mid, pch=16, cex=0.8, ylim=c(2, 4.25),
     xlab="Iteration", ylab="MCMC mean of tau")
 points(10*(1:1000), running_means_ncp, col=c_dark_highlight, pch=16, cex=0.8)
 abline(h=3.575019, col="grey", lty="dashed", lwd=3)
-legend("bottomright", c("CP, delta=0.90", "NCP, delta=0.90"),
+legend("bottomright", c("Centered, delta=0.90", "Non-Centered, delta=0.90"),
        fill=c(c_mid, c_dark_highlight), border="white", bty="n")
 ```
 
@@ -615,10 +633,10 @@ p_cp <- hist(params_cp90$theta.1, breaks=breaks, plot=FALSE)
 p_ncp <- hist(params_ncp90$theta.1, breaks=breaks, plot=FALSE)
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(p_ncp, col=c_dark_highlight, main="", xlab="theta.1")
+plot(p_ncp, col=c_dark_highlight, main="", xlab="theta.1", yaxt='n', ann=FALSE)
 plot(p_cp, col=c_mid, add=T)
 
-legend("topright", c("CP, delta=0.90", "NCP, delta=0.90"),
+legend("topright", c("Centered, delta=0.90", "Non-Centered, delta=0.90"),
        fill=c(c_mid, c_dark_highlight), bty="n")
 ```
 
@@ -633,7 +651,7 @@ plot(10*(1:1000), running_means_cp, col=c_mid, pch=16, cex=0.8, ylim=c(4, 7),
     xlab="Iteration", ylab="MCMC mean of theta.1")
 points(10*(1:1000), running_means_ncp, col=c_dark_highlight, pch=16, cex=0.8)
 abline(h=6.250004, col="grey", lty="dashed", lwd=3)
-legend("bottomright", c("CP, delta=0.90", "NCP, delta=0.90"),
+legend("bottomright", c("Centered, delta=0.90", "Non-Centered, delta=0.90"),
        fill=c(c_mid, c_dark_highlight), border="white", bty="n")
 ```
 
@@ -647,7 +665,7 @@ plot(10*(1:1000), running_means_cp, col=c_mid, pch=16, cex=0.8, ylim=c(10, 40),
     xlab="Iteration", ylab="MCMC variance of theta.1")
 points(10*(1:1000), running_means_ncp, col=c_dark_highlight, pch=16, cex=0.8)
 abline(h=29.78573, col="grey", lty="dashed", lwd=3)
-legend("bottomright", c("CP, delta=0.90", "NCP, delta=0.90"),
+legend("bottomright", c("Centered, delta=0.90", "Non-Centered, delta=0.90"),
        fill=c(c_mid, c_dark_highlight), border="white", bty="n")
 ```
 
@@ -675,6 +693,10 @@ models in practice.  If the divergences can be removed by
 increasing ```adapt_delta``` then Hamiltonian Monte Carlo applied to the given
 implementation will yield accurate inferences.  If the divergences persist,
 however, then the model will need to be reimplemented to avoid biases.
+
+# Acknowledgements
+
+I thank Bob Carpenter for many helpful comments.
 
 # Original Computing Environment
 
