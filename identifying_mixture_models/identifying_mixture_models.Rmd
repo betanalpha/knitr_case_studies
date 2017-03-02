@@ -695,7 +695,7 @@ model in Stan,
 input_data <- read_rdump("mix.data.R")
 
 degenerate_fit <- stan(file='gauss_mix.stan', data=input_data,
-                       chains=4, seed=483892929)
+                       chains=4, seed=483892929, refresh=2000)
 ```
 
 The split Rhat is atrocious, indicating that the chains are not exploring the
@@ -750,7 +750,7 @@ writeLines(readLines("gauss_mix_asym_prior.stan"))
 Running in Stan
 ```{r, cache=TRUE, comment=NA}
 asym_fit <- stan(file='gauss_mix_asym_prior.stan', data=input_data,
-                 chains=4, seed=483892929)
+                 chains=4, seed=483892929, refresh=2000)
 ```
 we see that split Rhat still looks terrible,
 ```{r, comment=NA}
@@ -797,7 +797,7 @@ stan_rdump(c("N", "y"), file="mix_low.data.R")
 input_low_data <- read_rdump("mix_low.data.R")
 
 asym_fit <- stan(file='gauss_mix_asym_prior.stan', data=input_low_data,
-                 chains=4, seed=483892929)
+                 chains=4, seed=483892929, refresh=2000)
 ```
 we achieve a much better fit,
 ```{r, comment=NA}
@@ -843,7 +843,7 @@ writeLines(readLines("gauss_mix_ordered_prior.stan"))
 Running the model in Stan
 ```{r, cache=TRUE, comment=NA}
 ordered_fit <- stan(file='gauss_mix_ordered_prior.stan', data=input_data,
-                    chains=4, seed=483892929)
+                    chains=4, seed=483892929, refresh=2000)
 ```
 we immediately recover a better fit,
 ```{r, comment=NA}
@@ -907,7 +907,8 @@ stan_rdump(c("N", "y", "theta"), file="collapse_mix.data.R")
 input_data <- read_rdump("collapse_mix.data.R")
 
 singular_fit <- stan(file='gauss_mix_given_theta.stan', data=input_data,
-                 chains=1, iter=11000, warmup=1000, seed=483892929)
+                     chains=1, iter=11000, warmup=1000, seed=483892929,
+                     refresh=11000)
 ```
 Because the components are so close together they can move around to yield
 similar fits to the data, and the multimodal non-identifiability from the
@@ -938,7 +939,8 @@ stan_rdump(c("N", "y", "theta"), file="collapse_mix.data.R")
 input_data <- read_rdump("collapse_mix.data.R")
 
 singular_fit <- stan(file='gauss_mix_given_theta.stan', data=input_data,
-                 chains=1, iter=11000, warmup=1000, seed=483892929)
+                     chains=1, iter=11000, warmup=1000, seed=483892929,
+                     refresh=11000)
 
 params50 <- as.data.frame(extract(singular_fit, permuted=FALSE)[,1,])
 ```
@@ -950,7 +952,8 @@ stan_rdump(c("N", "y", "theta"), file="collapse_mix.data.R")
 input_data <- read_rdump("collapse_mix.data.R")
 
 singular_fit <- stan(file='gauss_mix_given_theta.stan', data=input_data,
-                 chains=1, iter=11000, warmup=1000, seed=483892929)
+                     chains=1, iter=11000, warmup=1000, seed=483892929,
+                     refresh=11000)
 
 params75 <- as.data.frame(extract(singular_fit, permuted=FALSE)[,1,])
 ```
@@ -974,7 +977,8 @@ when we try to fit the mixture weight jointly with the component parameters the
 conditional pathologies aggregate into something worse.
 ```{r, cache=TRUE, comment=NA}
 singular_fit <- stan(file='gauss_mix.stan', data=input_data,
-                 chains=1, iter=11000, warmup=1000, seed=483892929)
+                     chains=1, iter=11000, warmup=1000, seed=483892929,
+                     refresh=11000)
 ```
 
 The problem is that the collapsing components do not inform the mixture weights
@@ -982,13 +986,13 @@ particularly well, and the posterior is changed little from the prior,
 ```{r}
 params1 <- as.data.frame(extract(singular_fit, permuted=FALSE)[,1,])
 
-breaks=(0:100) / 100
+breaks=(0:50) / 50
 prior_hist <- hist(rbeta(10000, 5, 5), breaks=breaks, plot=FALSE)
 post_hist <- hist(params1$theta, breaks=breaks, plot=FALSE)
 
 par(mar = c(4, 4, 0.5, 0.5))
 plot(prior_hist, col=c_light_trans, border=c_light_highlight_trans,
-     main="", xlab="theta")
+     main="", xlab="theta", yaxt='n', ann=FALSE)
 plot(post_hist, col=c_dark_trans, border=c_dark_highlight_trans, add=T)
 legend("topright", c("Posterior", "Prior"),
        fill=c(c_dark_trans, c_light_trans), bty="n")
@@ -1022,7 +1026,8 @@ Moreover, imposing a parameter ordering simply cuts the bowtie in half,
 maintaining the potentially pathological geometry,
 ```{r, , cache=TRUE, comment=NA}
 singular_fit <- stan(file='gauss_mix_ordered_prior.stan', data=input_data,
-                 chains=1, iter=11000, warmup=1000, seed=483892929)
+                     chains=1, iter=11000, warmup=1000, seed=483892929,
+                     refresh=11000)
 
 params1 <- as.data.frame(extract(singular_fit, permuted=FALSE)[,1,])
 
