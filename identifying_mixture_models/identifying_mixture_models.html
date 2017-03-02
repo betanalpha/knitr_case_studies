@@ -133,9 +133,9 @@ $(document).ready(function () {
 <p>Mixture likelihoods become particularly concise if we adopt a <span class="math inline">\(1\)</span>-of-<span class="math inline">\(K\)</span> coding convention where the assignment of the measurement to one of the component data generating processes is represented by a set of binary variables, <span class="math inline">\(\mathbf{z} = (z_1, \ldots, z_K)\)</span>, such that <span class="math inline">\(z_k = 1\)</span> if the measurement was drawn from the <span class="math inline">\(k\)</span>th component and <span class="math inline">\(z_k = 0\)</span> otherwise. In this notation the mixture likelihood is written as <span class="math display">\[
 \pi (y \mid \boldsymbol{\alpha}, \mathbf{z})
 =
-\prod_{k = 1}^{K} \pi_{n} ( y \mid \alpha_{n} )^{z_n},
+\prod_{k = 1}^{K} \pi_{k} ( y \mid \alpha_{k} )^{z_k},
 \]</span> where <span class="math inline">\(\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_K)\)</span>.</p>
-<p>Because mixture models are extremely expressive they encompass many different inferential and decision problems. For example, if multiple measurements <span class="math inline">\(y_n\)</span> are given but the corresponding assignments <span class="math inline">\(z_kn\)</span> are unknown then inference over the mixture model is equivalent to <em>clustering</em> the measurements across the component data generating processes. Similarly, if both the measurements and the assignments are given then inference over the mixture model admits <em>classification</em> of future measurements. Finally, <em>semi-supervised</em> learning corresponds to inference over a mixture model where only some of the assignments are known.</p>
+<p>Because mixture models are extremely expressive they encompass many different inferential and decision problems. For example, if multiple measurements <span class="math inline">\(y_n\)</span> are given but the corresponding assignments <span class="math inline">\(z_{kn}\)</span> are unknown then inference over the mixture model is equivalent to <em>clustering</em> the measurements across the component data generating processes. Similarly, if both the measurements and the assignments are given then inference over the mixture model admits <em>classification</em> of future measurements. Finally, <em>semi-supervised</em> learning corresponds to inference over a mixture model where only some of the assignments are known.</p>
 <p>In practice discrete assignments are difficult to accurately fit, but we can immediately facilitate inference by marginalizing the assignments out of the model entirely. First we have to construct the joint distribution for the measurements and the assignments, <span class="math display">\[
 \pi (y, \mathbf{z} \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
 =
@@ -149,7 +149,7 @@ $(document).ready(function () {
 then we can write the distribution for the assignments as <span class="math display">\[
 \pi (\mathbf{z} \mid \boldsymbol{\theta} )
 =
-\prod_{k = 1}^{K} \theta_{n}^{z_n},
+\prod_{k = 1}^{K} \theta_{k}^{z_k},
 \]</span> and the joint likelihood becomes <span class="math display">\[
 \pi (y, \mathbf{z} \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
 =
@@ -169,7 +169,7 @@ then we can write the distribution for the assignments as <span class="math disp
 \]</span> Because each <span class="math inline">\(\mathbf{z}\)</span> identifies a unique mixture component, each term in the sum reduces to the corresponding component distribution, <span class="math display">\[
 \pi (y \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
 =  
-\sum_{k = 1}^{K} \theta_k \, \pi_{n} ( y \mid \alpha_{k} ).
+\sum_{k = 1}^{K} \theta_k \, \pi_{k} ( y \mid \alpha_{k} ).
 \]</span> The marginal likelihood reduces to a convex combination of the component data generating processes.</p>
 <p>Marginalizing out the discrete assignments yields a likelihood that depends on only continuous parameters, making it amenable to state-of-the-art tools like Stan. Moreover, modeling the latent mixture probabilities instead of the discrete assignments admits more precise inferences as a consequence of the Rao-Blackwell theorem. From any perspective the marginalized mixture likelihood is the ideal basis for inference.</p>
 </div>
@@ -194,8 +194,8 @@ then we can write the distribution for the assignments as <span class="math disp
 \]</span> Additional measurements, however, do not impact the non-identifiability inherent to mixture models. Consequently we will consider only a single measurement in the proceeding section, returning to multiple measurements in the example.</p>
 </div>
 </div>
-<div id="degeneracies-mixture-models-and-non-identifiability" class="section level1">
-<h1>Degeneracies Mixture Models and Non-identifiability</h1>
+<div id="degenerate-mixture-models-and-non-identifiability" class="section level1">
+<h1>Degenerate Mixture Models and Non-identifiability</h1>
 <p>When making inferences with a mixture model we need to learn each of the component weights, <span class="math inline">\(\theta_k\)</span>, and the component parameters, <span class="math inline">\(\alpha_k\)</span>. This introduces a subtle challenge because if the measurement cannot discriminate between the components then it cannot discriminate between the component parameters.</p>
 <p>If the individual component distributions <span class="math inline">\(\pi_{k} (y \mid \alpha_{k})\)</span> are distinct then the unique characteristics of each can be enough to inform the corresponding parameters individually and the mixture model is straightforward to fit. Circumstances become much more dire, however, in the <em>degenerate</em> case when the components are identical, <span class="math inline">\(\pi_{k} (y \mid \alpha_{k}) = \pi (y \mid \alpha_{k})\)</span>. In this case there is a fundamental ambiguity as to which parameters <span class="math inline">\(\alpha_{k}\)</span> are associated with each component in the mixture.</p>
 <p>To see this, let <span class="math inline">\(\sigma\)</span> denote a permutation of the indices in our mixture, <span class="math display">\[
@@ -241,7 +241,7 @@ then we can write the distribution for the assignments as <span class="math disp
 \end{align*}
 \]</span> In this case all of our inferences will be the same regardless of how we label the mixture components with explicit indices.</p>
 <p>Because of this labeling degeneracy the posterior distribution will be non-identified. In particular, it will manifest multimodality, with one mode for each of the possible labelings. For a mixture with <span class="math inline">\(K\)</span> identical components there are <span class="math inline">\(K!\)</span> possible labelings and hence any degenerate mixture model will exhibit at least <span class="math inline">\(K!\)</span> modes.</p>
-<p>Hence even for a relatively small number of components the posterior distribution will have too many modes for any statistical algorithm to accurately quantify. For example, if we applied Markov chain Monte Carlo then any chain would be able to explore one of the modes but it would not be able to transition <em>between</em> the modes, at least not within in any finite running time.</p>
+<p>Hence even for a relatively small number of components the posterior distribution will have too many modes for any statistical algorithm to accurately quantify unless the modes collapse into each other. For example, if we applied Markov chain Monte Carlo then any chain would be able to explore one of the modes but it would not be able to transition <em>between</em> the modes, at least not within in any finite running time.</p>
 </div>
 <div id="identifying-degenerate-bayesian-mixture-models" class="section level1">
 <h1>Identifying Degenerate Bayesian Mixture Models</h1>
@@ -257,8 +257,8 @@ then we can write the distribution for the assignments as <span class="math disp
 <p>In this section we’ll study the symmetric geometry induced by labeling degeneracies and show how that symmetry can be used to reduce the multimodal mixture posterior into a unimodal distribution that yields exactly the same inferences while being far easier to fit.</p>
 <div id="the-geometry-of-a-degenerate-posterior" class="section level3">
 <h3>The Geometry of a Degenerate Posterior</h3>
-<p>Each labeling is characterized by the unique assignment of indices to the components in our mixture. Permuting the indices yields a new assignment and hence a new labeling of our mixture model. Consequently a natural way to identify each labeling is to a choose a standard set of indices, <span class="math inline">\(\alpha_1, \ldots, \alpha_N\)</span>, and distinguish each labeling by the permutation that maps to the approrpiate indices, <span class="math inline">\(\alpha_{\sigma(1)}, \ldots, \alpha_{\sigma(N)}\)</span>. The standard indices themselves identify a labeling with the trivial permutation that leaves the indices unchanged.</p>
-<p>In general it is difficult to utilize these permutations, but if the component parameters, <span class="math inline">\(\alpha_n\)</span>, are scalar then we can exploit their unique <em>ordering</em> to readily identify permutations and hence labelings. For example, if we choose the standard labeling to be the one where the parameter values are ordered, <span class="math inline">\(\alpha_1 \le \ldots \le \alpha_N\)</span>, then any permutation will yield a new ordering of the parameters, <span class="math inline">\(\alpha_{\sigma(1)} \le \ldots \le \alpha_{\sigma(N)}\)</span>, which then identifies another labeling. In other words, we can identify the each labeling by the ordering the parameter values.</p>
+<p>Each labeling is characterized by the unique assignment of indices to the components in our mixture. Permuting the indices yields a new assignment and hence a new labeling of our mixture model. Consequently a natural way to identify each labeling is to a choose a standard set of indices, <span class="math inline">\(\alpha_1, \ldots, \alpha_K\)</span>, and distinguish each labeling by the permutation that maps to the appropriate indices, <span class="math inline">\(\alpha_{\sigma(1)}, \ldots, \alpha_{\sigma(K)}\)</span>. The standard indices themselves identify a labeling with the trivial permutation that leaves the indices unchanged.</p>
+<p>In general it is difficult to utilize these permutations, but if the component parameters, <span class="math inline">\(\alpha_n\)</span>, are scalar then we can exploit their unique <em>ordering</em> to readily identify permutations and hence labelings. For example, if we choose the standard labeling to be the one where the parameter values are ordered, <span class="math inline">\(\alpha_1 \le \ldots \le \alpha_K\)</span>, then any permutation will yield a new ordering of the parameters, <span class="math inline">\(\alpha_{\sigma(1)} \le \ldots \le \alpha_{\sigma(K)}\)</span>, which then identifies another labeling. In other words, we can identify the each labeling by the ordering the parameter values.</p>
 <p>This identification also has a welcome geometric interpretation. The region of parameter space satisfying a given ordering constraint, such as <span class="math inline">\(\alpha_1 \le \ldots \le \alpha_K\)</span>, defines a square pyramid with the apex point at zero. The <span class="math inline">\(K\)</span>-dimensional parameter space neatly decomposes into <span class="math inline">\(K!\)</span> of these pyramids, each with a distinct ordering and hence association with a unique labeling.</p>
 <p>When the priors are exchangeable the mixture posterior <em>aliases</em> across each of these pyramids in parameter space: if we were given the mixture posterior restricted to one of these pyramids then we could reconstruct the entire mixture distribution by simply rotating that restricted distribution into each of the other <span class="math inline">\(K! - 1\)</span> pyramids. As we do this we also map the mode in the restricted distribution into each pyramid, creating exactly the expected <span class="math inline">\(K!\)</span> multimodality. Moreover, those rotations are exactly given by permuting the parameter indices and reordering the corresponding parameter values.</p>
 </div>
@@ -272,7 +272,7 @@ Consequently we should be able to avoid the combinatorial cost of fitting the fu
 \pi' (\boldsymbol{\alpha}) =
 \left\{
 \begin{array}{ll}
-\pi (\boldsymbol{\alpha}), &amp; \alpha_1 \le  \ldots \le \alpha_N \\
+\pi (\boldsymbol{\alpha}), &amp; \alpha_1 \le  \ldots \le \alpha_K \\
 0, &amp; \mathrm{else}
 \end{array}
 \right. ,
@@ -422,7 +422,7 @@ f (\boldsymbol{\alpha}) \cdot
 \\
 &amp;\quad + \sum_{\sigma \in \Sigma'}
 \int_{\alpha_{\sigma(1)} &lt; \ldots &lt; \alpha_{\sigma(K)}}
-\prod_{n = 1}^{N} \mathrm{d} \theta_k \mathrm{d} \alpha_k \cdot
+\prod_{k = 1}^{K} \mathrm{d} \theta_k \mathrm{d} \alpha_k \cdot
 f (\boldsymbol{\alpha}) \cdot
 \pi (\boldsymbol{\alpha}) \, \pi(\boldsymbol{\theta}) \,
 \sum_{k = 1}^{K} \theta_k \, \pi (y \mid \alpha_k).
@@ -468,7 +468,7 @@ f ( \sigma^{-1}(\boldsymbol{\beta}) ) \cdot
 \pi ( \sigma^{-1}(\boldsymbol{\lambda}) ) \,
 \sum_{k' = 1}^{K} \lambda_{k'} \, \pi (y \mid \beta_{k'}).
 \end{align*}
-\]</span> We now exploit the permutation-invariance of the <span class="math inline">\(f\)</span> and the exchangeability of the priors to give <span class="math display">\[
+\]</span> We now exploit the permutation-invariance of <span class="math inline">\(f\)</span> and the exchangeability of the priors to give <span class="math display">\[
 \begin{align*}
 \mathbb{E}_{\pi} [ f ]
 &amp;\propto \quad
@@ -486,7 +486,7 @@ f ( \boldsymbol{\beta} ) \cdot
 \pi ( \boldsymbol{\beta} ) \, \pi ( \boldsymbol{\lambda} ) \,
 \sum_{k' = 1}^{K} \lambda_{k'} \, \pi (y \mid \beta_{k'})
 \\
-&amp;\propto N!
+&amp;\propto K!
 \int_{\alpha_1 &lt; \ldots &lt; \alpha_K}
 \prod_{k = 1}^{K} \mathrm{d} \theta_k \mathrm{d} \alpha_k \cdot
 f (\boldsymbol{\alpha}) \cdot
@@ -497,11 +497,11 @@ f (\boldsymbol{\alpha}) \cdot
 \int_{\alpha_1 &lt; \ldots &lt; \alpha_K}
 \prod_{k = 1}^{K} \mathrm{d} \theta_k \mathrm{d} \alpha_k \cdot
 f (\boldsymbol{\alpha}) \cdot
-N! \, \pi (\boldsymbol{\alpha}) \, \pi(\boldsymbol{\theta}) \,
+K! \, \pi (\boldsymbol{\alpha}) \, \pi(\boldsymbol{\theta}) \,
 \sum_{k = 1}^{K} \theta_k \, \pi (y \mid \alpha_k)
 \\
 &amp;= \int_{\alpha_1 &lt; \ldots &lt; \alpha_N}
-\prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+\prod_{n = 1}^{K} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
 f (\boldsymbol{\alpha}) \cdot
 \pi' (\boldsymbol{\alpha}, \boldsymbol{\theta} \mid y).
 \end{align*}
@@ -509,10 +509,10 @@ f (\boldsymbol{\alpha}) \cdot
 <p>Once again <span class="math display">\[
 \pi' (\boldsymbol{\alpha}, \boldsymbol{\theta} \mid y)
 \propto
-N! \, \pi (\boldsymbol{\alpha}) \, \pi(\boldsymbol{\theta}) \,
+K! \, \pi (\boldsymbol{\alpha}) \, \pi(\boldsymbol{\theta}) \,
 \sum_{k = 1}^{K} \theta_k \, \pi (y \mid \alpha_k)
 \]</span> is exactly the mixture posterior density confined to the pyramid given by the standard ordering. Consequently, in general we can exactly recover the desired expectation by integrating over only the region of parameter space satisfying the chosen ordering constraint.</p>
-<p>While the ordering is limited to scalar parameters, it can still proves useful when the component distributions are multivariate. Although we cannot order the multivariate parameters themselves, ordering any one of the parameters is sufficient to break the labeling degeneracy for the entire mixture.</p>
+<p>While the ordering is limited to scalar parameters, it can still prove useful when the component distributions are multivariate. Although we cannot order the multivariate parameters themselves, ordering any one of the parameters is sufficient to break the labeling degeneracy for the entire mixture.</p>
 </div>
 </div>
 </div>

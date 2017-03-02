@@ -498,7 +498,7 @@ legend(&quot;bottomright&quot;,
 <p><span class="math display">\[\tau \sim \text{Half-Cauchy}(0, 5)\]</span></p>
 <p><span class="math display">\[\tilde{\theta}_{n} \sim \mathcal{N}(0, 1)\]</span></p>
 <p><span class="math display">\[\theta_{n} = \mu + \tau \cdot \tilde{\theta}_{n}.\]</span></p>
-<p>Because we are actively sampling from different parameters, we should expect, and indeed observe, a very different posterior distribution. Formally a non-centered implementation is not actually a reparameterization of the centered implementation, but the terms “centered parameterization” and “non-centered parameterization” have persisted in the literature and so I will use them here.</p>
+<p>Because we are actively sampling from different parameters, we should expect, and indeed observe, a very different posterior distribution.</p>
 <p>The Stan program for the non-centered parameterization is almost as simple as that for the centered parameterization,</p>
 <pre class="r"><code>writeLines(readLines(&quot;eight_schools_ncp.stan&quot;))</code></pre>
 <pre><code>data {
@@ -535,9 +535,9 @@ SAMPLING FOR MODEL 'eight_schools_ncp' NOW (CHAIN 1).
 Chain 1, Iteration:     1 / 11000 [  0%]  (Warmup)
 Chain 1, Iteration:  1001 / 11000 [  9%]  (Sampling)
 Chain 1, Iteration: 11000 / 11000 [100%]  (Sampling)
- Elapsed Time: 0.042933 seconds (Warm-up)
-               0.339855 seconds (Sampling)
-               0.382788 seconds (Total)</code></pre>
+ Elapsed Time: 0.039317 seconds (Warm-up)
+               0.303233 seconds (Sampling)
+               0.34255 seconds (Total)</code></pre>
 <p>we see that the effective sample size per iteration has drastically improved,</p>
 <pre class="r"><code>print(fit_ncp80)</code></pre>
 <pre><code>Inference for Stan model: eight_schools_ncp.
@@ -585,7 +585,7 @@ theta[7]          1
 theta[8]          1
 lp__              1
 
-Samples were drawn using NUTS(diag_e) at Thu Mar  2 15:25:52 2017.
+Samples were drawn using NUTS(diag_e) at Thu Mar  2 17:05:54 2017.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).</code></pre>
@@ -630,9 +630,9 @@ SAMPLING FOR MODEL 'eight_schools_ncp' NOW (CHAIN 1).
 Chain 1, Iteration:     1 / 11000 [  0%]  (Warmup)
 Chain 1, Iteration:  1001 / 11000 [  9%]  (Sampling)
 Chain 1, Iteration: 11000 / 11000 [100%]  (Sampling)
- Elapsed Time: 0.050764 seconds (Warm-up)
-               0.554328 seconds (Sampling)
-               0.605092 seconds (Total)</code></pre>
+ Elapsed Time: 0.047731 seconds (Warm-up)
+               0.553458 seconds (Sampling)
+               0.601189 seconds (Total)</code></pre>
 <pre class="r"><code>divergent &lt;- get_sampler_params(fit_ncp90, inc_warmup=FALSE)[[1]][,'divergent__']
 sum(divergent)</code></pre>
 <pre><code>[1] 0</code></pre>

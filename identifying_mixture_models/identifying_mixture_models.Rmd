@@ -41,13 +41,13 @@ likelihood is written as
 $$
 \pi (y \mid \boldsymbol{\alpha}, \mathbf{z})
 =
-\prod_{k = 1}^{K} \pi_{n} ( y \mid \alpha_{n} )^{z_n},
+\prod_{k = 1}^{K} \pi_{k} ( y \mid \alpha_{k} )^{z_k},
 $$
 where $\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_K)$.
 
 Because mixture models are extremely expressive they encompass many different
 inferential and decision problems.  For example, if multiple measurements $y_n$
-are given but the corresponding assignments $z_kn$ are unknown then inference
+are given but the corresponding assignments $z_{kn}$ are unknown then inference
 over the mixture model is equivalent to _clustering_ the measurements across the
 component data generating processes.  Similarly, if both the measurements and
 the assignments are given then inference over the mixture model admits
@@ -75,7 +75,7 @@ then we can write the distribution for the assignments as
 $$
 \pi (\mathbf{z} \mid \boldsymbol{\theta} )
 =
-\prod_{k = 1}^{K} \theta_{n}^{z_n},
+\prod_{k = 1}^{K} \theta_{k}^{z_k},
 $$
 and the joint likelihood becomes
 $$
@@ -102,7 +102,7 @@ the sum reduces to the corresponding component distribution,
 $$
 \pi (y \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
 =  
-\sum_{k = 1}^{K} \theta_k \, \pi_{n} ( y \mid \alpha_{k} ).
+\sum_{k = 1}^{K} \theta_k \, \pi_{k} ( y \mid \alpha_{k} ).
 $$
 The marginal likelihood reduces to a convex combination of the component
 data generating processes.
@@ -146,7 +146,7 @@ Additional measurements, however, do not impact the non-identifiability inherent
 to mixture models.  Consequently we will consider only a single measurement
 in the proceeding section, returning to multiple measurements in the example.
 
-# Degeneracies Mixture Models and Non-identifiability
+# Degenerate Mixture Models and Non-identifiability
 
 When making inferences with a mixture model we need to learn each of the
 component weights, $\theta_k$, and the component parameters, $\alpha_k$.
@@ -228,9 +228,10 @@ exhibit at least $K!$ modes.
 
 Hence even for a relatively small number of components the posterior
 distribution will have too many modes for any statistical algorithm to
-accurately quantify.  For example, if we applied Markov chain Monte Carlo then
-any chain would be able to explore one of the modes but it would not be able to
-transition _between_ the modes, at least not within in any finite running time.
+accurately quantify unless the modes collapse into each other.  For example, if
+we applied Markov chain Monte Carlo then any chain would be able to explore one
+of the modes but it would not be able to transition _between_ the modes, at
+least not within in any finite running time.
 
 # Identifying Degenerate Bayesian Mixture Models
 
@@ -276,9 +277,9 @@ Each labeling is characterized by the unique assignment of indices to the
 components in our mixture.  Permuting the indices yields a new assignment
 and hence a new labeling of our mixture model.  Consequently a natural way to
 identify each labeling is to a choose a standard set of indices,
-$\alpha_1, \ldots, \alpha_N$, and distinguish each labeling by the permutation
-that maps to the approrpiate indices,
-$\alpha_{\sigma(1)}, \ldots, \alpha_{\sigma(N)}$.  The standard indices
+$\alpha_1, \ldots, \alpha_K$, and distinguish each labeling by the permutation
+that maps to the appropriate indices,
+$\alpha_{\sigma(1)}, \ldots, \alpha_{\sigma(K)}$.  The standard indices
 themselves identify a labeling with the trivial permutation that leaves the
 indices unchanged.
 
@@ -286,9 +287,9 @@ In general it is difficult to utilize these permutations, but if the component
 parameters, $\alpha_n$, are scalar then we can exploit their unique
 _ordering_ to readily identify permutations and hence labelings.  For example,
 if we choose the standard labeling to be the one where the parameter values
-are ordered, $\alpha_1 \le  \ldots \le \alpha_N$, then any permutation will
+are ordered, $\alpha_1 \le  \ldots \le \alpha_K$, then any permutation will
 yield a new ordering of the parameters,
-$\alpha_{\sigma(1)} \le \ldots \le \alpha_{\sigma(N)}$, which then identifies
+$\alpha_{\sigma(1)} \le \ldots \le \alpha_{\sigma(K)}$, which then identifies
 another labeling.  In other words, we can identify the each labeling by the
 ordering the parameter values.
 
@@ -333,7 +334,7 @@ $$
 \pi' (\boldsymbol{\alpha}) =
 \left\{
 \begin{array}{ll}
-\pi (\boldsymbol{\alpha}), & \alpha_1 \le  \ldots \le \alpha_N \\
+\pi (\boldsymbol{\alpha}), & \alpha_1 \le  \ldots \le \alpha_K \\
 0, & \mathrm{else}
 \end{array}
 \right. ,
@@ -516,7 +517,7 @@ f (\boldsymbol{\alpha}) \cdot
 \\
 &\quad + \sum_{\sigma \in \Sigma'}
 \int_{\alpha_{\sigma(1)} < \ldots < \alpha_{\sigma(K)}}
-\prod_{n = 1}^{N} \mathrm{d} \theta_k \mathrm{d} \alpha_k \cdot
+\prod_{k = 1}^{K} \mathrm{d} \theta_k \mathrm{d} \alpha_k \cdot
 f (\boldsymbol{\alpha}) \cdot
 \pi (\boldsymbol{\alpha}) \, \pi(\boldsymbol{\theta}) \,
 \sum_{k = 1}^{K} \theta_k \, \pi (y \mid \alpha_k).
@@ -567,7 +568,7 @@ f ( \sigma^{-1}(\boldsymbol{\beta}) ) \cdot
 \sum_{k' = 1}^{K} \lambda_{k'} \, \pi (y \mid \beta_{k'}).
 \end{align*}
 $$
-We now exploit the permutation-invariance of the $f$ and the exchangeability
+We now exploit the permutation-invariance of $f$ and the exchangeability
 of the priors to give
 $$
 \begin{align*}
@@ -587,7 +588,7 @@ f ( \boldsymbol{\beta} ) \cdot
 \pi ( \boldsymbol{\beta} ) \, \pi ( \boldsymbol{\lambda} ) \,
 \sum_{k' = 1}^{K} \lambda_{k'} \, \pi (y \mid \beta_{k'})
 \\
-&\propto N!
+&\propto K!
 \int_{\alpha_1 < \ldots < \alpha_K}
 \prod_{k = 1}^{K} \mathrm{d} \theta_k \mathrm{d} \alpha_k \cdot
 f (\boldsymbol{\alpha}) \cdot
@@ -598,11 +599,11 @@ f (\boldsymbol{\alpha}) \cdot
 \int_{\alpha_1 < \ldots < \alpha_K}
 \prod_{k = 1}^{K} \mathrm{d} \theta_k \mathrm{d} \alpha_k \cdot
 f (\boldsymbol{\alpha}) \cdot
-N! \, \pi (\boldsymbol{\alpha}) \, \pi(\boldsymbol{\theta}) \,
+K! \, \pi (\boldsymbol{\alpha}) \, \pi(\boldsymbol{\theta}) \,
 \sum_{k = 1}^{K} \theta_k \, \pi (y \mid \alpha_k)
 \\
 &= \int_{\alpha_1 < \ldots < \alpha_N}
-\prod_{n = 1}^{N} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
+\prod_{n = 1}^{K} \mathrm{d} \theta_n \mathrm{d} \alpha_n \cdot
 f (\boldsymbol{\alpha}) \cdot
 \pi' (\boldsymbol{\alpha}, \boldsymbol{\theta} \mid y).
 \end{align*}
@@ -612,7 +613,7 @@ Once again
 $$
 \pi' (\boldsymbol{\alpha}, \boldsymbol{\theta} \mid y)
 \propto
-N! \, \pi (\boldsymbol{\alpha}) \, \pi(\boldsymbol{\theta}) \,
+K! \, \pi (\boldsymbol{\alpha}) \, \pi(\boldsymbol{\theta}) \,
 \sum_{k = 1}^{K} \theta_k \, \pi (y \mid \alpha_k)
 $$
 is exactly the mixture posterior density confined to the pyramid given by the
@@ -620,7 +621,7 @@ standard ordering.  Consequently, in general we can exactly recover the desired
 expectation by integrating over only the region of parameter space satisfying
 the chosen ordering constraint.
 
-While the ordering is limited to scalar parameters, it can still proves useful
+While the ordering is limited to scalar parameters, it can still prove useful
 when the component distributions are multivariate.  Although we cannot order the
 multivariate parameters themselves, ordering any one of the parameters is
 sufficient to break the labeling degeneracy for the entire mixture.  
