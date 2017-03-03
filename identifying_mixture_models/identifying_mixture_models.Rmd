@@ -32,80 +32,70 @@ the corresponding likelihood and then subsequent posterior distribution.
 
 ## The Mixture Likelihood
 
-Mixture likelihoods become particularly concise if we adopt a $1$-of-$K$
-coding convention where the assignment of the measurement to one of the
-component data generating processes is represented by a set of binary variables,
-$\mathbf{z} = (z_1, \ldots, z_K)$, such that $z_k = 1$ if the measurement was drawn
-from the $k$th component and $z_k = 0$ otherwise.  In this notation the mixture
-likelihood is written as
+Let $z \in \{0 ,\ldots, K\}$ be an _assignment_ that indicates to which data
+generating process our measurement was generated.  Conditioned on this
+assignment, the mixture likelihood is just
 $$
-\pi (y \mid \boldsymbol{\alpha}, \mathbf{z})
+\pi (y \mid \boldsymbol{\alpha}, z)
 =
-\prod_{k = 1}^{K} \pi_{k} ( y \mid \alpha_{k} )^{z_k},
+\pi_{z} ( y \mid \alpha_{z} ),
 $$
 where $\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_K)$.
 
-Because mixture models are extremely expressive they encompass many different
-inferential and decision problems.  For example, if multiple measurements $y_n$
-are given but the corresponding assignments $z_{kn}$ are unknown then inference
-over the mixture model is equivalent to _clustering_ the measurements across the
+By combining assignments with a set of data generating processes we admit an
+extremely expressive class of models that encompass many different inferential
+and decision problems.  For example, if multiple measurements $y_n$ are given
+but the corresponding assignments $z_n$ are unknown then inference over the
+mixture model is equivalent to _clustering_ the measurements across the
 component data generating processes.  Similarly, if both the measurements and
 the assignments are given then inference over the mixture model admits
 _classification_ of future measurements.  Finally, _semi-supervised_ learning
 corresponds to inference over a mixture model where only some of the assignments
 are known.
 
-In practice discrete assignments are difficult to accurately fit, but we can
-immediately facilitate inference by marginalizing the assignments out of the
-model entirely.  First we have to construct the joint distribution for the
-measurements and the assignments,
-$$
-\pi (y, \mathbf{z} \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
-=
-\pi (y \mid \boldsymbol{\alpha}, \mathbf{z}) \,
-\pi (\mathbf{z} \mid \boldsymbol{\theta} ).
-$$
-If each component in the mixture occurs with probability $\theta_k$,
+In practice discrete assignments are difficult to fit accurately and
+efficiently, but we can facilitate inference by _marginalizing_ the assignments
+out of the model entirely.  If each component in the mixture occurs with
+probability $\theta_k$,
 $$
 \boldsymbol{\theta} = (\theta_1, \ldots, \theta_K), \,
 0 \le \theta_{k} \le 1, \,
 \sum_{k = 1}^{K} \theta_{k} = 1,
-$$  
-then we can write the distribution for the assignments as
 $$
-\pi (\mathbf{z} \mid \boldsymbol{\theta} )
+then the assignments follow a multinomial distribution,
+$$
+\pi (z \mid \boldsymbol{\theta} )
 =
-\prod_{k = 1}^{K} \theta_{k}^{z_k},
+\theta_{z},
 $$
-and the joint likelihood becomes
+and the joint likelihood over the measurement and its assignment is given by
 $$
-\pi (y, \mathbf{z} \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
+\pi (y, z \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
 =
-\prod_{k = 1}^{K} \pi_{k} ( y \mid \alpha_{k} )^{z_k}
-\cdot
-\prod_{k = 1}^{K} \theta_{k}^{z_k}
+\pi (y \mid \boldsymbol{\alpha}, z) \,
+\pi (z \mid \boldsymbol{\theta} )
 =
-\prod_{k = 1}^{K} \left[ \theta_k \, \pi_{k} ( y \mid \alpha_{k} ) \right]^{z_k}.
+\pi_{z} ( y \mid \alpha_{z} ) \, \theta_z.
 $$
-
-Finally we marginalize over all of the possible assignments,
+Marginalizing over all of the possible assignments then gives
 $$
+\begin{align*}
 \pi (y \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
-=
-\sum_{\mathbf{z}} \pi (y, \mathbf{z} \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
-=
-\sum_{\mathbf{z}} \prod_{k = 1}^{K}
-\left( \theta_k \, \pi_{k} ( y \mid \alpha_{k} ) \right)^{z_k}.
+&=
+\sum_{z} \pi (y, z \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
+\\
+&=
+\sum_{z} \pi_{z} ( y \mid \alpha_{z} ) \, \theta_z
+\\
+&=
+\sum_{k = 1}^{K} \pi_{k} ( y \mid \alpha_{k} ) \, \theta_k
+\\
+&=
+\sum_{k = 1}^{K}  \theta_k \, \pi_{k} ( y \mid \alpha_{k} ).
+\end{align*}
 $$
-Because each $\mathbf{z}$ identifies a unique mixture component, each term in
-the sum reduces to the corresponding component distribution,
-$$
-\pi (y \mid \boldsymbol{\alpha}, \boldsymbol{\theta})
-=  
-\sum_{k = 1}^{K} \theta_k \, \pi_{k} ( y \mid \alpha_{k} ).
-$$
-The marginal likelihood reduces to a convex combination of the component
-data generating processes.
+In words, after marginalizing out the assignments the mixture likelihood reduces
+to a convex combination of the component data generating processes.
 
 Marginalizing out the discrete assignments yields a likelihood that depends
 on only continuous parameters, making it amenable to state-of-the-art tools like
