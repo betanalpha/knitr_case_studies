@@ -891,6 +891,10 @@ weights, let's try to fit conditioned on a single mixture weight.  Note that we
 will be using just a single chain in this section as the posteriors will all be
 unimodal, but in practice one should always multiple chains as we will not have
 such a guarantee.
+```{r, comment=NA}
+writeLines(readLines("gauss_mix_given_theta.stan"))
+```
+
 ```{r, cache=TRUE, comment=NA}
 theta <- 0.25
 stan_rdump(c("N", "y", "theta"), file="collapse_mix.data.R")
