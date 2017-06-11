@@ -1,0 +1,325 @@
+---
+title: "The QR Decomposition For Regression Models"
+author: "Michael Betancourt"
+date: "June 2017"
+output:
+  html_document:
+    fig_caption: yes
+    theme: cerulean
+---
+
+A common problem with regression modeling is correlation amongst
+the covariates which induces strong posterior correlations that
+can frustrate accurate computation with those models.  In this
+case study I will review the _QR decomposition_, a technique for
+decorrelating the covariates and, hence, the resulting posterior
+distribution.  
+
+We'll begin with a simple example that demonstrates the pathological
+behavior of correlated covariates before going through the mathematics
+of the QR decomposition and how it can be applied in Stan.
+
+# Fitting Issues with Correlated Covariates
+
+Consider a very simple regression with only two covariates --
+$x \sim \mathcal{N} (1, 0.1)$ and it's square, $x^{2}$. The
+inclusion of both $x$ and $x^{2}$ is not uncommon in nonlinear
+regressions where the response is given by polynomials of a set
+of input covariates.
+
+```{r, comment=NA}
+set.seed(689934)
+
+N <- 5000
+x <- rnorm(N, 1, 0.1)
+X = t(data.matrix(data.frame(x, x * x)))
+
+M <- 2
+beta = matrix(c(2.5, -1), nrow=M, ncol=1)
+alpha <- -0.275
+sigma <- 0.8
+
+mu <- t(X) %*% beta + alpha
+y = sapply(1:N, function(n) rnorm(1, mu[n], sigma))
+
+library(rstan)
+rstan_options(auto_write = TRUE)
+stan_rdump(c("N", "M", "X", "y"), file="regression.data.R")
+```
+
+Because $x$ is positive, it will be highly correlated with its
+square.  
+
+```{r}
+c_light <- c("#DCBCBC")
+c_light_highlight <- c("#C79999")
+c_mid <- c("#B97C7C")
+c_mid_highlight <- c("#A25050")
+c_dark <- c("#8F2727")
+c_dark_highlight <- c("#7C0000")
+
+c_light_trans <- c("#DCBCBCBF")
+c_light_highlight_trans <- c("#C79999BF")
+c_mid_trans <- c("#B97C7CBF")
+c_mid_highlight_trans <- c("#A25050BF")
+c_dark_trans <- c("#8F2727BF")
+c_dark_highlight_trans <- c("#7C0000BF")
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(X[1,], X[2,],
+     col=c_dark, pch=16, cex=0.8, xlab="x", ylab="x^2")
+```
+
+The correlations here are particularly strong because we didn't
+standardize the covariates, although standardization only slightly
+reduces the correlations.  In more typical situations the covariates
+will be highly correlated due to common confounders in which case
+standardization will have no effect.
+
+Now let's try to fit a Bayesian linear regression,
+
+```{r, comment=NA}
+writeLines(readLines("regression.stan"))
+```
+
+```{r, cache=TRUE, comment=NA}
+input_data <- read_rdump("regression.data.R")
+
+fit <- stan(file='regression.stan', data=input_data,
+            chains=1, seed=483892929, refresh=1000)
+```
+
+None of the diagnostics indicate a poor fit,
+
+```{r, comment=NA}
+print(fit)
+```
+
+```{r, comment=NA}
+divergent <- get_sampler_params(fit, inc_warmup=FALSE)[[1]][,'divergent__']
+sum(divergent)
+```
+
+```{r, comment=NA}
+breaks= 0:10
+n_hist_nom <- hist(get_sampler_params(fit, inc_warmup=FALSE)[[1]][,'treedepth__'],
+                   breaks=breaks, plot=FALSE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(n_hist_nom, col=c_dark_highlight_trans, main="",
+     xlab="theta.1", yaxt='n', ann=FALSE)
+```
+
+But we can see that the posterior over the slopes is poorly identified.
+
+```{r}
+params <- as.data.frame(extract(fit, permuted=FALSE))
+names(params) <- gsub("chain:1.", "", names(params), fixed = TRUE)
+names(params) <- gsub("[", ".", names(params), fixed = TRUE)
+names(params) <- gsub("]", "", names(params), fixed = TRUE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params$beta.1, params$beta.2,
+     col=c_dark_trans, pch=16, cex=0.8, xlab="beta.1", ylab="beta.2",
+     xlim=c(-6, 6), ylim=c(-3, 3))
+points(beta[1,1], beta[2,1],
+       col=c_mid, pch=17, cex=2)
+```
+
+Note also that the posterior just barely intersects with the true
+value of the slopes.   
+
+# Decorrelating the Posterior with a QR Decomposition
+
+Fortunately we can remove the correlations between the covariates,
+and eliminate the pathological behavior of the Bayesian posterior,
+by applying a QR decomposition.  Perhaps unsurprisingly this is
+the same QR decomposition that arises in the analytic maximum
+likelihood and conjugate Bayesian treatment of linear regression,
+although here it will be applicable regardless of the choice of
+priors and for any general linear model.
+
+## Mathematical Derivation
+
+The _thin_ QR decomposition decomposes a rectangular $I \times J$ matrix
+into
+$$
+\mathbf{A} = \mathbf{Q} \cdot \mathbf{R}
+$$
+where $\mathbf{Q}$ is an $I \times I$ orthogonal matrix and $\mathbf{R}$ is a
+$I \times J$ upper-triangular matrix.
+
+If we apply the decomposition to the transposed design matrix,
+$\mathbf{X}^{T} = \mathbf{Q} \cdot \mathbf{R}$, then we can refactor
+the linear response as
+$$
+\begin{align*}
+\boldsymbol{\mu}
+&= \mathbf{X}^{T} \cdot \boldsymbol{\beta} + \alpha
+\\
+&= \mathbf{Q} \cdot \mathbf{R} \cdot \boldsymbol{\beta} + \alpha
+\\
+&= \mathbf{Q} \cdot (\mathbf{R} \cdot \boldsymbol{\beta}) + \alpha
+\\
+&= \mathbf{Q} \cdot \widetilde{\boldsymbol{\beta}} + \alpha.
+\\
+\end{align*}
+$$
+
+Because the matrix $\mathbf{Q}$ is orthogonal, its columns are
+independent and consequently we'd expect the posterior over the new
+parameters,
+$\widetilde{\boldsymbol{\beta}} = \mathbf{R} \cdot \boldsymbol{\beta}$,
+to be significantly less correlated.
+
+Moreover, we can readily recover the original slopes as
+$$
+\boldsymbol{\beta} = \mathbf{R}^{-1} \cdot \widetilde{\boldsymbol{\beta}}.
+$$
+Because $\mathbf{R}$ is upper diagonal we don't have to construct
+its inverse explicitly and can instead solve for $\boldsymbol{\beta}$
+with only $\mathcal{O} (M^{2})$ operations.
+
+Finally, the transformation between $\boldsymbol{\beta}$ and
+$\widetilde{\boldsymbol{\beta}}$ is _linear_ so the corresponding
+Jacobian is depends only on the data.  This means that in Stan
+we can define the transformed parameters
+$\boldsymbol{\beta} = \mathbf{R}^{-1} \cdot \widetilde{\boldsymbol{\beta}}$
+and apply priors directly to $\boldsymbol{\beta}$ while ignoring
+the warning about Jacobians.
+
+On the other hand, applying weakly-informative priors to the
+$\widetilde{\boldsymbol{\beta}}$ directly can be interpreted as a form
+of _empirical Bayes_ where we use the correlations in the data guide
+the choice of prior.
+
+## Implementation in Stan
+
+With the components of the thin QR decomposition added to the input data,
+```{r, comment=NA}
+qr_decomp = qr(t(X)) # defaults to thin QR decomposition
+
+Q = qr.Q(qr_decomp)
+R = qr.R(qr_decomp)
+
+stan_rdump(c("N", "M", "Q", "R", "y"), file="qr_regression.data.R")
+```
+
+we can readily construct the corresponding QR regression in Stan,
+
+```{r, comment=NA}
+writeLines(readLines("qr_regression.stan"))
+```
+
+The decorrelated model immediately achieves higher effective sample
+size with no indication of pathologies.
+
+```{r, cache=TRUE, warning=TRUE, message=TRUE, comment=NA}
+input_data <- read_rdump("qr_regression.data.R")
+
+qr_fit <- stan(file='qr_regression.stan', data=input_data,
+               chains=1, seed=483892929, refresh=1000)
+```
+
+```{r, comment=NA}
+n_hist_qr <- hist(get_sampler_params(qr_fit, inc_warmup=FALSE)[[1]][,'treedepth__'],
+                  breaks=breaks, plot=FALSE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(n_hist_qr, col=c_dark_highlight_trans, main="", xlab="theta.1", yaxt='n', ann=FALSE)
+plot(n_hist_nom, col=c_mid_trans, add=T)
+
+legend("topright", c("Nominal", "QR"),
+       fill=c(c_mid, c_dark_highlight), bty="n")
+```
+
+```{r}
+params <- as.data.frame(extract(qr_fit, permuted=FALSE))
+names(params) <- gsub("chain:1.", "", names(params), fixed = TRUE)
+names(params) <- gsub("[", ".", names(params), fixed = TRUE)
+names(params) <- gsub("]", "", names(params), fixed = TRUE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params$beta_tilde.1, params$beta_tilde.2,
+     col=c_dark, pch=16, cex=0.8, xlab="beta_tilde.1", ylab="beta_tilde.2")
+```
+
+And we recover the posterior for the nominal slopes,
+
+```{r}
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params$beta.1, params$beta.2,
+     col=c_dark, pch=16, cex=0.8, xlab="beta.1", ylab="beta.2")
+points(beta[1,1], beta[2,1],
+       col=c_mid, pch=17, cex=2)
+```
+
+What's weird, however, is that this _isn't_ the same posterior
+as for the nominal regression.  The QR regression posterior
+has longer tails along the non-identified direction which
+actually ensures a better fit.  **If these are supposed to
+be different implementations of the same model then why are
+they giving different posteriors?  Presumably the QR regression
+would be more accurate, but if the nominal regression is biased
+to smaller tails they why don't any of the diagnostics indicate
+problems?**
+
+If the rows of the effective design matrix are orthogonal then
+why are the transformed slopes still so strongly correlated in
+the QR regression posterior?  Remember that we are putting an
+isotropic gaussian prior on the nominal slopes, but this implies
+a strongly correlated prior for the transformed slopes.  If we
+impose the weakly informative prior on the transformed slopes
+directly we see that the resulting posterior becomes much less
+correlated.  
+
+```{r, cache=TRUE, warning=TRUE, message=TRUE, comment=NA}
+input_data <- read_rdump("qr_regression.data.R")
+
+qr_fit <- stan(file='qr_regression_qr_prior.stan', data=input_data,
+               chains=1, seed=483892929, refresh=1000)
+```
+
+```{r}
+params <- as.data.frame(extract(qr_fit, permuted=FALSE))
+names(params) <- gsub("chain:1.", "", names(params), fixed = TRUE)
+names(params) <- gsub("[", ".", names(params), fixed = TRUE)
+names(params) <- gsub("]", "", names(params), fixed = TRUE)
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params$beta_tilde.1, params$beta_tilde.2,
+     col=c_dark, pch=16, cex=0.8, xlab="beta_tilde.1", ylab="beta_tilde.2")
+```
+
+```{r}
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params$beta.1, params$beta.2,
+     col=c_dark, pch=16, cex=0.8, xlab="beta.1", ylab="beta.2",
+     xlim=c(-6, 6), ylim=c(-3, 3))
+points(beta[1,1], beta[2,1],
+       col=c_mid, pch=17, cex=2)
+```
+
+Care must be taken, however, as this is a different choice of prior
+and hence defines a different model!  In particular, in this case
+a weakly informative prior over the transformed slopes defines a
+strongly informative prior over the nominal slopes that biases the
+posterior away from the true value.
+
+# Conclusion
+
+The QR decomposition is a straightforward technique that can
+drastically improve the performance of regression with not only
+linear models but also general linear models.  Given its ease
+of use and strong potential for improvement it should be a ready
+tool in any modeler's toolbox.
+
+# Original Computing Environment
+
+```{r, comment=NA}
+writeLines(readLines(file.path(Sys.getenv("HOME"), ".R/Makevars")))
+```
+
+```{r, comment=NA}
+devtools::session_info("rstan")
+```
