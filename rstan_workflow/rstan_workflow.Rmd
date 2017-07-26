@@ -1,0 +1,394 @@
+---
+title: "Robust Statistical Workflow with RStan"
+author: "Michael Betancourt"
+date: "July 2017"
+bibliography: rstan_workflow.bib
+output:
+  html_document:
+    fig_caption: yes
+    theme: cerulean
+---
+
+Stan and its implementation of dynamic Hamiltonian Monte Carlo is an extremely
+powerful tool for specifying and then fitting complex Bayesian models. In order
+to ensure a robust analysis, however, that power must be complemented with
+responsibility.
+
+In particular, while dynamic implementations of Hamiltonian Monte Carlo, i.e.
+implementations where the integration time is dynamic, do perform well over a
+large class of models their success is not guaranteed. When they do fail,
+however, their failures manifest in diagnostics that are readily checked.
+
+By acknowledging and respecting these diagnostics you can ensure that Stan is
+accurately fitting the Bayesian posterior and hence accurately characterizing
+your model. And only with an accurate characterization of your model can you
+properly utilize its insights.
+
+# A Little Bit About Markov Chain Monte Carlo
+
+Hamiltonian Monte Carlo is an implementation of Markov chain Monte Carlo,
+an algorithm which approximates expectations with respect to a given target
+distribution, $\pi$,
+$$
+\mathbb{E}_{\pi} [ f ] = \int \mathrm{d}q \, \pi (q) \, f(q),
+$$
+using the states of a Markov chain, $\{q_{0}, \ldots, q_{N} \}$,
+$$
+\mathbb{E}_{\pi} [ f ] \approx
+\hat{f}_{N} = \frac{1}{N + 1} \sum_{n = 0}^{N} f(q_{n}).
+$$
+Typically the target distribution is taken to be the posterior distribution
+of our specified model.
+
+These estimators are guaranteed to be accurate only _asymptotically_,
+as the Markov chain grows to be infinitely long,
+$$
+\lim_{N \rightarrow \infty} \hat{f}_{N} = \mathbb{E}_{\pi} [ f ].
+$$
+To be useful in applied analyses, we need these Markov chain Monte Carlo
+estimators to converge to the true expectation values sufficiently quickly
+that they are reasonably accurate _before_ we exhaust our finite computational
+resources.  This fast convergence requires strong ergodicity conditions to hold,
+typically a condition called _geometric ergodicity_ between the Markov
+transition and target distribution.  In particular, geometric ergodicity is a
+sufficient condition for Markov chain Monte Carlo estimators to follow a central
+limit theorem, which ensures not only that they are unbiased after only a finite
+number of iterations but also that we can empirically quantify their precision,
+$$
+\hat{f}_{N} - \mathbb{E}_{\pi} [ f ]
+\sim \mathcal{N} \! \left( 0, \sqrt{ \mathrm{Var}[f] / N_{\mathrm{eff}}} \right).
+$$
+
+Unfortunately proving geometric ergodicity theoretically is infeasible for
+any nontrivial problem.  Instead we must rely on empirical diagnostics that
+identify _obstructions_ to geometric ergodicity, and hence well-behaved Markov
+chain Monte Carlo estimators.  For a general Markov transition and target
+distribution, the best known diagnostic is the split $\hat{R}$ statistic over an
+ensemble of Markov chains initialized from diffuse points in parameter space.  
+To do any better we need to exploit the particular structure of a given
+transition or target distribution.
+
+Hamiltonian Monte Carlo, for example, is especially powerful in this regard as
+its failures to be geometrically ergodic with respect to any target distribution
+manifest in distinct behaviors that have been developed into sensitive
+diagnostics.  One of these behaviors is the appearance of _divergences_ that
+indicate the Hamiltonian Markov chain has encountered regions of high curvature
+in the target distribution which it cannot adequately explore.  Another is the
+_energy Bayesian fraction of missing information_, or E-BFMI, which quantifies
+the efficacy of the momentum resampling in between Hamiltonian trajectories.
+
+For more details on Markov chain Monte Carlo and Hamiltonian Monte Carlo see
+@Betancourt:2017.
+
+In this case study I will demonstrate the recommended Stan workflow in R
+where we not only fit a model but also scrutinize these diagnostics and ensure
+an accurate fit.
+
+# Setting Up The RStan Environment
+
+We begin by importing the RStan module and setting some local options,
+```{r, comment=NA}
+library(rstan)
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+```
+
+By setting `rstan_options(auto_write = TRUE)` we allow RStan to cache compiled
+models so that we can run them multiple times without the overhead of
+recompilation.  `options(mc.cores = parallel::detectCores())` enables
+RStan to run multiple Markov chains in parallel over any cores that your
+computer may have.  These settings are recommended if you are running locally
+on your own machine, as opposed to running on a remote cluster, and your local
+machine which has plenty of RAM.  For very large problems running multiple
+Markov chains in parallel may exhaust your RAM and degrade performance, in
+which case you would not want to utilize this option.
+
+In order to facilitate checking diagnostics we source the attached utility
+script which loads some useful functions,
+```{r, comment=NA}
+source('stan_utility.R')
+lsf.str()
+```
+
+## Specifying and Fitting A Model in Stan
+
+To demonstrate the recommended Stan workflow let's consider a hierarchical model
+of the eight schools dataset infamous in the statistical literature
+[@Rubin:1981],
+
+$$\mu \sim \mathcal{N}(0, 5)$$
+
+$$\tau \sim \text{Half-Cauchy}(0, 5)$$
+
+$$\theta_{n} \sim \mathcal{N}(\mu, \tau)$$
+
+$$y_{n} \sim \mathcal{N}(\theta_{n}, \sigma_{n}),$$
+
+where $n \in \left\{1, \ldots, 8 \right\}$ and the
+$\left\{ y_{n}, \sigma_{n} \right\}$ are given as data.
+
+For more information on the eight schools dataset see @GelmanEtAl:2014a.
+
+## Specifying the Model with a Stan Program
+
+In particular, let's implement a centered-parameterization of the model which
+is known to frustrate even sophisticated samplers like Hamiltonian Monte Carlo.
+In Stan the centered parameterization is specified with the Stan program
+```{r, comment=NA}
+writeLines(readLines("eight_schools_cp.stan"))
+```
+
+Note that we have specified the Stan program in its own file.  We strongly
+recommend keeping your workflow modular by separating the Stan program from
+the R environment in this way.  Not only does it make it easier to identify
+and read through the Stan-specific components of your analysis, it also makes
+it easy to share your models Stan users exploiting workflows in environments,
+such as Python and the command line.
+
+## Specifying the Data
+
+Similarly, we strongly recommend that you specify the data in its own file.  
+
+Data specified in R lists can be immediately converted to an
+external Stan data file using RStan's `stan_rdump` function,
+```{r, comment=NA}
+J <- 8
+y <- c(28,  8, -3,  7, -1,  1, 18, 12)
+sigma <- c(15, 10, 16, 11,  9, 11, 10, 18)
+
+stan_rdump(c("J", "y", "sigma"), file="eight_schools.data.R")
+```
+
+At the same time, an existing Stan data file can be read into the R
+environment using the `read_rdump` function,
+```{r, comment=NA}
+data <- read_rdump("eight_schools.data.R")
+```
+
+## Fitting the Model
+
+With the model and data specified we can now turn to Stan to quantify the
+resulting posterior distribution with Hamiltonian Monte Carlo,
+```{r, comment=NA}
+fit <- stan(file='eight_schools_cp.stan', data=data, seed=194838)
+```
+
+We recommend explicitly specifying the seed of Stan's random number generator,
+as we have done here, so that we can reproduce these exactly results in the
+future, at least when using the same machine, operating system, and interface.  
+This is especially helpful for the more subtle pathologies that may not always
+be found, which results in seemingly stochastic behavior.
+
+By default the `sampling` method runs 4 Markov chains of Hamiltonian Monte
+Carlo, each initialized from a diffuse initial condition to maximize the
+probability that at least one of the chains might encounter a pathological
+neighborhood of the posterior, if it exists.  Because we set
+`options(mc.cores = parallel::detectCores())` above, these chains will run in
+parallel when possible.
+
+Each of those chains proceeds with 1000 warmup iterations and 1000 sampling
+iterations, totaling 4000 sampling iterations available for diagnostics and
+analysis.
+
+## Validating a Fit in Stan
+
+We are now ready to validate the fit using the information contained in
+the `fit` object.
+
+## Checking Split $\hat{R}$ and Effective Sample Sizes
+
+The first diagnostics we check are universal to Markov chain Monte Carlo and
+are displayed using the `print` method of the `fit` object,
+```{r, comment=NA}
+print(fit)
+```
+
+Firstly we want to ensure that the split $\hat{R}$ for each parameter is close
+to 1.  Empirically we have found that `Rhat > 1.1` is usually indicative of
+problems in the fit.  Here all of the parameters look good.
+
+Then we want to consider the effective sample size, or `n_eff`.  The issue here
+is related to the fact that we are _estimating_ the effective sample size from
+the fit output.  When `n_eff / n_transitions < 0.001` the estimators that we use
+are often biased and can significantly overestimate the true effective sample
+size.
+
+Both large split $\hat{R}$ and low effective samples per transition are
+consequences of poorly mixing Markov chains.  Improving the mixing of the Markov
+chains almost always requires tweaking the model specification, for example with
+a reparameterization or stronger priors.
+
+## Checking the Tree Depth
+
+The dynamic implementation of Hamiltonian Monte Carlo used in Stan has a maximum
+trajectory length built in to avoid infinite loops that can occur for
+non-identified models.  For sufficiently complex models, however, Stan can
+saturate this threshold even if the model is identified, which limits the
+efficacy of the sampler.  
+
+We can check whether that threshold was hit using one of our utility functions,
+```{r, comment=NA}
+check_treedepth(fit)
+```
+
+We're good here, but if our fit had saturated the threshold then we would have
+wanted to rerun with a larger maximum tree depth,
+
+`fit <- stan(file='eight_schools_cp.stan', data=data, seed=194838, control=list(max_treedepth=15))`
+
+and then check if still saturated this larger threshold with
+
+`check_treedepth(fit, 15)`
+
+## Checking the E-BFMI
+
+Hamiltonian Monte Carlo proceeds in two phases -- the algorithm first simulates
+a Hamiltonian trajectory that rapidly explores a slice of the target parameter
+space before resampling the auxiliary momenta to allow the next trajectory to
+explore another slice of the target parameter space.  Unfortunately, the jumps
+between these slices induced by the momenta resamplings can be short, which
+often leads to slow exploration.  
+
+We can identify this problem by consulting the energy Bayesian Fraction of
+Missing Information,
+```{r, comment=NA}
+check_energy(fit)
+```
+
+The `check_energy` function uses the threshold of 0.2 to diagnose problems,
+although this is based on preliminary empirical studies and should be taken
+only as a very rough recommendation.  In particular, this diagnostic comes out
+of recent theoretical work and will be better understood as we apply it to more
+and more problems.
+
+As with split $\hat{R}$ and effective sample size per transition, the problems
+indicated by low E-BFMI are remedied by tweaking the specification of the model.
+Unfortunately the exact tweaks required depend on the exact structure of the
+model and, consequently, there are no generic solutions.
+
+## Checking Divergences
+
+Finally, we can check divergences which indicate pathological neighborhoods of
+the posterior that the simulated Hamiltonian trajectories are not able to
+explore sufficiently well.  For this fit we have a significant number of
+divergences
+```{r, comment=NA}
+check_div(fit)
+```
+indicating that the Markov chains did not completely explore the posterior and
+that our Markov chain Monte Carlo estimators will be biased.
+
+Divergences, however, can sometimes be false positives.  To verify that we
+have real fitting issues we can rerun with a larger target acceptance
+probability, `adapt_delta`, which will force more accurate simulations of
+Hamiltonian trajectories and reduce the false positives.
+```{r, comment=NA}
+fit <- stan(file='eight_schools_cp.stan', data=data, seed=194838, control=list(adapt_delta=0.90))
+```
+
+Checking again,
+```{r, comment=NA}
+check_div(fit)
+```
+we see that while the divergences were reduced they did not completely vanish.
+In order to argue that divergences are only false positives, the divergences
+have to be completely eliminated for some `adapt_delta` sufficiently close to 1.
+Here we could continue increasing `adapt_delta`, where we would see that the
+divergences do not completely vanish, or we can analyze the existing
+divergences graphically.
+
+If the divergences are not false positives then they will tend to concentrate
+in the pathological neighborhoods of the posterior.  Falsely positive divergent
+iterations, however, will follow the same distribution as non-divergent
+iterations.
+
+Here we will use the `partition_div` function of the `stan_utility` module to
+separate divergence and non-divergent iterations,
+
+```{r, comment=NA}
+c_dark <- c("#8F272780")
+green <- c("#00FF0080")
+
+partition <- partition_div(fit)
+div_params <- partition[[1]]
+nondiv_params <- partition[[2]]
+
+par(mar = c(4, 4, 0.5, 0.5))
+plot(nondiv_params$'theta[1]', log(nondiv_params$tau),
+     col=c_dark, pch=16, cex=0.8, xlab="theta[1]", ylab="log(tau)",
+     xlim=c(-20, 50), ylim=c(-1,4))
+points(div_params$'theta[1]', log(div_params$tau),
+       col=green, pch=16, cex=0.8)
+```
+
+One of the challenges with a visual analysis of divergences is determining
+exactly which parameters to examine.  Consequently visual analyses are most
+useful when there are already components of the model about which you are
+suspicious, as in this case where we know that the correlation between random
+effects (`theta.1` through `theta.8`) and the hierarchical standard deviation,
+`tau`, can be problematic.
+
+Indeed we see the divergences clustering towards small values of tau where the
+posterior abruptly stops.  This abrupt stop is indicative of a transition into
+a pathological neighborhood that Stan was not able to penetrate.
+
+In order to avoid this issue we have to consider a modification to our model,
+and in this case we can appeal to a _non-centered parameterization_ of the same
+model that does not suffer these issues.
+
+## Validating a Fit in ShinyStan
+
+Another way of browsing the diagnostic information is to use the
+Shiny app _ShinyStan_.
+
+After loading the library,
+```{r, comment=NA}
+library(shinystan)
+```
+
+ShinyStan can be activated with the call
+
+`launch_shinystan(fit)`
+
+which opens ShinyStan in a new browser window.
+
+Quantitative diagnostics can be found in the "Diagnose" tab.  Divergences
+will also be shown in the plots created in the "Expore" tab.
+
+# A Successful Fit
+
+Multiple diagnostics have indicated that our fit of the centered
+parameterization of our hierarchical model is not to be trusted, so let's
+instead consider the complementary non-centered parameterization,
+
+```{r, comment=NA}
+writeLines(readLines("eight_schools_ncp.stan"))
+```
+
+Running this model,
+```{r, comment=NA}
+fit <- stan(file='eight_schools_ncp.stan', data=data, seed=194838, control=list(adapt_delta=0.9))
+```
+we see that all of the diagnostics are clean,
+```{r, comment=NA}
+print(fit)
+check_treedepth(fit)
+check_energy(fit)
+check_div(fit)
+```
+
+With this more appropriate implementation of our model  we can now utilize
+Markov chain Monte Carlo estimators of expectations, such as parameter means
+and variances, to accurately characterize our model's posterior distribution.
+
+# Original Computing Environment
+
+```{r, comment=NA}
+writeLines(readLines(file.path(Sys.getenv("HOME"), ".R/Makevars")))
+```
+
+```{r, comment=NA}
+devtools::session_info("rstan")
+```
+
+# References
