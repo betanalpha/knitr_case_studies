@@ -1,9 +1,15 @@
 data {
   int<lower=1> N;
   int<lower=1> M;
-  matrix[N, M] Q;
-  matrix[M, M] R;
+  matrix[M, N] X;
   vector[N] y;
+}
+
+transformed data {
+  // Compute, thin, and then scale QR decomposition
+  matrix[N, M] Q = qr_Q(X')[, 1:M] * N;
+  matrix[M, M] R = qr_R(X')[1:M, ] / N;
+  matrix[M, M] R_inv = inverse(R);
 }
 
 parameters {
@@ -13,13 +19,10 @@ parameters {
 }
 
 transformed parameters {
-  // Lots of transposing because Stan doesn't
-  // have a mdivide_right_tri_upper
-  vector[M] beta = mdivide_right_tri_low(beta_tilde', R')';
+  vector[M] beta = R_inv * beta_tilde;
 }
 
 model {
-  beta ~ normal(0, 10);
   alpha ~ normal(0, 10);
   sigma ~ cauchy(0, 10);
 

@@ -12,9 +12,9 @@ parameters {
 }
 
 model {
-  beta ~ normal(0, 1);
-  alpha ~ normal(0, 1);
-  sigma ~ cauchy(0, 1);
+  beta ~ normal(0, 10);
+  alpha ~ normal(0, 10);
+  sigma ~ cauchy(0, 10);
 
   y ~ normal(X' * beta + alpha, sigma);
 }

@@ -1,37 +1,71 @@
 ---
 title: "The QR Decomposition For Regression Models"
 author: "Michael Betancourt"
-date: "June 2017"
+date: "July 2017"
 output:
   html_document:
     fig_caption: yes
     theme: cerulean
 ---
 
-A common problem with regression modeling is correlation amongst
-the covariates which induces strong posterior correlations that
-can frustrate accurate computation with those models.  In this
-case study I will review the _QR decomposition_, a technique for
-decorrelating the covariates and, hence, the resulting posterior
-distribution.  
+A common problem in regression modeling is correlation amongst the covariates
+which can induce strong posterior correlations that frustrate accurate
+computation.  In this case study I will review the  _QR decomposition_, a
+technique for decorrelating covariates and, consequently, the resulting
+posterior distribution.  
 
-We'll begin with a simple example that demonstrates the pathological
-behavior of correlated covariates before going through the mathematics
-of the QR decomposition and how it can be applied in Stan.
+We'll begin with a simple example that demonstrates the difficulties induced
+by correlated covariates before going through the mathematics of the QR
+decomposition and finally how it can be applied in Stan.
+
+# Setting up the RStan Environment
+
+First things first, let's setup our local environment,
+
+```{r, comment=NA}
+library(rstan)
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+source("stan_utility.R")
+
+c_light <- c("#DCBCBC")
+c_light_highlight <- c("#C79999")
+c_mid <- c("#B97C7C")
+c_mid_highlight <- c("#A25050")
+c_dark <- c("#8F2727")
+c_dark_highlight <- c("#7C0000")
+
+c_light_trans <- c("#DCBCBC80")
+c_light_highlight_trans <- c("#C7999980")
+c_mid_trans <- c("#B97C7C80")
+c_mid_highlight_trans <- c("#A2505080")
+c_dark_trans <- c("#8F272780")
+c_dark_highlight_trans <- c("#7C000080")
+```
 
 # Fitting Issues with Correlated Covariates
 
-Consider a very simple regression with only two covariates --
-$x \sim \mathcal{N} (1, 0.1)$ and it's square, $x^{2}$. The
-inclusion of both $x$ and $x^{2}$ is not uncommon in nonlinear
-regressions where the response is given by polynomials of a set
-of input covariates.
+Now consider a very simple regression with only two covariates --
+$x \sim \mathcal{N} (1, 0.1)$ and it's square, $x^{2}$. The inclusion of both
+$x$ and $x^{2}$ is not uncommon in polynomial regressions where the response is
+given by a sum of polynomials over the input covariates.
+
+In particular, the correlations here are particularly strong because we didn't
+standardize the covariate, $x$, before squaring it.  Powers are much better
+identified when the input is centered around zero.  Unfortunately in practice
+we may not be able to standardize the covariates before they are transformed.
+Moreover, in more complex regressions seemingly independent covariates are
+often highly correlated due to common confounders in which case standardization
+will not be of much help.
+
+We begin by simulating some data and, per good Stan practice, saving it in an
+external file,
 
 ```{r, comment=NA}
 set.seed(689934)
 
 N <- 5000
-x <- rnorm(N, 1, 0.1)
+x <- rnorm(N, 10, 1)
 X = t(data.matrix(data.frame(x, x * x)))
 
 M <- 2
@@ -42,116 +76,132 @@ sigma <- 0.8
 mu <- t(X) %*% beta + alpha
 y = sapply(1:N, function(n) rnorm(1, mu[n], sigma))
 
-library(rstan)
-rstan_options(auto_write = TRUE)
-stan_rdump(c("N", "M", "X", "y"), file="regression.data.R")
+stan_rdump(c("N", "M", "X", "y"), file="regr.data.R")
 ```
 
-Because $x$ is positive, it will be highly correlated with its
-square.  
+Because the covariate $x$ is restricted to positive values, it is highly
+correlated with its square,
 
 ```{r}
-c_light <- c("#DCBCBC")
-c_light_highlight <- c("#C79999")
-c_mid <- c("#B97C7C")
-c_mid_highlight <- c("#A25050")
-c_dark <- c("#8F2727")
-c_dark_highlight <- c("#7C0000")
-
-c_light_trans <- c("#DCBCBCBF")
-c_light_highlight_trans <- c("#C79999BF")
-c_mid_trans <- c("#B97C7CBF")
-c_mid_highlight_trans <- c("#A25050BF")
-c_dark_trans <- c("#8F2727BF")
-c_dark_highlight_trans <- c("#7C0000BF")
-
 par(mar = c(4, 4, 0.5, 0.5))
 plot(X[1,], X[2,],
      col=c_dark, pch=16, cex=0.8, xlab="x", ylab="x^2")
 ```
 
-The correlations here are particularly strong because we didn't
-standardize the covariates, although standardization only slightly
-reduces the correlations.  In more typical situations the covariates
-will be highly correlated due to common confounders in which case
-standardization will have no effect.
-
-Now let's try to fit a Bayesian linear regression,
+With the data in hand we can attempt to fit a naive linear regression model,
 
 ```{r, comment=NA}
-writeLines(readLines("regression.stan"))
+writeLines(readLines("regr.stan"))
 ```
 
 ```{r, cache=TRUE, comment=NA}
-input_data <- read_rdump("regression.data.R")
-
-fit <- stan(file='regression.stan', data=input_data,
-            chains=1, seed=483892929, refresh=1000)
+input_data <- read_rdump("regr.data.R")
+fit <- stan(file='regr.stan', data=input_data, seed=483892929)
 ```
 
-None of the diagnostics indicate a poor fit,
+Checking our diagnostics,
 
 ```{r, comment=NA}
 print(fit)
+check_treedepth(fit)
+check_energy(fit)
+check_div(fit)
 ```
 
-```{r, comment=NA}
-divergent <- get_sampler_params(fit, inc_warmup=FALSE)[[1]][,'divergent__']
-sum(divergent)
-```
+we see that everything looks okay save for some trajectories that have
+prematurely terminated because of the default tree depth limit.  Although there
+aren't many of them,
 
 ```{r, comment=NA}
-breaks= 0:10
-n_hist_nom <- hist(get_sampler_params(fit, inc_warmup=FALSE)[[1]][,'treedepth__'],
-                   breaks=breaks, plot=FALSE)
+breaks <- 0:10
+sampler_params <- get_sampler_params(fit, inc_warmup=FALSE)
+treedepths <- do.call(rbind, sampler_params)[,'treedepth__']
+treedepths_hist <- hist(treedepths, breaks=breaks, plot=FALSE)
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(n_hist_nom, col=c_dark_highlight_trans, main="",
+plot(treedepths_hist, col=c_dark_highlight_trans, main="",
      xlab="theta.1", yaxt='n', ann=FALSE)
 ```
 
-But we can see that the posterior over the slopes is poorly identified.
+even a few prematurely terminating trajectories can hinder performance, and
+may even indicate potential problems with adaptation.
+
+To maximize performance and avoid any potential issues we refit with a larger
+tree depth threshold,
+
+```
+fit <- stan(file='regr.stan', data=input_data, seed=483892929, control=list(max_treedepth=15))
+```
+
+Now the diagnostics are clean
+
+```{r, comment=NA}
+print(fit)
+check_treedepth(fit, 15)
+check_energy(fit)
+check_div(fit)
+```
+
+The small step sizes, however,
+
+```{r, comment=NA}
+sampler_params <- get_sampler_params(fit, inc_warmup=FALSE)
+stepsizes <- sapply(sampler_params, function(x) x[1,'stepsize__'])
+names(stepsizes) <- list("Chain 1", "Chain 2", "Chain 3" ,"Chain 4")
+stepsizes
+```
+
+do require significant computation, over one million gradient evaluations,
+across the entire fit,
+
+```{r, comment=NA}
+n_gradients <- sapply(sampler_params, function(x) sum(x[,'n_leapfrog__']))
+n_gradients
+sum(n_gradients)
+```
+
+Plotting the posterior samples we can see why.  The marginal posterior for the
+slopes is only weakly-identified and the posterior geometry becomes extremely
+narrow,
 
 ```{r}
-params <- as.data.frame(extract(fit, permuted=FALSE))
-names(params) <- gsub("chain:1.", "", names(params), fixed = TRUE)
-names(params) <- gsub("[", ".", names(params), fixed = TRUE)
-names(params) <- gsub("]", "", names(params), fixed = TRUE)
+partition <- partition_div(fit)
+params <- partition[[2]]
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(params$beta.1, params$beta.2,
-     col=c_dark_trans, pch=16, cex=0.8, xlab="beta.1", ylab="beta.2",
-     xlim=c(-6, 6), ylim=c(-3, 3))
+plot(params$'beta[1]', params$'beta[2]',
+     col=c_dark_trans, pch=16, cex=0.8, xlab="beta[1]", ylab="beta[2]",
+     xlim=c(1.5, 3), ylim=c(-1.1, -0.9))
 points(beta[1,1], beta[2,1],
        col=c_mid, pch=17, cex=2)
 ```
 
-Note also that the posterior just barely intersects with the true
-value of the slopes.   
+requiring very precise trajectory simulations at each iteration of the Markov
+chains.
 
 # Decorrelating the Posterior with a QR Decomposition
 
-Fortunately we can remove the correlations between the covariates,
-and eliminate the pathological behavior of the Bayesian posterior,
-by applying a QR decomposition.  Perhaps unsurprisingly this is
-the same QR decomposition that arises in the analytic maximum
-likelihood and conjugate Bayesian treatment of linear regression,
-although here it will be applicable regardless of the choice of
-priors and for any general linear model.
+Fortunately we can reduce the correlations between the covariates, and
+ameliorate the challenging geometry of the Bayesian posterior, by applying a QR
+decomposition.  Perhaps unsurprisingly this is the same QR decomposition that
+arises in the analytic maximum likelihood and conjugate Bayesian treatment of
+linear regression, although here it will be applicable regardless of the choice
+of priors and for any general linear model.
 
 ## Mathematical Derivation
 
-The _thin_ QR decomposition decomposes a rectangular $I \times J$ matrix
+The _thin_ QR decomposition decomposes a rectangular $N \times M$ matrix
 into
 $$
 \mathbf{A} = \mathbf{Q} \cdot \mathbf{R}
 $$
-where $\mathbf{Q}$ is an $I \times I$ orthogonal matrix and $\mathbf{R}$ is a
-$I \times J$ upper-triangular matrix.
+where $\mathbf{Q}$ is an $N \times M$ orthogonal matrix with $M$ non-zero rows
+and $N - M$ rows of vanishing rows, and $\mathbf{R}$ is a $M \times M$
+upper-triangular matrix.
 
 If we apply the decomposition to the transposed design matrix,
-$\mathbf{X}^{T} = \mathbf{Q} \cdot \mathbf{R}$, then we can refactor
-the linear response as
+$\mathbf{X}^{T} = \mathbf{Q} \cdot \mathbf{R}$, then we can refactor the linear
+response as
 $$
 \begin{align*}
 \boldsymbol{\mu}
@@ -166,153 +216,162 @@ $$
 \end{align*}
 $$
 
-Because the matrix $\mathbf{Q}$ is orthogonal, its columns are
-independent and consequently we'd expect the posterior over the new
-parameters,
+Because the matrix $\mathbf{Q}$ is orthogonal, its columns are independent and
+consequently we expect the posterior over the new parameters,
 $\widetilde{\boldsymbol{\beta}} = \mathbf{R} \cdot \boldsymbol{\beta}$,
-to be significantly less correlated.
+to be significantly less correlated.  In practice we can also equalize the
+scales of the posterior by normalizing the $Q$ and $R$ matrices,
+$$
+\begin{align*}
+\mathbf{Q} &\rightarrow \mathbf{Q} \cdot N
+\\
+\mathbf{R} &\rightarrow \mathbf{R} \, / \, N.
+\end{align*}
+$$
 
-Moreover, we can readily recover the original slopes as
+We can then readily recover the original slopes as
 $$
 \boldsymbol{\beta} = \mathbf{R}^{-1} \cdot \widetilde{\boldsymbol{\beta}}.
 $$
-Because $\mathbf{R}$ is upper diagonal we don't have to construct
-its inverse explicitly and can instead solve for $\boldsymbol{\beta}$
-with only $\mathcal{O} (M^{2})$ operations.
+As $\mathbf{R}$ is upper diagonal we could compute its inverse with only
+$\mathcal{O} (M^{2})$ operations, but because we need to compute it only once
+we will use the naive inversion function in Stan here.
 
-Finally, the transformation between $\boldsymbol{\beta}$ and
-$\widetilde{\boldsymbol{\beta}}$ is _linear_ so the corresponding
-Jacobian is depends only on the data.  This means that in Stan
-we can define the transformed parameters
+Because the transformation between $\boldsymbol{\beta}$ and
+$\widetilde{\boldsymbol{\beta}}$ is _linear_, the corresponding Jacobian depends
+only on the data and hence doesn't affect posterior computations.  This means
+that in Stan we can define the transformed parameters
 $\boldsymbol{\beta} = \mathbf{R}^{-1} \cdot \widetilde{\boldsymbol{\beta}}$
-and apply priors directly to $\boldsymbol{\beta}$ while ignoring
-the warning about Jacobians.
+and apply priors directly to $\boldsymbol{\beta}$ while ignoring the warning
+about Jacobians.
 
-On the other hand, applying weakly-informative priors to the
+Interestingly, applying weakly-informative priors to the
 $\widetilde{\boldsymbol{\beta}}$ directly can be interpreted as a form
-of _empirical Bayes_ where we use the correlations in the data guide
-the choice of prior.
+of _empirical Bayes_, where we use the empirical correlations in the data to
+guide the choice of prior.
 
 ## Implementation in Stan
 
-With the components of the thin QR decomposition added to the input data,
-```{r, comment=NA}
-qr_decomp = qr(t(X)) # defaults to thin QR decomposition
-
-Q = qr.Q(qr_decomp)
-R = qr.R(qr_decomp)
-
-stan_rdump(c("N", "M", "Q", "R", "y"), file="qr_regression.data.R")
-```
-
-we can readily construct the corresponding QR regression in Stan,
+The scaled, thin QR decomposition is straightforward to implement in Stan,
 
 ```{r, comment=NA}
-writeLines(readLines("qr_regression.stan"))
+writeLines(readLines("qr_regr.stan"))
 ```
 
-The decorrelated model immediately achieves higher effective sample
-size with no indication of pathologies.
+Fitting the QR regression model, and ignoring the warning about the Jacobian
+due to the considerations above,
 
-```{r, cache=TRUE, warning=TRUE, message=TRUE, comment=NA}
-input_data <- read_rdump("qr_regression.data.R")
-
-qr_fit <- stan(file='qr_regression.stan', data=input_data,
-               chains=1, seed=483892929, refresh=1000)
+```{r, cache=TRUE, comment=NA}
+qr_fit <- stan(file='qr_regr.stan', data=input_data, seed=483892929)
 ```
+
+we see no indications of an inaccurate fit,
 
 ```{r, comment=NA}
-n_hist_qr <- hist(get_sampler_params(qr_fit, inc_warmup=FALSE)[[1]][,'treedepth__'],
-                  breaks=breaks, plot=FALSE)
-
-par(mar = c(4, 4, 0.5, 0.5))
-plot(n_hist_qr, col=c_dark_highlight_trans, main="", xlab="theta.1", yaxt='n', ann=FALSE)
-plot(n_hist_nom, col=c_mid_trans, add=T)
-
-legend("topright", c("Nominal", "QR"),
-       fill=c(c_mid, c_dark_highlight), bty="n")
+print(qr_fit)
+check_treedepth(qr_fit)
+check_energy(qr_fit)
+check_div(qr_fit)
 ```
+
+The effective sample sizes are the same, but the larger step sizes,
+
+```{r, comment=NA}
+sampler_params <- get_sampler_params(qr_fit, inc_warmup=FALSE)
+qr_stepsizes <- sapply(sampler_params, function(x) x[1,'stepsize__'])
+names(qr_stepsizes) <- list("Chain 1", "Chain 2", "Chain 3" ,"Chain 4")
+qr_stepsizes
+```
+
+require only about half the gradient evaluations needed in the naive regression,
+
+```{r, comment=NA}
+n_gradients <- sapply(sampler_params, function(x) sum(x[,'n_leapfrog__']))
+n_gradients
+sum(n_gradients)
+```
+
+Consequently even in this simple example the QR decomposition is about twice
+as fast as the naive regression.  In more complex, higher-dimensional
+regressions the improvement can be even larger.
+
+This is not unexpected, however, given how much less correlated the posterior
+for the transformed slopes is,
 
 ```{r}
-params <- as.data.frame(extract(qr_fit, permuted=FALSE))
-names(params) <- gsub("chain:1.", "", names(params), fixed = TRUE)
-names(params) <- gsub("[", ".", names(params), fixed = TRUE)
-names(params) <- gsub("]", "", names(params), fixed = TRUE)
+partition <- partition_div(qr_fit)
+params <- partition[[2]]
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(params$beta_tilde.1, params$beta_tilde.2,
-     col=c_dark, pch=16, cex=0.8, xlab="beta_tilde.1", ylab="beta_tilde.2")
+plot(params$'beta_tilde[1]', params$'beta_tilde[2]',
+     col=c_dark_trans, pch=16, cex=0.8, xlab="beta_tilde[1]", ylab="beta_tilde[2]")
 ```
 
-And we recover the posterior for the nominal slopes,
+Comfortingly, we also successfully recover the posterior for the nominal slopes,
 
 ```{r}
 par(mar = c(4, 4, 0.5, 0.5))
-plot(params$beta.1, params$beta.2,
-     col=c_dark, pch=16, cex=0.8, xlab="beta.1", ylab="beta.2")
+plot(params$'beta[1]', params$'beta[2]',
+     col=c_dark_trans, pch=16, cex=0.8, xlab="beta[1]", ylab="beta[2]",
+     xlim=c(1.5, 3), ylim=c(-1.1, -0.9))
 points(beta[1,1], beta[2,1],
        col=c_mid, pch=17, cex=2)
 ```
 
-What's weird, however, is that this _isn't_ the same posterior
-as for the nominal regression.  The QR regression posterior
-has longer tails along the non-identified direction which
-actually ensures a better fit.  **If these are supposed to
-be different implementations of the same model then why are
-they giving different posteriors?  Presumably the QR regression
-would be more accurate, but if the nominal regression is biased
-to smaller tails they why don't any of the diagnostics indicate
-problems?**
+## Interaction of the QR Decomposition and Priors
 
-If the rows of the effective design matrix are orthogonal then
-why are the transformed slopes still so strongly correlated in
-the QR regression posterior?  Remember that we are putting an
-isotropic gaussian prior on the nominal slopes, but this implies
-a strongly correlated prior for the transformed slopes.  If we
-impose the weakly informative prior on the transformed slopes
-directly we see that the resulting posterior becomes much less
-correlated.  
+If the rows of the effective design matrix, $\mathbf{Q}$, are orthogonal then
+why are the transformed slopes nontrivially correlated in the QR regression
+posterior?  The independent weakly informative priors we put on the nominal
+slopes actually implies a strongly correlated prior for the transformed slopes!  
+
+If we remove the weakly informative prior entirely,
+
+```{r, comment=NA}
+writeLines(readLines("qr_regr_no_prior.stan"))
+```
 
 ```{r, cache=TRUE, warning=TRUE, message=TRUE, comment=NA}
-input_data <- read_rdump("qr_regression.data.R")
-
-qr_fit <- stan(file='qr_regression_qr_prior.stan', data=input_data,
-               chains=1, seed=483892929, refresh=1000)
+qr_fit <- stan(file='qr_regr_no_prior.stan', data=input_data, seed=483892929)
 ```
+
+```{r, comment=NA}
+print(qr_fit)
+check_treedepth(qr_fit)
+check_energy(qr_fit)
+check_div(qr_fit)
+```
+
+then the posterior for the  transformed slopes becomes significantly less
+correlated,
 
 ```{r}
-params <- as.data.frame(extract(qr_fit, permuted=FALSE))
-names(params) <- gsub("chain:1.", "", names(params), fixed = TRUE)
-names(params) <- gsub("[", ".", names(params), fixed = TRUE)
-names(params) <- gsub("]", "", names(params), fixed = TRUE)
+partition <- partition_div(qr_fit)
+params <- partition[[2]]
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(params$beta_tilde.1, params$beta_tilde.2,
-     col=c_dark, pch=16, cex=0.8, xlab="beta_tilde.1", ylab="beta_tilde.2")
+plot(params$'beta_tilde[1]', params$'beta_tilde[2]',
+     col=c_dark_trans, pch=16, cex=0.8, xlab="beta_tilde[1]", ylab="beta_tilde[2]")
 ```
 
-```{r}
-par(mar = c(4, 4, 0.5, 0.5))
-plot(params$beta.1, params$beta.2,
-     col=c_dark, pch=16, cex=0.8, xlab="beta.1", ylab="beta.2",
-     xlim=c(-6, 6), ylim=c(-3, 3))
-points(beta[1,1], beta[2,1],
-       col=c_mid, pch=17, cex=2)
-```
+**Or it should.  What's going on here?**
 
-Care must be taken, however, as this is a different choice of prior
-and hence defines a different model!  In particular, in this case
-a weakly informative prior over the transformed slopes defines a
-strongly informative prior over the nominal slopes that biases the
-posterior away from the true value.
+In particular, the QR decomposition performs best when there the likelihood
+dominates the prior, either due to sufficiently many data or sufficiently weak
+prior information.
 
 # Conclusion
 
-The QR decomposition is a straightforward technique that can
-drastically improve the performance of regression with not only
-linear models but also general linear models.  Given its ease
-of use and strong potential for improvement it should be a ready
-tool in any modeler's toolbox.
+The QR decomposition is a straightforward technique that can drastically improve
+the performance of regression with not only linear models but also general
+linear models.  Given its ease of use and strong potential for improvement it
+should be a ready tool in any modeler's toolbox.
+
+# Acknowledgements
+
+The exact implementation used here was cribbed from the discussion of QR
+decomposition in the Stan manual.  The technique was originally introduced
+into the Stan ecosystem by Ben Goodrich.
 
 # Original Computing Environment
 
