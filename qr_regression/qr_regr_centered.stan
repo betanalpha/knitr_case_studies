@@ -6,10 +6,18 @@ data {
 }
 
 transformed data {
+  matrix[M, N] X_centered;
+  matrix[N, M] Q;
+  matrix[M, M] R;
+  matrix[M, M] R_inv;
+
+  for (m in 1:M)
+    X_centered[m] = X[m] - mean(X[m]);
+
   // Compute, thin, and then scale QR decomposition
-  matrix[N, M] Q = qr_Q(X')[, 1:M] * N;
-  matrix[M, M] R = qr_R(X')[1:M, ] / N;
-  matrix[M, M] R_inv = inverse(R);
+   Q = qr_Q(X_centered')[, 1:M] * N;
+   R = qr_R(X_centered')[1:M, ] / N;
+   R_inv = inverse(R);
 }
 
 parameters {
@@ -23,7 +31,8 @@ transformed parameters {
 }
 
 model {
-  alpha ~ normal(0, 10);
+  beta ~ normal(0, 10);
+  alpha ~ normal(0, 100);
   sigma ~ cauchy(0, 10);
 
   y ~ normal(Q * beta_tilde + alpha, sigma);

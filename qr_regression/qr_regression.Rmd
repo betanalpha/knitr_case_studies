@@ -318,21 +318,38 @@ points(beta[1,1], beta[2,1],
        col=c_mid, pch=17, cex=2)
 ```
 
-## Interaction of the QR Decomposition and Priors
+## The Importance of Centering Covariates
 
-If the rows of the effective design matrix, $\mathbf{Q}$, are orthogonal then
+If the rows of the effective design matrix, $\mathbf{Q}$, are orthogonal, then
 why are the transformed slopes nontrivially correlated in the QR regression
-posterior?  The independent weakly informative priors we put on the nominal
-slopes actually implies a strongly correlated prior for the transformed slopes!  
+posterior?  
 
-If we remove the weakly informative prior entirely,
+One possibility could be the prior we put on the nominal slopes, which implies a
+strongly correlated prior for the transformed slopes.  Here, however, the prior
+is too weak to have any strong effect on the posterior distribution.  Still,
+it's important to keep in mind that the QR decomposition performs best when the
+likelihood dominates the prior, either due to sufficiently many data or
+sufficiently weak prior information.
+
+The real cause of the correlations in the posterior for the transformed slopes
+is that _the covariates are not centered_.  As with any decomposition, the QR
+decomposition can fully decorrelate the covariates, and hence the likelihood
+and the corresponding posterior, only after the covariates have been centered
+around their empirical means.
+
+Our design matrix is readily recentered within Stan itself, although we just as
+easily could have done it within R itself.  Keeping in mind that centering the
+covariates drastically changes the interpretation of the intercept, we also
+should inflate the prior for $\alpha$,
 
 ```{r, comment=NA}
-writeLines(readLines("qr_regr_no_prior.stan"))
+writeLines(readLines("qr_regr_centered.stan"))
 ```
 
+and then fit the recentered design matrix,
+
 ```{r, cache=TRUE, warning=TRUE, message=TRUE, comment=NA}
-qr_fit <- stan(file='qr_regr_no_prior.stan', data=input_data, seed=483892929)
+qr_fit <- stan(file='qr_regr_centered.stan', data=input_data, seed=483892929)
 ```
 
 ```{r, comment=NA}
@@ -342,8 +359,21 @@ check_energy(qr_fit)
 check_div(qr_fit)
 ```
 
-then the posterior for the  transformed slopes becomes significantly less
-correlated,
+Not only has the effective sample size has drastically increased, the fit
+requires only a tenth of the gradient evaluations needed by the naive
+regression,
+
+```{r, comment=NA}
+sampler_params <- get_sampler_params(qr_fit, inc_warmup=FALSE)
+n_gradients <- sapply(sampler_params, function(x) sum(x[,'n_leapfrog__']))
+n_gradients
+sum(n_gradients)
+```
+
+With the improved effective sample size and reduced computational cost, the
+centered QR decomposition achieves a 20 fold increase in performance!
+
+All of this is due to the now isotropic posterior for the transformed slopes,
 
 ```{r}
 partition <- partition_div(qr_fit)
@@ -354,11 +384,21 @@ plot(params$'beta_tilde[1]', params$'beta_tilde[2]',
      col=c_dark_trans, pch=16, cex=0.8, xlab="beta_tilde[1]", ylab="beta_tilde[2]")
 ```
 
-**Or it should.  What's going on here?**
+While the posterior for the new intercept is expectedly different, the posterior
+for the nominal slopes remains the same,
 
-In particular, the QR decomposition performs best when there the likelihood
-dominates the prior, either due to sufficiently many data or sufficiently weak
-prior information.
+```{r}
+par(mar = c(4, 4, 0.5, 0.5))
+plot(params$'beta[1]', params$'beta[2]',
+     col=c_dark_trans, pch=16, cex=0.8, xlab="beta[1]", ylab="beta[2]",
+     xlim=c(1.5, 3), ylim=c(-1.1, -0.9))
+points(beta[1,1], beta[2,1],
+       col=c_mid, pch=17, cex=2)
+```
+
+A common feature of regression models, centering not only improves the
+interpretability of the model but also proves critical to achieving optimal
+computational performance.  
 
 # Conclusion
 
@@ -370,8 +410,8 @@ should be a ready tool in any modeler's toolbox.
 # Acknowledgements
 
 The exact implementation used here was cribbed from the discussion of QR
-decomposition in the Stan manual.  The technique was originally introduced
-into the Stan ecosystem by Ben Goodrich.
+decomposition in the Stan manual written by Ben Goodrich, who also originally
+introduced the technique into the Stan ecosystem.
 
 # Original Computing Environment
 
