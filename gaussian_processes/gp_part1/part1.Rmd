@@ -111,14 +111,13 @@ In this case study we will assume a zero mean function.
 The covariance function or covariance kernel, $k(x_1, x_2)$ controls how
 the realizations of a Gaussian process vary around the mean function.  
 The larger to covariance between two covariates, $x_1$ and $x_2$, the
-closer less their functional outputs, $f(x_1)$ and $f(x_2)$, can vary.
+less their functional outputs, $f(x_1)$ and $f(x_2)$, can vary.
 
 There are many other covariance functions in common use, and those common
-covariance functions can be combined to yield even more covariance functions
-as covariance functions form an _algebra_.  Not only is the sum of two
-covariance functions also a covariance function, so too is their product.  
-Consequently we can build quite sophisticated Gaussian processes by
-exploiting just a few base covariance functions.
+covariance functions can be combined to yield even more covariance functions.
+Not only is the sum of two covariance functions also a covariance function,
+so too is their product.  Consequently we can build quite sophisticated
+Gaussian processes by exploiting just a few base covariance functions.
 
 Perhaps the most common covariance function, and the one we will use
 in this case study exclusively, is the _exponentiated quadratic_
@@ -127,7 +126,8 @@ $$ k(x_1, x_2) =
 \alpha^{2} \exp \left( - \frac{ (x_1 - x_2)^{2} }{\rho^{2}} \right).$$
 Unfortunately naming conventions for this kernel are not entirely
 consistent across fields or even time, and the reader might also find
-it referred to as a squared exponential kernel amonst other names.
+it referred to as a squared exponential kernel, a quadratic exponential
+kernel, and a Gaussian kernel, amongst other names.
 
 The exponentiated quadratic kernel supports smooth functions between
 covariate inputs and a one-dimensional variate output.  The _marginal
@@ -175,7 +175,6 @@ Given a regression model such as
 $$\pi(y \mid x, \sigma) = \mathcal{N} (y \mid f(x), \sigma)$$
 or
 $$\pi(y \mid x, \phi) = \mathrm{NegBin2}(y \mid f(x), \phi)$$
-$$
 we introduce a Gaussian process as a prior over the functions $f(x)$
 which defines a joint model over the statistical model for the variates
 and its functional dependency on the covariates.  Given observations we
@@ -187,7 +186,7 @@ Gaussian process prior.  In other words if
 $$y \sim \mathcal{N} (f(x), \sigma)$$
 $$f \sim \mathcal{GP}(m, k)$$
 then the posterior is a Gaussian process with analytic
-mean and covariance funtions.  The posterior Gaussian process
+mean and covariance functions.  The posterior Gaussian process
 also has mean function $m$ but the covariance function is modified
 to
 $$k'(x_1, x_2) = k(x_1, x_2) + \sigma^{2} \delta(x_1 - x_2),$$
@@ -256,7 +255,9 @@ covariance matrix, here using the builtin `cov_exp_quad` function,
 and then simulate data by adding Gaussian variation around the
 sampled function.  Note that we add a _nugget_ of $10^{-10}$ so the
 marginal covariance matrix before computing its Cholesky decomposition
-in order to stabilize the numerical calculations.
+in order to stabilize the numerical calculations.  Often the nugget
+is taking to be square root of the floating point precision, which
+would be $10^{-8}$ for double precision calculations.
 
 ```{r, comment=NA}
 writeLines(readLines("simu_gauss.stan"))
@@ -510,6 +511,8 @@ wrong and how we can maintain robust performance.
 The insights motivating this case study came from a particularly
 fertile research project with Dan Simpson, Rob Trangucci, and
 Aki Vehtari.
+
+I thank Dan Simpson for many helpful comments on the case study.
 
 # Original Computing Environment
 
