@@ -127,7 +127,8 @@ $$ k(x_1, x_2) =
 Unfortunately naming conventions for this kernel are not entirely
 consistent across fields or even time, and the reader might also find
 it referred to as a squared exponential kernel, a quadratic exponential
-kernel, and a Gaussian kernel, amongst other names.
+kernel, a radial basis function or RBF kernel, and a Gaussian kernel,
+amongst other names.
 
 The exponentiated quadratic kernel supports smooth functions between
 covariate inputs and a one-dimensional variate output.  The _marginal
@@ -253,11 +254,11 @@ simu_data <- list(alpha=alpha_true, rho=rho_true, sigma=sigma_true,
 To sample from the Gaussian process we simply construct the marginal
 covariance matrix, here using the builtin `cov_exp_quad` function,
 and then simulate data by adding Gaussian variation around the
-sampled function.  Note that we add a _nugget_ of $10^{-10}$ so the
-marginal covariance matrix before computing its Cholesky decomposition
-in order to stabilize the numerical calculations.  Often the nugget
-is taking to be square root of the floating point precision, which
-would be $10^{-8}$ for double precision calculations.
+sampled function.  Note that we add a _nugget_ or _jitter_ of $10^{-10}$
+so the marginal covariance matrix before computing its Cholesky
+decomposition in order to stabilize the numerical calculations.  Often
+the nugget is taking to be square root of the floating point precision,
+which would be $10^{-8}$ for double precision calculations.
 
 ```{r, comment=NA}
 writeLines(readLines("simu_gauss.stan"))
@@ -363,7 +364,7 @@ plot_gp_quantiles(pred_fit, data, true_realization,
 ```
 
 Similarly, we can visualize the posterior predictive
-distribution that incorporates the Gaussian measurement
+distribution that incorporates the Poisson measurement
 variation with realizations,
 
 ```{r, comment=NA}
@@ -512,7 +513,8 @@ The insights motivating this case study came from a particularly
 fertile research project with Dan Simpson, Rob Trangucci, and
 Aki Vehtari.
 
-I thank Dan Simpson for many helpful comments on the case study.
+I thank Dan Simpson, Aki Vehtari, and Rob Trangucci for many
+helpful comments on the case study.
 
 # Original Computing Environment
 

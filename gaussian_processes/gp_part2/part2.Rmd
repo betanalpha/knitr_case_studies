@@ -17,7 +17,7 @@ basics of Gaussian processes and their implementation in Stan.  We
 assumed, however, the knowledge of the correct hyperparameters for
 the squared exponential kernel, $\alpha$ and $\rho$, as well as the
 measurement variability, $\sigma$, in the Gaussian observation model.  
-In practice we will not know these hyperparameters a prior but will
+In practice we will not know these hyperparameters a priori but will
 instead have to infer them from the observed data themselves.
 
 Unfortunately, inferring Gaussian process hyperparameters is a notoriously
@@ -341,12 +341,13 @@ in [Part 3](../gp_part3/part3.html).
 # Conclusion
 
 Gaussian processes provide a flexible means of nonparametrically
-modeling  regression behavior, but that flexibility also
+modeling regression behavior, but that flexibility also
 hinders the performance of point estimates derived from
 maximum marginal likelihood and even regularized maximum
-marginal likelihood.  In order to take best advantage of
-this flexibility we need to infer Gaussian process
-hyperparameters with Bayesian methods.
+marginal likelihood, especially when the observed data are
+sparse.  In order to take best advantage of this flexibility
+we need to infer Gaussian process hyperparameters with
+Bayesian methods.
 
 [Part 3: Bayesian Inference of Gaussian Processes Hyperparameters](../gp_part3/part3.html)
 
@@ -356,7 +357,8 @@ The insights motivating this case study came from a particularly
 fertile research project with Dan Simpson, Rob Trangucci, and
 Aki Vehtari.
 
-I thank Dan Simpson for many helpful comments on the case study.
+I thank Dan Simpson, Aki Vehtari, and Rob Trangucci for many
+helpful comments on the case study.
 
 # Original Computing Environment
 
