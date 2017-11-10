@@ -6,8 +6,18 @@ bibliography: rstan_workflow.bib
 output:
   html_document:
     fig_caption: yes
-    theme: cerulean
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 2
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
 
 Stan and its implementation of dynamic Hamiltonian Monte Carlo is an extremely
 powerful tool for specifying and then fitting complex Bayesian models. In order
@@ -64,7 +74,7 @@ any nontrivial problem.  Instead we must rely on empirical diagnostics that
 identify _obstructions_ to geometric ergodicity, and hence well-behaved Markov
 chain Monte Carlo estimators.  For a general Markov transition and target
 distribution, the best known diagnostic is the split $\hat{R}$ statistic over an
-ensemble of Markov chains initialized from diffuse points in parameter space.  
+ensemble of Markov chains initialized from diffuse points in parameter space.
 To do any better we need to exploit the particular structure of a given
 transition or target distribution.
 
@@ -134,7 +144,7 @@ For more information on the eight schools dataset see @GelmanEtAl:2014a.
 In particular, let's implement a centered-parameterization of the model which
 is known to frustrate even sophisticated samplers like Hamiltonian Monte Carlo.
 In Stan the centered parameterization is specified with the Stan program
-```{r, comment=NA}
+```{r}
 writeLines(readLines("eight_schools_cp.stan"))
 ```
 
@@ -147,7 +157,7 @@ such as Python and the command line.
 
 ## Specifying the Data
 
-Similarly, we strongly recommend that you specify the data in its own file.  
+Similarly, we strongly recommend that you specify the data in its own file.
 
 Data specified in R lists can be immediately converted to an
 external Stan data file using RStan's `stan_rdump` function,
@@ -175,7 +185,7 @@ fit <- stan(file='eight_schools_cp.stan', data=data, seed=194838)
 
 We recommend explicitly specifying the seed of Stan's random number generator,
 as we have done here, so that we can reproduce these exactly results in the
-future, at least when using the same machine, operating system, and interface.  
+future, at least when using the same machine, operating system, and interface.
 This is especially helpful for the more subtle pathologies that may not always
 be found, which results in seemingly stochastic behavior.
 
@@ -193,38 +203,85 @@ analysis.
 ## Validating a Fit in Stan
 
 We are now ready to validate the fit using the information contained in
-the `fit` object.
+the `fit` object.  While RStan automatically outputs diagnostic warnings
+that indicate problems with the fit, here I will demonstrate how to
+analyze those diagnostics programmatically.
 
-## Checking Split $\hat{R}$ and Effective Sample Sizes
+The first diagnostics we will check are universal to Markov chain Monte Carlo:
+effective sample size per iteration and split $\hat{R}$.  We will then consider
+a suite of powerful diagnostics that are unique to Hamiltonian Monte Carlo.
 
-The first diagnostics we check are universal to Markov chain Monte Carlo and
-are displayed using the `print` method of the `fit` object,
+## Universal Diagnostics
+
+The effective sample size, or `n_eff`, and split $\hat{R}$, or `rhat`, for
+each parameter is displayed using the `print` method of the `fit` object,
 ```{r, comment=NA}
 print(fit)
 ```
 
-Firstly we want to ensure that the split $\hat{R}$ for each parameter is close
-to 1.  Empirically we have found that `Rhat > 1.1` is usually indicative of
-problems in the fit.  Here all of the parameters look good.
+We can investigate each more programatically, however, using some of our
+utility functions.
 
-Then we want to consider the effective sample size, or `n_eff`.  The issue here
-is related to the fact that we are _estimating_ the effective sample size from
-the fit output.  When `n_eff / n_transitions < 0.001` the estimators that we use
-are often biased and can significantly overestimate the true effective sample
-size.
+### Checking Effective Sample Sizes
 
-Both large split $\hat{R}$ and low effective samples per transition are
-consequences of poorly mixing Markov chains.  Improving the mixing of the Markov
-chains almost always requires tweaking the model specification, for example with
-a reparameterization or stronger priors.
+As noted in Section 1, the effective sample size quantifies the accuracy
+of the Markov chain Monte Carlo estimator of a given function, here each
+parameter mean, provided that geometric ergodicity holds.  The potential
+problem with these effective sample sizes, however, is that we must
+_estimate_ them from the fit output.  When we geneate less than 0.001
+effective samples per transition of the Markov chain the estimators that
+we use are typically biased and can significantly overestimate the true
+effective sample size.
 
-## Checking the Tree Depth
+We can check that our effective sample size per iteration is large enough
+with one of our utility functions,
+```{r, comment=NA}
+check_n_eff(fit)
+```
+
+Here there are no indications of problems in our estimates of the effective
+sample size.
+
+### Checking Split $\hat{R}$
+
+The effective sample size, however, is meaningless unless our Markov chain
+and target distribution interact sufficiently well that geometric ergodicity
+holds.  Split $\hat{R}$ quantifies an important necessary condition for
+geometric ergodicity, namely that all chains must converge to the same
+equilibrium behavior.
+
+If the input Markov chains have the same behavior for a given parameter then
+the corresponding split $\hat{R}$ will be close to 1.  The further split
+$\hat{R}$ is from 1 the more idiosyncraticly the chains behave.  Empirically
+we have found that `Rhat > 1.1` is usually indicative of problems in the fit.
+
+In addition to browsing the `print` output, we can check split $\hat{R}$
+programmatically using one of our utility functions,
+```{r, comment=NA}
+check_rhat(fit)
+```
+
+Here the split $\hat{R}$ for all of our parameters looks good.
+
+Both large split $\hat{R}$ and low effective sample size per iteration are
+consequences of poorly mixing Markov chains.  Improving the mixing of the
+Markov chains almost always requires tweaking the model specification, for
+example with a reparameterization or stronger priors.
+
+## Hamiltonian Monte Carlo Diagnostics
+
+One of the most powerful features of Hamiltonian Monte Carlo is that it
+provides additional diagnostics that can indicate problems with the fit.
+These diagnostics are extremely sensitive and typically indicate problems
+long before the arise in the more universal diagnostics considered above.
+
+### Checking the Tree Depth
 
 The dynamic implementation of Hamiltonian Monte Carlo used in Stan has a maximum
 trajectory length built in to avoid infinite loops that can occur for
 non-identified models.  For sufficiently complex models, however, Stan can
 saturate this threshold even if the model is identified, which limits the
-efficacy of the sampler.  
+efficacy of the sampler.
 
 We can check whether that threshold was hit using one of our utility functions,
 ```{r, comment=NA}
@@ -240,14 +297,14 @@ and then check if still saturated this larger threshold with
 
 `check_treedepth(fit, 15)`
 
-## Checking the E-BFMI
+### Checking the E-BFMI
 
 Hamiltonian Monte Carlo proceeds in two phases -- the algorithm first simulates
 a Hamiltonian trajectory that rapidly explores a slice of the target parameter
 space before resampling the auxiliary momenta to allow the next trajectory to
 explore another slice of the target parameter space.  Unfortunately, the jumps
 between these slices induced by the momenta resamplings can be short, which
-often leads to slow exploration.  
+often leads to slow exploration.
 
 We can identify this problem by consulting the energy Bayesian Fraction of
 Missing Information,
@@ -267,7 +324,7 @@ indicated by low E-BFMI are remedied by tweaking the specification of the model.
 Unfortunately the exact tweaks required depend on the exact structure of the
 model and, consequently, there are no generic solutions.
 
-## Checking Divergences
+### Checking Divergences
 
 Finally, we can check divergences which indicate pathological neighborhoods of
 the posterior that the simulated Hamiltonian trajectories are not able to
@@ -343,9 +400,8 @@ Another way of browsing the diagnostic information is to use the
 Shiny app _ShinyStan_.
 
 After loading the library,
-```{r, comment=NA}
-library(shinystan)
-```
+
+`library(shinystan)`
 
 ShinyStan can be activated with the call
 
@@ -372,10 +428,7 @@ fit <- stan(file='eight_schools_ncp.stan', data=data, seed=194838, control=list(
 ```
 we see that all of the diagnostics are clean,
 ```{r, comment=NA}
-print(fit)
-check_treedepth(fit)
-check_energy(fit)
-check_div(fit)
+check_all_diagnostics(fit)
 ```
 
 With this more appropriate implementation of our model  we can now utilize
