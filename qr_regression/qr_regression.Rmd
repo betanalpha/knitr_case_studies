@@ -5,14 +5,24 @@ date: "July 2017"
 output:
   html_document:
     fig_caption: yes
-    theme: cerulean
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 2
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
 
 A common problem in regression modeling is correlation amongst the covariates
 which can induce strong posterior correlations that frustrate accurate
 computation.  In this case study I will review the  _QR decomposition_, a
 technique for decorrelating covariates and, consequently, the resulting
-posterior distribution.  
+posterior distribution.
 
 We'll begin with a simple example that demonstrates the difficulties induced
 by correlated covariates before going through the mathematics of the QR
@@ -102,10 +112,7 @@ fit <- stan(file='regr.stan', data=input_data, seed=483892929)
 Checking our diagnostics,
 
 ```{r, comment=NA}
-print(fit)
-check_treedepth(fit)
-check_energy(fit)
-check_div(fit)
+check_all_diagnostics(fit)
 ```
 
 we see that everything looks okay save for some trajectories that have
@@ -133,13 +140,10 @@ tree depth threshold,
 fit <- stan(file='regr.stan', data=input_data, seed=483892929, control=list(max_treedepth=15))
 ```
 
-Now the diagnostics are clean
+Now the tree depth diagnostics are clean
 
 ```{r, comment=NA}
-print(fit)
 check_treedepth(fit, 15)
-check_energy(fit)
-check_div(fit)
 ```
 
 The small step sizes, however,
@@ -268,10 +272,7 @@ qr_fit <- stan(file='qr_regr.stan', data=input_data, seed=483892929)
 we see no indications of an inaccurate fit,
 
 ```{r, comment=NA}
-print(qr_fit)
-check_treedepth(qr_fit)
-check_energy(qr_fit)
-check_div(qr_fit)
+check_all_diagnostics(qr_fit)
 ```
 
 The effective sample sizes are the same, but the larger step sizes,
@@ -322,7 +323,7 @@ points(beta[1,1], beta[2,1],
 
 If the rows of the effective design matrix, $\mathbf{Q}$, are orthogonal, then
 why are the transformed slopes nontrivially correlated in the QR regression
-posterior?  
+posterior?
 
 One possibility could be the prior we put on the nominal slopes, which implies a
 strongly correlated prior for the transformed slopes.  Here, however, the prior
@@ -353,10 +354,7 @@ qr_fit <- stan(file='qr_regr_centered.stan', data=input_data, seed=483892929)
 ```
 
 ```{r, comment=NA}
-print(qr_fit)
-check_treedepth(qr_fit)
-check_energy(qr_fit)
-check_div(qr_fit)
+check_all_diagnostics(qr_fit)
 ```
 
 Not only has the effective sample size has drastically increased, the fit
@@ -398,7 +396,7 @@ points(beta[1,1], beta[2,1],
 
 A common feature of regression models, centering not only improves the
 interpretability of the model but also proves critical to achieving optimal
-computational performance.  
+computational performance.
 
 # Conclusion
 
