@@ -5,18 +5,28 @@ date: "October 2017"
 output:
   html_document:
     fig_caption: yes
-    theme: cerulean
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 2
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
 ---
 
-[Part 1: Introduction to Gaussian Processes](../gp_part1/part1.html)  
-Part 2: Optimizing Gaussian Processes Hyperparameters  
-[Part 3: Bayesian Inference of Gaussian Processes Hyperparameters](../gp_part3/part3.html)  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
+
+[Part 1: Introduction to Gaussian Processes](../gp_part1/part1.html)
+Part 2: Optimizing Gaussian Processes Hyperparameters
+[Part 3: Bayesian Inference of Gaussian Processes Hyperparameters](../gp_part3/part3.html)
 
 In [Part 1](../gp_part1/part1.html) of this case study we learned the
 basics of Gaussian processes and their implementation in Stan.  We
 assumed, however, the knowledge of the correct hyperparameters for
 the squared exponential kernel, $\alpha$ and $\rho$, as well as the
-measurement variability, $\sigma$, in the Gaussian observation model.  
+measurement variability, $\sigma$, in the Gaussian observation model.
 In practice we will not know these hyperparameters a priori but will
 instead have to infer them from the observed data themselves.
 
@@ -204,7 +214,7 @@ _regularization_.  Let's see if that does any better.
 
 Regularized maximum marginal likelihood introduces a loss functions
 to prevent the fit from straying into neighborhoods that are known
-to be pathological, such as those that might be prone to overfitting.  
+to be pathological, such as those that might be prone to overfitting.
 Exactly what kind of regularization is needed is unclear at this point
 -- indeed we will see in [Part 3](../gp_part3/part3.html) that a
 Bayesian workflow is much more adept at identifying what kind of
