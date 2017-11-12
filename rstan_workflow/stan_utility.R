@@ -1,4 +1,4 @@
-#' Check transitions that ended with a divergence
+# Check transitions that ended with a divergence
 check_div <- function(fit) {
   sampler_params <- get_sampler_params(fit, inc_warmup=FALSE)
   divergent <- do.call(rbind, sampler_params)[,'divergent__']
@@ -48,7 +48,7 @@ check_n_eff <- function(fit) {
   fit_summary <- summary(fit, probs = c(0.5))$summary
   N <- dim(fit_summary)[[1]]
 
-  iter <- dim(extract(fit)[[1]])
+  iter <- dim(extract(fit)[[1]])[[1]]
 
   no_warning <- TRUE
   for (n in 1:N) {
