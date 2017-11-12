@@ -5,8 +5,18 @@ date: "January 2017"
 output:
   html_document:
     fig_caption: yes
-    theme: cerulean
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 2
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
 
 Weakly informative priors are an appealing modeling technique where the modeler
 identifies appropriate scales in a given analysis and uses those scales to
@@ -15,13 +25,13 @@ are utilized, however, is not explicitly defined.  Consequently the actual
 implementation of weakly informative priors can be ambiguous for practitioners.
 
 In this case study I will consider two approaches for implementing
-weakly informative priors and demonstrate each effects the resulting analysis.  
+weakly informative priors and demonstrate each effects the resulting analysis.
 
 # Poorly Informed Regression
 
 Weakly informative priors are especially critical when inferences are hindered
 with only weakly identifiable likelihoods, such as those arising from models
-with sparse data.  
+with sparse data.
 
 To that end, let's say that we are analyzing a small company and we want to
 model how much daily rainfall, $x$, affects daily income, $y$, using only a few
@@ -135,7 +145,7 @@ from reasoning about priors _relative_ to the likelihood.  Because diffuse
 priors distribute probability across such a large region of parameter space,
 likelihoods that identify much smaller regions of parameter space quickly
 overwhelm the prior distribution and dominate the posterior distribution.  Hence
-diffuse priors supposedly "let the data speak for themselves".  
+diffuse priors supposedly "let the data speak for themselves".
 
 In complex models, however, it typically takes a significant amount of data for
 the likelihood to be able to identify a necessarily small region of parameter
@@ -173,7 +183,7 @@ appropriate default in the first place follows similar logic to constructing a
 null hypothesis in frequentist methodologies.  The  parameterization of our
 linear regression is again already well-suited as a vanishing intercept, slope,
 or measurement variability corresponds to a trivial system with no income or
-weather interactions.  
+weather interactions.
 
 Once we have identified an appropriate parameterization we can determine
 the scales coherent with our prior knowledge of the system.  Each scale
@@ -214,14 +224,14 @@ exact shape of the prior distribution, here we will consider only how the exact
 shape of a weakly informative prior qualitatively affects the resulting
 inferences.
 
-# Weakly Informative Priors Under Well-Chosen Scales
+## Weakly Informative Priors Under Well-Chosen Scales
 
 When the scales are well-chosen all weakly informative priors behave similarly,
 regularizing the posterior by penalizing extreme parameter values.  The exact
 shape of a weakly informative prior, however, does introduce some important
 differences in how strong that regularization is.
 
-# Light-Tailed Weakly Informative Priors
+### Light-Tailed Weakly Informative Priors
 
 Let's first consider a relatively light-tailed weakly informative prior that
 utilizes Gaussian and half-Gaussian distributions.  Because we simulated the
@@ -273,7 +283,7 @@ the weakly informative priors.  Because these priors were chosen to be coherent
 with our prior information, however, even a prior-dominated posterior yields
 reasonable inferences!
 
-# Heavy-Tailed Weakly Informative Priors
+### Heavy-Tailed Weakly Informative Priors
 
 To contrast, let's now consider the more heavily-tailed priors given by
 Cauchy and half-Cauchy distributions.  Once again our prescient choice of units
@@ -345,7 +355,7 @@ value that stresses the evaluation of the special functions and can drastically
 hinder computational performance.  Consequently, heavy-tailed weakly informative
 priors must be employed with care in practice.
 
-# Weakly Informative Priors Under Poorly-Chosen Scales
+## Weakly Informative Priors Under Poorly-Chosen Scales
 
 The differing behavior of weakly informative priors with different shapes
 becomes particularly striking when the scales are poorly-chosen, and the
@@ -369,7 +379,7 @@ How this tension between the weakly informative prior and the likelihood
 manifests in the posterior is extremely sensitive to the exact shape of the
 weakly informative prior.
 
-# The Failure Mode of Light Tails
+### The Failure Mode of Light Tails
 
 Let's first consider the relatively light tail of a Gaussian prior
 distribution,
@@ -406,7 +416,7 @@ obviously pathological,  practitioners must take care to verify that their
 posteriors are actually contracting and not accumulating around the given
 scales.
 
-# The Failure Mode of Heavy Tails
+### The Failure Mode of Heavy Tails
 
 The heavier tail of the Cauchy prior responds very differently to a
 poorly-chosen scale,
@@ -456,13 +466,13 @@ regularization towards the given scales.  If the scales are consistent with the
 measurements then this regularization yields well-behaved posteriors that
 facilitate statistical computation.  If the scales are poorly-chosen, however,
 then the regularization biases the resulting inferences as would any poor
-assumption in the model.  
+assumption in the model.
 
 Heavier tailed priors induce weaker regularization which allows the posterior
 to assign significant probability mass above the chosen scale where the
 computation of the model may become slow or even unstable.  On the other hand,
 the weaker regularization does not bias the model as strongly when the scales
-are inconsistent with the measurements.  
+are inconsistent with the measurements.
 
 Because accurate and fast statistical computation is critical to any analysis,
 we on the Stan Development Team have come to favor the lighter tails of a
@@ -472,7 +482,7 @@ analyzed in order the verify the accuracy of the resulting inferences.
 
 # Acknowledgements
 
-I thank Bob Carpenter many helpful comments.
+I thank Bob Carpenter for many helpful comments.
 
 # Original Computing Environment
 
