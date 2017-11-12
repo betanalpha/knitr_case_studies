@@ -5,12 +5,22 @@ date: "October 2017"
 output:
   html_document:
     fig_caption: yes
-    theme: cerulean
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 2
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
 ---
 
-[Part 1: Introduction to Gaussian Processes](../gp_part1/part1.html)  
-[Part 2: Optimizing Gaussian Processes Hyperparameters](../gp_part2/part2.html)  
-Part 3: Bayesian Inference of Gaussian Processes Hyperparameters  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
+
+[Part 1: Introduction to Gaussian Processes](../gp_part1/part1.html)
+[Part 2: Optimizing Gaussian Processes Hyperparameters](../gp_part2/part2.html)
+Part 3: Bayesian Inference of Gaussian Processes Hyperparameters
 
 In [Part 2](../gp_part2/part2.html) of this case study we
 investigated the limited performance of both regularized and
@@ -88,16 +98,12 @@ writeLines(readLines("gp1.stan"))
 ```
 
 We take our new model out for a run and, following a robust
-Bayesian workflow, check the diagnostics.
+Bayesian workflow, check the output.
 
 ```{r, comment=NA}
 fit <- stan(file='gp1.stan', data=data, seed=5838298)
 
 print(fit)
-
-check_treedepth(fit)
-check_energy(fit)
-check_div(fit)
 ```
 
 The output of `print(fit)` is already alarming as the posterior for
@@ -200,9 +206,7 @@ exhibits a divergence,
 ```{r, comment=NA}
 fit <- stan(file='gp2.stan', data=data, seed=5838298)
 
-check_treedepth(fit)
-check_energy(fit)
-check_div(fit)
+check_all_diagnostics(fit)
 ```
 
 Following up with the divergence we take a look at
@@ -240,7 +244,7 @@ we are seeing is the manifestation of another non-identifiability, this
 time _below_ the minimum covariate distance.  Just as there is no
 information in the data above the maximum covariate distance, there is
 also no information in the data below the minimum covariate distance where
-the hyperparameters are informed only by their priors.  
+the hyperparameters are informed only by their priors.
 
 In particular, the measurement variability can drop to zero, allowing
 the Gaussian process to perfectly interpolate between the observed data.
@@ -295,7 +299,7 @@ the Gamma distribution, but the Gamma distribution has a somewhat heavy
 tail towards zero that can make it hard to constrain the posterior below
 $l$.  Instead we will utilize an inverse Gamma distribution that has a
 lighter tail towards zero and more strongly constrains the posterior above
-$l$.  
+$l$.
 
 Finally we have to decide how exactly to translate the lower and upper
 length scales to a particular inverse Gamma distribution.  One particularly
@@ -309,7 +313,7 @@ by making a Gaussian approximation to the tail conditions,
 $$ l \approx \mu - 3 \sigma = \frac{b}{a - 1} - 3 \frac{b}{\sqrt{(a-1)^{2}(a-2)}} $$
 $$ u \approx \mu + 3 \sigma = \frac{b}{a - 1} + 3 \frac{b}{\sqrt{(a-1)^{2}(a-2)}}, $$
 
-and then refine the approximation using Stan's spiffy new algebraic solver.  
+and then refine the approximation using Stan's spiffy new algebraic solver.
 For example, if we set $l = 2$ and $u = 10$ then we can define the Stan program
 
 ```{r, comment=NA}
@@ -337,9 +341,7 @@ which we eagerly fit
 ```{r, comment=NA}
 fit <- stan(file='gp3.stan', data=data, seed=5838298)
 
-check_treedepth(fit)
-check_energy(fit)
-check_div(fit)
+check_all_diagnostics(fit)
 ```
 
 to find no diagnostic indications of problems.
@@ -409,7 +411,7 @@ plot(nondiv_params$rho, nondiv_params$alpha, log="xy",
      col=c_dark_trans, pch=16, cex=0.8, xlab="rho", ylab="alpha")
 points(div_params$rho, div_params$alpha,
        col=c_green_trans, pch=16, cex=0.8)
-```     
+```
 
 To our great relief, the realizations from this model provide a
 solid fit to the data both for the input covariates and the out
@@ -470,7 +472,7 @@ I want to end this case study with one last word of caution
 when attempting to employ Gaussian processes over high-dimensional
 covariate spaces, which is unfortunately a common approach for
 _emulation_ methods that try to interpolate between the inputs
-and outputs of some expensive computer simulation.  
+and outputs of some expensive computer simulation.
 
 In low-dimensional covariate spaces the information provided
 by principled weakly informative priors, especially on the
@@ -485,7 +487,7 @@ however, the volume of this tube, and hence the span of
 functions admitted by the Gaussian process, grows exponentially
 fast.  If we try to get away with a point estimate for the
 hyperparameters we then find that the probability of choosing
-the right hyperparameters decreases exponentially fast.  
+the right hyperparameters decreases exponentially fast.
 Marginalizing over the hyperparameters with a Bayesian model
 resolves that problem, but only at the expense of having
 exponentially growing uncertainties between the input covariates.
@@ -525,7 +527,7 @@ behavior and facilitate efficient computation.  Here we used a
 proper Bayesian workflow to identify the principled priors needed
 to identify a Gaussian process regression with an exponentiated
 quadratic kernel, but that same workflow can also be used to
-motivate hyperparameter priors for other kernels.  
+motivate hyperparameter priors for other kernels.
 
 # Acknowledgements
 
