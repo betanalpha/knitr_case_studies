@@ -6,8 +6,18 @@ bibliography: divergences_and_bias.bib
 output:
   html_document:
     fig_caption: yes
-    theme: cerulean
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 2
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
 
 Markov chain Monte Carlo (MCMC) approximates expectations with respect to a
 given target distribution,
@@ -70,14 +80,14 @@ $$\theta_{n} \sim \mathcal{N}(\mu, \tau)$$
 $$y_{n} \sim \mathcal{N}(\theta_{n}, \sigma_{n}),$$
 
 where $n \in \left\{1, \ldots, 8 \right\}$ and the
-$\left\{ y_{n}, \sigma_{n} \right\}$ are given as data.  
+$\left\{ y_{n}, \sigma_{n} \right\}$ are given as data.
 
 Inferring the hierarchical hyperparameters, $\mu$ and $\sigma$, together with
 the group-level parameters, $\theta_{1}, \ldots, \theta_{8}$, allows the model
 to pool data across the groups and reduce their posterior variance.
 Unfortunately this pooling also squeezes the posterior distribution into a
 particularly challenging geometry that obstructs geometric ergodicity and hence
-biases MCMC estimation.  
+biases MCMC estimation.
 
 In this case study we'll first examine the direct _centered_ parameterization of
 the Eight Schools model and see how divergences identify this bias before there
@@ -108,6 +118,7 @@ We begin by setting up our R environment,
 ```{r, comment=NA}
 library(rstan)
 rstan_options(auto_write = TRUE)
+source('stan_utility.R')
 ```
 and then some graphic customizations that we'll use later,
 ```{r}
@@ -132,7 +143,7 @@ use short chains when prototyping their analysis, or even for their final
 analysis if they are limited by time or computational resources.
 
 For this lone chain split $\hat{R}$ doesn't indicate any problems and the
-effective sample size per iteration is reasonable,
+effective sample size per iteration is reasonable if a bit small,
 ```{r, comment=NA}
 print(fit_cp)
 ```
@@ -167,9 +178,7 @@ abline(h=0.7657852, col="grey", lty="dashed", lwd=3)
 Hamiltonian Monte Carlo, however, is not so oblivious to these issues as
 almost 2% of the iterations in our lone Markov chain ended with a divergence,
 ```{r, comment=NA}
-divergent <- get_sampler_params(fit_cp, inc_warmup=FALSE)[[1]][,'divergent__']
-sum(divergent)
-sum(divergent) / 700
+check_div(fit_cp)
 ```
 Even with a single short chain these divergences are able to identity the bias
 and advise skepticism of any resulting MCMC estimators.
@@ -178,16 +187,15 @@ Additionally, because the divergent transitions, here shown here in green, tend
 to be located near the pathologies we can use them to identify the location of
 the problematic neighborhoods in parameter space,
 ```{r}
-params_cp$divergent <- divergent
-
-div_params_cp <- params_cp[params_cp$divergent == 1,]
-nondiv_params_cp <- params_cp[params_cp$divergent == 0,]
+partition <- partition_div(fit_cp)
+div_params_cp <- partition[[1]]
+nondiv_params_cp <- partition[[2]]
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(nondiv_params_cp$theta.1, log(nondiv_params_cp$tau),
+plot(nondiv_params_cp$'theta[1]', log(nondiv_params_cp$tau),
      col=c_dark, pch=16, cex=0.8, xlab="theta.1", ylab="log(tau)",
      xlim=c(-20, 50), ylim=c(-6,4))
-points(div_params_cp$theta.1, log(div_params_cp$tau),
+points(div_params_cp$'theta[1]', log(div_params_cp$tau),
        col="green", pch=16, cex=0.8)
 ```
 
@@ -216,7 +224,7 @@ fit_cp80 <- stan(file='eight_schools_cp.stan', data=input_data,
 Even with so many more iterations, split $\hat{R}$ does not indicate any
 serious issues,
 ```{r, comment=NA}
-print(fit_cp80)
+check_rhat(fit_cp80)
 ```
 We really need to be incorporating multiple chains for split $\hat{R}$ to be
 effective.  Still, note that the effective sample size per iteration has
@@ -259,23 +267,20 @@ leaves us with a significant bias.
 
 The rate of divergences remains near 2% of all iterations,
 ```{r, comment=NA}
-divergent <- get_sampler_params(fit_cp80, inc_warmup=FALSE)[[1]][,'divergent__']
-sum(divergent)
-sum(divergent) / 10000
+check_div(fit_cp80)
 ```
 and the increased sampling really allows us to see the truncated funnel geometry
 of the Markov chain,
 ```{r}
-params_cp80$divergent <- divergent
-
-div_params_cp <- params_cp80[params_cp80$divergent == 1,]
-nondiv_params_cp <- params_cp80[params_cp80$divergent == 0,]
+partition <- partition_div(fit_cp80)
+div_params_cp80 <- partition[[1]]
+nondiv_params_cp80 <- partition[[2]]
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(nondiv_params_cp$theta.1, log(nondiv_params_cp$tau),
+plot(nondiv_params_cp80$'theta[1]', log(nondiv_params_cp80$tau),
      col=c_dark, pch=16, cex=0.8, xlab="theta.1", ylab="log(tau)",
      xlim=c(-20, 50), ylim=c(-6,4))
-points(div_params_cp$theta.1, log(div_params_cp$tau),
+points(div_params_cp80$'theta[1]', log(div_params_cp80$tau),
        col="green", pch=16, cex=0.8)
 ```
 
@@ -383,22 +388,15 @@ pathological it becomes.  The chain with the largest ```adapt_delta``` pushes
 deeper into the neck of the funnel but still ends up diverging once it probes
 too far,
 ```{r}
-params_cp99 <- as.data.frame(extract(fit_cp99, permuted=FALSE))
-names(params_cp99) <- gsub("chain:1.", "", names(params_cp99), fixed = TRUE)
-names(params_cp99) <- gsub("[", ".", names(params_cp99), fixed = TRUE)
-names(params_cp99) <- gsub("]", "", names(params_cp99), fixed = TRUE)
-
-divergent <- get_sampler_params(fit_cp99, inc_warmup=FALSE)[[1]][,'divergent__']
-params_cp99$divergent <- divergent
-
-div_params_cp99 <- params_cp99[params_cp99$divergent == 1,]
-nondiv_params_cp99 <- params_cp99[params_cp99$divergent == 0,]
+partition <- partition_div(fit_cp99)
+div_params_cp99 <- partition[[1]]
+nondiv_params_cp99 <- partition[[2]]
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(nondiv_params_cp99$theta.1, log(nondiv_params_cp99$tau),
+plot(nondiv_params_cp99$'theta[1]', log(nondiv_params_cp99$tau),
      xlab="theta.1", ylab="log(tau)", xlim=c(-20, 50), ylim=c(-6,4),
      col=c_dark, pch=16, cex=0.8)
-points(div_params_cp99$theta.1, log(div_params_cp99$tau),
+points(div_params_cp99$'theta[1]', log(div_params_cp99$tau),
        col="green", pch=16, cex=0.8)
 ```
 
@@ -406,6 +404,11 @@ The improved exploration is evident when comparing the samples, here without
 labeling the divergences, from the chain with the default settings and the
 the ```adapt_delta=0.99``` chain,
 ```{r}
+params_cp99 <- as.data.frame(extract(fit_cp99, permuted=FALSE))
+names(params_cp99) <- gsub("chain:1.", "", names(params_cp99), fixed = TRUE)
+names(params_cp99) <- gsub("[", ".", names(params_cp99), fixed = TRUE)
+names(params_cp99) <- gsub("]", "", names(params_cp99), fixed = TRUE)
+
 par(mar = c(4, 4, 0.5, 0.5))
 plot(params_cp99$theta.1, log(params_cp99$tau),
      xlab="theta.1", ylab="log(tau)", xlim=c(-20, 50), ylim=c(-6,4),
@@ -493,25 +496,21 @@ plot(params_ncp80$iter, log(params_ncp80$tau), col=c_dark, pch=16, cex=0.8,
 
 We do, however, we do still see the rare divergence,
 ```{r, comment=NA}
-divergent <- get_sampler_params(fit_ncp80, inc_warmup=FALSE)[[1]][,'divergent__']
-sum(divergent)
-sum(divergent) / 10000
+check_div(fit_ncp80)
 ```
 
 These infrequent divergences do not seem concentrate anywhere in parameter
 space,
 ```{r}
-divergent <- get_sampler_params(fit_ncp80, inc_warmup=FALSE)[[1]][,'divergent__']
-params_ncp80$divergent <- divergent
-
-div_params_ncp <- params_ncp80[params_ncp80$divergent == 1,]
-nondiv_params_ncp <- params_ncp80[params_ncp80$divergent == 0,]
+partition <- partition_div(fit_ncp80)
+div_params_ncp80 <- partition[[1]]
+nondiv_params_ncp80 <- partition[[2]]
 
 par(mar = c(4, 4, 0.5, 0.5))
-plot(nondiv_params_ncp$theta.1, log(nondiv_params_ncp$tau),
+plot(nondiv_params_ncp80$'theta[1]', log(nondiv_params_ncp80$tau),
      xlab="theta.1", ylab="log(tau)", xlim=c(-20, 50), ylim=c(-6,4),
      col=c_dark, pch=16, cex=0.8)
-points(div_params_ncp$theta.1, log(div_params_ncp$tau),
+points(div_params_ncp80$'theta[1]', log(div_params_ncp80$tau),
        col="green", pch=16, cex=0.8)
 ```
 
@@ -525,8 +524,7 @@ fit_ncp90 <- stan(file='eight_schools_ncp.stan', data=input_data,
 ```
 
 ```{r, comment=NA}
-divergent <- get_sampler_params(fit_ncp90, inc_warmup=FALSE)[[1]][,'divergent__']
-sum(divergent)
+check_div(fit_ncp90)
 ```
 
 The more agreeable geometry of the non-centered implementation allows the
@@ -583,7 +581,7 @@ legend("bottomright", c("Centered, delta=0.90", "Centered, delta=0.99",
 We have seen in these examples that hierarchical models implemented with a
 centered parameterization impede the geometric ergodicity of Hamiltonian Monte
 Carlo, at least when the data are not extremely informative.  The ultimate
-importance of the resulting bias, however, depends on the specific application.  
+importance of the resulting bias, however, depends on the specific application.
 
 If we are interested in the behavior of $\log \tau$ then this bias will be
 serious and affect the quality of any inferences drawn from the fit.  Often,
