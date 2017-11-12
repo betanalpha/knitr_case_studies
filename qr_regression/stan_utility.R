@@ -73,7 +73,7 @@ check_rhat <- function(fit) {
   no_warning <- TRUE
   for (n in 1:N) {
     rhat <- fit_summary[,6][n]
-    if (rhat > 1.1) {
+    if (rhat > 1.1 || is.infinite(rhat) || is.nan(rhat)) {
       print(sprintf('Rhat for parameter %s is %s!',
                     rownames(fit_summary)[n], rhat))
       no_warning <- FALSE
