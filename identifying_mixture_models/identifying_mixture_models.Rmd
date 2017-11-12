@@ -5,8 +5,18 @@ date: "February 2017"
 output:
   html_document:
     fig_caption: yes
-    theme: cerulean
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 2
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
 
 Mixture modeling is a powerful technique for integrating multiple data
 generating processes into a single model.  Unfortunately when those data
@@ -230,7 +240,7 @@ degenerate modes and explore the entire mixture posterior, typically there will
 be too many modes to complete that exploration in any reasonable time.
 Consequently if we want to accurately fit these models in practice then we
 need to break the labeling degeneracy and remove the extreme multimodality
-altogether.  
+altogether.
 
 Exactly how we break the labeling degeneracy depends on what prior information
 we can exploit.  In particular, our strategy will be different depending on
@@ -288,7 +298,7 @@ parameter space satisfying a given ordering constraint, such as
 $\alpha_1 \le  \ldots \le \alpha_K$, defines a square pyramid with the apex
 point at zero.  The $K$-dimensional parameter space neatly decomposes into $K!$
 of these pyramids, each with a distinct ordering and hence association with a
-unique labeling.  
+unique labeling.
 
 When the priors are exchangeable the mixture posterior _aliases_ across each of
 these pyramids in parameter space: if we were given the mixture posterior
@@ -297,12 +307,12 @@ distribution by simply rotating that restricted distribution into each of the
 other $K! - 1$ pyramids.  As we do this we also map the mode in the restricted
 distribution into each pyramid, creating exactly the expected $K!$
 multimodality.  Moreover, those rotations are exactly given by permuting
-the parameter indices and reordering the corresponding parameter values.  
+the parameter indices and reordering the corresponding parameter values.
 
 ### Exchangeable Inferences and Ordering Constraints
 
 From a Bayesian perspective, all well-defined inferences are given by
-expectations of certain functions with respect to our posterior distribution.  
+expectations of certain functions with respect to our posterior distribution.
 Hence if we want to limit ourselves to only those inferences insensitive
 to the labeling then we have to considering expectations only of those functions
 that are permutation invariant,
@@ -310,7 +320,7 @@ $f(\sigma(\boldsymbol{\alpha})) = f(\boldsymbol{\alpha})$.
 
 Importantly, under this class of functions the symmetry of the degenerate
 mixture posterior carries over to the expectation values themselves: the
-expectation taken over each pyramid will yield exactly the same value.  
+expectation taken over each pyramid will yield exactly the same value.
 Consequently we should be able to avoid the combinatorial cost of fitting the
 full mixture model by simply restricting our exploration to a single ordering
 of the parameters.
@@ -614,7 +624,7 @@ the chosen ordering constraint.
 While the ordering is limited to scalar parameters, it can still prove useful
 when the component distributions are multivariate.  Although we cannot order the
 multivariate parameters themselves, ordering any one of the parameters is
-sufficient to break the labeling degeneracy for the entire mixture.  
+sufficient to break the labeling degeneracy for the entire mixture.
 
 # A Bayesian Mixture Model Example
 
@@ -653,6 +663,8 @@ y <- rnorm(N, mu[z], sigma[z]);
 ```{r, comment=NA}
 library(rstan)
 rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+source('stan_utility.R')
 
 stan_rdump(c("N", "y"), file="mix.data.R")
 ```
@@ -692,7 +704,7 @@ degenerate_fit <- stan(file='gauss_mix.stan', data=input_data,
 The split Rhat is atrocious, indicating that the chains are not exploring the
 same regions of parameter space.
 ```{r, comment=NA}
-print(degenerate_fit)
+check_all_diagnostics(degenerate_fit)
 ```
 Indeed this is to be expected as the individual chains find and then explore
 one of the two degenerate modes independently of the others,
@@ -745,7 +757,7 @@ asym_fit <- stan(file='gauss_mix_asym_prior.stan', data=input_data,
 ```
 we see that split Rhat still looks terrible,
 ```{r, comment=NA}
-print(asym_fit)
+check_all_diagnostics(asym_fit)
 ```
 
 Investigating the fit output we see that despite our strong, asymmetric prior
@@ -792,7 +804,7 @@ asym_fit <- stan(file='gauss_mix_asym_prior.stan', data=input_low_data,
 ```
 we achieve a much better fit,
 ```{r, comment=NA}
-print(asym_fit)
+check_all_diagnostics(asym_fit)
 ```
 All of our chains converge to the favored mode and our inference become
 well-behaved,
@@ -838,7 +850,7 @@ ordered_fit <- stan(file='gauss_mix_ordered_prior.stan', data=input_data,
 ```
 we immediately recover a better fit,
 ```{r, comment=NA}
-print(ordered_fit)
+check_all_diagnostics(ordered_fit)
 ```
 with all of the chains exploring the mode satisfying the standard ordering
 $$\mu_1 \le \mu_2,$$
@@ -871,7 +883,7 @@ overlap then the resulting posterior manifests a particularly nasty geometry
 that is difficult to explore.  This overlap is especially common when there
 are more components in the mixture than needed to capture the structure in the
 data, and excess components are forced to collapse into the necessary
-components.  
+components.
 
 To see this let's simulate a measurement where the two mixture components are
 located less than one standard deviation away from each other,
@@ -1003,15 +1015,16 @@ lines(0.08*(1:100) - 4, 0.08*(1:100) - 4, col="grey", lw=2)
 ```
 
 The sharp corners of the bowtie slow exploration, resulting in relatively few
-effective samples per iteration for the component means,
+effective samples over the 4000 total iterations for the component means,
 ```{r, comment=NA}
-print(singular_fit)
+summary(singular_fit, probs = c(0.5))$summary[,5]
 ```
 While the bowtie geometry slows exploration for this particular model, however,
-it does not bias it -- there are no divergences or other failing diagnostics,
+it does not bias it -- there are no divergences or other failing diagnostics.
 ```{r, comment=NA}
-sum(get_sampler_params(singular_fit, inc_warmup=FALSE)[[1]][,'divergent__'])
+check_all_diagnostics(singular_fit)
 ```
+
 Consequently we can readily overcome the slower exploration by running longer
 or, even better, running multiple chains.  Still, care must be taken in practice
 to ensure that the posterior geometry does not become too pathological for Stan
@@ -1060,7 +1073,7 @@ still be troublesome to fit.  As components begin to collapse into each other,
 for example, the posterior geometry becomes more and more pathological.
 Furthermore, mixture models often exhibit multimodalities beyond just those
 induced by the labeling degeneracy.  Resolving the degeneracy does not eliminate
-these tangible modes and the computational issues they beget.  
+these tangible modes and the computational issues they beget.
 
 As with so many modeling techniques, mixture models can be powerful in practice
 provided that they are employed with great care.
