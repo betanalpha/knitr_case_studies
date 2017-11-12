@@ -5,11 +5,21 @@ date: "October 2017"
 output:
   html_document:
     fig_caption: yes
-    theme: cerulean
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 2
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
 ---
 
-Part 1: Introduction to Gaussian Processes  
-[Part 2: Optimizing Gaussian Processes Hyperparameters](../gp_part2/part2.html)  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
+
+Part 1: Introduction to Gaussian Processes
+[Part 2: Optimizing Gaussian Processes Hyperparameters](../gp_part2/part2.html)
 [Part 3: Bayesian Inference of Gaussian Processes Hyperparameters](../gp_part3/part3.html)
 
 Often data decompose into _variates_, $y$, and _covariates_, $x$, with the
@@ -66,7 +76,7 @@ overfitting, where the model misinterprets the statistical variation in the
 variates as deterministic behavior.
 
 Bayesian methods are a particularly useful way to regularize overfitting,
-but principled prior assignment on such polynomial expansions can be awkward.  
+but principled prior assignment on such polynomial expansions can be awkward.
 Fortunately we can avoid parametric functions entirely and make inferences
 over entire spaces of functions using _Gaussian processes_.
 
@@ -109,7 +119,7 @@ In this case study we will assume a zero mean function.
 ## Covariance Functions
 
 The covariance function or covariance kernel, $k(x_1, x_2)$ controls how
-the realizations of a Gaussian process vary around the mean function.  
+the realizations of a Gaussian process vary around the mean function.
 The larger to covariance between two covariates, $x_1$ and $x_2$, the
 less their functional outputs, $f(x_1)$ and $f(x_2)$, can vary.
 
@@ -137,7 +147,7 @@ the variate output while the _length scale_, $\rho$, controls how
 quickly the variate output varies with respect to the distance
 between covariates.  In other words, the marginal standard deviation
 controls how strong the functions wiggle and the length scale controls
-who quickly they wiggle.  
+who quickly they wiggle.
 
 Keep in mind that the influences of these two hyperparameters are not
 independent.  Even if the length scale is very long, for example, we
@@ -168,7 +178,7 @@ matrix_ of the covariance kernel.
 
 Consequently we can perform all of the manipulations of a Gaussian
 processes that we need in practice using just the familiar properties
-of multivariate Gaussian distributions.  
+of multivariate Gaussian distributions.
 
 # Gaussian Process Regression
 
@@ -504,7 +514,7 @@ Gaussian process hyperparameters with maximum marginal likelihood
 and Bayesian inference, paying particular attention to what can go
 wrong and how we can maintain robust performance.
 
-[Part 2: Optimizing Gaussian Processes Hyperparameters](../gp_part2/part2.html)  
+[Part 2: Optimizing Gaussian Processes Hyperparameters](../gp_part2/part2.html)
 [Part 3: Bayesian Inference of Gaussian Processes Hyperparameters](../gp_part3/part3.html)
 
 # Acknowledgements
