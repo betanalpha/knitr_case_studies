@@ -21,7 +21,7 @@ knitr::opts_chunk$set(comment=NA)
 The Cauchy distribution has a notorious history of serving as a
 counterexample to mathematical proofs in probability theory.  At
 the same time it has been a consistent source of frustration for
-statistical computation as well.  In thise case study I will review
+statistical computation as well.  In this case study I review
 various ways of implementing the Cauchy distribution, from the
 nominal implementation to alternative implementations aimed at
 ameliorating these difficulties, and demonstrate their relative
@@ -410,7 +410,7 @@ pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n]))
 
 plot(1, type="n", main="", xaxt = "n", xlab="",
      ylab="Gradient Evaluations Per Iteration",
-     xlim=c(0, 5), ylim=c(0, 7000))
+     xlim=c(0, 5), ylim=c(0, 8000))
 axis(1, at=1:4, labels=c("Nom", "Alt 1", "Alt 2", "Alt 3"))
 
 polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
