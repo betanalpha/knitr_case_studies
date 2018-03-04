@@ -1,0 +1,585 @@
+---
+title: "Bayes Sparse Regression"
+author: "Michael Betancourt"
+date: "March 2018"
+bibliography: bayes_sparse_regression.bib
+output:
+  html_document:
+    fig_caption: yes
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 2
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
+
+As complex measurements convolve meaningful phenomena with more and more
+extraneous phenomena, _sparsity_ is becoming an increasingly prevalent objective
+in statistical analyses.  Much of this zeitgeist has been driven by the success
+of frequentist methods like compressed sensing and LASSO regression, and it is
+often naively assumed that these properties immediately carry over to the
+corresponding Bayesian analyses.  Sparsity in a Bayesian analysis, however, is
+induced by fundamentally different properties than those that induce sparsity in
+a frequentist analysis.
+
+In this case study I'll review how sparsity arises in frequentist and Bayesian
+analyses and discuss the often subtle challenges in implementing sparisty in
+practical Bayesian analyses.
+
+# Fading into Irrelevance
+
+The usual setting for sparsity is a regression over a data set containing
+many covariates that could possibly correlate with an outcome variate of
+interest.  In this circumstance sparsity is the assumption that only a few of
+these covariates have any meaningful correlation, although a priori we do not
+know exactly which covariates will be relevant and which will be irrelevant.
+A sparse regression encodes this assumption to allow the data to inform both
+which covariates are relevant and how the relevant covariates then correlate
+with the outcome variate.
+
+For example we might be interested in classifying individuals in a population
+into two groups, with many individual characteristics possibly influencing the
+probabilty of being associated with each group.  Without any sparsity
+assumptions the uncertainty in the irrelevant characterisics will propagate
+to large uncertainties in inferred associations.  If we can isolate only the
+relevant covariates, however, then we can significantly reduce these
+uncertainties and improve our inferences.
+
+For simplicity I will restrict the discussion to only general linear models
+where slopes, $\boldsymbol{\beta}$, control the influence of each covariate
+through some effective parameter for each observation,
+$$
+\theta_{n} (\mathbf{x}_{n}, \boldsymbol{\beta}, \alpha)
+=
+f ( \mathbf{x}_{n} \cdot \boldsymbol{\beta} + \alpha ).
+$$
+Because a covariate will no longer influence the model when the corresponding
+slope vanishes, sparsity is induced by regularizing the irrelevant slopes
+towards zero without affecting the relevant slopes and compromising inferences
+too much.
+
+How this sparsity is realized depends intimately on the inferential perspective
+that we consider.
+
+## Inducing Sparse Decisions
+
+_Frequentist sparsity_ is a decision making process that explicitly selects
+a small subset of covariates to inform the regression while discarding the rest.
+When executed properly this selection process can drastically reduce the size
+of the data that needs to be considered and hence the computational cost of
+making predictions for new observations.  When executed improperly the selection
+process can undermine our ability to infer the variate outcome.
+
+In the general linear model setting the selection of covariates is equivalent
+to identifying which slopes are zero and which are non-zero.  Methods like the
+LASSO [@Tibshirani:1996] achieve sparsity by strongly penalizing the maximum
+likelihood estimator of the slopes towards small values and then explicitly
+forcing a slope to zero when it falls below a given threshold during the maximum
+likelihood estimation.  As the optimization proceeds any slope that isn't needed
+to maintain the maximum likelihood fit to the observed data is forced to zero
+and utlimately discarded.
+
+For sufficiently simple data generating processes and large enough data sets
+these methods tend to be reasonably well-calibrated.  We will, on average,
+discard most of the irrelevant covariates while retaining most of the relevant
+covariates, and our abilty ot model the variate outcome, regardless of the
+exact data that we observe.
+
+## Inducing Sparse Inferences
+
+_Bayesian sparsity_ avoids decisions altogether and instead manifests as a
+disctint behavior in the posterior distribution.  In particular, Bayesian
+sparsity arises from a posterior distribution that strongly concentrates around
+the neighborhood in parameter space where the irrelevant slopes are zero and
+hence inconsequential when making inferences.
+
+As the penalty function induces sparse decisions in the frequentist setting, the
+prior distribution induces sparse inferences in the Bayesian setting.  How
+exactly, however, can a prior distribution coerce the desired concentration
+when we don't know which slopes are irrelevant a priori?
+
+It's tempting to appeal to the penalty function that is so critical to the
+success in the frequentist setting.  In particular, if we reinterpret the
+sparsity-inducing penalty functions as a log probability density over parameter
+space then does that define a sparsity-inducing prior distribution?
+Unfortunately it does not.  In fact the implied prior distibutions stretch
+the corresponding posterior distribution _away_ from the desired neighborhood
+where the irrelevan slopes vanish.
+
+The problem is that a sparsity-inducing penalty function has to influence only
+a single point in parameter space at any given time, whereas a
+sparsity-inducing prior distribution has to consider the entire parameter space
+at once.
+
+## Sparsity-Inducing Estiamators verses Sparsity-Inducing Distributions
+
+To highlight the difference between inducing sparsity in a point estimator and
+inducing sparsity in an entire distribution, let's consider the $L_{1}$ penalty
+at the heart of the LASSO,
+$$
+R_{L_{1}} ( \boldsymbol{\beta} ) =
+\sum_{m = 1}^{M} \lambda_{m} \left| \beta_{m} \right|.
+$$
+
+When the maximum likeihood estimate of the slope $\beta_{m}$ falls below the
+scale $\lambda_{m}$ it is regularized towards zero but, because the penalty is
+nearly flat above the scale, estimates above $\lambda_{m}$ experience negligible
+regularization.  Given a suitable choice of scales for each covariate this
+dichotomous behavior of the penalty facilitates the suppresion of the irrelevant
+slopes below the selection treshold while leaving the relevant slopes
+undisturbed.
+
+Interpreted as a negative log density, the $L_{1}$ penalty function implies
+independent Laplace priors for each of the slopes,
+$$
+\pi( \boldsymbol{\beta} )
+=
+\exp (- R_{L_{1}} ( \boldsymbol{\beta} ))
+=
+\prod_{m = 1}^{M} \exp (- \lambda_{m} \left| \beta_{m} \right| ).
+$$
+With this prior the mode of the resulting posterior distribution will coincide
+with the penalized maximum likelihood estimator; unfortunately the mode is not
+a well-posed inference drawn from the posterior distribution.  Proper inferences
+correspond instead of posterior expectation values that are informed by the
+_entire_ posterior distribution.  The affect of the Laplace prior on the full
+posterior distribution is not nearly as useful as its affect on the mode.
+
+Because the maximum likelihood estimator considers only a single point in
+parameter space at a time, it is influenced by the either the regularizing
+behavior of the penalty below each $\lambda_{m}$ or the laissez faire behavior
+above each $\lambda_{m}$, but not both.  The expanse of the posterior
+distribution, however, is influenced by both of these behaviors _at the same
+time_.  While the shape of the Laplace prior below $\lambda_{m}$ does induce
+some concentration of the posterior towards smaller values of $\beta_{m}$, the
+heavy tail also drags significant posterior probabilty far above $\lambda_{m}$.
+
+These opposing behaviors induce regrettable features in the posterior for
+both the irrelevant slopes, which leak significant probability mass towards
+undesired large values, and relevant slopes, which are overshrunk towards
+smaller values.  The former prevents us from identifying the irrelevant parameters
+while the latter biases our inferences.  Moreover, in both cases the marginal
+posteriors become much more diffuse than warranted which inflates our
+inferential uncertainties.
+
+If we want to induce sparsity in Bayesian decisions then we need a prior
+distribution with a more holistic approach to regularization.  Luckily enough,
+we have the horseshoe.
+
+# Constructing Prior Distributions That Induce Sparsity
+
+To implement Bayesian sparsity we need a prior distribution that allows the data
+to collapse the entire marginal posterior for each slope towards relevance or
+irrelevance, but not both.  In doing so we need to carefully define exactly what
+values of the slopes are consequential to the final inference and what values
+are not.
+
+## Sparsity-Inducing Shapes
+
+In order to provide the desired flexibility in the posterior for each slope we
+need a prior distribution that enforces a global scale while also giving each
+of slopes the flexibilty to transcend that scale as needed.  Because we don't
+know which slopes will need that flexibilty the desired prior will have to be
+exchangeable with respect to the slopes and hence manifest a hierachical
+structure.
+
+The _horseshoe_ prior [@CarvalhoEtAl:2009] accomplishes this flexibility by
+setting the scale for each component to the product of a global scale, $\tau$
+and a local scale,$\lambda_{m}$, each of which are themselves unknown
+parameters,
+$$
+\begin{align*}
+\beta_{m} &\sim \mathcal{N} (0, \tau \cdot \lambda_{m})
+\\
+\lambda_{m} &\sim \text{Half-}\mathcal{C} (0, 1)
+\\
+\tau &\sim \text{Half-}\mathcal{C} (0, \tau_{0}).
+\end{align*}
+$$
+The heavy-tailed Cauchy prior distribution for the local scales allows the data
+to push each to large values as needed, which then push the corresponding slopes
+above the global scale, $\tau_{0}$.  By making the global scale itself a
+parameter we also allow the data to refine the scale beyond our prior
+judgement of $\tau_{0}$.
+
+An immediate problem with the horseshoe prior is that the slopes that transcend
+the global scale are otherwise unregularized, leaving their posteriors to
+diffuse to extremely large values.  This behavior allows nonidentification or
+weak identification of the likelihood to propagate to the posterior and
+compromise the validity of the resulting inferences.  The _Finnish horseshoe_
+[@PiironenEtAl:2017] remedies this vulnerability by introducing another level
+to the prior hierarchy,
+$$
+\begin{align*}
+\beta_{m} &\sim \mathcal{N} (0, \tau \cdot \tilde{\lambda}_{m})
+\\
+\tilde{\lambda}_{m} &=
+\frac{c \lambda_{m}}
+{\sqrt{ c^{2} + \tau^{2} \lambda_{m}^{2}}}
+\\
+\lambda_{m} &\sim \text{Half-}\mathcal{C} (0, 1)
+\\
+c^{2} &\sim \text{Inv-}\mathcal{G} \, (\frac{\nu}{2}, \frac{\nu}{2} s^{2})
+\\
+\tau &\sim \text{Half-}\mathcal{C} (0, \tau_{0}).
+\end{align*}
+$$
+Integrating the new scale, $c$, out of the distribution implies a marginal
+$\text{Student-}t \, (\nu, 0, s)$ prior for each of the slopes, at least
+sufficiently far above the glboal treshold $\tau_{0}$.  Setting $\nu$ and $s$
+appropriately then ensures that we can contain with the posterior within a
+few multiples of $s$ around zero.
+
+## Sparsity-Inducing Thresholds
+
+With the shape of a sparsity-inducing prior established we are left only with
+determining the prior hyperparameter $\tau_{0}$ which effetively determines
+the scale below which slopes are irrelevant to the modeling of the output
+variate.  The subtlety with specifying $\tau_{0}$ is irrelevance is determined
+not by the prior distribution itself but rather our _measurement process_ --
+the contribution of a slope is negligible only when it is indistinguishable from
+the inherent variabiltiy of our observations.  As always the consequences of the
+prior depend on the context of the likelihood [@GelmanEtAl:2017].
+
+Let's presume that we will model our measurement process as a linear
+regression,
+$$
+y_{n} \sim
+\mathcal{N} (\mathbf{x}_{n} \cdot \boldsymbol{\beta} + \alpha, \sigma).
+$$
+The measurement variability, $\sigma$ provides a natural scale for irrelevance
+in this model.
+
+If we assume that the covariates are independent and distributed around zero
+with unit variation then a slope on the order of $\sigma$ will yield an
+individual response, $x_{nm} \beta_{m} \approx \sigma$, that would be hard to
+discriminate from the expected variation of the measurement itself a priori.
+Consequently $\tau_{0} = \sigma$ seems a reasonable assumption.
+
+When we consider the posterior behavior, however, we have to recognize that the
+data will typically inform our inferences beyond the scale of the measurement
+variability -- with $N$ independent observations we will be sensitive to effects
+as small as $\sigma / \sqrt{N}$.  If we ignore the number of observations then
+the consequnces of the resulting prior will change with the size of the data!
+This suggests instead that we take $\tau_{0} = \sigma / \sqrt{N}$.
+
+Our logic so far has relied on the expected contribution from each slope
+individually.  That tails of the horseshoe priors, however, are heavy enough
+that when we consider the contribution from many slopes at once we will see
+that at least a few will exceed the irrelevance threshold and significantly
+effect the variate-covariate relationship.  In order to avoid this ensemble
+behavior we have to reduce our prior scale even further to
+$$
+\tau_{0} = \frac{m_{0}}{M - m_{0}} \frac{\sigma}{\sqrt{N}},
+$$
+where $m_{0}$ is the expected number of relevant slopes.
+
+If we move away from pure linear regression then this argument has to be
+modified to account for nonlinearities in the measurement process.
+@PiironenEtAl:2017 derives approximate scales appropriate to general linear
+models.  In order to faciliate the optimal performance of the horseshoe family
+of prior distributions we must take care to ensure that the prior scale is
+compatible with the measurement process.
+
+# Experiments
+
+To demonstrate the subtlties in implementing sparsity in a Bayesian analysis
+let's consider data simulated from a linear regression model,
+```{r}
+writeLines(readLines("generate_data.stan"))
+```
+The covariates are all independently distributed around zero with unit variance,
+and there are a population of large slopes and small, irrelevant slopes.
+Moreover, the data are collinear with more covariates than observations.
+
+We begin by simulating a measurement,
+
+```{r}
+library(rstan)
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+
+util <- new.env()
+source('stan_utility.R', local=util)
+source('plot_utility.R', local=util)
+
+fit <- stan(file='generate_data.stan', iter=1,
+            chains=1, seed=194838, algorithm="Fixed_param")
+
+X <- extract(fit)$X[1,,]
+y <- extract(fit)$y[1,]
+N <- dim(X)[2]
+M <- dim(X)[1]
+beta_true <- extract(fit)$beta[1,]
+
+stan_rdump(c("N", "M", "X", "y", "beta_true"), file="linear_regression.data.R")
+```
+
+Only 7 of the simulated slopes are large enough to significantly effect
+the regression, with the other slopes left largely irrelevant.
+
+```{r}
+input_data <- read_rdump("linear_regression.data.R")
+
+c_dark <- c("#8F2727")
+c_dark_highlight <- c("#7C0000")
+
+par(mar = c(4, 4, 0.5, 0.5))
+hist(input_data$beta_true, main="", col=c_dark, border=c_dark_highlight,
+     xlab="True Slopes", yaxt='n', ylim=c(0, 40), ylab="",
+     breaks=11*(-100:100)/100)
+```
+
+Our ability to recover these large slopes will depend intimately on the prior
+we incorporate into our Bayesian model.
+
+## Uniform Prior
+
+Let's begin with a uniform prior over the slopes,
+```{r}
+writeLines(readLines("linear_regression_unif.stan"))
+```
+
+```{r, cache=TRUE}
+fit <- stan(file='linear_regression_unif.stan', data=input_data, seed=4938483)
+```
+
+Because of the collinear data the linear regression likelihood is
+non-identified, and the uniform prior allows that non-identifiabilty to
+propagate to the posterior.  The fit of the resulting posterior unsurpsingly
+fails in spectacular fashion, with vanishing effective sample sizes, large
+$\hat{R}$, and failing HMC diagnostics.
+
+```{r}
+capture.output(util$check_n_eff(fit))[1:5]
+capture.output(util$check_rhat(fit))[1:5]
+util$check_div(fit)
+util$check_treedepth(fit)
+util$check_energy(fit)
+```
+
+The fit does, however, exhibit some of the massive uncertainty inherent to
+the non-identified posterior,
+
+```{r}
+util$plot_post_quantiles(fit, input_data, "Uniform Prior")
+
+util$plot_residual_quantiles(fit, input_data, "Uniform Prior")
+
+util$plot_aux_posteriors(fit, "Uniform Prior")
+```
+
+## Narrow Weakly Informative Prior
+
+We definitley need a prior to compensate for the non-identified likelihood,
+but just how much prior informationt do we need?  Let's try a weakly-informative
+prior for all of the slopes that strongly concentrates below the scale of the
+measurement variability.
+
+```{r}
+writeLines(readLines("linear_regression_narrow.stan"))
+```
+
+```{r, cache=TRUE}
+fit <- stan(file='linear_regression_narrow.stan', data=input_data, seed=4938483)
+```
+
+The fit is much better behaved,
+
+```{r}
+util$check_all_diagnostics(fit)
+```
+
+But the extreme regularization biases the marginal posteriors for the larger
+slopes far below their true values.  Moreover, the inferred measurement
+variability is biased quite high in order to compensate.
+
+```{r}
+util$plot_post_quantiles(fit, input_data, "Narrow Prior")
+
+util$plot_residual_quantiles(fit, input_data, "Narrow Prior")
+
+util$plot_aux_posteriors(fit, "Narrow Prior")
+```
+
+## Wide Weakly Informative Prior
+
+Would a weakly informative prior work if we expanded the scale so to
+encompass the breadth of the true slopes?
+
+```{r}
+writeLines(readLines("linear_regression_wide.stan"))
+```
+
+```{r, cache=TRUE}
+fit <- stan(file='linear_regression_wide.stan', data=input_data, seed=4938483)
+```
+
+The fit diagnostics hint at trouble, which is not unexpected given that the
+wider prior allows more of the likelihood non-identifiabilty to spread to the
+posterior.
+
+```{r}
+util$check_all_diagnostics(fit)
+```
+
+More importantly, the wide prior offers little regularization to the many slopes
+that are expected to be negligible.  The resulting marginal posteriors exhibit
+little contraction away from the prior.
+
+```{r}
+util$plot_post_quantiles(fit, input_data, "Wide Prior")
+
+util$plot_residual_quantiles(fit, input_data, "Wide Prior")
+
+util$plot_aux_posteriors(fit, "Wide Prior")
+```
+
+## Laplace Prior
+
+If want to isolate the significant slopes then we have to encode the
+assumption of sparsity into our prior distribution.  Before considering
+the family of horseshoe priors, however, let's take a look at the Laplace
+prior motivated by a naive translation of the frequentist LASSO.
+
+```{r}
+writeLines(readLines("linear_regression_laplace.stan"))
+```
+
+```{r, cache=TRUE}
+fit <- stan(file='linear_regression_laplace.stan', data=input_data, seed=4938483,
+            control=list(adapt_delta=0.99, max_treedepth=12))
+```
+
+Even with the large treedepths and small adaptation target, `adapt_delta`, the
+fit with the Laplace prior exhibits slow mixing.
+
+```{r}
+util$check_n_eff(fit)
+util$check_rhat(fit)
+util$check_div(fit)
+util$check_treedepth(fit, 12)
+util$check_energy(fit)
+```
+
+The posterior seems much better behaved compared to our failures up to this
+point, but we do see somewhat large uncertainties and excessive regularization
+of the larger slopes as expected from our previous discussion.
+
+```{r}
+util$plot_post_quantiles(fit, input_data, "Laplace Prior")
+
+util$plot_residual_quantiles(fit, input_data, "Laplace Prior")
+
+util$plot_aux_posteriors(fit, "Laplace Prior")
+```
+
+## The Horseshoe
+
+In order to encode proper inferential sparsity into our Bayesian analysis we
+need to consider the horseshoe or variants thereof.
+
+```{r}
+writeLines(readLines("linear_regression_horseshoe.stan"))
+```
+
+```{r, cache=TRUE}
+fit <- stan(file='linear_regression_horseshoe.stan', data=input_data, seed=4938483,
+            control=list(adapt_delta=0.99, max_treedepth=15))
+```
+
+Unfortunately, the fit isn't great.  While the horseshoe does have a reputation
+for being challenging to fit, its lack of regularization of the large slopes
+is particularly troublesome in the context of the non-identified likelihood.
+
+```{r}
+util$check_n_eff(fit)
+util$check_rhat(fit)
+util$check_div(fit)
+util$check_treedepth(fit, 15)
+util$check_energy(fit)
+```
+
+That said, the sparsity induced by the horseshoe prior does allow the posterior
+to become much more narrow if not quite as accurate as we'd like.
+
+```{r}
+util$plot_post_quantiles(fit, input_data, "Horseshoe Prior")
+
+util$plot_residual_quantiles(fit, input_data, "Horseshoe Prior")
+
+util$plot_aux_posteriors(fit, "Horeshoe Prior")
+```
+
+## The Finnish Horseshoe
+
+Finally we can consider incorporating a Finnish horseshoe into our model.
+Here we assume 10 large slopes and tune the extra level of regularization to
+place most of the prior mass below a magnitude of 10.
+
+```{r}
+writeLines(readLines("linear_regression_finnish_horseshoe.stan"))
+```
+
+```{r, cache=TRUE}
+fit <- stan(file='linear_regression_finnish_horseshoe.stan', data=input_data,
+            seed=4938483,
+            control=list(adapt_delta=0.99, max_treedepth=15))
+```
+
+As with any Finn, the Finnish horseshoe can be a bit stubborn so we have to
+push the limits of Hamiltonian Monte Carlo a bit to resolve all of the
+structure it induces in the posterior distribution.  We some tuning, however,
+we recover a good fit.
+
+```{r}
+util$check_n_eff(fit)
+util$check_rhat(fit)
+util$check_div(fit)
+util$check_treedepth(fit, 15)
+util$check_energy(fit)
+```
+
+Excitingly, the Finnish horseshoe admits narrow posteriors around both the
+large and small slopes without compromising accuracy.
+
+```{r}
+util$plot_post_quantiles(fit, input_data, "Finnish Horseshoe Prior")
+
+util$plot_residual_quantiles(fit, input_data, "Finnish Horseshoe Prior")
+
+util$plot_aux_posteriors(fit, "Finnish Horeshoe Prior")
+```
+
+# Conclusion
+
+Sparsity is a potentially powerful but ultimately very subtle assumption.
+Only by utilizing prior distributions that induce sparsity in a principled
+manner can we truely exploit the assumption in those circumstances where it is
+appropriate.  In particular, any proper application of sparsity requires
+a detailed understanding of how the sparse parameters effect the measurement
+process itself.
+
+# Acknowledgements
+
+I thank Dan Simpson, Aki Vehtari, and Juho Piironen for many helpful
+conversations about sparsity.
+
+
+# Original Computing Environment
+
+```{r, comment=NA}
+writeLines(readLines(file.path(Sys.getenv("HOME"), ".R/Makevars")))
+```
+
+```{r, comment=NA}
+devtools::session_info("rstan")
+```
+
+# References
