@@ -26,9 +26,9 @@ they are employed in practice.  In particular, many introductions to probability
 theory sloppily confound the abstract mathematics with their practical
 implementations, convoluting _what_ we can calculate in the theory with _how_
 we perform those calculations.  To make matters even worse, probability theory
-is used to model a variety of subtlely different systems, which then burdens the
+is used to model a variety of subtlety different systems, which then burdens the
 already confused mathematics with the distinct and often conflicting
-philosphical connonations of those applications.
+philosophical connotations of those applications.
 
 In this case study I attempt to untangle this pedagogical knot to illuminate
 the basic concepts and manipulations of probability theory and how they can be
@@ -46,11 +46,11 @@ necessary.  These section are labeled "Extra Credit" and may be skipped without
 any consequence.
 
 Let me, however, open with a warning that the section on abstract probability
-theory will be devoid of any concrete examples.  This is not becuase of any
+theory will be devoid of any concrete examples.  This is not because of any
 conspiracy to confuse the reader, but rather is a consequence of the fact that
 we cannot explicitly construct abstract probability distributions in any
 meaningful sense.  Instead we must utilize problem-specific _representations_
-of abstract probability distributions.  Consequently conerete examples will have
+of abstract probability distributions.  Consequently concrete examples will have
 to wait until we introduce these representations in Section 3.
 
 # Setting A Foundation
@@ -132,7 +132,7 @@ $$
 <br><br>
 
 At the same time we can also map sets from the output space, $Y$, to sets in
-the input space, $X$, by appying the inverse of a given function,
+the input space, $X$, by applying the inverse of a given function,
 $$
 f^{-1}(B) = \left\{ x \in X \mid f(x) \in B \right\}.
 $$
@@ -182,10 +182,10 @@ In particular, all of the spaces that we typically deal with in practical
 problems, such as the integers and the real numbers, have natural
 $\sigma$-algebras.  Consequently we don't have to spend any time worrying about
 constructing a $\sigma$-algebra in practice and the restriction of the power set
-to a $\sigma$-algebra has little impact on teh practical use of probability
+to a $\sigma$-algebra has little impact on the practical use of probability
 theory.
 
-For more on these natural $\sigma$-algebas see the following optional section.
+For more on these natural $\sigma$-algebras see the following optional section.
 
 ## Extra Credit: Topology
 
@@ -193,12 +193,12 @@ A _topology_ on a space, $X$, is a collection of sets that contains the empty
 set and the full space and is closed under countable unions and finite
 intersections.  The sets in a given topology are called _open_ sets and the
 compliment of any open set is called a _closed_ set.  Be warned that open and
-closed in the topological sence are not exact opposites -- by definition the
+closed in the topological sense are not exact opposites -- by definition the
 empty set and the full space are both open and closed or, shudder, _clopen_.
 
 The topology of a space provides a formal way to define important properties
 like continuity.  For example, the fundamental differences between discrete and
-continous spaces arise from their different topologies.  In particular, all of
+continuous spaces arise from their different topologies.  In particular, all of
 the common spaces, such as the integers and the real numbers, have unique
 topologies from which many of their more-intuitive properties arise.
 
@@ -267,7 +267,7 @@ is allocated to the full space, $\mathbb{P}_{\pi} [X] = 1$.
 
 These three conditions completely specify a valid probability distribution,
 although to be formal we have to be careful about what we mean by "well-defined"
-subsets of $X$.  Somewhat unnervingly we cannot constuct an object that
+subsets of $X$.  Somewhat unnervingly we cannot construct an object that
 self-consistently allocates probability to _every_ subset of $X$ because of
 some very weird, pathological subsets.  Instead we have to limit our
 consideration to a $\sigma$-algebra, $\mathcal{X}$, that removes these odd
@@ -297,7 +297,7 @@ $$
 A_{n} \cap A_{m} = 0, \, n \ne m.
 $$
 
-The more familiar rules of probabilty theory can all be derived from these
+The more familiar rules of probability theory can all be derived from these
 axioms.  For example the last self-consistency condition implies that
 $$
 \mathbb{P}_{\pi}[A] + \mathbb{P}_{\pi}[A^{c}] = \mathbb{P}_{\pi}[X] = 1
@@ -343,7 +343,7 @@ $A$, which is just the probability allocated to that set,
 $$
 \mathbb{E}_{\pi} [ \mathbb{I}_{A} ] \equiv \mathbb{P}_{\pi} [ A ].
 $$
-We can then build up the expecation value of an arbitrary function with a
+We can then build up the expectation value of an arbitrary function with a
 careful approximation in terms of these indicator functions in a process known
 as _Lebesgue integration_.  For more detail see the following optional section.
 
@@ -434,10 +434,10 @@ with arbitrary accuracy.
 ![](figures/lebesgue/lebesgue.png)
 <br><br>
 
-Consequently we define the expecation of an everywhere-positive function as
+Consequently we define the expectation of an everywhere-positive function as
 the expectation of this approximating simple function.  Because we were careful
 to consider only simple functions bounded by $f$ we can also define the
-expectation of $f$ as the largest expecation of all bounded simple functions,
+expectation of $f$ as the largest expectation of all bounded simple functions,
 $$
 \mathbb{E}_{\pi} [ g ] = \max_{\phi \le g} \mathbb{E}_{\pi} [ \phi ].
 $$
@@ -482,7 +482,7 @@ probability distribution on $Y$ we need the two $\sigma$-algebras to be
 compatible in some sense.  In particular we need every subset
 $B \in \mathcal{Y}$ to correspond to a unique subset
 $f^{-1}(B) \in \mathcal{X}$.  If this holds for all subsets in $\mathcal{Y}$
-then we say that the transformation $f$ is _measureable_ and we can define
+then we say that the transformation $f$ is _measurable_ and we can define
 a _pushforward_ distribution, $\pi_{*}$ by
 $$
 \mathbb{P}_{\pi_{*}} [ B ] = \mathbb{P}_{\pi} [ f^{-1} (B) ].
@@ -504,7 +504,7 @@ probability distribution on $X$.  In this case we actually have one unique
 probability distribution that is just being defined over two different
 manifestations of the same abstract system.  The two manifestations, for
 example, might correspond to different choices of coordinate system, or
-different choices of units, or different choics of language capable of the same
+different choices of units, or different choices of language capable of the same
 descriptions.  These _doubly measurable_ transformations then serve as
 translations from one equivalent manifestation to another.
 
@@ -512,7 +512,7 @@ Measurable maps can also be used to project a probability distribution over a
 space onto a probability distribution over a lower-dimensional subspace.  Let
 $\varpi: X \rightarrow Y$ be a _projection operator_ that maps points in a space
 $X$ to points in the subspace $Y \subset X$.  It turns out that in this case a
-$\sigma$-algebra on $Z$ naturally defines a $\sigma$-algebra on $X$ and
+$\sigma$-algebra on $X$ naturally defines a $\sigma$-algebra on $Y$ and
 the projection operator is measurable with respect to this choice.
 Consequently any _joint probability distribution_ on $X$ will transform into a
 unique _marginal probability distribution_ on $Y$.  More commonly we say that we
@@ -522,7 +522,7 @@ _marginalize out_ the complementary subspace, $Y^{C}$.
 ![](figures/projection/projection.png)
 <br><br>
 
-Marginalization is a bit more striaghtforward when we are dealing with a product
+Marginalization is a bit more straightforward when we are dealing with a product
 space, $X \times Y$, which is naturally equipped with the component
 projection operators $\varpi_{X} : X \times Y \rightarrow X$ and
 $\varpi_{Y}: X \times Y \rightarrow Y$.  In this case by pushing a distribution
@@ -581,7 +581,7 @@ $$
 Evaluated at any $y \in Y$ the conditional probability distribution defines
 a probability distribution over the corresponding fiber space,
 $(F, \mathcal{F})$.  On the other hand, when evaluated at a given subset
-$A \in \mathcal{F}$ the conditonal probability distribution becomes a measurable
+$A \in \mathcal{F}$ the conditional probability distribution becomes a measurable
 function from $Y$ into $[0, 1]$ that quantifies how the probability of that set
 varies as we move from one fiber to the next.
 
@@ -619,7 +619,7 @@ $$
 <br><br>
 
 Conditional probability distributions are especially useful when we want to
-construct a complex probability distribution over a high-dimensonal space
+construct a complex probability distribution over a high-dimensional space
 because we can reduce the specification of the ungainly joint probability
 distribution with a sequence of lower-dimensional conditional probability
 distributions and marginal probability distributions about which we can more
@@ -649,12 +649,12 @@ $\sigma$-algebra with only a few elements we could completely specify this
 mapping with a lookup table, but any nontrivially large $\sigma$-algebra
 will simply be too large for this to be practical.  What we really need is a
 way to define this mapping algorithmically so that we can perform necessary
-calculations as needed instead of exhaustively specifiying the relationships.
+calculations as needed instead of exhaustively specifying the relationships.
 
-Fortunately most probabilistic systems admit _represenations_ that faithfully
+Fortunately most probabilistic systems admit _representations_ that faithfully
 recover all probabilities and expectation values on demand and hence completely
-specific a given probability distribution.  Many represenations exploit the
-particular struture of $X$ to fully characterize a probability distribution
+specific a given probability distribution.  Many representations exploit the
+particular structure of $X$ to fully characterize a probability distribution
 with a single function, while others utilize sequences of points to construct
 these probabilistic computations.
 
@@ -805,7 +805,7 @@ text(x=7.5, y=-0.08, labels="A", cex=1.5)
 text(x=7, y=0.025, labels="P[A]", cex=1.5, col="white")
 ```
 
-In `R` we can evalulate both the exhaustive sum,
+In `R` we can evaluate both the exhaustive sum,
 ```{r}
 K1 <- 5
 K2 <- 10
@@ -864,10 +864,10 @@ plot(x, dnorm(x, 0, 1), type="l", col=c_dark_highlight, lwd=2,
      xlab="x", ylab="Probability Density",
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5, yaxt='n')
 ```
-Note that I have not referred to this probabilitiy density function as
+Note that I have not referred to this probability density function as
 representing a "Gaussian probability distribution".  Under a double measurable
 transformation that doesn't affect the latent probability distribution the
-probability density function will pick up a Jacobian determinent that can skew
+probability density function will pick up a Jacobian determinant that can skew
 this bell-curved, Gaussian shape.  Consequently there are no Gaussian
 probability distributions, just probability distributions on $X = \mathbb{R}$
 that can be represented as Gaussian densities in certain manifestations of $X$.
@@ -924,8 +924,8 @@ One of the immediate difficulties with probability mass function and
 probability density function representations is that if a given expectation
 doesn't have a closed form, as we conveniently had for the examples given above,
 then the computation will likely be infeasible.  Exhaustive surveys of the space
-$X$ needed to numerically compute a summatation or integral is simply too
-expensive given the finite computational resources avaiable in most problems.
+$X$ needed to numerically compute a summation or integral is simply too
+expensive given the finite computational resources available in most problems.
 This is especially true when we consider more complicated probability
 distributions over high-dimensional spaces.
 
@@ -934,12 +934,12 @@ probability distribution uses a sequence of points in $X$ capable of
 _estimating_ expectations with more reasonable computational demands.
 
 Consider an arbitrary sequence of points from $X$,
-$S_{N} = {x_{1}, \ldots, x_{N}}$ and define the _emperical expectation_ of a
+$S_{N} = {x_{1}, \ldots, x_{N}}$ and define the _empirical expectation_ of a
 function $f : X \rightarrow \mathbb{R}$ as
 $$
 \hat{f}(S_{N}) = \frac{1}{N} \sum_{n = 1}^{N} f(x_{n}).
 $$
-A _sampling procedure_ is any process that generates sequences that satsify
+A _sampling procedure_ is any process that generates sequences that satisfy
 the asymptotic property
 $$
 \lim_{N \rightarrow \infty} \hat{f}(S_{N}) = \mathbb{E}_{\pi} [ f ],
@@ -950,9 +950,9 @@ definition any subset of such a sequence is also a sample.
 
 As the size of a sample increases the empirical expectations converge towards
 the true expectation values, as well as probabilities through expectations of
-indicator funtions.  In this way the sample procedure which is conceptually
+indicator functions.  In this way the sample procedure which is conceptually
 capable of generating arbitrarily long sequences provides a faithful
-represenation of the corresponding probability distribution.  In practice we
+representation of the corresponding probability distribution.  In practice we
 need to be able to quantify the accuracy of these estimators to understand how
 accurately we are representing the target probability distribution.
 
@@ -1013,7 +1013,7 @@ say that the resulting sample is _exact_.  Consequently each subset of an exact
 sample, including each point, is also an exact sample.
 
 In this case the empirical expectations satisfy a _central limit theorem_ which
-guarantees that the empirical expecations are distributed around the true
+guarantees that the empirical expectations are distributed around the true
 expectations,
 $$
 \hat{f}(S_{N}) \sim
@@ -1163,8 +1163,8 @@ asymptotically with no guaranatees on how they converge after only a finite
 number of transitions.  Unlike in the Monte Carlo method, Markov chain Monte
 Carlo estimators don't always satisfy a central limit theorem.
 
-Under technical _ergodicity_ conditons, however, Markov chain Monte Carlo
-estimators can achieve a central limit theorm of the form
+Under technical _ergodicity_ conditions, however, Markov chain Monte Carlo
+estimators can achieve a central limit theorem of the form
 $$
 \hat{f}(S_{N}) \sim
 \mathcal{N} \left( \mathbb{E}_{\pi} [ f ],
@@ -1178,7 +1178,7 @@ effective sample size using the sample generated by the Markov chain itself.
 
 Stan uses the powerful _dynamic Hamiltonian Monte Carlo_ method to generate
 Markov chains that target probability distributions defined on the real
-numbers.  These Markov chains acheive central limit theorems for many target
+numbers.  These Markov chains achieve central limit theorems for many target
 probability distributions and, when a central limit theorem does hold, the
 Markov chains typically yield very large effective sample sizes relative to the
 total sample size.  For more details on Markov chain Monte Carlo and Hamiltonian
@@ -1268,7 +1268,7 @@ $$
 &(f, x)& &\mapsto& &\pi_{F \mid X} (f \mid x)&.
 \end{alignat*}
 $$
-If the base space is also discrete with marginal probabilty mass function
+If the base space is also discrete with marginal probability mass function
 $\pi_{X}(x)$ then a probability distribution over the total space can be
 represented by a probability mass function that takes the simple form
 $$
@@ -1287,7 +1287,7 @@ $$
 &(f, x)& &\mapsto& &\pi_{F \mid X} (f \mid x)&.
 \end{alignat*}
 $$
-If the base space is also continous with marginal probabilty density function
+If the base space is also continuous with marginal probability density function
 $\pi_{X}(x)$ then a probability distribution over the total space can be
 represented by a probability density function that takes the simple form
 $$
@@ -1337,7 +1337,7 @@ versa, a probability distribution on the total space admits a
 _mixed representation_ compromised as a product of a conditional probability
 mass functions and a marginal probability density function, or vice versa.
 For example, a discrete fiber with a continuous base space defines a probability
-distribution over a space that contains _both_ discrete and continous
+distribution over a space that contains _both_ discrete and continuous
 properties.  Because discrete and real representations both take the form of
 functions, these mixed representations are straightforward to construct and
 utilize when computing probabilities and expectations on the total space.
@@ -1347,7 +1347,7 @@ utilize when computing probabilities and expectations on the total space.
 A sample from a probability distribution on the total space defines a sample
 for the marginal probability distribution on the base space by evaluating the
 projection operator at each point in the total sample.  A total sample, however,
-will not in general be enough informaton to generate a sample from a conditional
+will not in general be enough information to generate a sample from a conditional
 probability distribution.  The problem is that in most cases each fiber will
 be allocated a small or outright zero probability from the total probability
 distribution and no samples will fall exactly on a given fiber.  Instead we
@@ -1434,8 +1434,8 @@ cond_mu
 ```
 
 Explicitly constructing conditional probability density functions, however, can
-often be intractactable.  Fortunately we can take advantage of the fact that
-the conditional probabilty density function is _proportional_ to the joint
+often be intractable.  Fortunately we can take advantage of the fact that
+the conditional probability density function is _proportional_ to the joint
 probability density function with the conditioning parameters set to their
 known values,
 $$
@@ -1456,9 +1456,9 @@ cond_mu
 ```
 
 This alternative approach is particularly powerful when building Stan programs
-for complex conditoinal probability distributions.
+for complex conditional probability distributions.
 
-If we can generate samples from the marginal probabilty distribution and the
+If we can generate samples from the marginal probability distribution and the
 conditional probability distribution then we can immediately generate samples
 from the corresponding probability distribution on the total space.  We simply
 generate a sample from the marginal distribution and then generate samples from
@@ -1490,8 +1490,8 @@ plot(S1, S2, col=c("#8F272720"), lwd=2, pch=16, cex=0.8,
 
 # Interpretations of Probability
 
-Now that we have a basic understanding of the abstract defintion of probability
-theory and some of the ways in which we can implement probabilistic calcualtions
+Now that we have a basic understanding of the abstract definition of probability
+theory and some of the ways in which we can implement probabilistic calculations
 in practice we are _finally_ in a place where we can consider the applications
 of probability theory and the corresponding philosophical interpretations of
 this very generic, conserved quantity that we've been distributing.
@@ -1516,11 +1516,11 @@ model it with a probability distribution -- the more probability allocated to
 a neighborhood of the observation space, $Y$, the more likely we are to observe
 points in that neighborhood.  Probability becomes a quantification of the seeming
 randomness of observational outcomes, although we cannot distinguish between
-_ontological_ randomness that is inherent to the world or _epistimological_
+_ontological_ randomness that is inherent to the world or _epistemological_
 randomness that is due to our limited ability to resolve the world.
 
 In this perspective the outcomes of the observational process is quantified with
-a probability distribution over the observaton space called the _true data
+a probability distribution over the observation space called the _true data
 generating process_.  Observations are similarly idealized as exact samples from
 this probability distribution.
 
@@ -1570,7 +1570,7 @@ we exploit it as much as possible.
 
 # Acknowlegements
 
-I warmly thank Maggie Lieu for helpful comments.
+I warmly thank Maggie Lieu, Junpeng Lao, and Deen Abiola for helpful comments.
 
 # Original Computing Environment
 
