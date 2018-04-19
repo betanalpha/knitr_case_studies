@@ -1,0 +1,83 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal pdfcairo transparent enhanced size 14in, 10in font 'Times, 40'
+set output "differential_volumes_before.pdf"
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+unset xtics
+set xlabel ""
+set xrange [-10:10]
+
+unset ytics
+set ylabel ""
+set yrange[-10:10]
+
+set parametric
+set trange[-10:10]
+
+set isosamples 250
+
+fy(x0, y0) = y0
+fx(x0, y0) = x0
+
+a_x(t) = -3 + 1.25 * 2.5 * cos( pi * t / 10.0)
+a_y(t) = -3 + 1.25 * 3.5 * sin( pi * t / 10.0)
+
+plot for [i=1:40] i < 20 ? t : fx(i - 30, t), i < 20 ? fy(t, i - 10) : t \
+                  w l lt 1 lw 15 lc rgb '#F2F2F2' notitle, \
+  a_x(t), a_y(t) w filledcurve lc rgb "$dark" notitle
+
+
+END
+
+gnuplot << END
+
+set terminal pdfcairo transparent enhanced size 14in, 10in font 'Times, 40'
+set output "differential_volumes_after.pdf"
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+unset xtics
+set xlabel ""
+set xrange [-10:10]
+
+unset ytics
+set ylabel ""
+set yrange[-10:10]
+
+set parametric
+set trange[-10:10]
+
+set isosamples 250
+
+fy(x0, y0) = y0 * (1 - 8.0 / (3 * (x0**2 + y0**2) + 10.0))
+fx(x0, y0) = x0 * (1 - 8.0 / (3 * (x0**2 + y0**2) + 10.0))
+
+a_x(t) = -3 + 1.25 * 2.5 * cos( pi * t / 10.0)
+a_y(t) = -3 + 1.25 * 3.5 * sin( pi * t / 10.0)
+
+plot for [i=1:40] i < 20 ? t : fx(i - 30, t), i < 20 ? fy(t, i - 10) : t \
+                  w l lt 1 lw 15 lc rgb '#F2F2F2' notitle, \
+  fx(a_x(t), a_y(t)), fy(a_x(t), a_y(t)) w filledcurve lc rgb "$dark" notitle
+
+END
