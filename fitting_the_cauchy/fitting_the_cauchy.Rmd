@@ -55,8 +55,8 @@ plot(x, dcauchy(x, location = 0, scale = 1), type="l", col=c_dark_highlight, lwd
 
 This density, however, encodes extremely long tails that place significant
 probability mass at points far away from $x = m$.  We can see just how heavy
-these tails are by comparing the quantile function of the standarized Cauchy
-distribution to that of a standarized Gaussian distribution,
+these tails are by comparing the quantile function of the standardized Cauchy
+distribution to that of a standardized Gaussian distribution,
 
 ```{r}
 x <- seq(0, 1, 0.001)
@@ -68,23 +68,23 @@ text(x=0.9, y=250, labels="Cauchy", col=c_dark_highlight)
 text(x=0.9, y=-50, labels="Normal", col=c_light_highlight)
 ```
 
-$95\%$ of the mass of the Gaussian distribtution is contained within a distance
+$95\%$ of the mass of the Gaussian distribution is contained within a distance
 of $x = 1.6$ from $x = m = 0$, where as we would have to go to  $x = 6.3$
-to contain the same probabilty mass for the Cauchy distribution.  In order to
+to contain the same probability mass for the Cauchy distribution.  In order to
 contain $99\%$ of the mass we would need to go to $x = 2.3$ for the Gaussian
 distribution but all the way to $x = 31.8$ for the Cauchy distribution!
 
 These extremely heavy tails yield all kinds of surprising behavior for the
 Cauchy distribution.  All of the even moments of the distribution are infinite
 whereas all of the odd moments are not well defined.  In order to avoid
-pathological behavior we have to restict ourselves to characterizing the
+pathological behavior we have to restrict ourselves to characterizing the
 Cauchy distribution with quantiles.
 
 The Cauchy distribution was once recommended as the default for weakly
 informative priors, but the behavior of these heavy tails, especially the
 weak containment of probability mass around the location, $ x = m$, proved
 to be too ungainly.  Consequently we have since moved towards recommending
-Gaussian distributions for weakly informative priors.  Still, becausue the
+Gaussian distributions for weakly informative priors.  Still, because the
 Cauchy arises as a component in more sophisticated prior distributions such
 as the horseshoe and its generalizations, understanding how to best fit the
 distribution remains important.
@@ -112,27 +112,31 @@ Pushing the program through Stan,
 library(rstan)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
-source('stan_utility.R')
-source('plot_utility.R')
+
+util <- new.env()
+source('stan_utility.R', local=util)
+source('plot_utility.R', local=util)
 
 fit_nom <- stan(file='cauchy_nom.stan', seed=4938483,
                 warmup=1000, iter=11000, control=list(max_treedepth=20))
 
-check_n_eff(fit_nom)
-check_rhat(fit_nom)
-check_div(fit_nom)
-check_treedepth(fit_nom, 20)
-check_energy(fit_nom)
+util$check_all_diagnostics(fit_nom, max_depth=20)
 ```
 
-we see no indications of pathological behavior, although we did have to
-increase the maximum treedepth to a pretty high value.
+After increasing the maximum treedepth to a pretty high value we see no
+indications of pathological fitting behavior.  We do, however, see $\hat{k}$
+warnings which indicate that the $x$ parameters probably don't have finite
+means and variances and hence well-defined effective sample sizes!
 
-That does the trick, however, as Stan is able to recover the $5\%$, $50\%$,
-and $95\%$ quantiles of each component quite accurately,
+Consequently we shouldn't try to estimate the means or the estimated effective
+samples sizes of these parameters and instead focus on quantiles of each $x$
+or the mean of the included indicator function, $I$.
+
+Indeed Stan is able to recover the $5\%$, $50\%$, and $95\%$ quantiles of
+each parameter quite accurately,
 
 ```{r}
-plot_estimated_quantiles(fit_nom, "Nominal Parameterization")
+util$plot_estimated_quantiles(fit_nom, "Nominal Parameterization")
 ```
 
 The variable integration times in dynamic Hamiltonian Monte Carlo allow
@@ -177,7 +181,7 @@ the Stan conventions for the Normal and Gamma density functions.
 
 This property suggests a parameter expansion approach to implementing
 the Cauchy distribution where we fit $x_{a}$ and $x_{b}$ and then
-derive $x$ determinstically.  Although this requires twice the
+derive $x$ deterministically.  Although this requires twice the
 number of parameters, the resulting joint density is much more
 concentrated than the Cauchy distribution and hence significantly
 easier to fit.
@@ -209,20 +213,21 @@ and readily fit,
 fit_1 <- stan(file='cauchy_alt_1.stan', seed=4938483,
               warmup=1000, iter=11000)
 
-check_all_diagnostics(fit_1)
+util$check_all_diagnostics(fit_1)
 ```
 
 There are no indications of pathological behavior with Stan's default
-settings and indeed we accurately recover the quantiles of each of the
-fifty independent, Cauchy distributed components,
+settings, although we are again warned to be careful about interpreting
+expectations of the reconstructed Cauchy parameters.  That said, we once again
+accurately recover the quantiles of each of those recovered Cauchy parameters,
 
 ```{r}
-plot_estimated_quantiles(fit_1, "First Alternative")
+util$plot_estimated_quantiles(fit_1, "First Alternative")
 ```
 
 # Second Alternative Implementation
 
-This first alternative implementation immediatley suggests a second.
+This first alternative implementation immediately suggests a second.
 We can avoid the division in the recovery of $x$ by giving $x_{b}$
 and _inverse_ gamma distribution.  Here we let
 $$
@@ -230,7 +235,7 @@ x_{a} \sim \text{Normal} \, \left(0, 1 \right)
 $$
 and
 $$
-x_{b} \sim \text{Gamma} \, \left(\frac{1}{2}, \frac{s^{2}}{2} \right)
+x_{b} \sim \text{Inv-Gamma} \, \left(\frac{1}{2}, \frac{s^{2}}{2} \right)
 $$
 from which
 $$
@@ -273,14 +278,15 @@ and the fit
 fit_2 <- stan(file='cauchy_alt_2.stan', seed=4938483,
               warmup=1000, iter=11000)
 
-check_all_diagnostics(fit_2)
+util$check_all_diagnostics(fit_2)
 ```
 
-proceeds with no issues.  As before, we accurately recover the quantiles
-of each Cauchy distributed component in our model,
+proceeds with no issues save for the warnings about the recovered Cauchy
+parameters.  As before, we accurately recover the quantiles of each Cauchy
+distributed component in our model,
 
 ```{r}
-plot_estimated_quantiles(fit_2, "Second Alternative")
+util$plot_estimated_quantiles(fit_2, "Second Alternative")
 ```
 
 # Third Alternative Implementation
@@ -320,63 +326,50 @@ and the fit proceeds without any indications of problems,
 fit_3 <- stan(file='cauchy_alt_3.stan', seed=4938483,
               warmup=1000, iter=11000)
 
-check_all_diagnostics(fit_3)
+util$check_all_diagnostics(fit_3)
 ```
 
-Once again by modifing the geometry of the target distribution we
+Once again by modifying the geometry of the target distribution we
 accurately recover the quantiles of the Cauchy distribution without
 the excessive cost of its nominal implementation,
 
 ```{r}
-plot_estimated_quantiles(fit_3, "Third Alternative")
+util$plot_estimated_quantiles(fit_3, "Third Alternative")
 ```
 
 # Comparing Performance of the Various Implementations
 
-To quantify how much better these alternative implemenations perform
+To quantify how much better these alternative implementations perform
 let's consider the only performance metric that matters for Markov
 chain Monte Carlo: the number of effective samples per computational
 cost.  Here we use run time as a proxy for computational cost and
-consider the distribution of effective sample size per time for
-each of the fifty identical, Cauchy distributed components in our
-model.
+consider the effective sample size per time for the indicator function
+constructed in each of our models which, unlike the independent
+Cauchy components, has a finite mean and variance and hence well-defined
+effective sample size.
 
 ```{r}
-probs <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+r_nom <- (summary(fit_nom, probs=NA)$summary)[51,5] /
+         sum(get_elapsed_time(fit_nom)[,2])
+r_1 <- (summary(fit_1, probs=NA)$summary)[151,5] /
+        sum(get_elapsed_time(fit_1)[,2])
+r_2 <- (summary(fit_2, probs=NA)$summary)[151,5] /
+         sum(get_elapsed_time(fit_2)[,2])
+r_3 <- (summary(fit_3, probs=NA)$summary)[101,5] /
+        sum(get_elapsed_time(fit_3)[,2])
 
-q_nom <- quantile((summary(fit_nom, probs=NA)$summary)[1:50,5] /
-                  sum(get_elapsed_time(fit_nom)[,2]), probs = probs)
-q_1 <- quantile((summary(fit_1, probs=NA)$summary)[1:50,5] /
-                sum(get_elapsed_time(fit_1)[,2]), probs = probs)
-q_2 <- quantile((summary(fit_2, probs=NA)$summary)[1:50,5] /
-                sum(get_elapsed_time(fit_2)[,2]), probs = probs)
-q_3 <- quantile((summary(fit_3, probs=NA)$summary)[1:50,5] /
-                sum(get_elapsed_time(fit_3)[,2]), probs = probs)
-
-idx <- c(1, 1, 2, 2, 3, 3, 4, 4)
-x <- c(0.5, 1.5, 1.5, 2.5, 2.5, 3.5, 3.5, 4.5)
-
-cred <- data.frame(q_nom, q_1, q_2, q_3)
-pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n]))
-
-plot(1, type="n", main="", xaxt = "n", xlab="", ylab="ESS / Time (s)", xlim=c(0, 5), ylim=c(0, 6000))
+plot(1:4, c(r_nom, r_1, r_2, r_3), type="l", lwd=2, col=c_dark,
+     main="", xaxt = "n", xlab="", ylab="ESS / Time (s)",
+     xlim=c(0, 5), ylim=c(0, 4000))
 axis(1, at=1:4, labels=c("Nom", "Alt 1", "Alt 2", "Alt 3"))
-
-polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])), col = c_light, border = NA)
-polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])), col = c_light_highlight, border = NA)
-polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])), col = c_mid, border = NA)
-polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])), col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
 ```
 
 Immediately we see that the alternative implementations are
 drastically better than the nominal implementation.  Moreover,
-the second alternative implemenation is almost twice as fast
+the second alternative implementation is almost twice as fast
 as the the first.  Perhaps surprisingly, using an inverse Gamma
-distribution to avoid a division ends up being a signficiant
-improvement.  By not requiring a parameter expansion, the
-performance of the third alterantive implementation performs
-by the best.
+distribution to avoid a division ends up being a significant
+improvement.
 
 We can also compare the geometry of these implementations by
 considering only the number of gradient evaluations per iteration
@@ -448,7 +441,7 @@ writeLines(readLines("half_cauchy_nom.stan"))
 fit_half_nom <- stan(file='half_cauchy_nom.stan', seed=4938483,
                      warmup=1000, iter=11000)
 
-check_all_diagnostics(fit_half_nom)
+util$check_all_diagnostics(fit_half_nom)
 ```
 
 to the second alternative implementation,
@@ -459,10 +452,10 @@ writeLines(readLines("half_cauchy_alt.stan"))
 fit_half_reparam <- stan(file='half_cauchy_alt.stan', seed=4938483,
                          warmup=1000, iter=11000)
 
-check_all_diagnostics(fit_half_reparam)
+util$check_all_diagnostics(fit_half_reparam)
 ```
 
-Comparingthe 10th identical, Cauchy distribution component of
+Comparing the 10th identical, Cauchy distribution component of
 our model we see that the two implementations yield equivalent
 results,
 
@@ -481,7 +474,7 @@ c_dark_trans <- c("#8F272780")
 c_dark_highlight_trans <- c("#7C000080")
 
 plot(p1, col=c_dark_trans, border=c_dark_highlight_trans,
-     main="", xlab="x_{10}", yaxt='n', ylab="")
+     main="", xlab="x[10]", yaxt='n', ylab="")
 plot(p2, col=c_light_trans, border=c_light_highlight_trans, add=T)
 ```
 
@@ -489,7 +482,7 @@ plot(p2, col=c_light_trans, border=c_light_highlight_trans, add=T)
 
 Although the nominal implementation of the Cauchy distribution
 frustrates computational algorithms with either bias or slow
-execution, there exist mutiple alternative implementations that
+execution, there exist multiple alternative implementations that
 yield an equivalent distribution without the excessive cost.
 
 The practical consequences of these implementations, however,
@@ -502,6 +495,10 @@ of which implementation of the Cauchy we use.  Nevertheless
 it is up the the user to remain vigilant and monitor for
 indications of heavy tails and motivation for alternative
 implementations.
+
+# Acknowledgements
+
+I thank Aki Vehtari and Junpeng Lao for helpful comments.
 
 # Original Computing Environment
 

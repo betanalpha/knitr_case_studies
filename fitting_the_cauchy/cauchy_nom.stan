@@ -5,3 +5,7 @@ parameters {
 model {
   x ~ cauchy(0, 1);
 }
+
+generated quantities {
+  real I = fabs(x[1]) < 1 ? 1 : 0;
+}

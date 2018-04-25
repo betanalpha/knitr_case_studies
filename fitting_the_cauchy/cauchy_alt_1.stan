@@ -12,3 +12,6 @@ model {
   x_b ~ gamma(0.5, 0.5);
 }
 
+generated quantities {
+  real I = fabs(x[1]) < 1 ? 1 : 0;
+}
