@@ -1,0 +1,1608 @@
+---
+title: "A Principled Bayesian Workflow"
+author: "Michael Betancourt"
+date: "June 2018"
+bibliography: principled_bayesian_workflow.bib
+output:
+  html_document:
+    fig_caption: yes
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 3
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
+
+Given a probabilistic model, Bayesian inference is straightforward.  Inferences,
+in the form of posterior expectations, follow immediately from the model and any
+data included in the analysis.  Building a satisfactory model in a given
+application, however, is a far more open-ended challenge.  Unfortunately model
+building itself is only sparsely discussed in the statistics literature, leaving
+practitioners to piece together their own model building workflow from
+potentially incomplete or even inconsistent heuristics.
+
+In order to ensure robust analyses we need a _principled_ workflow that guides
+the development of a probabilistic model that is consistent with both our domain
+expertise and any observed data while also being amenable to accurate
+computation.  Such a workflow requires quantifying our domain expertise so that
+we can compare it to the properties of a given probabilistic model and evaluate
+consistency.  It requires calibrating our computational tools to ensure that we
+can accurately generate inferences, and it requires a principled means of
+comparing those inferences to a given observation.
+
+In this case study I introduce a principled workflow for building and evaluating
+probabilistic models in Bayesian inference.  This workflow is based on recent
+research in collaboration with Dan Simpson, Aki Vehtari, Sean Talts, and others.
+The specific workflow that I advocated here, however, is my particular take on
+this research focused on the needs for modeling and inference in the physical
+sciences.  It does not necessarily reflect the perspectives of any of my
+collaborators and may prove to be limiting in other applications.
+
+Moreover, as this workflow is an active topic of research it is subject to
+evolution and refinement. Use at your own risk.  But at the same time _don't_
+use at your own risk.  Better yet build a calibrated model, infer the relative
+risks, and then make a principled decision...
+
+We begin with an overview of the workflow that emphasizes the role of each
+step and the expertise needed to implement it well.  Once the workflow has been
+laid out I demonstrate its application on a seemingly simple analysis that holds
+a few surprises.
+
+# Work it, Make it, Do it, Makes Us Harder, Better, Faster, Stronger
+
+The workflow begins by exploring our domain expertise in the context of the
+analysis and then developing an initial model.  Next we consider the holistic
+consequences of that model, spanning inferential and computational
+considerations, without reference to a particular observation.  Once those
+consequences have been understood and deemed acceptable the model is applied to
+a particular observation and the corresponding inferences critiqued.  If the
+model is judged insufficient to capture the relevant structure in observed data
+then it must be expanded, at which point we begin the workflow anew for the
+expanded model.
+
+Here _domain expertise_ refers to the experience of those responsible for
+collecting, curating, or otherwise manipulating the data as well as stakeholders
+who will make decisions using the final inferences or any intermediaries who
+will help stakeholders to make those decisions.  _Statistical expertise_ refers
+to proficiency in probabilistic modeling and computation.
+
+Before looking at a given observation we want to first build a model
+incorporating domain expertise, and then understand the consequences of those
+modeling assumptions within the context of our analysis goals.
+
+## Step One: Conceptual Analysis {- #sec:conceptual}
+
+Our first step is to conceptually modeling the observational process from the
+latent phenomenon being studied through its interactions with the environment
+and how those interactions manifest as observations.  We want to pay particular
+attention to the many possible systematic effects that influence this process
+but are not known with complete certainty.  This conceptual analysis yields
+informal narratives describing how observations are generated.
+
+**Requirements:** Domain Expertise
+
+## Step Two: Define Observations {- #sec:observation-space}
+
+Once a conceptual model has been developed we can take our first steps towards
+building a formal mathematical model by defining the space in which observations
+take values.  This may include, for example, the number of repetitions,
+subjects, groups, or components in each observation as well as the range of
+values each component can take.
+
+**Requirements:** Domain Expertise and Statistical Expertise
+
+## Step Three: Identify Relevant Summary Statistics {- #sec:summary_stats}
+
+Given an observation space we can now identify summary statistics that isolate
+particularly important properties of the observation space, especially those
+details that are relevant to decision making and those that are expected to be
+difficult to model well.  These summary statistics are typically given by one
+or two dimensional functions of the observation amenable to visualization.
+
+We also want to complement these summary statistics with conceptual expectations
+for what behaviors are reasonable, or, as is often easier to elicit in practice,
+what behaviors are unreasonable.
+
+**Requirements:** Domain Expertise
+
+## Step Four: Build a Generative Model {- #sec:generative-model}
+
+With the observation space defined and scrutinized we can proceed to build and
+then analyze a full generative model of the observation process.
+
+### Build a Generative Observation Model {- #sec:observation-model}
+
+First we construct a generative model of the observation
+process, $\pi(y \mid \theta)$.  An ideal generative model is readily
+interpretable as a collection of mathematical narratives of how an observation
+is produced based on a given model configuration, $\theta$, translating the
+conceptual narrative produced in [Step One](#sec:conceptual) into a rigorous
+probabilistic model.
+
+**Requirements:** Domain Expertise and Statistical Expertise
+
+### Complete The Full Generative Model By Specifying Priors {- #sec:prior-model}
+
+We complete the generative model by complementing the observation model with a
+prior distribution for all unknown model configuration parameters,
+$\pi(\theta)$.  In particular we want to reason about the _scales_ of these
+parameters to motivate a prior distribution that incorporates enough information
+to ensure that the full generative model,
+$$
+\pi(y, \theta) = \pi(y \mid \theta) \, \pi(\theta),
+$$
+is well-behaved [@GelmanEtAl:2017a].
+
+Keep in mind that the separation of the generative model into an observation
+process and a prior distribution is not uniquely defined in a Bayesian model.
+Consider, for example, unobserved latent structure, $\pi(\theta \mid \phi)$,
+such as that arising in hierarchical models and hidden Markov models. We could
+equally well define the observation model as
+$\pi(y \mid \theta) \, \pi(\theta \mid \phi)$ with the prior distribution
+$\pi(\phi)$, or the observation model as $\pi(y \mid \theta)$ with the prior
+distribution $\pi(\theta \mid \phi) \, \pi(\phi)$.  Only the full generative
+model is uniquely defined.
+
+Consequently the focus here should be not on specifying prior distributions in
+isolation but rather _completing_ the observation model developed
+[above](#sec:observation-model) with probabilistic structure for the model
+configuration parameters as needed.  This might take the form of independent,
+one-dimensional prior distributions for each parameter or more sophisticated
+correlated distributions which introduce their own parameters that require
+another round of prior distributions.  It's probability distributions all the
+way down.
+
+**Requirements:** Domain Expertise and Statistical Expertise
+
+## Step Five: Analyze the Generative Ensemble {- #sec:analyze-generative}
+
+Before drawing inferences from a given observation we first want to analyze the
+scope of our generative model and compare to our domain expertise.
+
+To do that we first simulate parameters _and_ observations from the complete
+generative model.  Specifically, we simulate and then analyze ground truths
+from the prior and observations from the corresponding observation model,
+$$
+\begin{align*}
+\tilde{\theta} &\sim \pi(\theta)
+\\
+\tilde{y} &\sim \pi(y \mid \tilde{\theta} ),
+\end{align*}
+$$
+
+**Requirements:** Statistical Expertise
+
+### Analyze the Prior Predictive Distribution {- #sec:prior-predictive}
+
+Analyzing the distribution of summary statistics constructed in
+[Step Three](#sec:summary_stats) for the simulated observations provides a
+natural evaluation of our modeling assumptions, a technique that goes back to
+Good's _device of imaginary results_ [@Good:1950].  The device of imaginary
+results also gives its user a +2 to Wisdom saving throws.
+
+If the behavior of the summary statistics for these simulated observations is
+not within the conceptual expectations defined
+in [Step Three](#sec:summary_stats) then we need to return to
+[Step Four](#sec:prior-model) and incorporate additional prior information to
+restrict the scope of model to reasonable behaviors.
+
+**Requirements:** Domain Expertise
+
+### Fit the Simulated Observations and Evaluate {- #sec:fit-generative}
+
+For each simulated observation we can also attempt to construct a posterior
+distribution, $\pi(\theta \mid \tilde{y})$, with a given computational method
+and analyze the range of possible inferences [@Betancourt2018a].
+
+#### Evaluate Diagnostics {-}
+
+If diagnostics of the given computational method, such as $\hat{R}$ for Markov
+chain Monte Carlo and divergences for Hamiltonian Monte Carlo, indicate
+inaccuracies in these fits then we need to consider retuning the method, or
+selecting another method altogether, and then repeating
+[Step Five](#sec:fit-generative).
+
+Correlating poor performance with the corresponding simulated ground truth can
+also help to identify regions of the model configuration space that may be
+ill-posed for practical computation.
+
+**Requirements:** Statistical Expertise
+
+#### Evaluate Prior-Posterior Consistency {-}
+
+If the computational method generates posterior samples,
+$$
+\tilde{\theta}' \sim \pi(\theta \mid \tilde{y}),
+$$
+then the ensemble of all posterior samples over the simulated ground truths and
+observations will be indistinguishable from any sample from the prior
+distribution.
+
+This allows us to verify a given computational method using _simulated-based
+calibration_ [@TaltsEtAl:2018].  If performance is unsatisfactory then we need
+to consider retuning the method, or selecting another method altogether and then
+repeating [Step Five](#sec:fit-generative).
+
+**Requirements:** Statistical Expertise
+
+#### Analyze Posterior Behaviors {-}
+
+Assuming that we are accurately recovering posteriors across all of the
+simulated observations then we can proceed to analyze the range of behaviors in
+these posteriors.  For example, the posterior $z$-score of a given parameter,
+$$
+z = \left|
+\frac{ \mu_{\mathrm{post}} - \tilde{\theta} }
+{ \sigma_{\mathrm{post}} } \right|
+$$
+quantifies how accurately the posterior recovers the ground truth while the
+posterior shrinkage,
+$$
+s = 1 -
+\frac{ \sigma^{2}_{\mathrm{post}} }
+{ \sigma^{2}_{\mathrm{prior}} },
+$$
+quantifies how much the posterior learns from a given observation.
+
+If there are indications of undesired posterior behavior, such as overfitting or
+non-identifiability, then we need to return to [Step One](#sec:conceptual) and
+consider an improved experimental design or return to
+[Step Four](#sec:prior-model) and incorporate additional prior information to
+restrict the scope of model to reasonable behaviors.
+
+**Requirements:** Statistical Expertise
+
+#### Analyzing Posterior-Informed Decisions {-}
+
+If a posterior-informed decision-making process has been established then we can
+calibrate the performance of this process by comparing the decision derived from
+each posterior relative to the corresponding simulated ground truth.  For
+example, if a discovery claim has to be made then we at the very least want to
+compute the corresponding false discovery rate and true discovery rate within
+the context of our generative model.
+
+If the performance of the decision-making progress is insufficient then we need
+to return to [Step One](#sec:conceptual) and consider an improved experimental
+design or possibly return to [Step Four](#sec:prior-model) and incorporate
+additional prior information to restrict the scope of model to reasonable
+behaviors.
+
+**Requirements:** Domain Expertise and Statistical Expertise
+
+## Step Six: Fit the Observations and Evaluate {-}
+
+Once computation, inferences, and decision-making processes have been validated
+within the scope of the model assumptions, the analysis can be applied to the
+observed data.  Analysis of the resulting inference may suggest expanding the
+model, but any changes to the model after looking at the data introduce a
+vulnerability to overfitting and so we must be extremely vigilant to study the
+ensemble behavior in subsequent iterations of the workflow.
+
+Confident that we understand the consequence of our probabilistic model we can
+now construct a posterior distribution from a given observation.  We have to be
+careful, however, as the previous validation of the computational method may not
+apply if the observed data is not within the scope of the generative model.
+Consequently we need to be careful to check any diagnostics of our method.
+
+If any diagnostics indicate poor performance then our not only is our
+computational method suspect but also our generative model may not be rich
+enough to capture the relevant details of the observed data.  At the very least
+we should reconsider the tuning of our computational tools, but we may also want
+to consider going back to [Step Four](#sec:generative-model) and expanding our
+model so that it better captures the observation.
+
+**Requirements:** Statistical Expertise
+
+## Step Seven: Analyze the Posterior Predictive Distribution {-}
+
+Even if we are able to compute a posterior accurately there is no guarantee that
+our model captures the complexity of the given observation.
+
+In order to verify the sufficiency of our model we need to compare the
+observation to the _posterior predictive distribution_ [@Betancourt:2015b].  We
+can achieve this verification similar to the device of imaginary results
+discussed in [Step Five](#sec:prior-predictive), only simulating observations
+from the observational process conditioned on posterior samples,
+$$
+\begin{align*}
+\tilde{\theta}' &\sim \pi(\theta \mid y)
+\\
+\tilde{y} &\sim \pi(y \mid \tilde{\theta}' ).
+\end{align*}
+$$
+
+As with [Step Five](#sec:prior-predictive) we evaluate the summary statistics
+defined in [Step Three](#sec:summary_stats) at the posterior predictive samples
+to generate a distribution, only this time we compare the distribution to the
+observed data in a _posterior predictive check_ [@Rubin:1984].  If there is
+strong disagreement then we need to go back to
+[Section Four](#sec:generative-model) and elaborate the components of the
+generative model that influence those summary statistics manifesting
+disagreement.  We then restart the workflow and iterate until we can't identify
+any deviations from the model and our observation and our domain expertise.
+
+**Requirements:** Domain Expertise and Statistical Expertise
+
+# Close Enough For An Effective Demonstration
+
+In order to demonstrate the proposed workflow let's a consider a relatively
+simple example of an analysis that might arise in any science lab.  We have
+been tasked with analyzing data collected by a precocious young student who was
+instructed to train a suite of detectors onto a specimen that emits a constant
+flow of particles.  They dutifully collected data and collated it into a file
+which has arrived in our inbox.
+
+Before evening reading the email we set up our local `R` environment.
+
+```{r}
+library(rstan)
+rstan_options(auto_write = TRUE)
+
+library(foreach)
+library(doParallel)
+
+util <- new.env()
+source('stan_utility.R', local=util)
+
+c_light <- c("#DCBCBC")
+c_light_highlight <- c("#C79999")
+c_mid <- c("#B97C7C")
+c_mid_highlight <- c("#A25050")
+c_dark <- c("#8F2727")
+c_dark_highlight <- c("#7C0000")
+```
+
+## First Iteration: A Journey of a Thousand Models Begins with a Single Step
+
+In our first iteration through the workflow we model the experiment that we've
+been told occurred.  Nothing ominous here.
+
+### Step One: Conceptual Analysis {-}
+
+Our conceptual model follows the instructions given to the student.  1000
+detectors were directed towards the source and set to record the number of
+incident particles over a given interval of time.  The intensity of the source
+is presumed to be constant over that interval and each detector should be
+identical in operation.
+
+### Step Two: Define Observations {-}
+
+Mathematically our observation takes the form of integer counts, $y$, for each
+of the $N = 1000$ detectors.  In the Stan modeling language this is specified as
+
+```{r}
+writeLines(readLines("fit_data.stan", n=4))
+```
+
+### Step Three: Identify Relevant Summary Statistics {-}
+
+There are $N = 1000$ components in each observation, one for each detector.  We
+could analyze each component independently but, because we have assumed that the
+detectors are all identical, we can analyze their comprehensive responses with
+a histogram of their counts.  In other words we consider the histogram of
+detector counts _as the summary statistic_!
+
+Here we assume that our conceptual domain expertise would informs us that 25
+counts in a detector would be an extreme but not impossible observation.
+
+### Step Four: Build a Generative Model {-}
+
+The constant intensity of the source and detector response suggest a Poisson
+observation model for each of the detectors with a single source strength,
+$\lambda$.
+
+Our domain expertise that 25 counts is extreme suggests that we want our prior
+for $\lambda$ to keep most of its probability mass below $\lambda = 15$, which
+corresponds to fluctuations in the observations around
+$15 + 3 \sqrt{15} \approx 25$.  We achieve this with a half-normal prior with
+standard deviation = 6.44787 such that only 1% of the prior probability mass is
+above $\lambda = 15$.
+
+```{r}
+lambda <- seq(0, 20, 0.001)
+
+plot(lambda, dnorm(lambda, 0, 6.44787), type="l", col=c_dark_highlight, lwd=2,
+     xlab="lambda", ylab="Prior Density", yaxt='n')
+
+lambda99 <- seq(0, 15, 0.001)
+dens <- dnorm(lambda99, 0, 6.44787)
+lambda99 <- c(lambda99, 15, 0)
+dens <- c(dens, 0, 0)
+
+polygon(lambda99, dens, col=c_dark, border=NA)
+```
+
+This probabilistic model is implemented in the Stan programs
+
+```{r}
+writeLines(readLines("generative_ensemble.stan"))
+writeLines(readLines("fit_data.stan"))
+```
+
+### Step Five: Analyze the Generative Ensemble {-}
+
+Here we will consider $R = 1000$ draws from the generative ensemble, each of
+which simulates a ground truth and observed values for the $N = 1000$ detectors.
+
+```{r}
+R <- 1000
+N <- 1000
+
+simu_data <- list("N" = N)
+
+fit <- stan(file='generative_ensemble.stan', data=simu_data,
+            iter=R, warmup=0, chains=1, refresh=R,
+            seed=4838282, algorithm="Fixed_param")
+
+simu_lambdas <- extract(fit)$lambda
+simu_ys <- extract(fit)$y
+```
+
+More draws from the generative ensemble will yield a more precise understanding
+of the model and I recommend that you run as many replications as your
+computational resources allow.  In circumstances with limited computational
+resources even a few replications can provide a powerful view into the
+consequences of your model.
+
+#### Analyze the Prior Predictive Distribution {-}
+
+We can visualize the prior predictive distribution of histogram counts with
+quantiles of the bin counts over the generative replications.  Here the darkest
+red corresponds to the bin medians with the lighter bands corresponding to
+$(0.4, 0.6)$, $(0.3, 0.7)$, $(0.2, 0.8)$, and $(0.1, 0.9)$ intervals.  This
+visualization can obscure correlations amongst the bins, but it serves as a
+useful summary of the full prior predictive distribution.
+
+
+```{r}
+B <- 40
+counts <- sapply(1:R, function(r) hist(simu_ys[r,], breaks=(0:(B + 1))-0.5, plot=FALSE)$counts)
+probs = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+cred <- sapply(1:(B + 1), function(b) quantile(counts[b,], probs=probs))
+
+idx <- rep(0:B, each=2)
+x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] - 0.5)
+pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
+
+plot(1, type="n", main="Prior Predictive Distribution",
+     xlim=c(-0.5, B + 0.5), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
+
+polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
+        col = c_light, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
+        col = c_light_highlight, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
+        col = c_mid, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
+        col = c_mid_highlight, border = NA)
+lines(x, pad_cred[5,], col=c_dark, lwd=2)
+
+abline(v=25, col="white", lty=1, lw=2.5)
+abline(v=25, col="black", lty=1, lw=2)
+```
+
+Indeed we see a very small prior predictive probability for observations above
+the extreme scale informed by our domain expertise.
+
+```{r}
+length(simu_ys[simu_ys > 25]) / length(simu_ys)
+```
+
+#### Fit the Simulated Observations and Evaluate {-}
+
+Now we are ready to generate and analyze inferences from each of our
+replications.  Because each replication can be analyzed independently this
+analysis is embarrassingly parallel which allows us to exploit the many common
+parallel architectures.
+
+Because this particular model can be fit so quickly I am parallelizing over
+replications instead of, say, parallelizing the Markov chains run to fit each
+replication.  The optimal setup in any given analysis will depend on the details
+of the computational circumstances.
+
+```{r, cache=TRUE}
+registerDoParallel(makeCluster(detectCores()))
+
+simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_ys)))
+
+# Compile the posterior fit model
+fit_model = stan_model(file='fit_data.stan')
+
+ensemble_output <- foreach(simu=simu_list,
+                           .combine='cbind') %dopar% {
+  simu_lambda <- simu[1]
+  simu_y <- simu[2:(N + 1)];
+
+  # Fit the simulated observation
+  input_data <- list("N" = N, "y" = simu_y)
+
+  sink(file="/dev/null")
+  library(rstan)
+  fit <- sampling(fit_model, data=input_data, seed=4938483)
+  sink()
+
+  # Compute diagnostics
+  util <- new.env()
+  source('stan_utility.R', local=util)
+
+  warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
+
+  # Compute rank of prior draw with respect to thinned posterior draws
+  sbc_rank <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
+
+  # Compute posterior sensitivities
+  s <- summary(fit, probs = c(), pars='lambda')$summary
+  post_mean_lambda <- s[,1]
+  post_sd_lambda <- s[,3]
+
+  prior_sd_lambda <- 6.44787
+
+  z_score <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
+  shrinkage <- 1 - (post_sd_lambda / prior_sd_lambda)**2
+
+  c(warning_code, sbc_rank, z_score, shrinkage)
+}
+
+stopImplicitCluster()
+```
+
+The first thing we do is check the diagnostics to make sure that each fit is
+accurately representing the corresponding posterior distribution.
+
+```{r}
+warning_code <- ensemble_output[1,]
+if (sum(warning_code) != 0) {
+  print ("Some simulated posterior fits in the generative ensemble encountered problems!")
+  for (r in 1:R) {
+    if (warning_code[r] != 0) {
+      print(sprintf('Replication %s of %s', r, R))
+      util$parse_warning_code(warning_code[r])
+      print(sprintf('Simulated lambda = %s', simu_lambdas[r]))
+      print(" ")
+    }
+  }
+} else {
+  print ("No posterior fits in the generative ensemble encountered problems!")
+}
+```
+
+Fortunately there are no signs of any problems.
+
+We can provide an even stronger guarantee that our fits are accurate by applying
+simulation-based calibration (SBC).
+
+```{r}
+sbc_rank <- ensemble_output[2,]
+sbc_hist <- hist(sbc_rank, seq(0, 500, 25) - 0.5,
+                 col=c_dark, border=c_dark_highlight, plot=FALSE)
+plot(sbc_hist, main="", xlab="Prior Rank", yaxt='n', ylab="")
+
+low <- qbinom(0.005, R, 1 / 20)
+mid <- qbinom(0.5, R, 1 / 20)
+high <- qbinom(0.995, R, 1 / 20)
+bar_x <- c(-10, 510, 500, 510, -10, 0, -10)
+bar_y <- c(high, high, mid, low, low, mid, high)
+
+polygon(bar_x, bar_y, col=c("#DDDDDD"), border=NA)
+segments(x0=0, x1=500, y0=mid, y1=mid, col=c("#999999"), lwd=2)
+
+plot(sbc_hist, col=c_dark, border=c_dark_highlight, add=T)
+```
+
+The variations in the SBC histogram are within the expectations of uniformity
+shown in the grey bar, which suggests that the fits are indeed faithfully
+representing the true posterior distributions.
+
+Confident in our fits we can then analyze the posterior distributions
+themselves.
+
+```{r}
+z_score <- ensemble_output[3,]
+shrinkage <- ensemble_output[4,]
+
+plot(shrinkage, z_score, col=c("#8F272720"), lwd=2, pch=16, cex=0.8,
+     xlim=c(0, 1), xlab="Posterior Shrinkage",
+     ylim=c(0, 5), ylab="Posterior z-Score")
+```
+
+Agreeably the concentration towards large shrinkage indicates that all of our
+the posteriors in the generative ensemble are well-identified, and the
+concentration towards small $z$-scores indicates that they accurately  capture
+the corresponding ground truth.
+
+### Step Six: Fit the Observations and Evaluate {-}
+
+Confident that our model captures our domain expertise and is well-behaved
+within the scope of its own assumptions we can fire up our email client and
+grab the student's data.
+
+```{r}
+input_data <- read_rdump('workflow.data.R')
+fit <- stan(file='fit_data_ppc.stan', data=input_data,
+            seed=4938483, refresh=2000)
+```
+
+The fit shows no diagnostic problems,
+
+```
+util$check_all_diagnostics(fit)
+```
+
+and the recovered posterior looks reasonable.
+
+```{r}
+params = extract(fit)
+
+hist(params$lambda, main="", xlab="lambda", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+```
+
+### Step Seven: Analyze the Posterior Predictive Distribution {-}
+
+But how well does our model capture the structure of the data?  To perform
+a posterior predictive check we compare the observed histogram of counts to
+the posterior predictive distribution of counts, here visualized with marginal
+bin quantiles as we did for the prior predictive distribution.
+
+```{r}
+B <- 30
+
+obs_counts <- hist(input_data$y, breaks=(0:(B + 1))-0.5, plot=FALSE)$counts
+
+idx <- rep(0:B, each=2)
+x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] - 0.5)
+pad_obs <- do.call(cbind, lapply(idx, function(n) obs_counts[n + 1]))
+
+counts <- sapply(1:4000, function(n) hist(params$y_ppc[n,], breaks=(0:(B + 1))-0.5, plot=FALSE)$counts)
+probs = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+cred <- sapply(1:(B + 1), function(b) quantile(counts[b,], probs=probs))
+pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
+
+plot(1, type="n", main="Posterior Predictive Distribution",
+     xlim=c(-0.5, B + 0.5), xlab="y",
+     ylim=c(0, max(c(obs_counts, cred[9,]))), ylab="")
+
+polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
+        col = c_light, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
+        col = c_light_highlight, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
+        col = c_mid, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
+        col = c_mid_highlight, border = NA)
+lines(x, pad_cred[5,], col=c_dark, lwd=2)
+
+lines(x, pad_obs, col="white", lty=1, lw=2.5)
+lines(x, pad_obs, col="black", lty=1, lw=2)
+
+```
+
+Unfortunately the posterior predictive check indicates a serious excess of
+zeros above what we'd expect from Poissonian observations alone.  Our model is
+not flexible enough to capture both the peak at zero and the bulk away from
+zero, instead trying to compromise between these two behavior and capturing
+neither particularly well.  This experiment isn't quite as simple as it first
+appeared.
+
+## Second Iteration: If At First You Don't Succeed, Try Try Again
+
+The conflict between the observation and the model prediction we saw in the
+posterior predictive check immediately suggests an expanded model, and a second
+iteration of our workflow.
+
+### Step One: Conceptual Analysis {-}
+
+The excess of zeroes suggests that the detectors are not all in perfect working
+order.  Some apparently return zero counts regardless of the flux of incident
+particles.
+
+Fortunately we can readily capture this possibility with a _zero-inflated
+Poisson_ model that mixes a Poisson distribution with a point distribution that
+concentrates entirely at zero.
+
+### Step Two: Define Observations {-}
+
+The observation space does not change in our expanded model.
+
+```{r}
+writeLines(readLines("fit_data2.stan", n=4))
+```
+
+### Step Three: Identify Relevant Summary Statistics {-}
+
+The same histogram summary from before will still be useful with the addition
+of zero inflation in our model.
+
+### Step Four: Build a Generative Model {-}
+
+Our generative model expands to model excess zeroes by mixing the Poisson
+distribution with a Dirac distribution at zero.  We use the same prior for the
+source intensity, $\lambda$, and assign a uniform prior over the mixture weight,
+$\theta$.
+
+This expanded model is implemented in the Stan programs
+
+```{r}
+writeLines(readLines("generative_ensemble2.stan"))
+writeLines(readLines("fit_data2.stan"))
+```
+
+### Step Five: Analyze the Generative Ensemble {-}
+
+The structure of our generative ensemble doesn't change.
+
+```{r}
+R <- 1000
+N <- 1000
+
+simu_data <- list("N" = N)
+
+fit <- stan(file='generative_ensemble2.stan', data=simu_data,
+            iter=R, warmup=0, chains=1, refresh=R,
+            seed=4838282, algorithm="Fixed_param")
+
+simu_lambdas <- extract(fit)$lambda
+simu_thetas <- extract(fit)$theta
+simu_ys <- extract(fit)$y
+```
+
+####  Analyze the Prior Predictive Distribution
+
+The average prior predictive histogram now manifests the zero-inflation we have
+added to our model.
+
+```{r}
+B <- 50
+counts <- sapply(1:R, function(r) hist(simu_ys[r,], breaks=(0:(B + 1))-0.5, plot=FALSE)$counts)
+probs = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+cred <- sapply(1:(B + 1), function(b) quantile(counts[b,], probs=probs))
+
+idx <- rep(0:B, each=2)
+x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] - 0.5)
+pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
+
+plot(1, type="n", main="Prior Predictive Distribution",
+     xlim=c(-0.5, B + 0.5), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
+
+polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
+        col = c_light, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
+        col = c_light_highlight, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
+        col = c_mid, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
+        col = c_mid_highlight, border = NA)
+lines(x, pad_cred[5,], col=c_dark, lwd=2)
+
+abline(v=25, col="white", lty=1, lw=2.5)
+abline(v=25, col="black", lty=1, lw=2)
+```
+
+This addition, however, doesn't change the tail of observations and hence we
+still have an appropriately small prior predictive probability for extreme
+counts.
+
+```{r}
+length(simu_ys[simu_ys > 25]) / length(simu_ys)
+```
+
+#### Fit the Simulated Observations and Evaluate {-}
+
+We now proceed to fitting each replication.
+
+```{r, cache=TRUE}
+registerDoParallel(makeCluster(detectCores()))
+
+simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
+
+# Compile the posterior fit model
+fit_model = stan_model(file='fit_data2.stan')
+
+ensemble_output <- foreach(simu=simu_list,
+                           .combine='cbind') %dopar% {
+  simu_lambda <- simu[1]
+  simu_theta <- simu[2]
+  simu_y <- simu[3:(N + 2)];
+
+  # Fit the simulated observation
+  input_data <- list("N" = N, "y" = simu_y)
+
+  sink(file="/dev/null")
+  library(rstan)
+  fit <- sampling(fit_model, data=input_data, seed=4938483)
+  sink()
+
+  # Compute diagnostics
+  util <- new.env()
+  source('stan_utility.R', local=util)
+
+  warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
+
+  # Compute rank of prior draw with respect to thinned posterior draws
+  sbc_rank_lambda <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
+  sbc_rank_theta <- sum(simu_theta < extract(fit)$theta[seq(1, 4000 - 8, 8)])
+
+  # Compute posterior sensitivities
+  s <- summary(fit, probs = c(), pars='lambda')$summary
+  post_mean_lambda <- s[,1]
+  post_sd_lambda <- s[,3]
+
+  prior_sd_lambda <- 6.44787
+
+  z_score_lambda <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
+  shrinkage_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
+
+  s <- summary(fit, probs = c(), pars='theta')$summary
+  post_mean_theta <- s[,1]
+  post_sd_theta <- s[,3]
+
+  prior_sd_theta <- sqrt(1.0 / 12)
+
+  z_score_theta <- abs((post_mean_theta - simu_theta) / post_sd_theta)
+  shrinkage_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
+
+  c(warning_code,
+    sbc_rank_lambda, z_score_lambda, shrinkage_lambda,
+    sbc_rank_theta, z_score_theta, shrinkage_theta)
+}
+
+stopImplicitCluster()
+```
+
+Our first step is to check the fit diagnostics for each replication.
+
+```{r}
+warning_code <- ensemble_output[1,]
+if (sum(warning_code) != 0) {
+  print ("Some simulated posterior fits in the generative ensemble encountered problems!")
+  for (r in 1:R) {
+    if (warning_code[r] != 0) {
+      print(sprintf('Replication %s of %s', r, R))
+      util$parse_warning_code(warning_code[r])
+      print(sprintf('Simulated lambda = %s', simu_lambdas[r]))
+      print(sprintf('Simulated theta = %s', simu_thetas[r]))
+      print(" ")
+    }
+  }
+} else {
+  print ("No posterior fits in the generative ensemble encountered problems!")
+}
+```
+
+Unfortunately our computed fits are nowhere near as reliable for the expanded
+model!  Indeed if we carefully analyze the ground truths for each of the
+problematic fits we notice that problems arise whenever $\lambda$ is small or
+$\theta$ is large.  That seems a little suspicious, no?
+
+It should, because this is a manifestation of a _non-identifiability_ hiding in
+our zero-inflated model.  When the Poisson source strength is small enough the
+resulting distribution for observations will be indistinguishable from the Dirac
+distribution responsible for generating the excess zeroes.
+
+Our domain expertise informs us that the source intensity and observation time
+are large enough that zero counts should be rare for a working detector.  This
+information, however, was not encoded in our model and manifested in
+computational problems that brought the issue to our attention.  Interestingly
+computational problems have a knack for identifying limitations in models,
+providing even more motivation to watch them carefully.
+
+We need to tweak our generative model to incorporate our additional knowledge
+and try again.
+
+## Third Iteration: It's About the Journey, Not The Destination, Right?
+
+Taking a deep breath we push on with our third iteration of the model building
+workflow.
+
+### Step One: Conceptual Analysis {-}
+
+Our conceptual analysis is unchanged save for the additional consideration that
+we expect the Poisson distribution for working detectors and Dirac distribution
+for malfunctioning detectors to be distinguishable behaviors.
+
+### Step Two: Define Observations {-}
+
+The observation space remains the same.
+
+```{r}
+writeLines(readLines("fit_data3.stan", n=4))
+```
+
+### Step Three: Identify Relevant Summary Statistics {-}
+
+As does the utility of the histogram summary.
+
+### Step Four: Build a Generative Model
+
+We not need to introduce more prior distributions that separate the behavior
+of the working detectors and the malfunctioning detectors, but we have to be
+careful to avoid using the observed data to inform these prior distributions
+lest we introduce the potential for overfitting to that observation.  Instead
+we want to use the tension in the posterior predictive check to suggest an
+additional model component, here the zero-inflation, and then use our domain
+expertise to motivate appropriate prior distributions independent of the details
+of the observation itself.
+
+We can tame the non-identifiability that is inconsistent with our domain
+expertise by utilizing an inverse Gamma distribution that places only 1%
+probability below $\lambda = 1$, where the Poisson distribution starts to look
+like a Dirac distribution at zero.  At the same time we want to maintain 1%
+of the prior probability above $\lambda = 15$.
+
+```{r}
+lambda <- seq(0, 20, 0.001)
+dens <- lapply(lambda, function(l) dgamma(1 / l, 3.48681, rate=9.21604) * (1 / l**2))
+plot(lambda, dens, type="l", col=c_dark_highlight, lwd=2,
+     xlab="lambda", ylab="Prior Density", yaxt='n')
+
+lambda98 <- seq(1, 15, 0.001)
+dens <- lapply(lambda98, function(l) dgamma(1 / l, 3.48681, rate=9.21604) * (1 / l**2))
+lambda98 <- c(lambda98, 15, 1)
+dens <- c(dens, 0, 0)
+
+polygon(lambda98, dens, col=c_dark, border=NA)
+```
+
+Additionally, we set a prior distribution for the zero mixture probability,
+$\theta$ that puts only 1% probability mass below 0.1 and above 0.9 to capture
+our domain knowledge that some detectors are expected to fail but not all of
+them.  Again, we want to be careful to not use the exact number of zeros in the
+observed data to inform this prior distribution.
+
+```{r}
+theta <- seq(0, 1, 0.001)
+dens <- dbeta(theta, 2.8663, 2.8663)
+plot(theta, dens, type="l", col=c_dark_highlight, lwd=2,
+     xlab="theta", ylab="Prior Density", yaxt='n')
+
+theta98 <- seq(0.1, 0.9, 0.001)
+dens <- dbeta(theta98, 2.8663, 2.8663)
+theta98 <- c(theta98, 0.9, 0.1)
+dens <- c(dens, 0, 0)
+
+polygon(theta98, dens, col=c_dark, border=NA)
+```
+
+The new generative model is implemented in the Stan programs
+
+```{r}
+writeLines(readLines("generative_ensemble3.stan"))
+writeLines(readLines("fit_data3.stan"))
+```
+
+### Step Five: Analyze the Generative Ensemble {-}
+
+The structure of our generative ensemble remains the same.
+
+```{r}
+R <- 1000
+N <- 1000
+
+simu_data <- list("N" = N)
+
+fit <- stan(file='generative_ensemble3.stan', data=simu_data,
+            iter=R, warmup=0, chains=1, refresh=R,
+            seed=4838282, algorithm="Fixed_param")
+
+simu_lambdas <- extract(fit)$lambda
+simu_thetas <- extract(fit)$theta
+simu_ys <- extract(fit)$y
+```
+
+#### Analyze the Prior Predictive Distribution {-}
+
+With the modified prior distributions we see a slightly different prior
+predictive average histogram, but one still compatible with our domain
+expertise.
+
+```{r}
+B <- 60
+counts <- sapply(1:R, function(r) hist(simu_ys[r,], breaks=(0:(B + 1))-0.5, plot=FALSE)$counts)
+probs = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+cred <- sapply(1:(B + 1), function(b) quantile(counts[b,], probs=probs))
+
+idx <- rep(0:B, each=2)
+x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] - 0.5)
+pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
+
+plot(1, type="n", main="Prior Predictive Distribution",
+     xlim=c(-0.5, B + 0.5), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
+
+polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
+        col = c_light, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
+        col = c_light_highlight, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
+        col = c_mid, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
+        col = c_mid_highlight, border = NA)
+lines(x, pad_cred[5,], col=c_dark, lwd=2)
+
+abline(v=25, col="white", lty=1, lw=2.5)
+abline(v=25, col="black", lty=1, lw=2)
+```
+
+Indeed we have the desired low probability for extreme observations.
+
+```{r}
+length(simu_ys[simu_ys > 25]) / length(simu_ys)
+```
+
+#### Fit the Simulated Observations and Evaluate {-}
+
+We can now proceed to fitting each replication.
+
+```{r, cache=TRUE}
+registerDoParallel(makeCluster(detectCores()))
+
+simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
+
+# Compile the posterior fit model
+fit_model = stan_model(file='fit_data3.stan')
+
+ensemble_output <- foreach(simu=simu_list,
+                           .combine='cbind') %dopar% {
+  simu_lambda <- simu[1]
+  simu_theta <- simu[2]
+  simu_y <- simu[3:(N + 2)];
+
+  # Fit the simulated observation
+  input_data <- list("N" = N, "y" = simu_y)
+
+  sink(file="/dev/null")
+  library(rstan)
+  fit <- sampling(fit_model, data=input_data, seed=4938483)
+  sink()
+
+  # Compute diagnostics
+  util <- new.env()
+  source('stan_utility.R', local=util)
+
+  warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
+
+  # Compute rank of prior draw with respect to thinned posterior draws
+  sbc_rank_lambda <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
+  sbc_rank_theta <- sum(simu_theta < extract(fit)$theta[seq(1, 4000 - 8, 8)])
+
+  # Compute posterior sensitivities
+  s <- summary(fit, probs = c(), pars='lambda')$summary
+  post_mean_lambda <- s[,1]
+  post_sd_lambda <- s[,3]
+
+  prior_sd_lambda <- sqrt( (9.21604)**2 / ((3.48681 - 1)**2 * (3.48681 - 1)) )
+
+  z_score_lambda <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
+  shrinkage_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
+
+  s <- summary(fit, probs = c(), pars='theta')$summary
+  post_mean_theta <- s[,1]
+  post_sd_theta <- s[,3]
+
+  prior_sd_theta <- sqrt( (2.8663)**2 / (4 * (2.8663)**2 * (2 * 2.8663 + 1)) )
+
+  z_score_theta <- abs((post_mean_theta - simu_theta) / post_sd_theta)
+  shrinkage_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
+
+  c(warning_code,
+    sbc_rank_lambda, z_score_lambda, shrinkage_lambda,
+    sbc_rank_theta, z_score_theta, shrinkage_theta)
+}
+
+stopImplicitCluster()
+```
+
+With the non-identifiability tempered there are no diagnostic indications of
+fitting problems.
+
+```{r}
+warning_code <- ensemble_output[1,]
+if (sum(warning_code) != 0) {
+  print ("Some simulated posterior fits in the generative ensemble encountered problems!")
+  for (r in 1:R) {
+    if (warning_code[r] != 0) {
+      print(sprintf('Replication %s of %s', r, R))
+      util$parse_warning_code(warning_code[r])
+      print(sprintf('Simulated lambda = %s', simu_lambdas[r]))
+      print(sprintf('Simulated theta = %s', simu_thetas[r]))
+      print(" ")
+    }
+  }
+} else {
+  print ("No posterior fits in the generative ensemble encountered problems!")
+}
+```
+
+Similarly, the SBC histograms for both $\lambda$ and $\theta$ show no signs of
+errors in our fits.
+
+```{r}
+sbc_rank <- ensemble_output[2,]
+sbc_hist <- hist(sbc_rank, seq(0, 500, 25) - 0.5,
+                 col=c_dark, border=c_dark_highlight, plot=FALSE)
+plot(sbc_hist, main="", xlab="Prior Rank (Lambda)", yaxt='n', ylab="")
+
+low <- qbinom(0.005, R, 1 / 20)
+mid <- qbinom(0.5, R, 1 / 20)
+high <- qbinom(0.995, R, 1 / 20)
+bar_x <- c(-10, 510, 500, 510, -10, 0, -10)
+bar_y <- c(high, high, mid, low, low, mid, high)
+
+polygon(bar_x, bar_y, col=c("#DDDDDD"), border=NA)
+segments(x0=0, x1=500, y0=mid, y1=mid, col=c("#999999"), lwd=2)
+
+plot(sbc_hist, col=c_dark, border=c_dark_highlight, add=T)
+
+sbc_rank <- ensemble_output[5,]
+sbc_hist <- hist(sbc_rank, seq(0, 500, 25) - 0.5,
+                 col=c_dark, border=c_dark_highlight, plot=FALSE)
+plot(sbc_hist, main="", xlab="Prior Rank (Lambda)", yaxt='n', ylab="")
+
+mean <- length(sbc_rank) / (500 / 25)
+low <- mean - 3 * sqrt(mean)
+high <- mean + 3 * sqrt(mean)
+bar_x <- c(-10, 510, 500, 510, -10, 0, -10)
+bar_y <- c(high, high, mean, low, low, mean, high)
+
+polygon(bar_x, bar_y, col=c("#DDDDDD"), border=NA)
+segments(x0=0, x1=500, y0=mean, y1=mean, col=c("#999999"), lwd=2)
+
+plot(sbc_hist, col=c_dark, border=c_dark_highlight, add=T)
+```
+
+This leaves us to check the ensemble behavior of our recovered posterior
+distributions which looks reasonable for both parameters.
+
+```{r}
+z_score <- ensemble_output[3,]
+shrinkage <- ensemble_output[4,]
+
+plot(shrinkage, z_score, col=c("#8F272720"), lwd=2, pch=16, cex=0.8, main="Lambda",
+     xlim=c(0, 1), xlab="Posterior Shrinkage", ylim=c(0, 5), ylab="Posterior z-Score")
+
+z_score <- ensemble_output[6,]
+shrinkage <- ensemble_output[7,]
+
+plot(shrinkage, z_score, col=c("#8F272720"), lwd=2, pch=16, cex=0.8, main="Theta",
+     xlim=c(0, 1), xlab="Posterior Shrinkage", ylim=c(0, 5), ylab="Posterior z-Score")
+```
+
+### Step Six: Fit the Observations and Evaluate {-}
+
+Confident in the performance of the expanded model within the scope of its
+own assumptions we go back to fit the observed data once again.
+
+```{r}
+input_data <- read_rdump('workflow.data.R')
+fit <- stan(file='fit_data3_ppc.stan', data=input_data,
+            seed=4938483, refresh=2000)
+```
+
+The diagnostics look good,
+
+```{r}
+util$check_all_diagnostics(fit)
+```
+
+and the marginal posterior distributions look reasonable.
+
+```{r}
+params = extract(fit)
+
+par(mfrow=c(2, 1))
+
+hist(params$lambda, main="", xlab="lambda", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+
+hist(params$theta, main="", xlab="theta", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+```
+
+### Step Seven: Analyze the Posterior Predictive Distribution {-}
+
+Excited that we might finally have a sufficient model we proceed to the
+posterior predictive check,
+
+```{r}
+B <- 30
+
+obs_counts <- hist(input_data$y, breaks=(0:(B + 1))-0.5, plot=FALSE)$counts
+
+idx <- rep(0:B, each=2)
+x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] - 0.5)
+pad_obs <- do.call(cbind, lapply(idx, function(n) obs_counts[n + 1]))
+
+counts <- sapply(1:4000, function(n) hist(params$y_ppc[n,], breaks=(0:(B + 1))-0.5, plot=FALSE)$counts)
+probs = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+cred <- sapply(1:(B + 1), function(b) quantile(counts[b,], probs=probs))
+pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
+
+plot(1, type="n", main="Posterior Predictive Distribution",
+     xlim=c(-0.5, B + 0.5), xlab="y",
+     ylim=c(0, max(c(obs_counts, cred[9,]))), ylab="")
+
+polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
+        col = c_light, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
+        col = c_light_highlight, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
+        col = c_mid, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
+        col = c_mid_highlight, border = NA)
+lines(x, pad_cred[5,], col=c_dark, lwd=2)
+
+lines(x, pad_obs, col="white", lty=1, lw=2.5)
+lines(x, pad_obs, col="black", lty=1, lw=2)
+
+```
+
+only to see that the tail of the posterior predictive histogram extends pretty
+far beyond that in the observed data.  This suggests that the detectors may be
+censored and unable to record values above $y = 14$.  At this point we are
+suspicious of the exact experimental process and before considering an expanded
+model we need to consult with the one person who was there.
+
+## Fourth Iteration: Coffee Is For Closers
+
+A principled analysis workflow is a powerful investigatory tool for identifying
+subtle structure in the observed data and motivating appropriate model features.
+There is a fine line, however, between improving the model and overfitting to
+the given observation.  To avoid crossing this line we have to lean on our
+domain expertise, or the domain expertise of others.
+
+### Step One: Conceptual Analysis {-}
+
+Suspicious of the experimental setup under which the data were collected we ask
+to meet with the student who ran the experiment.  When we bring up the odd
+behavior we saw the student seems nonchalant.  "Oh, you mean like when the
+detectors didn't read out anything at all?" they say. "I just repeated the
+measurement for each detector until they reported an actual value."
+
+And there it is.  The readout system for detectors seems to be vulnerable to
+overloading when the counts surpass a given value, returning no value at all.
+When the student repeated the measurement for detectors in this state they
+unintentionally induced a _censored obsevation_ where the Poisson distribution
+for the observations is cutoff at a certain value.
+
+### Step Two: Define Observations {-}
+
+The observation space does not change.
+
+```{r}
+writeLines(readLines("fit_data4.stan", n=4))
+```
+
+### Step Three: Identify Relevant Summary Statistics {-}
+
+The same histogram summary remains appropriate.
+
+### Step Four: Build a Generative Model {-}
+
+We now have to augment out generative model to account for the censoring of
+the counts.  Ideally we would treat the censoring threshold as a systematic
+parameter here and infer it with uncertainties to avoid overfitting to our one
+observation.  Unfortunately that model is a bit ungainly, so for pedagogical
+simplification we will take the fixed threshold of $y = 14$ implied by the
+observed data.
+
+```{r}
+writeLines(readLines("generative_ensemble4.stan"))
+writeLines(readLines("fit_data4.stan"))
+```
+
+### Step Five: Analyze the Generative Ensemble {-}
+
+We dutifully generate our ensemble.
+
+```{r}
+R <- 1000
+N <- 1000
+
+simu_data <- list("N" = N)
+
+fit <- stan(file='generative_ensemble4.stan', data=simu_data,
+            iter=R, warmup=0, chains=1, refresh=R,
+            seed=4838282, algorithm="Fixed_param")
+
+simu_lambdas <- extract(fit)$lambda
+simu_thetas <- extract(fit)$theta
+simu_ys <- extract(fit)$y
+```
+
+#### Analyze the Prior Predictive Distribution {-}
+
+The prior predictive average histogram now exhibits features of the
+zero-inflation and the censoring.
+
+```{r}
+B <- 26
+counts <- sapply(1:R, function(r) hist(simu_ys[r,], breaks=(0:(B + 1))-0.5, plot=FALSE)$counts)
+probs = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+cred <- sapply(1:(B + 1), function(b) quantile(counts[b,], probs=probs))
+
+idx <- rep(0:B, each=2)
+x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] - 0.5)
+pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
+
+plot(1, type="n", main="Prior Predictive Distribution",
+     xlim=c(-0.5, B + 0.5), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
+
+polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
+        col = c_light, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
+        col = c_light_highlight, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
+        col = c_mid, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
+        col = c_mid_highlight, border = NA)
+lines(x, pad_cred[5,], col=c_dark, lwd=2)
+
+abline(v=25, col="white", lty=1, lw=2.5)
+abline(v=25, col="black", lty=1, lw=2)
+
+```
+
+With the censoring we now have exactly zero prior predictive probability above
+the extreme observation scale derived from our domain expertise.
+
+```{r}
+length(simu_ys[simu_ys > 25]) / length(simu_ys)
+```
+
+#### Fit the Simulated Observations and Evaluate {-}
+
+We contine to fitting each replication in our generative ensemble.
+
+```{r, cache=TRUE}
+registerDoParallel(makeCluster(detectCores()))
+
+simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
+
+# Compile the posterior fit model
+fit_model = stan_model(file='fit_data4.stan')
+
+ensemble_output <- foreach(simu=simu_list,
+                           .combine='cbind') %dopar% {
+  simu_lambda <- simu[1]
+  simu_theta <- simu[2]
+  simu_y <- simu[3:(N + 2)];
+
+  # Fit the simulated observation
+  input_data <- list("N" = N, "y" = simu_y)
+
+  sink(file="/dev/null")
+  library(rstan)
+  fit <- sampling(fit_model, data=input_data, seed=4938483)
+  sink()
+
+  # Compute diagnostics
+  util <- new.env()
+  source('stan_utility.R', local=util)
+
+  warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
+
+  # Compute rank of prior draw with respect to thinned posterior draws
+  sbc_rank_lambda <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
+  sbc_rank_theta <- sum(simu_theta < extract(fit)$theta[seq(1, 4000 - 8, 8)])
+
+  # Compute posterior sensitivities
+  s <- summary(fit, probs = c(), pars='lambda')$summary
+  post_mean_lambda <- s[,1]
+  post_sd_lambda <- s[,3]
+
+  prior_sd_lambda <- sqrt( (9.21604)**2 / ((3.48681 - 1)**2 * (3.48681 - 1)) )
+
+  z_score_lambda <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
+  shrinkage_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
+
+  s <- summary(fit, probs = c(), pars='theta')$summary
+  post_mean_theta <- s[,1]
+  post_sd_theta <- s[,3]
+
+  prior_sd_theta <- sqrt( (2.8663)**2 / (4 * (2.8663)**2 * (2 * 2.8663 + 1)) )
+
+  z_score_theta <- abs((post_mean_theta - simu_theta) / post_sd_theta)
+  shrinkage_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
+
+  c(warning_code,
+    sbc_rank_lambda, z_score_lambda, shrinkage_lambda,
+    sbc_rank_theta, z_score_theta, shrinkage_theta)
+}
+
+stopImplicitCluster()
+```
+
+The diagnostics all look clean.
+
+```{r}
+warning_code <- ensemble_output[1,]
+if (sum(warning_code) != 0) {
+  print ("Some simulated posterior fits in the generative ensemble encountered problems!")
+  for (r in 1:R) {
+    if (warning_code[r] != 0) {
+      print(sprintf('Replication %s of %s', r, R))
+      util$parse_warning_code(warning_code[r])
+      print(sprintf('Simulated lambda = %s', simu_lambdas[r]))
+      print(sprintf('Simulated theta = %s', simu_thetas[r]))
+      print(" ")
+    }
+  }
+} else {
+  print ("No posterior fits in the generative ensemble encountered problems!")
+}
+```
+
+Similarly the SBC histograms exhibit no problems.
+
+```{r}
+sbc_rank <- ensemble_output[2,]
+sbc_hist <- hist(sbc_rank, seq(0, 500, 25) - 0.5,
+                 col=c_dark, border=c_dark_highlight, plot=FALSE)
+plot(sbc_hist, main="", xlab="Prior Rank (Lambda)", yaxt='n', ylab="")
+
+low <- qbinom(0.005, R, 1 / 20)
+mid <- qbinom(0.5, R, 1 / 20)
+high <- qbinom(0.995, R, 1 / 20)
+bar_x <- c(-10, 510, 500, 510, -10, 0, -10)
+bar_y <- c(high, high, mid, low, low, mid, high)
+
+polygon(bar_x, bar_y, col=c("#DDDDDD"), border=NA)
+segments(x0=0, x1=500, y0=mid, y1=mid, col=c("#999999"), lwd=2)
+
+plot(sbc_hist, col=c_dark, border=c_dark_highlight, add=T)
+
+sbc_rank <- ensemble_output[5,]
+sbc_hist <- hist(sbc_rank, seq(0, 500, 25) - 0.5,
+                 col=c_dark, border=c_dark_highlight, plot=FALSE)
+plot(sbc_hist, main="", xlab="Prior Rank (Lambda)", yaxt='n', ylab="")
+
+mean <- length(sbc_rank) / (500 / 25)
+low <- mean - 3 * sqrt(mean)
+high <- mean + 3 * sqrt(mean)
+bar_x <- c(-10, 510, 500, 510, -10, 0, -10)
+bar_y <- c(high, high, mean, low, low, mean, high)
+
+polygon(bar_x, bar_y, col=c("#DDDDDD"), border=NA)
+segments(x0=0, x1=500, y0=mean, y1=mean, col=c("#999999"), lwd=2)
+
+plot(sbc_hist, col=c_dark, border=c_dark_highlight, add=T)
+```
+
+Moreover, the recovered posteriors for each fit perform reasonable well.
+
+```{r}
+z_score <- ensemble_output[3,]
+shrinkage <- ensemble_output[4,]
+
+plot(shrinkage, z_score, col=c("#8F272720"), lwd=2, pch=16, cex=0.8, main="Lambda",
+     xlim=c(0, 1), xlab="Posterior Shrinkage", ylim=c(0, 5), ylab="Posterior z-Score")
+
+z_score <- ensemble_output[6,]
+shrinkage <- ensemble_output[7,]
+
+plot(shrinkage, z_score, col=c("#8F272720"), lwd=2, pch=16, cex=0.8, main="Theta",
+    xlim=c(0, 1), xlab="Posterior Shrinkage", ylim=c(0, 5), ylab="Posterior z-Score")
+```
+
+### Step Six: Fit the Observations and Evaluate {-}
+
+Exhausted, we march on to fitting the observed data.
+
+```{r}
+input_data <- read_rdump('workflow.data.R')
+fit <- stan(file='fit_data4_ppc.stan', data=input_data,
+            seed=4938483, refresh=2000)
+```
+
+The diagnostics are clean,
+
+```{r}
+util$check_all_diagnostics(fit)
+```
+
+and the marginal posteriors are reasonable.
+
+```{r}
+params = extract(fit)
+
+par(mfrow=c(2, 1))
+
+hist(params$lambda, main="", xlab="lambda", yaxt='n', ylab="",
+col=c_dark, border=c_dark_highlight)
+
+hist(params$theta, main="", xlab="theta", yaxt='n', ylab="",
+col=c_dark, border=c_dark_highlight)
+```
+
+### Step Seven: Analyze the Posterior Predictive Distribution {-}
+
+Anxiously we move onto the posterior predictive check,
+
+```{r}
+B <- 20
+
+obs_counts <- hist(input_data$y, breaks=(0:(B + 1))-0.5, plot=FALSE)$counts
+
+idx <- rep(0:B, each=2)
+x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] - 0.5)
+pad_obs <- do.call(cbind, lapply(idx, function(n) obs_counts[n + 1]))
+
+counts <- sapply(1:4000, function(n) hist(params$y_ppc[n,], breaks=(0:(B + 1))-0.5, plot=FALSE)$counts)
+probs = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+cred <- sapply(1:(B + 1), function(b) quantile(counts[b,], probs=probs))
+pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
+
+plot(1, type="n", main="Posterior Predictive Distribution",
+     xlim=c(-0.5, B + 0.5), xlab="y",
+     ylim=c(0, max(c(obs_counts, cred[9,]))), ylab="")
+
+polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
+        col = c_light, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
+        col = c_light_highlight, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
+        col = c_mid, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
+        col = c_mid_highlight, border = NA)
+lines(x, pad_cred[5,], col=c_dark, lwd=2)
+
+lines(x, pad_obs, col="white", lty=1, lw=2.5)
+lines(x, pad_obs, col="black", lty=1, lw=2)
+```
+
+only to see no tension between the observed data and the posterior prediction.
+We finally have a model that captures the intricacies of our observed data!
+
+Satisfied in our detector detective work we send out the results to our
+colleagues and start drafting a note instructing students what to do when the
+detectors do not report any counts at all.
+
+# Discussion
+
+By very carefully following a principled Bayesian workflow we were able to
+develop a model that incorporated enough domain expertise to achieve a
+reasonable fit to our observed data.  Indeed the progression of the workflow
+itself helped to inform which domain expertise we need to incorporate, and
+in particular when we needed to follow up with colleagues to better understand
+the circumstances of the experiment.  By minding this domain expertise, and not
+simply fitting to the potentially irrelevant details of the observed data, we
+ensured a final model that is robust to overfitting and should generalize well
+to application on new observations.
+
+That said, this workflow makes no claim that the final model is correct in any
+absolute sense.  Our ability to critique the model is limited by the specific
+questions we ask and the information encoded in the observed data.  Indeed more
+thorough questions or additional data might demonstrate limitations of our
+concluding model and the need for further iterations.  Our detectors, for
+example, may not have identical responses, and that may response may not be so
+static in time.  Similarly the source being measured may not emit particles
+uniformly in time or space.  A principled workflow doesn't yield the correct
+model but rather a model that has been iteratively improved to meet the needs
+of a given inferential task.
+
+While the workflow is structured it is not automatic, requiring careful and
+customized consideration of our domain expertise in the scope of our modeling
+assumptions at each step.  Moreover the workflow isn't cheap, requiring
+significant computational resources to fully exploit it even on this relatively
+simple example.  That investment of time and resources, however, provides a
+powerful model robust to many of the pathologies that can lead to biased
+inferences and faulty scientific insights.
+
+# Acknowledgements
+
+# Original Computing Environment
+
+```{r, comment=NA}
+writeLines(readLines(file.path(Sys.getenv("HOME"), ".R/Makevars")))
+```
+
+```{r, comment=NA}
+devtools::session_info("rstan")
+```
+
+# References
