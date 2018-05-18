@@ -507,49 +507,49 @@ replication.  The optimal setup in any given analysis will depend on the details
 of the computational circumstances.
 
 ```{r, cache=TRUE}
-registerDoParallel(makeCluster(detectCores()))
+tryCatch({
+  registerDoParallel(makeCluster(detectCores()))
 
-simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_ys)))
+  simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_ys)))
 
-# Compile the posterior fit model
-fit_model = stan_model(file='fit_data.stan')
+  # Compile the posterior fit model
+  fit_model = stan_model(file='fit_data.stan')
 
-ensemble_output <- foreach(simu=simu_list,
-                           .combine='cbind') %dopar% {
-  simu_lambda <- simu[1]
-  simu_y <- simu[2:(N + 1)];
+  ensemble_output <- foreach(simu=simu_list,
+                             .combine='cbind') %dopar% {
+    simu_lambda <- simu[1]
+    simu_y <- simu[2:(N + 1)];
 
-  # Fit the simulated observation
-  input_data <- list("N" = N, "y" = simu_y)
+    # Fit the simulated observation
+    input_data <- list("N" = N, "y" = simu_y)
 
-  sink(file="/dev/null")
-  library(rstan)
-  fit <- sampling(fit_model, data=input_data, seed=4938483)
-  sink()
+    sink(file="/dev/null")
+    library(rstan)
+    fit <- sampling(fit_model, data=input_data, seed=4938483)
+    sink()
 
-  # Compute diagnostics
-  util <- new.env()
-  source('stan_utility.R', local=util)
+    # Compute diagnostics
+    util <- new.env()
+    source('stan_utility.R', local=util)
 
-  warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
+    warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
 
-  # Compute rank of prior draw with respect to thinned posterior draws
-  sbc_rank <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
+    # Compute rank of prior draw with respect to thinned posterior draws
+    sbc_rank <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
 
-  # Compute posterior sensitivities
-  s <- summary(fit, probs = c(), pars='lambda')$summary
-  post_mean_lambda <- s[,1]
-  post_sd_lambda <- s[,3]
+    # Compute posterior sensitivities
+    s <- summary(fit, probs = c(), pars='lambda')$summary
+    post_mean_lambda <- s[,1]
+    post_sd_lambda <- s[,3]
 
-  prior_sd_lambda <- 6.44787
+    prior_sd_lambda <- 6.44787
 
-  z_score <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
-  shrinkage <- 1 - (post_sd_lambda / prior_sd_lambda)**2
+    z_score <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
+    shrinkage <- 1 - (post_sd_lambda / prior_sd_lambda)**2
 
-  c(warning_code, sbc_rank, z_score, shrinkage)
-}
-
-stopImplicitCluster()
+    c(warning_code, sbc_rank, z_score, shrinkage)
+  }
+}, finally={ stopImplicitCluster() })
 ```
 
 The first thing we do is check the diagnostics to make sure that each fit is
@@ -797,62 +797,62 @@ length(simu_ys[simu_ys > 25]) / length(simu_ys)
 We now proceed to fitting each replication.
 
 ```{r, cache=TRUE}
-registerDoParallel(makeCluster(detectCores()))
+tryCatch({
+  registerDoParallel(makeCluster(detectCores()))
 
-simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
+  simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
 
-# Compile the posterior fit model
-fit_model = stan_model(file='fit_data2.stan')
+  # Compile the posterior fit model
+  fit_model = stan_model(file='fit_data2.stan')
 
-ensemble_output <- foreach(simu=simu_list,
-                           .combine='cbind') %dopar% {
-  simu_lambda <- simu[1]
-  simu_theta <- simu[2]
-  simu_y <- simu[3:(N + 2)];
+  ensemble_output <- foreach(simu=simu_list,
+                             .combine='cbind') %dopar% {
+    simu_lambda <- simu[1]
+    simu_theta <- simu[2]
+    simu_y <- simu[3:(N + 2)];
 
-  # Fit the simulated observation
-  input_data <- list("N" = N, "y" = simu_y)
+    # Fit the simulated observation
+    input_data <- list("N" = N, "y" = simu_y)
 
-  sink(file="/dev/null")
-  library(rstan)
-  fit <- sampling(fit_model, data=input_data, seed=4938483)
-  sink()
+    sink(file="/dev/null")
+    library(rstan)
+    fit <- sampling(fit_model, data=input_data, seed=4938483)
+    sink()
 
-  # Compute diagnostics
-  util <- new.env()
-  source('stan_utility.R', local=util)
+    # Compute diagnostics
+    util <- new.env()
+    source('stan_utility.R', local=util)
 
-  warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
+    warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
 
-  # Compute rank of prior draw with respect to thinned posterior draws
-  sbc_rank_lambda <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
-  sbc_rank_theta <- sum(simu_theta < extract(fit)$theta[seq(1, 4000 - 8, 8)])
+    # Compute rank of prior draw with respect to thinned posterior draws
+    sbc_rank_lambda <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
+    sbc_rank_theta <- sum(simu_theta < extract(fit)$theta[seq(1, 4000 - 8, 8)])
 
-  # Compute posterior sensitivities
-  s <- summary(fit, probs = c(), pars='lambda')$summary
-  post_mean_lambda <- s[,1]
-  post_sd_lambda <- s[,3]
+    # Compute posterior sensitivities
+    s <- summary(fit, probs = c(), pars='lambda')$summary
+    post_mean_lambda <- s[,1]
+    post_sd_lambda <- s[,3]
 
-  prior_sd_lambda <- 6.44787
+    prior_sd_lambda <- 6.44787
 
-  z_score_lambda <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
-  shrinkage_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
+    z_score_lambda <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
+    shrinkage_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
 
-  s <- summary(fit, probs = c(), pars='theta')$summary
-  post_mean_theta <- s[,1]
-  post_sd_theta <- s[,3]
+    s <- summary(fit, probs = c(), pars='theta')$summary
+    post_mean_theta <- s[,1]
+    post_sd_theta <- s[,3]
 
-  prior_sd_theta <- sqrt(1.0 / 12)
+    prior_sd_theta <- sqrt(1.0 / 12)
 
-  z_score_theta <- abs((post_mean_theta - simu_theta) / post_sd_theta)
-  shrinkage_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
+    z_score_theta <- abs((post_mean_theta - simu_theta) / post_sd_theta)
+    shrinkage_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
 
-  c(warning_code,
-    sbc_rank_lambda, z_score_lambda, shrinkage_lambda,
-    sbc_rank_theta, z_score_theta, shrinkage_theta)
-}
-
-stopImplicitCluster()
+    c(warning_code,
+      sbc_rank_lambda, z_score_lambda, shrinkage_lambda,
+      sbc_rank_theta, z_score_theta, shrinkage_theta)
+  }
+}, finally={ stopImplicitCluster() })
 ```
 
 Our first step is to check the fit diagnostics for each replication.
@@ -1039,62 +1039,62 @@ length(simu_ys[simu_ys > 25]) / length(simu_ys)
 We can now proceed to fitting each replication.
 
 ```{r, cache=TRUE}
-registerDoParallel(makeCluster(detectCores()))
+tryCatch({
+  registerDoParallel(makeCluster(detectCores()))
 
-simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
+  simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
 
-# Compile the posterior fit model
-fit_model = stan_model(file='fit_data3.stan')
+  # Compile the posterior fit model
+  fit_model = stan_model(file='fit_data3.stan')
 
-ensemble_output <- foreach(simu=simu_list,
-                           .combine='cbind') %dopar% {
-  simu_lambda <- simu[1]
-  simu_theta <- simu[2]
-  simu_y <- simu[3:(N + 2)];
+  ensemble_output <- foreach(simu=simu_list,
+                             .combine='cbind') %dopar% {
+    simu_lambda <- simu[1]
+    simu_theta <- simu[2]
+    simu_y <- simu[3:(N + 2)];
 
-  # Fit the simulated observation
-  input_data <- list("N" = N, "y" = simu_y)
+    # Fit the simulated observation
+    input_data <- list("N" = N, "y" = simu_y)
 
-  sink(file="/dev/null")
-  library(rstan)
-  fit <- sampling(fit_model, data=input_data, seed=4938483)
-  sink()
+    sink(file="/dev/null")
+    library(rstan)
+    fit <- sampling(fit_model, data=input_data, seed=4938483)
+    sink()
 
-  # Compute diagnostics
-  util <- new.env()
-  source('stan_utility.R', local=util)
+    # Compute diagnostics
+    util <- new.env()
+    source('stan_utility.R', local=util)
 
-  warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
+    warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
 
-  # Compute rank of prior draw with respect to thinned posterior draws
-  sbc_rank_lambda <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
-  sbc_rank_theta <- sum(simu_theta < extract(fit)$theta[seq(1, 4000 - 8, 8)])
+    # Compute rank of prior draw with respect to thinned posterior draws
+    sbc_rank_lambda <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
+    sbc_rank_theta <- sum(simu_theta < extract(fit)$theta[seq(1, 4000 - 8, 8)])
 
-  # Compute posterior sensitivities
-  s <- summary(fit, probs = c(), pars='lambda')$summary
-  post_mean_lambda <- s[,1]
-  post_sd_lambda <- s[,3]
+    # Compute posterior sensitivities
+    s <- summary(fit, probs = c(), pars='lambda')$summary
+    post_mean_lambda <- s[,1]
+    post_sd_lambda <- s[,3]
 
-  prior_sd_lambda <- sqrt( (9.21604)**2 / ((3.48681 - 1)**2 * (3.48681 - 1)) )
+    prior_sd_lambda <- sqrt( (9.21604)**2 / ((3.48681 - 1)**2 * (3.48681 - 1)) )
 
-  z_score_lambda <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
-  shrinkage_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
+    z_score_lambda <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
+    shrinkage_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
 
-  s <- summary(fit, probs = c(), pars='theta')$summary
-  post_mean_theta <- s[,1]
-  post_sd_theta <- s[,3]
+    s <- summary(fit, probs = c(), pars='theta')$summary
+    post_mean_theta <- s[,1]
+    post_sd_theta <- s[,3]
 
-  prior_sd_theta <- sqrt( (2.8663)**2 / (4 * (2.8663)**2 * (2 * 2.8663 + 1)) )
+    prior_sd_theta <- sqrt( (2.8663)**2 / (4 * (2.8663)**2 * (2 * 2.8663 + 1)) )
 
-  z_score_theta <- abs((post_mean_theta - simu_theta) / post_sd_theta)
-  shrinkage_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
+    z_score_theta <- abs((post_mean_theta - simu_theta) / post_sd_theta)
+    shrinkage_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
 
-  c(warning_code,
-    sbc_rank_lambda, z_score_lambda, shrinkage_lambda,
-    sbc_rank_theta, z_score_theta, shrinkage_theta)
-}
-
-stopImplicitCluster()
+    c(warning_code,
+      sbc_rank_lambda, z_score_lambda, shrinkage_lambda,
+      sbc_rank_theta, z_score_theta, shrinkage_theta)
+  }
+}, finally={ stopImplicitCluster() })
 ```
 
 With the non-identifiability tempered there are no diagnostic indications of
@@ -1359,62 +1359,62 @@ length(simu_ys[simu_ys > 25]) / length(simu_ys)
 We contine to fitting each replication in our generative ensemble.
 
 ```{r, cache=TRUE}
-registerDoParallel(makeCluster(detectCores()))
+tryCatch({
+  registerDoParallel(makeCluster(detectCores()))
 
-simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
+  simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
 
-# Compile the posterior fit model
-fit_model = stan_model(file='fit_data4.stan')
+  # Compile the posterior fit model
+  fit_model = stan_model(file='fit_data4.stan')
 
-ensemble_output <- foreach(simu=simu_list,
-                           .combine='cbind') %dopar% {
-  simu_lambda <- simu[1]
-  simu_theta <- simu[2]
-  simu_y <- simu[3:(N + 2)];
+  ensemble_output <- foreach(simu=simu_list,
+                             .combine='cbind') %dopar% {
+    simu_lambda <- simu[1]
+    simu_theta <- simu[2]
+    simu_y <- simu[3:(N + 2)];
 
-  # Fit the simulated observation
-  input_data <- list("N" = N, "y" = simu_y)
+    # Fit the simulated observation
+    input_data <- list("N" = N, "y" = simu_y)
 
-  sink(file="/dev/null")
-  library(rstan)
-  fit <- sampling(fit_model, data=input_data, seed=4938483)
-  sink()
+    sink(file="/dev/null")
+    library(rstan)
+    fit <- sampling(fit_model, data=input_data, seed=4938483)
+    sink()
 
-  # Compute diagnostics
-  util <- new.env()
-  source('stan_utility.R', local=util)
+    # Compute diagnostics
+    util <- new.env()
+    source('stan_utility.R', local=util)
 
-  warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
+    warning_code <- util$check_all_diagnostics(fit, quiet=TRUE)
 
-  # Compute rank of prior draw with respect to thinned posterior draws
-  sbc_rank_lambda <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
-  sbc_rank_theta <- sum(simu_theta < extract(fit)$theta[seq(1, 4000 - 8, 8)])
+    # Compute rank of prior draw with respect to thinned posterior draws
+    sbc_rank_lambda <- sum(simu_lambda < extract(fit)$lambda[seq(1, 4000 - 8, 8)])
+    sbc_rank_theta <- sum(simu_theta < extract(fit)$theta[seq(1, 4000 - 8, 8)])
 
-  # Compute posterior sensitivities
-  s <- summary(fit, probs = c(), pars='lambda')$summary
-  post_mean_lambda <- s[,1]
-  post_sd_lambda <- s[,3]
+    # Compute posterior sensitivities
+    s <- summary(fit, probs = c(), pars='lambda')$summary
+    post_mean_lambda <- s[,1]
+    post_sd_lambda <- s[,3]
 
-  prior_sd_lambda <- sqrt( (9.21604)**2 / ((3.48681 - 1)**2 * (3.48681 - 1)) )
+    prior_sd_lambda <- sqrt( (9.21604)**2 / ((3.48681 - 1)**2 * (3.48681 - 1)) )
 
-  z_score_lambda <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
-  shrinkage_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
+    z_score_lambda <- abs((post_mean_lambda - simu_lambda) / post_sd_lambda)
+    shrinkage_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
 
-  s <- summary(fit, probs = c(), pars='theta')$summary
-  post_mean_theta <- s[,1]
-  post_sd_theta <- s[,3]
+    s <- summary(fit, probs = c(), pars='theta')$summary
+    post_mean_theta <- s[,1]
+    post_sd_theta <- s[,3]
 
-  prior_sd_theta <- sqrt( (2.8663)**2 / (4 * (2.8663)**2 * (2 * 2.8663 + 1)) )
+    prior_sd_theta <- sqrt( (2.8663)**2 / (4 * (2.8663)**2 * (2 * 2.8663 + 1)) )
 
-  z_score_theta <- abs((post_mean_theta - simu_theta) / post_sd_theta)
-  shrinkage_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
+    z_score_theta <- abs((post_mean_theta - simu_theta) / post_sd_theta)
+    shrinkage_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
 
-  c(warning_code,
-    sbc_rank_lambda, z_score_lambda, shrinkage_lambda,
-    sbc_rank_theta, z_score_theta, shrinkage_theta)
-}
-
-stopImplicitCluster()
+    c(warning_code,
+      sbc_rank_lambda, z_score_lambda, shrinkage_lambda,
+      sbc_rank_theta, z_score_theta, shrinkage_theta)
+  }
+}, finally={ stopImplicitCluster() })
 ```
 
 The diagnostics all look clean.
