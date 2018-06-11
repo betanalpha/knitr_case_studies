@@ -19,52 +19,94 @@ output:
 knitr::opts_chunk$set(comment=NA)
 ```
 
-Given a probabilistic model, Bayesian inference is straightforward.  Inferences,
-in the form of posterior expectations, follow immediately from the model and any
-data included in the analysis.  Building a satisfactory model in a given
-application, however, is a far more open-ended challenge.  Unfortunately model
-building itself is only sparsely discussed in the statistics literature, leaving
-practitioners to piece together their own model building workflow from
-potentially incomplete or even inconsistent heuristics.
+Given the posterior distribution derived from a probabilistic model and a
+particular observation, Bayesian inference is straightforward to implement.
+Inferences, and any decisions based upon them, follow immediately in the form of
+posterior expectations.  Building such a probabilistic model that is
+satisfactory in a given application, however, is a far more open-ended challenge.
+Unfortunately the process of model building is only sparsely discussed in the
+statistics literature, leaving practitioners to piece together their own model
+building workflow from potentially incomplete or even inconsistent heuristics.
 
 In order to ensure robust analyses we need a _principled_ workflow that guides
 the development of a probabilistic model that is consistent with both our domain
 expertise and any observed data while also being amenable to accurate
-computation.  Such a workflow requires quantifying our domain expertise so that
-we can compare it to the properties of a given probabilistic model and evaluate
-consistency.  It requires calibrating our computational tools to ensure that we
-can accurately generate inferences, and it requires a principled means of
-comparing those inferences to a given observation.
-
-In this case study I introduce a principled workflow for building and evaluating
-probabilistic models in Bayesian inference.  This workflow is based on recent
-research in collaboration with Dan Simpson, Aki Vehtari, Sean Talts, and others.
-The specific workflow that I advocated here, however, is my particular take on
-this research focused on the needs for modeling and inference in the physical
-sciences.  It does not necessarily reflect the perspectives of any of my
-collaborators and may prove to be limiting in other applications.
+computation.  In this case study I introduce a principled workflow for building
+and evaluating probabilistic models in Bayesian inference.  This workflow is
+based on recent research in collaboration with Dan Simpson, Aki Vehtari, Sean
+Talts, and others; see, for example, @GabryEtAl:2017.  The specific workflow
+that I advocated here, however, is my particular take on this research focused
+on the needs for modeling and inference in the physical sciences.  It does not
+necessarily reflect the perspectives of any of my collaborators and may prove
+to be limiting in other applications.
 
 Moreover, as this workflow is an active topic of research it is subject to
 evolution and refinement. Use at your own risk.  But at the same time _don't_
 use at your own risk.  Better yet build a calibrated model, infer the relative
 risks, and then make a principled decision...
 
-We begin with an overview of the workflow that emphasizes the role of each
-step and the expertise needed to implement it well.  Once the workflow has been
-laid out I demonstrate its application on a seemingly simple analysis that holds
-a few surprises.
+We begin with a discussion of what we desire in a probabilistic model and then
+I introduce a workflow, emphasizing the role of each step and the expertise
+needed to implement it well.  Once the workflow has been laid out I demonstrate
+its application on a seemingly simple analysis that hides a few surprises.
+
+# Building a Mystery {#sec:questions}
+
+What properties characterize a principled probabilistic model?  First and
+foremost the model should be consistent with our domain expertise, capturing
+not necessarily all of our knowledge of the experimental design but just
+enough to avoid unreasonable inferences.  Such a model then allows us to
+critique the experimental design itself, including whether or not our
+computational tools will be sufficient to fit prospective data and whether or
+not our experimental design admits answers to relevant questions.  The utility
+of these analyses, however, relies on the model being rich enough to learn the
+structure of the true data generating process beyond our domain expertise, and
+sometimes in spite of it.
+
+In order to validate a given model we need to ask four questions.
+
+#### Question One: Domain Consistency Expertise {- #sec:question_one}
+
+_Are the assumptions inherent in our model consistent with the relevant elements
+of our domain expertise?_
+
+#### Question Two: Computational Faithfulness {- #sec:question_two}
+
+_Are our computational tools sufficient to accurately fit the model?_
+
+#### Question Three: Model Sensitivity {- #sec:question_three}
+
+_How do we expect our inferences to perform over the distribution of reasonable
+observations?_
+
+#### Question Four: Practical Model Validity {- #sec:question_four}
+
+_Is our model rich enough to capture the relevant structure of the true data
+generating process?_
+
+The first three questions are asked before our measurement process resolves to
+a particular observation, considering instead the robustness of the model to
+the possible observations.  Even if we our observation is immediately available,
+however, these questions are important in understanding how to safely utilize
+resulting inferences.  The final question is asked once the observed data is
+available and the resulting inferences have been constructed.
+
+The ultimate goal of a principled Bayesian workflow is to answer these
+questions, hopefully confirming each in turn before moving on to the next.  In
+practice, however, answering these questions will identify deficiencies in the
+initial model that will need to be resolved before restarting the workflow.
 
 # Work it, Make it, Do it, Makes Us Harder, Better, Faster, Stronger
 
-The workflow begins by exploring our domain expertise in the context of the
-analysis and then developing an initial model.  Next we consider the holistic
-consequences of that model, spanning inferential and computational
-considerations, without reference to a particular observation.  Once those
-consequences have been understood and deemed acceptable the model is applied to
-a particular observation and the corresponding inferences critiqued.  If the
-model is judged insufficient to capture the relevant structure in observed data
-then it must be expanded, at which point we begin the workflow anew for the
-expanded model.
+The workflow proposed here begins by exploring and quantifying our domain
+expertise in the context of a given analysis before developing an initial model.
+We next consider the holistic consequences of that model, spanning inferential
+and computational considerations, without reference to a particular observation
+in order to answer the first three questions.  Once those consequences have been
+understood and deemed acceptable the model is applied to a particular observation
+and the corresponding inferences critiqued.  If the model is judged insufficient
+to capture the relevant structure in observed data then it must be expanded, at
+which point we begin the workflow anew for the expanded model.
 
 Here _domain expertise_ refers to the experience of those responsible for
 collecting, curating, or otherwise manipulating the data as well as stakeholders
@@ -72,13 +114,9 @@ who will make decisions using the final inferences or any intermediaries who
 will help stakeholders to make those decisions.  _Statistical expertise_ refers
 to proficiency in probabilistic modeling and computation.
 
-Before looking at a given observation we want to first build a model
-incorporating domain expertise, and then understand the consequences of those
-modeling assumptions within the context of our analysis goals.
-
 ## Step One: Conceptual Analysis {- #sec:conceptual}
 
-Our first step is to conceptually modeling the observational process from the
+Our first step is to conceptually model the observational process from the
 latent phenomenon being studied through its interactions with the environment
 and how those interactions manifest as observations.  We want to pay particular
 attention to the many possible systematic effects that influence this process
@@ -100,14 +138,17 @@ values each component can take.
 ## Step Three: Identify Relevant Summary Statistics {- #sec:summary_stats}
 
 Given an observation space we can now identify summary statistics that isolate
-particularly important properties of the observation space, especially those
+particularly important properties of the experimental design, especially those
 details that are relevant to decision making and those that are expected to be
-difficult to model well.  These summary statistics are typically given by one
-or two dimensional functions of the observation amenable to visualization.
+difficult to model well.  By identifying the relevant structures within the
+observation space these summary statistics provide the basis for quantifying
+[Question One](#sec:question_one) and [Question Four](#sec:question_four).  In
+practice such summary statistics are typically given by one or two dimensional
+functions amenable to visualization.
 
 We also want to complement these summary statistics with conceptual expectations
 for what behaviors are reasonable, or, as is often easier to elicit in practice,
-what behaviors are unreasonable.
+what behaviors are _unreasonable_.
 
 **Requirements:** Domain Expertise
 
@@ -124,6 +165,13 @@ interpretable as a collection of mathematical narratives of how an observation
 is produced based on a given model configuration, $\theta$, translating the
 conceptual narrative produced in [Step One](#sec:conceptual) into a rigorous
 probabilistic model.
+
+Often the generative observation model is a crude approximation to the
+complexity of the true measurement process, but crude approximations are often
+sufficient to answer even sophisticated questions.  Still, we want to keep the
+approximate nature of our model in mind and consider also various extensions of
+the model, for example heterogeneities, time dependences, and other systematic
+effects.
 
 **Requirements:** Domain Expertise and Statistical Expertise
 
@@ -163,7 +211,9 @@ way down.
 ## Step Five: Analyze the Generative Ensemble {- #sec:analyze-generative}
 
 Before drawing inferences from a given observation we first want to analyze the
-scope of our generative model and compare to our domain expertise.
+scope of our generative model and compare to our domain expertise in order to
+provide some answer to [Question One](#sec:question_one),
+[Question Two](#sec:question_two), and [Question Three](#sec:question_three).
 
 To do that we first simulate parameters _and_ observations from the complete
 generative model.  Specifically, we simulate and then analyze ground truths
@@ -182,9 +232,10 @@ $$
 
 Analyzing the distribution of summary statistics constructed in
 [Step Three](#sec:summary_stats) for the simulated observations provides a
-natural evaluation of our modeling assumptions, a technique that goes back to
-Good's _device of imaginary results_ [@Good:1950].  The device of imaginary
-results also gives its user a +2 to Wisdom saving throws.
+natural evaluation of our modeling assumptions within the context of our domain
+expertise, answering [Question One](#sec:question_one).  This technique goes
+back to Good's _device of imaginary results_ [@Good:1950], which also gives its
+user a +2 to Wisdom saving throws.
 
 If the behavior of the summary statistics for these simulated observations is
 not within the conceptual expectations defined
@@ -198,9 +249,11 @@ restrict the scope of model to reasonable behaviors.
 
 For each simulated observation we can also attempt to construct a posterior
 distribution, $\pi(\theta \mid \tilde{y})$, with a given computational method
-and analyze the range of possible inferences [@Betancourt2018a].
+and analyze the range of possible inferences [@Betancourt2018a] in order to
+answer [Question Two](#sec:question_two) and
+[Question Three](#sec:question_three).
 
-#### Evaluate Diagnostics {-}
+#### Evaluate Diagnostics {- #sec:diagnosics}
 
 If diagnostics of the given computational method, such as $\hat{R}$ for Markov
 chain Monte Carlo and divergences for Hamiltonian Monte Carlo, indicate
@@ -210,7 +263,9 @@ selecting another method altogether, and then repeating
 
 Correlating poor performance with the corresponding simulated ground truth can
 also help to identify regions of the model configuration space that may be
-ill-posed for practical computation.
+ill-posed for practical computation.  These pathological behaviors imply extreme
+behavior in the posterior which often hints at tension between the model and our
+domain expertise.
 
 **Requirements:** Statistical Expertise
 
@@ -235,20 +290,24 @@ repeating [Step Five](#sec:fit-generative).
 
 Assuming that we are accurately recovering posteriors across all of the
 simulated observations then we can proceed to analyze the range of behaviors in
-these posteriors.  For example, the posterior $z$-score of a given parameter,
+these posteriors.  For example, the _posterior $z$-score_ of a given parameter,
 $$
 z = \left|
 \frac{ \mu_{\mathrm{post}} - \tilde{\theta} }
 { \sigma_{\mathrm{post}} } \right|
 $$
-quantifies how accurately the posterior recovers the ground truth while the
-posterior shrinkage,
+quantifies how accurately the posterior recovers the ground truth with smaller
+values indicating more accurate posteriors.  At the same time the _posterior
+shrinkage_,
 $$
 s = 1 -
 \frac{ \sigma^{2}_{\mathrm{post}} }
 { \sigma^{2}_{\mathrm{prior}} },
 $$
-quantifies how much the posterior learns from a given observation.
+quantifies how much the posterior learns from a given observation.  Shrinkage
+near zero indicates that the data provide little information beyond that encoded
+in the prior distribution while shrinkage near one indicates highly informative
+observations.
 
 If there are indications of undesired posterior behavior, such as overfitting or
 non-identifiability, then we need to return to [Step One](#sec:conceptual) and
@@ -279,22 +338,23 @@ behaviors.
 
 Once computation, inferences, and decision-making processes have been validated
 within the scope of the model assumptions, the analysis can be applied to the
-observed data.  Analysis of the resulting inference may suggest expanding the
-model, but any changes to the model after looking at the data introduce a
-vulnerability to overfitting and so we must be extremely vigilant to study the
-ensemble behavior in subsequent iterations of the workflow.
+observed data and we can confront [Question Four](#sec:question_four).  Analysis
+of the resulting inference may suggest expanding the model, but any changes to
+the model after looking at the data introduce a vulnerability to overfitting and
+so we must be extremely vigilant to study the ensemble behavior in subsequent
+iterations of the workflow.
 
 Confident that we understand the consequence of our probabilistic model we can
-now construct a posterior distribution from a given observation.  We have to be
+construct a posterior distribution from a given observation.  We have to be
 careful, however, as the previous validation of the computational method may not
 apply if the observed data is not within the scope of the generative model.
 Consequently we need to be careful to check any diagnostics of our method.
 
-If any diagnostics indicate poor performance then our not only is our
-computational method suspect but also our generative model may not be rich
-enough to capture the relevant details of the observed data.  At the very least
-we should reconsider the tuning of our computational tools, but we may also want
-to consider going back to [Step Four](#sec:generative-model) and expanding our
+If any diagnostics indicate poor performance then not only is our computational
+method suspect but also our generative model may not be rich enough to capture
+the relevant details of the observed data.  At the very least we should
+reconsider the tuning of our computational tools, but we may also want to
+consider going back to [Step Four](#sec:generative-model) and expanding our
 model so that it better captures the observation.
 
 **Requirements:** Statistical Expertise
@@ -304,11 +364,12 @@ model so that it better captures the observation.
 Even if we are able to compute a posterior accurately there is no guarantee that
 our model captures the complexity of the given observation.
 
-In order to verify the sufficiency of our model we need to compare the
-observation to the _posterior predictive distribution_ [@Betancourt:2015b].  We
-can achieve this verification similar to the device of imaginary results
-discussed in [Step Five](#sec:prior-predictive), only simulating observations
-from the observational process conditioned on posterior samples,
+In order to verify the sufficiency of our model and answer
+[Question Four](#sec:question_four) we need to compare the observation to the
+_posterior predictive distribution_ [@Betancourt:2015b].  We can achieve this
+verification similar to the device of imaginary results discussed in
+[Step Five](#sec:prior-predictive), only simulating observations from the
+observational process conditioned on posterior samples,
 $$
 \begin{align*}
 \tilde{\theta}' &\sim \pi(\theta \mid y)
@@ -322,10 +383,23 @@ defined in [Step Three](#sec:summary_stats) at the posterior predictive samples
 to generate a distribution, only this time we compare the distribution to the
 observed data in a _posterior predictive check_ [@Rubin:1984].  If there is
 strong disagreement then we need to go back to
-[Section Four](#sec:generative-model) and elaborate the components of the
+[Step Four](#sec:generative-model) and elaborate the components of the
 generative model that influence those summary statistics manifesting
-disagreement.  We then restart the workflow and iterate until we can't identify
-any deviations from the model and our observation and our domain expertise.
+disagreement.  We may even need to go back to [Step One](#sec:conceptual) and
+improve our domain expertise of the experimental design before considering an
+expanded model.  Once we have a new model we then restart the workflow and
+iterate until we can't identify any deviations from the model and our
+observation and our domain expertise.
+
+In order to avoid overfitting to the observed data in this iterative model
+expansion we have to be careful to not abuse the particular structure of the
+observed data.  We don't want to respond to failing posterior predictive checks
+by incorporating quantitative features of the observed data into the model but
+rather expanding the model within the scope of our, possibly improved, domain
+expertise.  For example, we don't want to respond to our posterior predictive
+checks by adding a new component to our model with particular values but rather
+a new component with uncertain values to be fit jointly with the rest of the
+model.
 
 **Requirements:** Domain Expertise and Statistical Expertise
 
@@ -388,7 +462,7 @@ detectors are all identical, we can analyze their comprehensive responses with
 a histogram of their counts.  In other words we consider the histogram of
 detector counts _as the summary statistic_!
 
-Here we assume that our conceptual domain expertise would informs us that 25
+Here we assume that our conceptual domain expertise would inform us that 25
 counts in a detector would be an extreme but not impossible observation.
 
 ### Step Four: Build a Generative Model {-}
@@ -447,18 +521,18 @@ simu_ys <- extract(fit)$y
 More draws from the generative ensemble will yield a more precise understanding
 of the model and I recommend that you run as many replications as your
 computational resources allow.  In circumstances with limited computational
-resources even a few replications can provide a powerful view into the
+resources, however, even a few replications can provide a powerful view into the
 consequences of your model.
 
 #### Analyze the Prior Predictive Distribution {-}
 
 We can visualize the prior predictive distribution of histogram counts with
 quantiles of the bin counts over the generative replications.  Here the darkest
-red corresponds to the bin medians with the lighter bands corresponding to
-$(0.4, 0.6)$, $(0.3, 0.7)$, $(0.2, 0.8)$, and $(0.1, 0.9)$ intervals.  This
-visualization can obscure correlations amongst the bins, but it serves as a
-useful summary of the full prior predictive distribution.
-
+red corresponds to the bin medians with the increasingly lighter bands
+corresponding to $(0.4, 0.6)$, $(0.3, 0.7)$, $(0.2, 0.8)$, and $(0.1, 0.9)$
+intervals, respectively.  This visualization can obscure correlations amongst
+the bins, but it serves as a useful summary of the full prior predictive
+distribution.
 
 ```{r}
 B <- 40
@@ -498,8 +572,8 @@ length(simu_ys[simu_ys > 25]) / length(simu_ys)
 
 Now we are ready to generate and analyze inferences from each of our
 replications.  Because each replication can be analyzed independently this
-analysis is embarrassingly parallel which allows us to exploit the many common
-parallel architectures.
+analysis is embarrassingly parallel which allows us to exploit the increasingly
+common parallel computing resources.
 
 Because this particular model can be fit so quickly I am parallelizing over
 replications instead of, say, parallelizing the Markov chains run to fit each
@@ -523,10 +597,8 @@ tryCatch({
     # Fit the simulated observation
     input_data <- list("N" = N, "y" = simu_y)
 
-    sink(file="/dev/null")
-    library(rstan)
-    fit <- sampling(fit_model, data=input_data, seed=4938483)
-    sink()
+    capture.output(library(rstan))
+    capture.output(fit <- sampling(fit_model, data=input_data, seed=4938483))
 
     # Compute diagnostics
     util <- new.env()
@@ -814,10 +886,8 @@ tryCatch({
     # Fit the simulated observation
     input_data <- list("N" = N, "y" = simu_y)
 
-    sink(file="/dev/null")
-    library(rstan)
-    fit <- sampling(fit_model, data=input_data, seed=4938483)
-    sink()
+    capture.output(library(rstan))
+    capture.output(fit <- sampling(fit_model, data=input_data, seed=4938483))
 
     # Compute diagnostics
     util <- new.env()
@@ -888,7 +958,7 @@ distribution responsible for generating the excess zeroes.
 Our domain expertise informs us that the source intensity and observation time
 are large enough that zero counts should be rare for a working detector.  This
 information, however, was not encoded in our model and manifested in
-computational problems that brought the issue to our attention.  Interestingly
+computational problems that brought the issue to our attention.  Indeed
 computational problems have a knack for identifying limitations in models,
 providing even more motivation to watch them carefully.
 
@@ -1056,10 +1126,8 @@ tryCatch({
     # Fit the simulated observation
     input_data <- list("N" = N, "y" = simu_y)
 
-    sink(file="/dev/null")
-    library(rstan)
-    fit <- sampling(fit_model, data=input_data, seed=4938483)
-    sink()
+    capture.output(library(rstan))
+    capture.output(fit <- sampling(fit_model, data=input_data, seed=4938483))
 
     # Compute diagnostics
     util <- new.env()
@@ -1261,7 +1329,7 @@ Suspicious of the experimental setup under which the data were collected we ask
 to meet with the student who ran the experiment.  When we bring up the odd
 behavior we saw the student seems nonchalant.  "Oh, you mean like when the
 detectors didn't read out anything at all?" they say. "I just repeated the
-measurement for each detector until they reported an actual value."
+measurement for each detector until they reported an actual value." they say.
 
 And there it is.  The readout system for detectors seems to be vulnerable to
 overloading when the counts surpass a given value, returning no value at all.
@@ -1288,7 +1356,8 @@ the counts.  Ideally we would treat the censoring threshold as a systematic
 parameter here and infer it with uncertainties to avoid overfitting to our one
 observation.  Unfortunately that model is a bit ungainly, so for pedagogical
 simplification we will take the fixed threshold of $y = 14$ implied by the
-observed data.
+observed data assuming that it too is consistent with our hypothetical domain
+expertise.
 
 ```{r}
 writeLines(readLines("generative_ensemble4.stan"))
@@ -1376,10 +1445,8 @@ tryCatch({
     # Fit the simulated observation
     input_data <- list("N" = N, "y" = simu_y)
 
-    sink(file="/dev/null")
-    library(rstan)
-    fit <- sampling(fit_model, data=input_data, seed=4938483)
-    sink()
+    capture.output(library(rstan))
+    capture.output(fit <- sampling(fit_model, data=input_data, seed=4938483))
 
     # Compute diagnostics
     util <- new.env()
@@ -1565,14 +1632,15 @@ detectors do not report any counts at all.
 # Discussion
 
 By very carefully following a principled Bayesian workflow we were able to
-develop a model that incorporated enough domain expertise to achieve a
-reasonable fit to our observed data.  Indeed the progression of the workflow
-itself helped to inform which domain expertise we need to incorporate, and
-in particular when we needed to follow up with colleagues to better understand
-the circumstances of the experiment.  By minding this domain expertise, and not
-simply fitting to the potentially irrelevant details of the observed data, we
-ensured a final model that is robust to overfitting and should generalize well
-to application on new observations.
+answer the questions proposed in [Section One](#sec:questions) and develop a
+model that incorporated enough domain expertise to achieve a reasonable fit to
+our observed data.  Indeed the progression of the workflow itself helped to
+inform which domain expertise we need to incorporate, and in particular when we
+needed to follow up with colleagues to better understand the circumstances of
+the experiment.  By minding this domain expertise, and not simply fitting to the
+potentially irrelevant details of the observed data, we ensured a final model
+that is robust to overfitting and should generalize well to application on new
+observations.
 
 That said, this workflow makes no claim that the final model is correct in any
 absolute sense.  Our ability to critique the model is limited by the specific
@@ -1585,7 +1653,7 @@ uniformly in time or space.  A principled workflow doesn't yield the correct
 model but rather a model that has been iteratively improved to meet the needs
 of a given inferential task.
 
-While the workflow is structured it is not automatic, requiring careful and
+While the workflow is structured, it is not automatic and requires careful and
 customized consideration of our domain expertise in the scope of our modeling
 assumptions at each step.  Moreover the workflow isn't cheap, requiring
 significant computational resources to fully exploit it even on this relatively
@@ -1594,6 +1662,8 @@ powerful model robust to many of the pathologies that can lead to biased
 inferences and faulty scientific insights.
 
 # Acknowledgements
+
+I thank Sean Talts for helpful comments.
 
 # Original Computing Environment
 
