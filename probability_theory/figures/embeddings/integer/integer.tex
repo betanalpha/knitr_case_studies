@@ -1,0 +1,60 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\newcommand*{\offset}{0.025}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.35, thick]
+
+  \draw [color=white] (-21, -5) rectangle (21, 0);
+
+  \foreach \i in {0, 1, ..., 5} {
+    \fill [] (2 * \i - 18, 0) circle(0.15)
+    node[below, yshift=-5] { $\i$ };
+  } 
+  \fill [] (-6, 0) circle(0.15); 
+  \draw [->, >=stealth, line width=1, color=black] (-6, 0) -- +(1, 0);
+  
+  \node[] at (-13, -3) { $\mathbb{N}$ };
+  
+  \node[] at (0, -3) { $\iota: \mathbb{N} \rightarrow \mathbb{R}$ };
+
+  \draw [<->, >=stealth, line width=1, color=gray80] (5, 0) -- +(16, 0);
+  \node[] at (13, -3) { $\mathbb{R}$ };
+  
+  \foreach \i in {0, 1, ..., 5} {
+    \draw [line width=1, color=gray80, text=black] (2 * \i + 8, 0.5) -- +(0, -1)
+    node[below] { $\i$ };
+  }  
+  \fill [] (20, 0) circle(0.15); 
+  \draw [->, >=stealth, line width=1, color=black] (20, 0) -- +(1, 0);
+  
+  
+  \foreach \i in {0, 1, ..., 5} {
+    \fill [] (2 * \i + 8, 0) circle(0.15)
+    node[below, yshift=-5] { $\i$ };
+  }  
+  
+\end{tikzpicture}
+
+\end{document}  
