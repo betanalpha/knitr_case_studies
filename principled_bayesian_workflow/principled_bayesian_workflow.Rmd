@@ -412,7 +412,7 @@ instructed to train a suite of detectors onto a specimen that emits a constant
 flow of particles.  They dutifully collected data and collated it into a file
 which has arrived in our inbox.
 
-Before evening reading the email we set up our local `R` environment.
+Before even reading the email we set up our local `R` environment.
 
 ```{r}
 library(rstan)
@@ -758,7 +758,7 @@ lines(x, pad_obs, col="black", lty=1, lw=2)
 Unfortunately the posterior predictive check indicates a serious excess of
 zeros above what we'd expect from Poissonian observations alone.  Our model is
 not flexible enough to capture both the peak at zero and the bulk away from
-zero, instead trying to compromise between these two behavior and capturing
+zero, instead trying to compromise between these two behaviors and capturing
 neither particularly well.  This experiment isn't quite as simple as it first
 appeared.
 
@@ -990,7 +990,7 @@ As does the utility of the histogram summary.
 
 ### Step Four: Build a Generative Model
 
-We not need to introduce more prior distributions that separate the behavior
+We need to introduce more prior distributions that separate the behavior
 of the working detectors and the malfunctioning detectors, but we have to be
 careful to avoid using the observed data to inform these prior distributions
 lest we introduce the potential for overfitting to that observation.  Instead
@@ -1334,7 +1334,7 @@ measurement for each detector until they reported an actual value." they say.
 And there it is.  The readout system for detectors seems to be vulnerable to
 overloading when the counts surpass a given value, returning no value at all.
 When the student repeated the measurement for detectors in this state they
-unintentionally induced a _censored obsevation_ where the Poisson distribution
+unintentionally induced a _censored observation_ where the Poisson distribution
 for the observations is cutoff at a certain value.
 
 ### Step Two: Define Observations {-}
@@ -1588,7 +1588,7 @@ col=c_dark, border=c_dark_highlight)
 
 ### Step Seven: Analyze the Posterior Predictive Distribution {-}
 
-Anxiously we move onto the posterior predictive check,
+Anxiously we move on to the posterior predictive check,
 
 ```{r}
 B <- 20
@@ -1647,7 +1647,7 @@ absolute sense.  Our ability to critique the model is limited by the specific
 questions we ask and the information encoded in the observed data.  Indeed more
 thorough questions or additional data might demonstrate limitations of our
 concluding model and the need for further iterations.  Our detectors, for
-example, may not have identical responses, and that may response may not be so
+example, may not have identical responses, and that may not be so
 static in time.  Similarly the source being measured may not emit particles
 uniformly in time or space.  A principled workflow doesn't yield the correct
 model but rather a model that has been iteratively improved to meet the needs
