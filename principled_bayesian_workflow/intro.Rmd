@@ -1,0 +1,965 @@
+---
+title: "A Principled Bayesian Workflow"
+author: "Michael Betancourt"
+date: "October 2018"
+bibliography: principled_bayesian_workflow.bib
+output:
+  html_document:
+    fig_caption: yes
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 3
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
+
+Given the a probabilistic model and a particular observation, Bayesian inference 
+is straightforward to implement.  Inferences, and any decisions based upon them, 
+follow immediately in the form of expectations with respect to the corresponding
+posterior distribution.  Building a probabilistic model that is useful in a 
+given application, however, is a far more open-ended challenge.  Unfortunately 
+the process of model building is often ignored in introductory texts, leaving 
+practitioners to piece together their own model building workflow from 
+potentially incomplete or even inconsistent heuristics.
+
+In this case study I introduce a _principled_ workflow for building
+and evaluating probabilistic models in Bayesian inference.  This workflow is
+based on recent research in collaboration with Dan Simpson, Aki Vehtari, Sean
+Talts, and others; see, for example, @GabryEtAl:2017.  The specific workflow
+that I advocated here, however, is my particular take on this research focused
+on the needs for modeling and inference in the physical sciences.  It does not
+necessarily reflect the perspectives of any of my collaborators and may prove
+to be limiting in other applications.
+
+Moreover, as this workflow is an active topic of research it is subject to
+evolution and refinement. Use at your own risk.  But at the same time _don't_
+use at your own risk.  Better yet build a calibrated model, infer the relative
+risks, and then make a principled decision...
+
+We begin with a review of Bayesian inference and then a discussion of what 
+properties we want in a probabilistic model and in what ways we can validate
+those properties.  I then introduce a workflow that implements these validates
+to guid the development of a useful model, emphasizing the role of each step and 
+the expertise needed to implement it well.  Once the workflow has been laid out 
+I demonstrate its application on a seemingly simple analysis that hides a few 
+surprises.
+
+# Bayesian Modeling and Inference
+
+In order to avoid any confusion let's first review the foundational concepts
+in Bayesian inference.  Be aware that I'll be taking an experimental perspective 
+here, and that perspective may clash with different philosophical perspectives
+on Bayesian inference or statistics in general that are often emphasized in
+introductory texts.  Fortunately, in many cases the differences between these 
+perspectives don't make any practical difference.
+
+Let's first consider some phenomenon about which we want to learn.  Further 
+let's assume that this phenomenon manifests in some latent system with which we 
+can interact.  Importantly, this latent system contains not only the phenomenon 
+of interest but also the environment that exhibits the phenomenon.
+
+In order to learn about this phenomenon we then design an experiment that 
+implements a _measurement process_.  The measurement probes the latent system,
+generating data sensitive to the phenomenon of interest.  Each realization of
+the measurement process results in an _observation_, $\tilde{y}$, that is an
+element of an _observation space_, $Y$.
+
+The measurement process however, is not deterministic.  There may be 
+_ontological_ variability that results in different observations every time we 
+probe the latent system, or _epistemic_ uncertainty that limits how accurately 
+we can resolve the measurement.  Regardless of its interpretation, we presume
+that this complication is sufficiently regular that it can be quantified in a
+probability distribution that we denote the _true data generating process_,
+$\pi^{\dagger}$.  Ultimately the best we can learn about the underlying 
+latent system and the phenomenon of interest is this true data generating
+process itself.
+
+Although we presume that a true data generating process exists, we don't know
+what form it will take in a given application.  The space of all possible data
+generating processes, $\mathcal{P}$, is far too large and mathematically 
+ungainly to consider, so in practice we have to limit our search to a 
+_small world_, $\mathcal{S}$, or _observational model_ of possible data 
+generating processes.  
+
+<br><br>
+![](figures/small_world/small_world/small_world.png)
+<br><br>
+
+Each element of the observational model, or each _model configuration_, defines 
+a probability distribution over the observation space which quantifies a 
+mathematical narrative of how the data could be generated, encapsulating the 
+phenomenon of interest as well as any systematic phenomena encountered from the 
+latent system through the measurement process.  We can then use the assumed
+observational model to learn from observations, making inferences and informing 
+decisions about the latent system that we're studying.  In practice we specify 
+an observational model with a collection of probability densities, 
+$\pi_{S} (y ; \theta)$, with each _parameter_ $\theta$ identifying a model 
+configuration.
+
+<br><br>
+![](figures/model_config/model_config.png)
+<br><br>
+
+Bayesian inference encodes information about the observational model into 
+probability distributions -- the more probability a distribution assigns to a 
+neighborhood of model configurations, the more consistent those model 
+configurations are with our available information.  From this perspective the 
+model configuration space is no longer just a collection of data generating 
+processes but also a conditional probability distribution over the combination 
+of the observation space and the small world,
+$$
+\pi_{S}(y ; \theta) = \pi_{S}(y \mid \theta).
+$$
+
+Introducing a _prior distribution_, $\pi_{S}(\theta)$, that encodes domain 
+expertise about the measurement process and latent system complements the 
+observational model to give a _Bayesian joint distribution_,
+$$
+\pi_{S}(y, \theta) = \pi_{S}(y ; \theta) \pi_{S}(\theta).
+$$
+Given the an explicit observation, $\tilde{y}$, this joint distribution then
+defines a _posterior distribution_ that concentrates on those model
+configurations consistent with both our domain expertise and the measurement,
+$$
+\pi_{S}(\theta \mid \tilde{y}) 
+= 
+\frac{ \pi_{S}(\tilde{y}, \theta) }{ \pi_{S}(\tilde{y}) }
+\propto
+\pi_{S}(\tilde{y}, \theta).
+$$
+
+We can also interpret this process as _updating_ the prior distribution into
+a posterior distribution,
+$$
+\pi_{S}(\theta \mid \tilde{y}) 
+=
+\left( \frac{ \pi_{S}(\tilde{y} \mid \theta) }{ \pi_{S}(\tilde{y}) } \right)
+\pi_{S}(\theta),
+$$ 
+which makes the inherently learning process more evident.  Our information
+after the observation, encoded in the posterior, is just our information
+before the observation, encoded in the prior, plus the information we learn
+from the observation, encoded in the ratio 
+$\pi_{S}(\tilde{y} \mid \theta) / \pi_{S}(\tilde{y})$.
+
+<br><br>
+![](figures/bayes/bayes.png)
+<br><br>
+
+Any inferential query we have can then be answered as an appropriate expectation 
+with respect to the posterior distribution.  For example, where in the small 
+world the most consistent model configurations concentrate can be quantified 
+with the mean or the median.  The breadth of this concentration can be 
+quantified with the standard deviation or tail quantiles.
+
+# Questioning Authority {#sec:questions}
+
+Bayesian inference is straightforward to implement, at least conceptually,
+given an observational model and a prior distribution or, equivalently, the 
+joint distribution, $\pi_{S}(y, \theta)$.  The utility of any inferences we 
+generate, however, are completely dependent on this assumed model.  A poor
+model might readily yield inferences, but those inferences will be of little
+use in practice and may even be dangerous in critical applications.
+
+But what characterizes a useful probabilistic model?  Ideally the model would be
+consistent with our domain expertise, capturing not necessarily all of our 
+knowledge of the experimental design but just enough to answer the scientific
+questions of interest.  It would also help if the model didn't obstruct our
+available computational tools, so that we could accurately compute posterior
+expectation values and faithfully represent out inferences.  Finally, we would 
+hope that our model is rich enough to capture the structure of the true data 
+generating process needed to answer the relevant questions.
+
+Consequently we can verify the utility of a model in a given application by
+answering four questions.
+
+#### Question One: Domain Expertise Consistency {- #sec:question_one}
+
+_Is our model consistent with our domain expertise?_
+
+#### Question Two: Computational Faithfulness {- #sec:question_two}
+
+_Are our computational tools sufficient to accurately fit the model?_
+
+#### Question Three: Model Sensitivity {- #sec:question_three}
+
+_How do we expect our inferences to perform over the possible realizations of
+the measurement process?_
+
+#### Question Four: Model Adequacy {- #sec:question_four}
+
+_Is our model rich enough to capture the relevant structure of the true data
+generating process?_
+
+These questions can be challenging to answer even in simple applications, but
+with careful analysis of a given model we can assemble the necessary evidence to 
+answer each of the four questions well enough to identify practical problems 
+with the model.
+
+## Domain Expertise Consistency 
+
+A common refrain is to "let the data speak for itself".  In a statistical
+analysis, however, the data speak only through the observational model, and the
+observational model isn't always so talkative.
+
+When the _likelihood function_, $\pi_{S}(\tilde{y} \mid \theta)$, concentrates
+in a small neighborhood of parameter space then the structure of the prior isn't
+particularly important.  The information we learn from the observation dominates
+the form of the posterior distribution.
+
+<br><br>
+![](figures/joint_triptych/joint_triptych_one/joint_triptych_one.png)
+<br><br>
+
+The observational model, however, isn't always so well-behaved.  Sometimes the
+experimental design isn't sufficiently sensitive to the phenomena of interest,
+which manifests in a _weakly-identified_ likelihood function that spans huge
+regions of the model configuration space, or even a _non-identified_ likelihood
+function that extends all the way to infinity.  In these cases the form of the
+posterior is dominated by the form of the prior, and a careless prior propagates
+to a careless posterior.
+
+<br><br>
+![](figures/joint_triptych/joint_triptych_two/joint_triptych_two.png)
+<br><br>
+
+In order to compensate for poor identification in the likelihood function we
+need the prior distribution to incorporate just enough domain expertise to
+suppress extreme, although not impossible, model configurations.
+
+<br><br>
+![](figures/joint_triptych/joint_triptych_three/joint_triptych_three.png)
+<br><br>
+
+That said, the success of a _containment prior_ depends on how the prior 
+interacts with the likelihood function, and in sophisticated models these
+interactions can be difficult to analyze.  In practice it's often easiest to
+study how these interactions affect observations predicted by the model.
+
+The _prior predictive distribution_,
+$$
+\pi_{S}(y) = \int \mathrm{d} \theta \, \pi_{S}(y, \theta),
+$$
+averages each data generating process within the observational model over the
+prior distribution, quantifying the range of observations that the model would
+predict using only its own assumptions.  A model predicting too many 
+observations that are considered extreme within the scope of our domain
+expertise conflicts with that domain expertise.
+
+Analyzing the posterior predictive distribution, however, is not particularly
+straightforward when the the observation space is high-dimensional.  In this
+case we have to consider _summary statistics_ that project the observational
+space to some lower dimensional space that's more amenable to visualization and
+comparable to our domain expertise.  For example we might project the 
+observations to a one-dimensional summary, $t : Y \rightarrow \mathbb{R}$, or
+even a structured summary like a histogram or empirical cumulative distribution
+function.  Constructing an interpretable summary statistic is a fine art.
+
+Once a summary statistic has been chosen we can then identify which values
+of the summary statistic correspond to observations that begin to become 
+extreme.  For example, if we're observing how quickly a drug propagates through
+a patient's blood stream we can be fairly confident that the observed 
+propagation speed will be less than the speed of sound in water as a drug dose
+traveling that fast would have unfortunately physical consequences.  Similarly,
+if we're observing carbon in the air then we don't want our model predictive
+carbon concentrations more characteristic of concrete than breathable air.
+If we're observing the migration of birds then we can be fairly sure that we
+won't observe any particularly fit individuals approaching the speed of light.
+In practice these thresholds are readily identified with a cursory examination 
+of the available domain expertise, especially if the summary statistics are
+well-chosen.
+
+With a summary statistic and thresholds in hand a _prior predictive check_
+follows immediately.  We simply push the prior predictive distribution forward
+along the summary statistic, the corresponding probability density 
+$\pi_{S*}(t)$, here show in dark red, and then compare how much probability 
+leaks past the threshold and into the extreme values, here shown in light red.
+
+<br><br>
+![](figures/prior_predictive/prior_predictive_theory/prior_predictive_theory.png)
+<br><br>
+
+In practice we typically can't construct the probability density function for
+this pushforward distribution analytically, but we can approximate it using 
+samples from the joint distribution.  Sampling
+$$
+\begin{align*}
+\tilde{\theta} &\sim \pi_{S}(\theta)
+\\
+\tilde{y} &\sim \pi_{S}(y \mid \tilde{\theta})
+\end{align*}
+$$
+yields samples from the joint distribution, $(\tilde{y}, \tilde{\theta})$,
+and evaluating the summary statistic at the simulated observations,
+$$
+t(\tilde{y})
+$$
+yields samples from the pushforward of the prior predictive distribution that
+we can, for example, use to construct a histogram.
+
+<br><br>
+![](figures/prior_predictive/prior_predictive_practice/prior_predictive_practice.png)
+<br><br>
+
+The model shouldn't predict no observations past the thresholds -- extreme
+observations are unreasonable but not impossible after all.  Instead what we
+want to look for is excessive predictions past the thresholds which is often a
+more qualitative judgement than quantitative judgement.  Indeed visualizations 
+of the pushforward distributions are a powerful way to elicit qualitative 
+information from domain experts unfamiliar with statistics.  The emphasis on
+the observation space is often more interpretable than the configurations of a
+specific observational model and the emphasis on extremes allows the experts to 
+reject which they are often less reluctant to do than accept.
+
+The idea of analyzing the prior predictive distribution goes back to Good's 
+_device of imaginary results_ [@Good:1950], which conveniently also gives its 
+user +2 to Wisdom saving throws.
+
+## Computational Faithfulness
+
+A model is only as good as our ability to wield it.  In Bayesian inference, a
+model is only as good as our ability to compute expectation values with respect
+to the posterior distributions it generates.  Robust methods that offer a
+self-diagnostics capable of identifying inaccurate computation, such as 
+Hamiltonian Monte Carlo, are extremely powerful in this regard as they provide
+some confidence that we can realize the inferences of our model.  
+
+If these diagnostics are available then the prior predictive distribution 
+proves further useful.  Fitting observations simulated from the prior 
+predictive distribution allows us check the performance of our chosen Bayesian 
+computational method over the range of reasonable posterior distributions.
+
+What can we do, however, if our method isn't self-diagnostic?  Fortunately the
+joint distribution implies a subtle consistency property that allows us to 
+check _any_ method capable of generating posterior samples.  If we average the
+posterior distributions from observations drawn from the prior predictive 
+distribution then we will _always_ recover the prior distribution,
+$$
+\pi_{S}(\theta') 
+= 
+\int \mathrm{d} y \, \mathrm{d} \theta \,
+\pi_{S} (\theta' \mid y) \pi_{S} (y, \theta).
+$$
+In particular this implies that the ensemble of posterior samples,
+$$
+\begin{align*}
+\tilde{\theta} &\sim \pi_{S}(\theta)
+\\
+\tilde{y} &\sim \pi_{S}(y \mid \tilde{\theta})
+\\
+\tilde{\theta}' &\sim \pi(\theta \mid \tilde{y}),
+\end{align*}
+$$
+will always be identical to samples from the prior distribution.  Any
+deviation between the two samples indicates that either our model has been 
+incorrectly implemented or our computational method is generating biased
+samples.
+
+_Simulated-based calibration_ [@TaltsEtAl:2018] compares the ensemble posterior
+sample and the prior sample using _ranks_.  For each simulated observation we
+generate $R$ samples from the corresponding posterior distribution,
+$$
+\begin{align*}
+\tilde{\theta} &\sim \pi_{S}(\theta)
+\\
+\tilde{y} &\sim \pi_{S}(y \mid \tilde{\theta})
+\\\
+(\tilde{\theta}'_{1}, \ldots, \tilde{\theta}'_{R}) &\sim \pi(\theta \mid \tilde{y}),
+\end{align*}
+$$
+and compute the rank of the prior sample within the posterior samples, i.e.
+the number of posterior samples larger than the prior sample,
+$$
+\rho = \sharp \left\{ \tilde{\theta} < \tilde{\theta}'_{r} \right\}.
+$$
+If the ensemble posterior sample and the prior sample are equivalent then these
+ranks should be uniformly distributed, which we can quickly analyze for each
+parameter in the model configuration space using a histogram.
+
+<br><br>
+![](figures/sbc/sbc.png)
+<br><br>
+
+Here the grey band demonstrates the expected variation of truly uniform ranks.
+Deviation outside of these bands indicates computational problems.
+
+Technically this method requires exact posterior samples, which are not 
+available if we using, for example, Markov chain Monte Carlo.  In this case we
+have to first thin our Markov chains to remove any effective autocorrelation.
+See [@TaltsEtAl:2018] for more details.
+
+## Model Sensitivity
+
+The scope of reasonable observations and model configurations quantified within
+the Bayesian joint distribution also provides a way to analyze the range of 
+inferential outcomes we should expect, and in particular _calibrate_ them with
+respect to the simulated truths.
+
+For example, let's say that we have some _decision making process_ that takes in
+an observation as input and returns an action from the space of possible 
+actions, $A$,
+$$
+\begin{alignat*}{6}
+\a :\; &Y& &\rightarrow& \; &A&
+\\
+&y& &\mapsto& &a(y)&.
+\end{alignat*}
+$$
+This process might be a Bayesian decision theoretical process informed by
+posterior expectation, but it need not be.  It could just as easily be a
+process to reject or accept a null hypothesis using an orthodox significance 
+test.
+
+Further let's say that the benefit of taking action $a \in A$ when the true
+data generating process is given by the model configuration $\theta$ is
+$$
+\begin{alignat*}{6}
+U :\; &A \times \mathcal{S}& &\rightarrow& \; &\mathbb{R}&
+\\
+&(a, \theta)& &\mapsto& &U(a, \theta)&.
+\end{alignat*}
+$$
+For example this might be a false discovery rate or the benefits of an 
+intervention minus any of its implementation costs.  In this context the utility 
+of a decision making process for a given observation becomes  
+$$
+\begin{alignat*}{6}
+U_{a} :\; &Y& &\rightarrow& \; &\mathbb{R}&
+\\
+&(y, \theta)& &\mapsto& &U(a(y), \theta)&.
+\end{alignat*}
+$$
+
+Before the measurement process resolves we don't know what the observation will
+be, nor do we know what the true data generating process will be.  If we 
+assume that our model is rich enough to capture the true data generating 
+process, however, then the joint distribution quantifies the possibilities.
+Consequently we can construct the distribution of possible utilities by 
+pushing the Bayesian joint distribution forward along the utility function
+$U_{a}$.
+
+<br><br>
+![](figures/sensitivity/sensitivity_theory/sensitivity_theory.png)
+<br><br>
+
+As with the prior predictive check, we can implement this pushforward in
+practice readily using samples from the joint distribution,
+$$
+\begin{align*}
+\tilde{\theta} &\sim \pi_{S}(\theta)
+\\
+\tilde{y} &\sim \pi_{S}(y \mid \tilde{\theta})
+\\\
+U(a(\tilde{y}), \tilde{\theta}).
+\end{align*}
+$$
+
+<br><br>
+![](figures/sensitivity/sensitivity_practice/sensitivity_practice.png)
+<br><br>
+
+This distribution of utilities is particularly useful for understanding how
+sensitive the measurement process is to the relevant features of the latent
+system that we're studying.  By carefully quantifying what we want to learn in
+the experiment into a utility function we can formalize how capabile our model
+is at answering those questions.
+
+We can also take a less application-specific approach and use the Bayesian joint 
+distribution to characterize the general performance of our inferences and
+capture any pathologies that might be lurking within the assumptions of our
+model.
+
+Consider, for example, the _posterior $z$-score_ of a given parameter in the
+model configuration space,
+$$
+z = \left|
+\frac{ \mu_{\mathrm{post}} - \tilde{\theta} }
+{ \sigma_{\mathrm{post}} } \right|.
+$$
+The posterior $z$-score quantifies how accurately the posterior recovers the 
+true model configuration, with smaller values indicating a posterior that
+concentrates more tightly around the corresponding true parameter and larger
+values indicating a posterior that concentrates elsewhere.
+
+Similarly, the _posterior shrinkage_ of a given parameter,
+$$
+s = 1 -
+\frac{ \sigma^{2}_{\mathrm{post}} }
+{ \sigma^{2}_{\mathrm{prior}} },
+$$
+quantifies how much the posterior learns about that parameter from a given 
+observation.  Shrinkage near zero indicates that the data provide little 
+information beyond the domain expertise encoded in the prior distribution, while 
+shrinkage near one indicates observations that strongly inform this parameter.
+
+Conveniently, these two posterior expectations can capture an array of 
+pathological behavior that typically compromises our inferences.  For example,
+a posterior with high posterior shrinkage and high posterior $z$-score 
+indicates a model that overfits to the variation in the measurement and is
+unable to accurately recover the true model configuration.  A posterior with
+small posterior shrinkage and small posterior $z$-scores indicates a model that
+is poorly informed by the observations, where as a posterior with small 
+posterior shrinkage and large posterior $z$-scores indicates a model with
+substantial conflict between the observational model and the prior distribution.
+
+If we fit the posterior for each observation in an ensemble of samples from
+the Bayesian joint distribution then we can visualize the distribution of
+posterior $z$-scores and posterior shrinkages with a scatter plot of each
+posterior's behavior and quickly identify potential problems.
+
+<br><br>
+![](figures/eye_chart/eye_chart_regimes.png)
+<br><br>
+
+## Model Adequacy
+
+Finally we can consider the adequacy of our model to capture the relevant
+structure of the true data generating process.
+
+If our model is sufficiently rich then the small world might contain the true
+data generating process and inferences within the small world might identify 
+that true data generating process.  In practice, however, reality is much richer 
+than any model we could feasibly implement and the small world is unlikely to
+contain the true data generating process.
+
+<br><br>
+![](figures/small_world/small_world_one/small_world_one.png)
+<br><br>
+
+In this more realistic scenario the posteriors can't concentrate around the true
+data generating process, and instead must be resort to concentrating around the
+model configurations within the small world that best approximate the true data
+generating process.
+
+<br><br>
+![](figures/small_world/small_world_two/small_world_two.png)
+<br><br>
+
+The pertinent question is then not whether or not our small world contains the
+true data generating process but rather whether or not our small world is 
+_close enough_ to the true data generating process.  To paraphrase George Box,
+our model is probably wrong, but is it useful?
+
+Consequently, in order to quantify the adequacy of our model we need to 
+determine how close it is to the true data generating process, and in order to 
+do that we need to summarize our inferences into a predictive distribution that 
+we can directly compare to the true data generating process. For that we 
+appeal to the _posterior predictive distribution_,
+$$
+\pi_{S}(y \mid \tilde{y}) 
+= 
+\int \mathrm{d} \theta \, \pi_{S}(y \mid \theta) \, \pi_{S}(\theta \mid \tilde{y}),
+$$
+which averages all of the data generating process within the observational model 
+over the posterior distribution, quantifying the range of predictions consistent 
+with both our domain expertise and the observation, $\tilde{y}$.  
+
+If we want to compare the whole of the posterior predictive distribution and the 
+true data generating process, then some reasonable assumptions quickly lead us
+to the _Kullback-Leibler divergence_, 
+$KL(\pi^{\dagger}(y) \mid \mid \pi_{S}(y \mid \tilde{y})) [@Betancourt:2015b]
+which vanishes when the two distributions are identical and monotonically
+increases as they deviate.  Unfortunately we can't compute this divergence 
+without knowing the true data generating process!  Instead we have to 
+_approximate_ the divergence using just our observed data, which ultimately
+yields Bayesian cross validation and the many information criteria that 
+further approximate that.  Importantly in this series of approximations we
+lose the ability to estimate absolute divergences and instead can estimate only
+_differences_ between divergences from the posterior predictive distributions of
+different models.  This makes these approximations useful for model comparison, 
+but not determining the adequacy of a single model in isolation.
+
+There's also a deeper issue with comprehensive measures like the 
+Kullback-Leibler divergence between the posterior predictive distribution and
+the true data generating process.  We know our model will not capture every 
+intimate detail of reality, but we really only want our model to capture those
+details relevant to the inferences that we want to make.  If we're modeling
+bird migration then we don't have any need to model the irrelevant effects of
+quantum mechanics or general relativity!  Comprehensive measures are often
+strongly effected by these irrelevant differences, making it difficult to 
+isolate the differences about which we do care.
+
+Fortunately we've already thought about isolating the features of the 
+observation space relevant to our scientific questions -- they're exactly what
+motivated the summary statistics we would use for a prior predictive check!
+Consequently we can reuse those summary statistics to construct _posterior
+predictive checks_ that visually compare the pushforwards of the posterior 
+predictive distribution, $\pi_{S* \mid Y}(t \mid \tilde{y})$, to the observed
+summary statistic, $t(\tilde{y})$.
+
+If the observed summary statistic, here shown in light red, falls within the 
+bulk of the pushforward distribution, here shown in dark red, then our model is
+doing an adequate job of modeling the behaviors captured by the summary 
+statistic.
+
+<br><br>
+![](figures/posterior_predictive/posterior_predictive_good/posterior_predictive_good.png)
+<br><br>
+
+If the observed summary statistic falls in the tails of the pushforwad 
+distribution, however, then the situation is not so clear.
+<br><br>
+![](figures/posterior_predictive/posterior_predictive_bad/posterior_predictive_bad.png)
+<br><br>
+
+Unfortunately we can't discriminate between our observation being a rare but not
+impossible extreme and our model being insufficiently sophisticated to capture 
+the relevant structure of the true data generating process that manifests in the 
+summary statistic.  Instead we have to rely on our domain expertise to identify
+possible _model expansions_ that could resolve this discrepancy without 
+compromising our inferences if the discrepancy isn't really there.
+
+As with prior predictive checks, in practice we typically can't construct the 
+probability density function for these pushforward distributions analytically 
+in order to implement a posterior predictive check.  We can, however, readily
+approximate it with samples from the posterior predictive distribution,
+$$
+\tilde{y}' \sim \pi_{S}(\theta \mid \tilde{y}),
+$$
+on which we then evaluate our summary statistics, 
+$$
+t(\tilde{y}')
+$$
+to give samples from the pushforwards of the posterior predictive distribution.
+
+<br><br>
+![](figures/posterior_predictive/posterior_predictive_practice/posterior_predictive_practice.png)
+<br><br>
+
+Posterior predictive checks date back to @Rubin:1984.  
+
+# Building a Mystery
+
+What happens when a model fails to meet respond well to one or more of these
+questions?  We have to consider improving the model or, occasionally, changing
+the ambition of our analysis.  The goal of a principled Bayesian workflow is to
+guide a practitioner through the analysis of these questions, providing enough
+information in the case of failure to identify how the model needs to improve.
+This workflow can then guide the development of the model itself.
+
+Aspirational model.
+
+Simple model.
+
+<br><br>
+![](figures/asp_simple/asp_simple.png)
+<br><br>
+
+Differences motivate summary statistics.
+
+<br><br>
+![](figures/asp_simple_diff/asp_simple_diff.png)
+<br><br>
+
+We then iterate. If the model proves adequate then we proceed to apply our 
+model, but if it fails then we use the structure of the failure to identify the 
+problem and motivate an expanded model.
+
+<br><br>
+![](figures/model_expansion/model_expansion.png)
+<br><br>
+
+Discussion of overfitting.
+
+# Work it, Make it, Do it, Makes Us Harder, Better, Faster, Stronger
+
+Questions can be answered in stages.
+The first three questions are asked before our measurement process resolves to
+a particular observation, considering instead the robustness of the model to
+the possible observations.  Even if we our observation is immediately available,
+however, these questions are important in understanding how to safely utilize
+resulting inferences.  The final question is asked once the observed data is
+available and the resulting inferences have been constructed.
+
+The workflow proposed here begins by exploring and quantifying our domain
+expertise in the context of a given analysis before developing an initial model.
+We next consider the holistic consequences of that model, spanning inferential
+and computational considerations, without reference to a particular observation
+in order to answer the first three questions.  Once those consequences have been
+understood and deemed acceptable the model is applied to a particular observation
+and the corresponding inferences critiqued.  If the model is judged insufficient
+to capture the relevant structure in observed data then it must be expanded, at
+which point we begin the workflow anew for the expanded model.
+
+Here _domain expertise_ refers to the experience of those responsible for
+collecting, curating, or otherwise manipulating the data as well as stakeholders
+who will make decisions using the final inferences or any intermediaries who
+will help stakeholders to make those decisions.  _Statistical expertise_ refers
+to proficiency in probabilistic modeling and computation.
+
+## Experimental Design {-}
+
+### Step One: Conceptual Analysis {- #sec:conceptual}
+
+Our first step is to conceptually model the observational process from the
+latent phenomenon being studied through its interactions with the environment
+and how those interactions manifest as observations.  We want to pay particular
+attention to the many possible systematic effects that influence this process
+but are not known with complete certainty.  This conceptual analysis yields
+informal narratives describing how observations are generated.
+
+**Requirements:** Domain Expertise
+
+### Step Two: Define Observations {- #sec:observation-space}
+
+Once a conceptual model has been developed we can take our first steps towards
+building a formal mathematical model by defining the space in which observations
+take values.  This may include, for example, the number of repetitions,
+subjects, groups, or components in each observation as well as the range of
+values each component can take.
+
+**Requirements:** Domain Expertise and Statistical Expertise
+
+### Step Three: Identify Relevant Summary Statistics {- #sec:summary_stats}
+
+Given an observation space we can now identify summary statistics that isolate
+particularly important properties of the experimental design, especially those
+details that are relevant to decision making and those that are expected to be
+difficult to model well.  By identifying the relevant structures within the
+observation space these summary statistics provide the basis for quantifying
+[Question One](#sec:question_one) and [Question Four](#sec:question_four).  In
+practice such summary statistics are typically given by one or two dimensional
+functions amenable to visualization.
+
+We also want to complement these summary statistics with conceptual expectations
+for what behaviors are reasonable, or, as is often easier to elicit in practice,
+what behaviors are _unreasonable_.
+
+**Requirements:** Domain Expertise
+
+## Modeling
+
+### Step Four: Build a Generative Model {- #sec:generative-model}
+
+With the observation space defined and scrutinized we can proceed to build and
+then analyze a full generative model of the observation process.  Initial
+model should be as simple as possible, possibly ignoring systematic effects of 
+the environment in which the system of interest is contained.  It should be just
+sophisticated enough to be able to answer the scientific question of interest.
+
+#### Build a Generative Observation Model {- #sec:observation-model}
+
+First we construct a generative model of the observation
+process, $\pi(y \mid \theta)$.  An ideal generative model is readily
+interpretable as a collection of mathematical narratives of how an observation
+is produced based on a given model configuration, $\theta$, translating the
+conceptual narrative produced in [Step One](#sec:conceptual) into a rigorous
+probabilistic model.
+
+Often the generative observation model is a crude approximation to the
+complexity of the true measurement process, but crude approximations are often
+sufficient to answer even sophisticated questions.  Still, we want to keep the
+approximate nature of our model in mind and consider also various extensions of
+the model, for example heterogeneities, time dependences, and other systematic
+effects.
+
+**Requirements:** Domain Expertise and Statistical Expertise
+
+#### Complete The Full Generative Model By Specifying Priors {- #sec:prior-model}
+
+We complete the generative model by complementing the observation model with a
+prior distribution for all unknown model configuration parameters,
+$\pi(\theta)$.  In particular we want to reason about the _scales_ of these
+parameters to motivate a prior distribution that incorporates enough information
+to ensure that the full generative model,
+$$
+\pi(y, \theta) = \pi(y \mid \theta) \, \pi(\theta),
+$$
+is well-behaved [@GelmanEtAl:2017a].
+
+Keep in mind that the separation of the generative model into an observation
+process and a prior distribution is not uniquely defined in a Bayesian model.
+Consider, for example, unobserved latent structure, $\pi(\theta \mid \phi)$,
+such as that arising in hierarchical models and hidden Markov models. We could
+equally well define the observation model as
+$\pi(y \mid \theta) \, \pi(\theta \mid \phi)$ with the prior distribution
+$\pi(\phi)$, or the observation model as $\pi(y \mid \theta)$ with the prior
+distribution $\pi(\theta \mid \phi) \, \pi(\phi)$.  Only the full generative
+model is uniquely defined.
+
+Consequently the focus here should be not on specifying prior distributions in
+isolation but rather _completing_ the observation model developed
+[above](#sec:observation-model) with probabilistic structure for the model
+configuration parameters as needed.  This might take the form of independent,
+one-dimensional prior distributions for each parameter or more sophisticated
+correlated distributions which introduce their own parameters that require
+another round of prior distributions.  It's probability distributions all the
+way down.
+
+**Requirements:** Domain Expertise and Statistical Expertise
+
+### Step Four: Update Summary Statistics {- #sec:generative-model}
+
+### Step Five: Analyze the Generative Ensemble {- #sec:analyze-generative}
+
+Before drawing inferences from a given observation we first want to analyze the
+scope of our generative model and compare to our domain expertise in order to
+provide some answer to [Question One](#sec:question_one),
+[Question Two](#sec:question_two), and [Question Three](#sec:question_three).
+
+To do that we first simulate parameters _and_ observations from the complete
+generative model.  Specifically, we simulate and then analyze ground truths
+from the prior and observations from the corresponding observation model,
+$$
+\begin{align*}
+\tilde{\theta} &\sim \pi(\theta)
+\\
+\tilde{y} &\sim \pi(y \mid \tilde{\theta} ),
+\end{align*}
+$$
+
+**Requirements:** Statistical Expertise
+
+#### Analyze the Prior Predictive Distribution {- #sec:prior-predictive}
+
+Analyzing the distribution of summary statistics constructed in
+[Step Three](#sec:summary_stats) for the simulated observations provides a
+natural evaluation of our modeling assumptions within the context of our domain
+expertise, answering [Question One](#sec:question_one).  
+
+If the behavior of the summary statistics for these simulated observations is
+not within the conceptual expectations defined
+in [Step Three](#sec:summary_stats) then we need to return to
+[Step Four](#sec:prior-model) and incorporate additional prior information to
+restrict the scope of model to reasonable behaviors.
+
+**Requirements:** Domain Expertise
+
+#### Fit the Simulated Observations and Evaluate {- #sec:fit-generative}
+
+For each simulated observation we can also attempt to construct a posterior
+distribution, $\pi(\theta \mid \tilde{y})$, with a given computational method
+and analyze the range of possible inferences [@Betancourt2018a] in order to
+answer [Question Two](#sec:question_two) and
+[Question Three](#sec:question_three).
+
+##### Evaluate Diagnostics {- #sec:diagnosics}
+
+If diagnostics of the given computational method, such as $\hat{R}$ for Markov
+chain Monte Carlo and divergences for Hamiltonian Monte Carlo, indicate
+inaccuracies in these fits then we need to consider retuning the method, or
+selecting another method altogether, and then repeating
+[Step Five](#sec:fit-generative).
+
+Correlating poor performance with the corresponding simulated ground truth can
+also help to identify regions of the model configuration space that may be
+ill-posed for practical computation.  These pathological behaviors imply extreme
+behavior in the posterior which often hints at tension between the model and our
+domain expertise.
+
+**Requirements:** Statistical Expertise
+
+##### Evaluate Prior-Posterior Consistency {-}
+
+ If performance is unsatisfactory then we need
+to consider retuning the method, or selecting another method altogether and then
+repeating [Step Five](#sec:fit-generative).
+
+**Requirements:** Statistical Expertise
+
+##### Analyze Posterior Behaviors {-}
+
+Assuming that we are accurately recovering posteriors across all of the
+simulated observations then we can proceed to analyze the range of behaviors in
+these posteriors.  For example, the _posterior $z$-score_ and the _posterior
+shrinkage_.
+
+If there are indications of undesired posterior behavior, such as overfitting or
+non-identifiability, then we need to return to [Step One](#sec:conceptual) and
+consider an improved experimental design or return to
+[Step Four](#sec:prior-model) and incorporate additional prior information to
+restrict the scope of model to reasonable behaviors.
+
+**Requirements:** Statistical Expertise
+
+##### Analyzing Posterior-Informed Decisions {-}
+
+If a posterior-informed decision-making process has been established then we can
+calibrate the performance of this process by comparing the decision derived from
+each posterior relative to the corresponding simulated ground truth.  For
+example, if a discovery claim has to be made then we at the very least want to
+compute the corresponding false discovery rate and true discovery rate within
+the context of our generative model.
+
+If the performance of the decision-making progress is insufficient then we need
+to return to [Step One](#sec:conceptual) and consider an improved experimental
+design or possibly return to [Step Four](#sec:prior-model) and incorporate
+additional prior information to restrict the scope of model to reasonable
+behaviors.
+
+**Requirements:** Domain Expertise and Statistical Expertise
+
+## Inference
+
+### Step Six: Fit the Observations and Evaluate {-}
+
+Once computation, inferences, and decision-making processes have been validated
+within the scope of the model assumptions, the analysis can be applied to the
+observed data and we can confront [Question Four](#sec:question_four).  Analysis
+of the resulting inference may suggest expanding the model, but any changes to
+the model after looking at the data introduce a vulnerability to overfitting and
+so we must be extremely vigilant to study the ensemble behavior in subsequent
+iterations of the workflow.
+
+Confident that we understand the consequence of our probabilistic model we can
+construct a posterior distribution from a given observation.  We have to be
+careful, however, as the previous validation of the computational method may not
+apply if the observed data is not within the scope of the generative model.
+Consequently we need to be careful to check any diagnostics of our method.
+
+If any diagnostics indicate poor performance then not only is our computational
+method suspect but also our generative model may not be rich enough to capture
+the relevant details of the observed data.  At the very least we should
+reconsider the tuning of our computational tools, but we may also want to
+consider going back to [Step Four](#sec:generative-model) and expanding our
+model so that it better captures the observation.
+
+**Requirements:** Statistical Expertise
+
+### Step Seven: Analyze the Posterior Predictive Distribution {-}
+
+If there is
+strong disagreement then we need to go back to
+[Step Four](#sec:generative-model) and elaborate the components of the
+generative model that influence those summary statistics manifesting
+disagreement.  We may even need to go back to [Step One](#sec:conceptual) and
+improve our domain expertise of the experimental design before considering an
+expanded model.  Once we have a new model we then restart the workflow and
+iterate until we can't identify any deviations from the model and our
+observation and our domain expertise.
+
+In order to avoid overfitting to the observed data in this iterative model
+expansion we have to be careful to not abuse the particular structure of the
+observed data.  We don't want to respond to failing posterior predictive checks
+by incorporating quantitative features of the observed data into the model but
+rather expanding the model within the scope of our, possibly improved, domain
+expertise.  For example, we don't want to respond to our posterior predictive
+checks by adding a new component to our model with particular values but rather
+a new component with uncertain values to be fit jointly with the rest of the
+model.
+
+**Requirements:** Domain Expertise and Statistical Expertise
+
+# Acknowledgements
+
+I thank Sean Talts and Marc Dotson for helpful comments.
+
+Patreon peeps.
+
+# Original Computing Environment
+
+```{r, comment=NA}
+writeLines(readLines(file.path(Sys.getenv("HOME"), ".R/Makevars")))
+```
+
+```{r, comment=NA}
+devtools::session_info("rstan")
+```
+
+# References
