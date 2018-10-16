@@ -15,9 +15,16 @@ generated quantities {
   int y[N] = rep_array(0, N);
   for (n in 1:N) {
     if (!bernoulli_rng(theta)) {
-      y[n] = U + 1;
-      while (y[n] > U)
-        y[n] = poisson_rng(lambda);
+      real sum_p = 0;
+      real u = uniform_rng(0, 1);
+
+      for (b in 0:U) {
+        sum_p = sum_p + exp(poisson_lpmf(b | lambda) - poisson_lcdf(U | lambda));
+        if (sum_p >= u) {
+          y_ppc[n] = b;
+          break;
+        }
+      }
     }
   }
 }
