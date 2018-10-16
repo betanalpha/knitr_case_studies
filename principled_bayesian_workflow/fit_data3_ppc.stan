@@ -1,26 +1,29 @@
 data {
-  int N;
-  int y[N];
+  int N;    // Number of observations
+  int y[N]; // Count at each observation
 }
 
 parameters {
-  real<lower=0, upper=1> theta;
-  real<lower=0> lambda;
+  real<lower=0, upper=1> theta; // Excess zero probability
+  real<lower=0> lambda;         // Poisson intensity
 }
 
 model {
+  // Prior model
   theta ~ beta(2.8663, 2.8663);
   lambda ~ inv_gamma(3.48681, 9.21604);
 
+  // Observational model that mixes a Poisson with excess zeros
   for (n in 1:N) {
     real lpdf = poisson_lpmf(y[n] | lambda);
     if (y[n] == 0)
       target += log_mix(theta, 0, lpdf);
     else
-      target += log1m(theta) + lpdf;
+      target += log(1 - theta) + lpdf;
   }
 }
 
+// Simulate a full observation from the current value of the parameters
 generated quantities {
   int y_ppc[N] = rep_array(0, N);
 

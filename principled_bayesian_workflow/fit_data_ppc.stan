@@ -1,17 +1,18 @@
 data {
-  int N;
-  int y[N];
+  int N;    // Number of observations
+  int y[N]; // Count at each observation
 }
 
 parameters {
-  real<lower=0> lambda;
+  real<lower=0> lambda; // Poisson intensity
 }
 
 model {
-  lambda ~ normal(0, 6.44787);
-  y ~ poisson(lambda);
+  lambda ~ normal(0, 6.44787); // Prior model
+  y ~ poisson(lambda);         // Observational model
 }
 
+// Simulate a full observation from the current value of the parameters
 generated quantities {
   int y_ppc[N];
 
