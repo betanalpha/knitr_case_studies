@@ -634,6 +634,8 @@ $Y$.
 ![](figures/measurable/measurable.png)
 <br><br>
 
+### Projections
+
 Measurable transformations can be used to project a probability distribution 
 over a space onto a probability distribution over a lower-dimensional subspace.  
 Let $\varpi: X \rightarrow Y$ be a _projection operator_ that maps points in a 
@@ -670,23 +672,29 @@ two-dimensional space, $Y \times Z = \mathbb{R}^{2}$.  Marginalizing out $Y$
 then gives a probability distribution over the one-dimensional space,
 $Z = \mathbb{R}$.
 
-Another important class of measurable functions are those for which
-$f(A) \in \mathcal{Y}$ for any $A \in \mathcal{X}$ in addition to
+### Reparameterizations
+
+Another important class of measurable functions are those one-to-one maps for 
+which $f(A) \in \mathcal{Y}$ for any $A \in \mathcal{X}$ in addition to
 $f^{-1}(B) \in \mathcal{X}$ for any $B \in \mathcal{Y}$.  In this case $f$
 not only transforms a probability distribution on $X$ into a probability
 distribution on $Y$ but also transforms a probability distribution on $Y$ into 
 a probability distribution on $X$.  Moreover, transforming a distribution on 
 $X$ to one on $Y$ and back perfectly restores the original distribution -- 
-unlike projections these _doubly measurable_ transformations preserve all 
-information encoded in a probability distribution.
+unlike projections these _reparameterizations_ preserve all information encoded 
+in a probability distribution.
 
-In this case $(X, \mathcal{X}, \pi)$ and $(Y, \mathcal{Y}, \pi_{*})$ are just
-two different manifestations, or _parameterizations_ of the same abstract 
-system.  The two parameterizations, for example, might correspond to different 
-choices of coordinate system, different choices of units, or different choices 
-of language dialect capable of the same descriptions.  The doubly measurable 
-transformations then serve as _reparameterizations_ that translate from one 
-equivalent manifestation to another.
+In this case $(X, \mathcal{X}, \pi)$ and $(Y, \mathcal{Y}, \pi_{*})$ are really
+just two different manifestations, or _parameterizations_, of the same _abstract 
+probability system_.  The two parameterizations, for example, might correspond 
+to different choices of coordinate system, different choices of units, or 
+different choices of language dialect capable of the same descriptions.  The
+reparameterizations then translate from one equivalent manifestation to another.
+
+For discrete spaces all reparameterizations can be reduced to permutations that
+simply rearrange the individual elements of the space.  This simple intuition,
+however, doesn't carry over to continuous spaces for which reparameterizations
+can be signficantly more subtle.
 
 # Great Expectations {#sec:expectation_values}
 
@@ -829,17 +837,21 @@ Expectation values serve two powerful purposes.  As we saw above they can be
 used to summarize the behavior of a function $f : X \rightarrow \mathbb{R}$ in
 the context of a given probability distribution.  We can also invert this 
 perspective, however, and use the expectation value of certain functions to
-characterize the given probability distribution itself.  In this section we'll 
-be introduced to expectations of certain functions that are particularly useful 
-in interrogating the properties of probability distributions defined on certain 
+characterize the given probability distribution itself.  In this section I'll 
+introduce certain functions whose expectations are particularly useful in 
+interrogating the properties of probability distributions defined on certain 
 spaces. 
 
-First, however, a word of caution.  The interpretation of the specific 
-expectation values of these special functions is specific to the context of a
-given space and will not, in general, push forward along a transformation to
-another space.  To ensure a meaningful expectation value we must first push the
-special function forward along the transformation and only then perform an
-expectation.  Expectation and transformation typically do not commute!
+First, however, a word of caution.  The structure of these special functions,
+and hence the interpretation of these expectation values, is specific to the 
+context of a given space and will not, in general, push forward along a 
+transformation to another space.  In particular, the interpretation is unique 
+to a given parameterization and will change under reparameterizations even 
+though the abstract probabilistic system does not.
+
+If desired we can preserve the value of an expectation value if we first push 
+the special function forward along the transformation and only then perform an 
+expectation.  Expectation and transformation do not, in general, commute!
 
 ### This Distribution and I Are Having a Moment
 
@@ -947,6 +959,11 @@ In order to avoid confusion with the mean and variance of a probability
 distribution, I will always specify the argument $[f]$ when these alternative
 notations are being used.
 
+Finally, keep in mind that moments are defined within the context of a 
+particular parameterization.  Reparameterizing to another space introduces a 
+_different_ embedding function which defines _different_ moments that quantify
+_different_ properties of the abstract probability system.
+
 ### Cumulative Distribution Functions and Quantiles
 
 The target space is _ordered_ when we can uniquely define an ordering of each
@@ -1019,6 +1036,11 @@ probabilty distribution below and above.  This quantifies a different sense of
 where a probability distribution concentrates other than the mean. 
 _Tail quantiles_, such as $x_{0.05}$ and $x_{0.95}$, quantify a different sense
 of the breadth of a probability distribution than the variance. 
+
+Because a reparameterization can arbitrarily reorder a space, a cumulative
+distribution function is defined only within the context of a given
+parameterization.  As with moments, quantiles in different parameterizations
+isolate different properties of the abstract probability system.
 
 ### Histograms
 
@@ -1114,6 +1136,10 @@ while expectation values of functions on $Y$ are given by
 $$
 \mathbb{E}_{\pi_{*}} [ B ] = \sum_{x \in X } \pi(x) \, f(g(x)).
 $$
+
+For a reparameterization $g$ is one-to-one and $g^{-1}(y)$ identifies a single
+point.  Hence the pushforward probability mass function is just a relabeling of
+the original probability mass function, as expected.
 
 ### The Poisson Family of Probability Mass Functions
 
@@ -1330,14 +1356,15 @@ which again yields the exact value to floating point precision.
 ### Computing Pushforwards
 
 We have to be ever vigilant in recognizing the limitations of a representation
-such as a probability mass function.  Reparameterizing our system, or more 
-formally pushing our probability distribution forward along a sufficiently
-well-behaved one-to-one transformation, yields a new manifestation of the same 
-system but in the new space we have a different probability mass function, mean, 
-and variance.
+such as a probability mass function.  Pushing our probability distribution 
+forward along a measurable transformation yields a pushforward distribution 
+with its own probability mass function, mean, and variance.
 
-Using the transformation rules of a probability mass function introduced above
-we can visualize the probability mass function of the pushforward distribution,
+What happens to the representative probability mass function when we 
+reparameterize with the one-to-one measurable transformation $y = \sqrt{x}$?  
+Using the transformation rules introduced above we can readily visualize the 
+probability mass function of the pushforward distribution
+,
 ```{r}
 bin_edges <- c(-0.5, sapply(1:21, function(x) sqrt(x - 0.5)))
 p <- hist(0, breaks=bin_edges, plot=FALSE)
@@ -1417,7 +1444,7 @@ $$
 $$
 
 Unlike probability mass functions, probability densities don't transform quite
-as naturally under a reparameterization.  The complication is that the
+as naturally under a measurable transformation.  The complication is that the
 differential volumes over which we integrate will in general change under such a
 transformation, and probability density functions have to change in the opposite
 way to compensate and ensure that probabilities are conserved.  The change in
@@ -1447,8 +1474,8 @@ $$
 \end{align*}
 $$
 
-If the reparameterization is _many-to-one_ then we have to take into account all
-of the roots of $y = g(x)$ for a given y, 
+If the measurable transformation is _many-to-one_ then we have to take into 
+account all of the roots of $y = g(x)$ for a given y, 
 $\left\{x_{1}(y), \ldots, x_{N}(y) \right\}$,
 $$
 \begin{align*}
@@ -1464,8 +1491,8 @@ $$
 
 Deriving the pushforward probability density function for transformations that 
 change the dimensionality of the space, such as marginalizations, are more 
-challenging and require analytically integrating a reparameterized probability 
-density function over the complementary spaces.
+challenging and require analytically integrating an appropriately 
+reparameterized probability density function over the complementary spaces.
 
 ### The Gaussian Family of Probability Density Functions
 
@@ -1617,15 +1644,22 @@ $$
 ### Computing Pushforwards
 
 How does a Gaussian probability density function change under the 
-reparameterization $g : x \mapsto x^{2}$?  
+reparameterization 
+$$ y = \mathrm{logistic}(x) = (1 + e^{-x})^{-1}? $$
+```{r}
+g <- function(x) {
+  return(1 / (1 + exp(-x)))
+}
+``` 
 
 The first step in constructing the pushforward probability density function is 
 computing the inverse of the transformation,
 ```{r}
-y_inv <- function(y) {
-  return(sqrt(y))
+g_inv <- function(y) {
+  return(log(y / (1 - y)))
 }
 ```
+
 We then need to quantify how volume changes under the transformation,
 ```{r}
 delta_x = seq(-8, 8, 0.25)
@@ -1634,26 +1668,27 @@ plot(1, type="n", xlim=c(-4, 4), xlab="dx", ylim=c(0, 1), ylab="",
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5, yaxt='n')
 for (x in delta_x) abline(v=x, col=c_dark, lwd=2)
 
-plot(1, type="n", xlim=c(0, 16), xlab="dy", ylim=c(0, 1), ylab="",
+plot(1, type="n", xlim=c(0, 1), xlab="dy", ylim=c(0, 1), ylab="",
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5, yaxt='n')
-for (x in delta_x) abline(v=x * x, col=c_dark, lwd=2)
+for (x in delta_x) abline(v=g(x), col=c_dark, lwd=2)
 ```
 
 using the reciprocal of the Jacobian determinant, which in this case is given by
 ```{r}
 abs_J <- function(y) {
-  return(1 / (2 * sqrt(y)))
+  return(1 / (y * (1 - y)))
 }
 ```
+for both of the solutions.
 
 Putting these two pieces together along with the initial probability density 
 function gives the pushforward probability density function
 ```{r}
-ys <- seq(0, 16, 0.001)
-pdfs <- sapply(ys, function(y) dnorm(y_inv(y), mu, sigma) * abs_J(y))
+ys <- seq(0, 1, 0.001)
+pdfs <- sapply(ys, function(y) dnorm(g_inv(y), mu, sigma) * abs_J(y))
 
 plot(ys, pdfs, type="l", col=c_dark_highlight, lwd=2,
-     xlab="x", ylab="Probability Density",
+     xlab="y = logistic(x)", ylab="Probability Density",
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5, yaxt='n')
 ```
 
@@ -1664,7 +1699,7 @@ Gaussian probability distributions, just probability distributions that admit
 Gaussian probability density functions in certain parameterizations!
 
 Because Gaussian probability density functions are particularly convenient to 
-work with there is a great deal of literature in engineering Reparameterizations
+work with there is a great deal of literature in engineering reparameterizations
 that can push a given probability density function into something more Gaussian.  
 In particular the _Box-Cox_ family of transformations,
 $$
@@ -1778,11 +1813,11 @@ abstract probability distribution into a density function amenable to
 explicit specification and computation.
 
 This more formal perspective also helps to explain the transformation properties
-of density functions.  Counting measures are invariant under
-reparameterizations and so the pushforward of a probability mass function
-is just the composition of the original probability mass function with the
-reparameterization.  Lebesgue measures, however, are not necessarily invariant
-under reparameterization; in general the pushforward of the Lebesgue
+of density functions.  Counting measures are invariant under the permutation
+induced by a reparameterizations, and so the pushforward of a probability mass 
+function is just the composition of the original probability mass function with 
+the reparameterization.  Lebesgue measures, however, are not necessarily 
+invariant under reparameterization.  In general the pushforward of the Lebesgue
 measure requires a Jacobian determinant to account for the compression or
 expansion of volume in the transformation.  This change in the base measure
 then induces an inverse Jacobian determinant in the Radon-Nikodym derivatives,
@@ -2276,24 +2311,24 @@ pushforward_samples = sapply(stan_samples, function(x) (identity(x) - mu)**2)
 compute_mc_stats(pushforward_samples)
 ```
 
-Now let's consider the reparameterization $g : x \mapsto x^{2}$.  With samples 
-this transformation is straightforward to analyze by considering the pushforward
+Now let's consider the reparameterization $y = \mathrm{logistic}(x)$.  This 
+transformation is straightforward to analyze by considering the pushforward
 samples,
 ```{r}
-pushforward_samples = sapply(stan_samples, function(x) x**2)
+pushforward_samples = sapply(stan_samples, function(x) g(x))
 compute_mc_stats(pushforward_samples)
 ```
-In particular we can readily study the reparameterized probability density 
+In particular we can readily study the pushforward probability density 
 function by histogramming the pushforward samples,
 ```{r}
-ys <- seq(0, 25, 0.001)
-pdfs <- sapply(ys, function(y) dnorm(y_inv(y), mu, sigma) * abs_J(y))
+ys <- seq(0, 1, 0.001)
+pdfs <- sapply(ys, function(y) dnorm(g_inv(y), mu, sigma) * abs_J(y))
 
 plot(ys, pdfs, type="l", col=c_dark_highlight, lwd=2,
-     xlab="y = x^2", ylab="Probability Density",
+     xlab="y = logistic(x)", ylab="Probability Density",
      cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5, yaxt='n')
      
-hist(pushforward_samples, breaks=seq(0, 25, 0.5), probability=T,
+hist(pushforward_samples, breaks=seq(0, 1, 0.05), probability=T,
      col=c_mid_trans, border=c_mid_highlight_trans, add=T)
 ```
 
