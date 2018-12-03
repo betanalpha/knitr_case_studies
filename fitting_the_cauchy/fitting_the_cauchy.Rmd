@@ -18,26 +18,25 @@ output:
 knitr::opts_chunk$set(comment=NA)
 ```
 
-The Cauchy distribution has a notorious history of serving as a
-counterexample to mathematical proofs in probability theory.  At
-the same time it has been a consistent source of frustration for
-statistical computation as well.  In this case study I review
-various ways of implementing the Cauchy distribution, from the
-nominal implementation to alternative implementations aimed at
-ameliorating these difficulties, and demonstrate their relative
-performance.
+The Cauchy density function enjoys a notorious reputation in mathematics, 
+serving as a common counterexample to identify incomplete proofs in probability 
+theory.  At the same time it has also been a consistent source of frustration 
+for statistical computation.  In this case study I review various ways of 
+implementing the Cauchy distribution, from the nominal implementation to 
+alternative implementations aimed at ameliorating these difficulties, and 
+demonstrate their relative performance.
 
 # The Cauchy Distribution
 
-The Cauchy distribution seems innocent enough, with a density given by
-the rational function,
+The Cauchy distribution seems innocent enough, with a probability density 
+function given by the rational function,
 $$
 \pi(x) = \frac{1}{\pi \, s}
 \frac{ s^{2} }{ (x - m)^{2} + s^{2}}.
 $$
-Here the location, $m$, describes a certain sense of location of the
-distribution while the scale, $s$, describes a certain sense of its
-width.
+Here the location, $m$, quantifies where the corresponding probability 
+distribution concentrates while the scale, $s$, quantifies the breadth of that
+distribution.
 
 ```{r}
 
@@ -53,10 +52,11 @@ plot(x, dcauchy(x, location = 0, scale = 1), type="l", col=c_dark_highlight, lwd
      main="", xlab="x", ylab="Probability Density", yaxt='n')
 ```
 
-This density, however, encodes extremely long tails that place significant
-probability mass at points far away from $x = m$.  We can see just how heavy
-these tails are by comparing the quantile function of the standardized Cauchy
-distribution to that of a standardized Gaussian distribution,
+This probability density function, however, defines a probability distribution
+with extremely long tails that places significant probability in neighborhoods 
+far away from $x = m$.  We can see just how heavy these tails are by comparing 
+the quantile function of the standard Cauchy density to that of a standard 
+Gaussian density,
 
 ```{r}
 x <- seq(0, 1, 0.001)
@@ -68,39 +68,40 @@ text(x=0.9, y=250, labels="Cauchy", col=c_dark_highlight)
 text(x=0.9, y=-50, labels="Normal", col=c_light_highlight)
 ```
 
-$95\%$ of the mass of the Gaussian distribution is contained within a distance
-of $x = 1.6$ from $x = m = 0$, where as we would have to go to  $x = 6.3$
-to contain the same probability mass for the Cauchy distribution.  In order to
-contain $99\%$ of the mass we would need to go to $x = 2.3$ for the Gaussian
-distribution but all the way to $x = 31.8$ for the Cauchy distribution!
+$95\%$ of the probability of the Gaussian distribution is contained within a 
+distance of $x = 1.6$ from $x = m = 0$, but we would have to go to $x = 6.3$ to
+contain the same probability for the Cauchy distribution.  In order to contain 
+$99\%$ of the probability we would need to go to only $x = 2.3$ for the Gaussian
+distribution, but all the way to $x = 31.8$ for the Cauchy distribution!
 
-These extremely heavy tails yield all kinds of surprising behavior for the
-Cauchy distribution.  All of the even moments of the distribution are infinite
-whereas all of the odd moments are not well defined.  In order to avoid
-pathological behavior we have to restrict ourselves to characterizing the
-Cauchy distribution with quantiles.
+These extremely heavy tails yield all kinds of surprising behavior for 
+distributions defined with Cauchy density functions.  All of the even moments of 
+the distribution are infinite whereas all of the odd moments are not even well
+defined.  In order to avoid pathological behavior we have to restrict ourselves 
+to characterizing these Cauchy distributions with quantiles.
 
-The Cauchy distribution was once recommended as the default for weakly
-informative priors, but the behavior of these heavy tails, especially the
-weak containment of probability mass around the location, $ x = m$, proved
-to be too ungainly.  Consequently we have since moved towards recommending
-Gaussian distributions for weakly informative priors.  Still, because the
-Cauchy arises as a component in more sophisticated prior distributions such
-as the horseshoe and its generalizations, understanding how to best fit the
-distribution remains important.
+The Cauchy density was once recommended as the default for weakly informative 
+prior densities, but the behavior of these heavy tails, especially the
+weak containment of probability around the location, $x = m$, has proven to be 
+too ungainly in practice.  Consequently we have since moved towards recommending
+Gaussian densities for weakly informative prior densities.  Still, because the
+Cauchy density arises as a component in more sophisticated prior densities, such
+as the horseshoe and its generalizations, understanding how to best fit the it
+remains important.
 
-# The Nominal Implementation of the Cauchy Distribution
+# The Nominal Implementation of the Cauchy Density Function
 
-The heavy tails of the Cauchy distribution makes it notoriously difficult
+The heavy tails of the Cauchy density function make it notoriously difficult
 to estimate its expectation values.  In particular Random Walk Metropolis, the
 Metropolis-Adjusted Langevin Algorithm, and even static Hamiltonian Monte Carlo
 all fail to provide accurately estimates for these expectations.  The problem
 is that for accurate estimation any algorithm will have to explore the massive
-extent of the heavy tails, but once out in those tails there most algorithms
-have difficulty returning back to the bulk of the distribution around $m = 0$.
+extent of the heavy tails, but once out in those tails most algorithms have
+difficulty returning back to the bulk of the distribution around $m = 0$.
 
 How does the dynamic Hamiltonian Monte Carlo method used in Stan fare?
-It's easy enough to check, here with a product of fifty Cauchy distributions,
+It's easy enough to check, here with a product of fifty Cauchy density 
+functions and the indicator function for the interval $-1 \le x \le 1$,
 
 ```{r}
 writeLines(readLines("cauchy_nom.stan"))
@@ -139,25 +140,25 @@ each parameter quite accurately,
 util$plot_estimated_quantiles(fit_nom, "Nominal Parameterization")
 ```
 
-The variable integration times in dynamic Hamiltonian Monte Carlo allow
+The variable integration times in dynamic Hamiltonian Monte Carlo allow 
 extremely long trajectories once we're out in the tails of the Cauchy
-distribution.  These trajectories very slowly but surely carry us back
-into the bulk of the distribution no matter how far into the tails we
-have have sojourned.  The dynamic nature of the trajectories is important
-here -- once we are deep enough into the tails any static but finite
-integration time will not be long enough to ensure that we return.
+density function.  These trajectories very slowly, but surely, carry us back 
+into the bulk of the distribution no matter how far into the tails we have
+sojourned.  The dynamic nature of the trajectories is important here -- once we 
+are deep enough into the tails any static but finite integration time will not 
+be long enough to ensure that we return!
 
-Considering that most algorithms fail to accurately fit the Cauchy
-distribution, this is a pretty remarkable achievement for Stan.
-That said, the long trajectories required for this accuracy come at a
-pretty significant computational cost.  Consequently let's consider
-alternative implementations of the Cauchy distribution that can be
-fit with less computational resources.
+Considering that most algorithms fail to accurately fit distributions defined
+with Cauchy density functions, this is a pretty remarkable achievement for Stan.
+That said, the long trajectories required for this accuracy come at a 
+significant computational cost.  Consequently let's consider alternative
+implementations of the Cauchy distribution that can be fit with fewer 
+computational resources.
 
 # First Alternative Implementation
 
-An interesting property of the Cauchy distribution is that it arises
-as a scale mixture of Gaussian distributions,
+An interesting property of the Cauchy density function is that it arises as a 
+scale mixture of Gaussian density functions,
 $$
 \text{Cauchy}(x \mid m, s)
 = \int \mathrm{d} \tau \,
@@ -176,15 +177,15 @@ then
 $$
 x = m + \frac{ x_{a} }{ \sqrt{x_{b}} }
 $$
-follows a $\text{Cauchy}(m, s)$ distribution.  Note that I am using
-the Stan conventions for the Normal and Gamma density functions.
+follows a distribution specified by a $\text{Cauchy}(m, s)$ density function.  
+Note that I am using the Stan conventions for the normal and gamma density 
+function parameterizations.
 
-This property suggests a parameter expansion approach to implementing
-the Cauchy distribution where we fit $x_{a}$ and $x_{b}$ and then
-derive $x$ deterministically.  Although this requires twice the
-number of parameters, the resulting joint density is much more
-concentrated than the Cauchy distribution and hence significantly
-easier to fit.
+This property suggests a parameter expansion approach to implementing the Cauchy 
+distribution where we fit $x_{a}$ and $x_{b}$ and then derive $x$ 
+deterministically.  Although this requires twice the number of parameters, the
+resulting joint density function is much more concentrated than the Cauchy 
+density function and hence significantly easier to fit.
 
 ```{r}
 x <- seq(-3, 3, 0.05)
@@ -218,8 +219,8 @@ util$check_all_diagnostics(fit_1)
 
 There are no indications of pathological behavior with Stan's default
 settings, although we are again warned to be careful about interpreting
-expectations of the reconstructed Cauchy parameters.  That said, we once again
-accurately recover the quantiles of each of those recovered Cauchy parameters,
+expectations of the reconstructed Cauchy parameters.  The quantiles of each of 
+those recovered Cauchy parameters, however, once again prove to be no problem,
 
 ```{r}
 util$plot_estimated_quantiles(fit_1, "First Alternative")
@@ -227,9 +228,9 @@ util$plot_estimated_quantiles(fit_1, "First Alternative")
 
 # Second Alternative Implementation
 
-This first alternative implementation immediately suggests a second.
-We can avoid the division in the recovery of $x$ by giving $x_{b}$
-and _inverse_ gamma distribution.  Here we let
+This first alternative implementation immediately suggests a second.  We can 
+avoid the division in the recovery of $x$ by giving $x_{b}$ an _inverse_ gamma
+density function.  Here we let
 $$
 x_{a} \sim \text{Normal} \, \left(0, 1 \right)
 $$
@@ -241,15 +242,15 @@ from which
 $$
 x = m + x_{a} \cdot \sqrt{x_{b}}
 $$
-will follow a $\text{Cauchy}(m, s)$ distribution.
+will follow a distribution specified by a $\text{Cauchy}(m, s)$ density function.
 
 Although this may seem like a small change, the division operator and its
 derivatives are significantly slower to evaluate than the multiplication
-operator and its derivatives which can yield nontrivial performance
+operator and its derivatives.  Hence the change can yield nontrivial performance
 improvements.
 
-This small change yields a joint density that mirrors the joint density
-of the first alternative implementation and its pleasant geometry.
+This small change yields a joint density function that mirrors the joint density
+function of the first alternative implementation and its pleasant geometry.
 
 ```{r}
 x <- seq(-3, 3, 0.05)
@@ -292,8 +293,8 @@ util$plot_estimated_quantiles(fit_2, "Second Alternative")
 # Third Alternative Implementation
 
 The final alternative implementation that we will consider utilizes the
-inverse cumulative distribution function of the Cauchy distribution.
-In particular, if
+inverse cumulative distribution function of the Cauchy density.  In particular, 
+if
 $$
 \tilde{x} \sim \text{Uniform} \, \left(0, 1 \right)
 $$
@@ -301,7 +302,7 @@ then
 $$
 x = m + s \cdot \tan \, \left(\pi \left(\tilde{x} - \frac{1}{2} \right) \right)
 $$
-follows a $\text{Cauchy}(m, s)$ distribution.
+follows a distribution specified by a $\text{Cauchy}(m, s)$ density function.
 
 The latent density of $\text{logit}(\tilde{x})$, which is what Stan
 ultimately utilizes, exhibits much more reasonable tails than the Cauchy
@@ -310,8 +311,8 @@ distribution,
 ```{r}
 x <- seq(-10, 10, 0.001)
 plot(x, exp(-x) / (1 + exp(-x))**2, type="l", col=c_dark_highlight, lwd=2,
-     main="Third Alternative", xlab="x_tilde", ylab="Probability Density",
-     yaxt='n')
+     main="Third Alternative", xlab="logit(x_tilde)", 
+     ylab="Probability Density", yaxt='n')
 ```
 
 This final implementation requires only a sparse Stan program,
@@ -339,14 +340,13 @@ util$plot_estimated_quantiles(fit_3, "Third Alternative")
 
 # Comparing Performance of the Various Implementations
 
-To quantify how much better these alternative implementations perform
-let's consider the only performance metric that matters for Markov
-chain Monte Carlo: the number of effective samples per computational
-cost.  Here we use run time as a proxy for computational cost and
-consider the effective sample size per time for the indicator function
-constructed in each of our models which, unlike the independent
-Cauchy components, has a finite mean and variance and hence well-defined
-effective sample size.
+To quantify how much better these alternative implementations perform let's 
+consider the only well-defined performance metric for Markov chain Monte Carlo: 
+the number of effective samples per computational cost.  Here we use run time as 
+a proxy for computational cost and consider the effective sample size per time 
+for the indicator function constructed in each of our models which, unlike the 
+independent Cauchy components, has a finite mean and variance and hence 
+well-defined effective sample size.
 
 ```{r}
 r_nom <- (summary(fit_nom, probs=NA)$summary)[51,5] /
@@ -364,17 +364,15 @@ plot(1:4, c(r_nom, r_1, r_2, r_3), type="l", lwd=2, col=c_dark,
 axis(1, at=1:4, labels=c("Nom", "Alt 1", "Alt 2", "Alt 3"))
 ```
 
-Immediately we see that the alternative implementations are
-drastically better than the nominal implementation.  Moreover,
-the second alternative implementation is almost twice as fast
-as the the first.  Perhaps surprisingly, using an inverse Gamma
-distribution to avoid a division ends up being a significant
-improvement.
+Immediately we see that the alternative implementations are drastically better 
+than the nominal implementation.  Moreover, the second alternative 
+implementation is almost twice as fast as the the first.  Perhaps surprisingly, 
+using an inverse Gamma distribution to avoid a division ends up being a
+significant improvement.
 
-We can also compare the geometry of these implementations by
-considering only the number of gradient evaluations per iteration
-and ignoring the actual cost of each evaluation.
-
+We can also compare the geometry of these implementations by considering only 
+the number of gradient evaluations per iteration and ignoring the actual cost of 
+each evaluation.
 
 ```{r}
 probs <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
@@ -403,7 +401,7 @@ pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n]))
 
 plot(1, type="n", main="", xaxt = "n", xlab="",
      ylab="Gradient Evaluations Per Iteration",
-     xlim=c(0, 5), ylim=c(0, 8000))
+     xlim=c(0.5, 4.5), ylim=c(0, 8000))
 axis(1, at=1:4, labels=c("Nom", "Alt 1", "Alt 2", "Alt 3"))
 
 polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
@@ -417,17 +415,47 @@ polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
 lines(x, pad_cred[5,], col=c_dark, lwd=2)
 ```
 
-As expected the alternative implementations require far fewer
-gradient evaluations per iteration as they don't exhibit the
-heavy tails which require increasingly longer and longer trajectories.
+As expected the alternative implementations require far fewer gradient 
+evaluations per iteration as they don't exhibit the heavy tails which require increasingly longer and longer trajectories.
 
-# The Half Cauchy Distribution
+Zooming in to the alternative implementations,
 
-These alternative implemenations can also be modified to work for
-the half Cauchy distribution over positive values.  In particular,
-for the first and second alternative implemenations we just have
-to constrain $x_{a}$ to be positive.  In the third we just have
-to set
+```{r}
+probs <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+
+idx <- c(1, 1, 2, 2, 3, 3)
+x <- c(0.5, 1.5, 1.5, 2.5, 2.5, 3.5)
+
+cred <- data.frame(n_grad_1, n_grad_2, n_grad_3)
+pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n]))
+
+plot(1, type="n", main="", xaxt = "n", xlab="",
+     ylab="Gradient Evaluations Per Iteration",
+     xlim=c(0.5, 3.5), ylim=c(0, 50))
+axis(1, at=1:3, labels=c("Alt 1", "Alt 2", "Alt 3"))
+
+polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
+        col = c_light, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
+        col = c_light_highlight, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
+        col = c_mid, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
+        col = c_mid_highlight, border = NA)
+lines(x, pad_cred[5,], col=c_dark, lwd=2)
+```
+
+we see that the third implementation requires the fewest gradient evaluations
+and hence features the nicest geometry.  That said, the tangent function is
+more expensive then the cost of evaluating the gamma and inverse gamma density
+functions and in terms of overall efficiency the second implementation proves
+superior.
+
+# The Half Cauchy Density Function
+
+These alternative implementations can also be modified to work for the half 
+Cauchy density function that is defined over only positive values.  In 
+particular, for the first and second alternative implementations we just have to constrain $x_{a}$ to be positive.  In the third we just have to set
 $$
 x = \tan \, \left(\frac{\pi}{2} \tilde{x} \right)
 $$
@@ -455,9 +483,8 @@ fit_half_reparam <- stan(file='half_cauchy_alt.stan', seed=4938483,
 util$check_all_diagnostics(fit_half_reparam)
 ```
 
-Comparing the 10th identical, Cauchy distribution component of
-our model we see that the two implementations yield equivalent
-results,
+Comparing the 10th identical component of our model we see that the two 
+implementations yield equivalent results,
 
 ```{r}
 x <- extract(fit_half_nom)$x[,10]
@@ -480,25 +507,38 @@ plot(p2, col=c_light_trans, border=c_light_highlight_trans, add=T)
 
 # Conclusion
 
-Although the nominal implementation of the Cauchy distribution
-frustrates computational algorithms with either bias or slow
-execution, there exist multiple alternative implementations that
-yield an equivalent distribution without the excessive cost.
+Although the nominal implementation of the Cauchy density function frustrates
+computational algorithms with either bias or slow execution, there exist 
+multiple alternative implementations that yield an equivalent distribution 
+without the excessive cost.
 
-The practical consequences of these implementations, however,
-are ultimately not all that significant.  Having a Cauchy
-distribution in the generative model does not necessarily
-imply that the heavy tails will persist into the posterior.
-In most cases even a little bit of data can tame the heavy
-tails, resulting in a pleasant posterior geometry regardless
-of which implementation of the Cauchy we use.  Nevertheless
-it is up the the user to remain vigilant and monitor for
-indications of heavy tails and motivation for alternative
+The practical consequences of these implementations, however, may not ultimately
+be all that significant.  Having a Cauchy distribution in the generative model 
+does not necessarily imply that the heavy tails will persist into the posterior
+distribution.  In many cases even a little bit of data can tame the heavy tails, 
+resulting in a pleasant posterior geometry regardless of which implementation of 
+the Cauchy we use.  Nevertheless it is up the the user to remain vigilant and 
+monitor for indications of heavy tails and motivation for alternative
 implementations.
 
 # Acknowledgements
 
 I thank Aki Vehtari and Junpeng Lao for helpful comments.
+
+A very special thanks to everyone supporting me on Patreon: Aki Vehtari, 
+Alan O'Donnell, Andre Zapico, Andrew Rouillard, Austin Rochford, Avraham Adler, 
+Bo Schwartz Madsen, Bryan Yu, Cat Shark, Charles Naylor, Christopher Howlin, 
+Colin Carroll, Daniel Simpson, David Pascall, David Roher, David Stanard, 
+Ed Cashin, Eddie Landesberg, Elad Berkman, Eric Jonas, Ethan Goan, 
+Finn Lindgren, Granville Matheson, Hernan Bruno, J Michael Burgess, 
+Joel Kronander, Jonas Beltoft Gehrlein, Joshua Mayer, Justin Bois, 
+Lars Barquist, Luiz Carvalho, Marek Kwiatkowski, Matthew Kay, 
+Maurits van der Meer, Maxim Kesin, Michael Dillon, Michael Redman, 
+Noah Silverman, Ole Rogeberg, Oscar Olvera, Paul Oreto, Peter Heinrich, 
+Putra Manggala, Ravin Kumar, Riccardo Fusaroli, Richard Torkar, Robert Frost, 
+Robin Taylor, Sam Petulla, Sam Zorowitz, Seo-young Kim, Seth Axen, 
+Sharan Banagiri, Simon Duane, Stephen Oates, Stijn, Vladislavs Dovgalecs, 
+and yolha.
 
 # Original Computing Environment
 

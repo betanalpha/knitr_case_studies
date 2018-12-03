@@ -27,7 +27,7 @@ check_treedepth <- function(fit, max_depth = 10, quiet=FALSE) {
                             n, N, max_depth, 100 * n / N))
 
   if (n > 0) {
-    if (!quiet) print('  Run again with max_depth set to a larger value to avoid saturation')
+    if (!quiet) print('  Run again with max_treedepth set to a larger value to avoid saturation')
     if (quiet) return(FALSE)
   } else {
     if (quiet) return(TRUE)

@@ -7,7 +7,7 @@ vector[50] x = tan(pi() * (x_tilde - 0.5));
 }
 
 model {
-  // Implicit uniform prior on x_tilde
+  // Implicit uniform prior on the x_tilde
 }
 
 generated quantities {
