@@ -1,0 +1,48 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.5, thick]
+  \draw[color=white] (-1.5, -1.5) rectangle +(13, 13);
+  
+  \draw[<->, >=stealth] (-1, 0) -- +(11, 0)
+  node[right] { $\gamma_{1}$ };
+  
+  \draw[<->, >=stealth] (0, -1) -- +(0, 11);
+  \node[] at (0, 10.75) { $\gamma_{2}$ };
+  
+  % y = 0.25 * x + 3
+  \draw[<->, >=stealth, color=gray80] (-1, 2.75) -- (10, 5.5);
+  
+  \draw[color=mid,->, >=stealth] (0, 0) -- (5, 4.25);
+  \node[color=mid] at (1.25, 2.25) { $\mathbf{R}$ };
+
+  \draw[color=mid,->, >=stealth] (5, 4.25) -- +(4, 1);
+  \node[color=mid] at (6.5, 5.75) { $(\mathbf{I} - \mathbf{P}_{\mathbf{X}}) \cdot \mathbf{w}$ };
+  
+  \draw[color=dark,->, >=stealth] (0, 0) -- (9 * 0.98, 5.25 * 0.98);
+  \node[color=dark] at (5, 2) { $\tilde{\boldsymbol{\gamma}}$ };
+
+\end{tikzpicture}
+
+\end{document}  
