@@ -175,6 +175,7 @@ while the union of $B_{1}$ and $B_{2}$ is given by
 $$
 B_{1} \cup B_{2}  = \left\{ x \in X \mid -2 \le x \le 3 \right\},
 $$
+
 which we can specify with the boundaries
 ```{r}
 B_union_min <- -2
@@ -1386,7 +1387,7 @@ forward along a measurable transformation yields a pushforward distribution
 with its own probability mass function, mean, and variance.
 
 What happens to the representative probability mass function when we 
-reparameterize with the one-to-one measurable transformation $y = \sqrt{x}$?  
+reparameterize with the one-to-one measurable transformation $y = \sqrt{x}$?
 Using the transformation rules introduced above we can readily visualize the 
 probability mass function of the pushforward distribution
 ,
@@ -1441,7 +1442,7 @@ stabilizes to a constant value independent of the intensity itself, decoupling
 the exact correlation between mean and variance featured in the original 
 distribution.  Indeed the square root transformation is known as a _variance
 stabilizing transformation_ for distributions that admit parameterizations with
-Poissonian probability mass functions
+Poissonian probability mass functions.
 
 Reparameterizations like these are often used to simplify the use of a given 
 probability distribution by pushing it forward to a space where the 
@@ -1638,6 +1639,7 @@ Finally we can consider the intersection of the two sets,
 plot_norm(mu, sigma)
 plot_norm_probs(mu, sigma, B_inter_min, B_inter_max)
 ```
+
 which we can compute either with cumulative distribution functions,
 ```{r}
 norm_prob(B_inter_min, B_inter_max, mu, sigma)
@@ -1651,7 +1653,7 @@ norm_prob(B_union_min, B_union_max, mu, sigma)
 
 ### Computing Expectations
 
-The real line have a unique embedding into the real line -- the identify 
+The real line has a unique embedding into the real line -- the identify 
 function -- so means and variances are well-defined for the Gaussian family of
 probability density functions.  In line with their names, the mean of any
 member is given by the location parameter,
@@ -1722,7 +1724,7 @@ Gaussian probability density functions in certain parameterizations!
 
 Because Gaussian probability density functions are particularly convenient to 
 work with there is a great deal of literature in engineering reparameterizations
-that can push a given probability density function into something more Gaussian.  
+that can push a given probability density function into something more Gaussian.
 In particular the _Box-Cox_ family of transformations,
 $$
 g(x) = \frac{ x^{\phi} - 1 }{ \phi },
@@ -2033,6 +2035,7 @@ hist(r_samples, breaks=0:21-0.5,
 hist(stan_samples, breaks=0:21-0.5, 
      col=c_mid_trans, border=c_light_highlight_trans, probability=T, add=T)
 ```
+
 Indeed there is no indication of discrepancies between the two samples to 
 each other or the exact probability mass function.
 
