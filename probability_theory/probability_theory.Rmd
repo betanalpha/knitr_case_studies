@@ -232,7 +232,7 @@ set can also contain some less mathematically savory elements.  For example,
 making a seemingly innocent assumption known as the Axiom of Choice one can show
 that there exist sets in the real numbers that cannot be explicitly 
 constructed.  In particular, one can show that these non-constructible sets
-satisfy some very odd properties.
+feature some very odd properties.
 
 Consequently, when dealing with sets we often want to consider not the entire
 power set but rather a restriction of the power set that avoids any pathological
@@ -277,8 +277,8 @@ $\sigma$-algebras.  Consequently, in practice we don't have to spend any time
 worrying about explicitly constructing a $\sigma$-algebra, and the technical 
 need to restrict the power set to a $\sigma$-algebra has little impact on the 
 practical use of sets.  That said, because avoiding the pathologies of 
-non-constructible sets is critical to a well-defined probability theory 
-$\sigma$-algebras will be a common occurance.
+non-constructible sets is critical to a mathematically well-defined probability 
+theory, $\sigma$-algebras will be a common occurance.
 
 For more on these natural $\sigma$-algebras see the following optional section.
 
@@ -413,7 +413,7 @@ nature of this conserved quantity we can treat it as unit-less with total
 amounting to 1.
 
 A _probability distribution_ defines a mathematically self-consistent allocation
-of this conserved quantity across $X$.  If $A$ subset of $X$ then we write
+of this conserved quantity across $X$.  If $A$ is a subset of $X$ then we write
 $\mathbb{P}_{\pi}[A]$ as the probability assigned to $A$ by the probability 
 distribution $\pi$.  
 
@@ -594,16 +594,40 @@ $$
 - \mathbb{P}_{\pi}[ A_{1} \cup A_{2} ].
 $$
 
-A probability distribution is then completely specified by the
-_probability triplet_ $(X, \mathcal{X}, \pi)$ which is often denoted more
-compactly as
+These rules can be used to construct explicit probability distributions when
+the $\sigma$-algebra is small enough. For example, consider the binary space
+$X = \{0, 1\}$.  In this case the valid $\sigma$-algebra is the entire power 
+set consisting of the empty set, $A_{1} = \emptyset$, the atomic sets, 
+$A_{2} = \{ 0 \}$ and $A_{3} = \{ 1 \}$, and the entire space, $A_{4} = X$.
+What probabilities can we assign to these sets?  The axioms require that
+$\mathbb{P}_{\pi} [ A_{4} ] = 1$, and the complement rule then requires that
+$\mathbb{P}_{\pi} [ A_{1} ] = 0$.  We are free to assign any probability to one of
+the atomic sets, so we can take $\mathbb{P}_{\pi}  [ A_{3} ] = p$ in which case
+the complement rule requires that $\mathbb{P}_{\pi}  [ A_{2} ] = 1 - p$.  In 
+other words, _any_ probability distribution on the binary space $\{0, 1\}$ is
+completely specified by the parameter $p$ and the resulting allocation
 $$
-x \sim \pi
+\begin{align*}
+\mathbb{P}_{\pi} [ \;\, \emptyset \;\, ] &= 0
+\\
+\mathbb{P}_{\pi} [ \{ 0 \} ] &= 1 - p
+\\
+\mathbb{P}_{\pi} [ \{ 1 \} ] &= p
+\\
+\mathbb{P}_{\pi} [ \;\, X \; ] &= 1.
+\end{align*}
 $$
-where $x \in X$ is an arbitrary point denoting the space, $\pi$ denotes the 
-probability distribution, and a valid $\sigma$-algebra is just assumed.  Care 
-must be taken to not over interpret this notation -- in particular it says 
-nothing about individual points $x \in X$ but rather denotes to a probability 
+
+A probability distribution defined by Kolmogorov's axioms is completely 
+specified by the _probability triplet_ $(X, \mathcal{X}, \pi)$ which is often 
+denoted more compactly as
+$$
+x \sim \pi.
+$$
+Here the point $x \in X$ simply denotes denoting the space $X$, $\pi$ denotes 
+the probability distribution, and a valid $\sigma$-algebra is just assumed.  
+Care must be taken to not over interpret this notation -- in particular it says 
+nothing about individual points $x \in X$ but rather denotes a probability 
 distribution over all sets in the assumed $\sigma$-algebra.
 
 ## Measurable Transformations {#sec:measurable_transformations}
@@ -897,7 +921,7 @@ _Central moments_ center the embedding function around the first moment,
 $$
 \mathbb{c}_{\pi, n} 
 \equiv 
-\mathbb{E}_{\pi} [ (\iota - \mathbb{m}_{\pi, 0})^{n} ].
+\mathbb{E}_{\pi} [ (\iota - \mathbb{m}_{\pi, 1})^{n} ].
 $$
 
 The _mean_ of a probability distribution is the corresponding first moment,
@@ -1083,7 +1107,7 @@ relatively straightforward.
 Still, those concepts have so far been presented in the abstract without any
 concrete examples to provide context.  Why weren't there any examples to
 accompany the discussion in the previous section?  Because, unfortunately,
-probability distributions cannot be explicit defined in most problems!
+probability distributions cannot be explicitly defined in most problems!
 
 Recall that a probability distribution is defined as a map from the well-defined
 subsets in a $\sigma$-algebra to real numbers in the interval $[0, 1]$.  For a
@@ -1134,7 +1158,7 @@ $$
 $$
 while expectation values of functions on $Y$ are given by
 $$
-\mathbb{E}_{\pi_{*}} [ B ] = \sum_{x \in X } \pi(x) \, f(g(x)).
+\mathbb{E}_{\pi_{*}} [ f ] = \sum_{x \in X } \pi(x) \, f(g(x)).
 $$
 
 For a reparameterization $g$ is one-to-one and $g^{-1}(y)$ identifies a single
@@ -1231,6 +1255,7 @@ plot_poisson(l)
 plot_poisson_probs(0:(A1[1] - 1), l)
 plot_poisson_probs((A1[length(A1)] + 1):20, l)
 ```
+
 Because $A_{1}^{c}$ contains an infinite number of elements we can't compute it
 by exhaustively summing probability masses, but we can compute it using the
 cumulative probability function,
@@ -1457,9 +1482,6 @@ $$
 <br><br>
 ![](figures/differential_volumes/differential_volumes.png)
 <br><br>
-
-In particular, pushforward probability density functions pick up a determinant 
-of the _Jacobian matrix of partial derivatives_,
 
 For example, the pushforward probability density function corresponding to the
 reparameterization $g : \mathbb{R}^{N} \rightarrow \mathbb{R}^{N}$ picks up an 
@@ -2456,8 +2478,8 @@ the theory and ensure that we wield it responsibly.
 
 I warmly thank Maggie Lieu, Junpeng Lao, Deen Abiola, Jeremy Mason, Victor
 Salgado, xcurry\@github, Sean Talts, Elea McDonnell Feit, Christoph Bannwarth,
-Boris Shilov, and ssp3nc3r\@github for helpful comments as well as the feedback 
-from those who have attended my courses.
+Boris Shilov, ssp3nc3r\@github, and Max Kesin for helpful comments as well as 
+the feedback from those who have attended my courses.
 
 A very special thanks to everyone supporting me on Patreon: Aki Vehtari, Austin 
 Rochford, Bo Schwartz Madsen, Cat Shark, Charles Naylor, Colin Carroll, Daniel 
