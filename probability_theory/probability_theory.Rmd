@@ -2250,17 +2250,15 @@ plot(xs, cdfs, type="l", lwd=2, main="", col=c_dark_highlight, xlab="x", xlim=c(
 
 os <- sort(r_samples)
 ecdfs <- sapply(os, function(x) length(r_samples[r_samples <= x])) / length(r_samples)
-xs <- rep(os, each=2)[2:1999]
-ys <- rep(ecdfs, each=2)[2:1999]
-lines(rep(os, each=2)[2:1999], rep(ecdfs, each=2)[2:1999],
-      col=c_mid_highlight, lwd=2)
+xs <- c(-8, rep(os, each=2), 8)
+ys <- c(0, 0, rep(ecdfs, each=2))
+lines(xs, ys, col=c_mid_highlight, lwd=2)
 
 os <- sort(stan_samples)
 ecdfs <- sapply(os, function(x) length(stan_samples[stan_samples <= x])) / length(stan_samples)
-xs <- rep(os, each=2)[2:1999]
-ys <- rep(ecdfs, each=2)[2:1999]
-lines(rep(os, each=2)[2:1999], rep(ecdfs, each=2)[2:1999], type="l",
-      col=c_light_highlight, lwd=2)
+xs <- c(-8, rep(os, each=2), 8)
+ys <- c(0, 0, rep(ecdfs, each=2))
+lines(xs, ys, col=c_light_highlight, lwd=2)
 ```
 
 Probabilities can be estimated with expectation values of the corresponding
