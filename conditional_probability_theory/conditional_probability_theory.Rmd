@@ -57,8 +57,8 @@ $$
 <br><br>
 
 which then collapse to the base space under the projection operator.
-Moreover, under reasonable conditions the fibers will all be copies of a common 
-_fiber space_, $F$ regardless of the base point, 
+Moreover, under reasonable conditions all the fibers, regardless of their base 
+point, will look like the same _fiber space_, $F$,  
 $$
 F(y) = F, \forall y \in Y.
 $$
@@ -181,9 +181,9 @@ Projection operators allow us to transform a probability distribution over a
 space to a probability distribution on some lower-dimensional subspace.  Is it 
 possible, however, to go the other way?  Can we take a given marginal 
 probability distribution on a subspace and construct a joint probability 
-distribution on the total space that pushes forward back to that marginal?  We 
-can if we define a probability distribution over all of the fibers in order to
-specify the information lost in the compression to the marginal distribution.
+distribution on the total space that projects back to that marginal?  We can if 
+we define a probability distribution over all of the fibers in order to specify 
+the information lost in the compression to the marginal distribution.
 
 A _conditional probability distribution_ defines a probability distribution over
 each fiber,
@@ -247,12 +247,12 @@ that if we push it forward along the projection operator we recover the input
 marginal distribution with which we started.
 
 To reinforce these ideas let's consider how conditional probability 
-distributions manifest on a product space, $X \times Y$ with respect to the 
+distributions manifest on a product space, $X \times Y$, with respect to the 
 $Y$-projection $\varpi: X \times Y \rightarrow Y$.  As we saw in the previous
 section, in this case the fiber space is $X$.
 
-The conditional probability distribution here is a set of probability 
-distributions over $X$ indexed by the base point $y \in Y$,
+In this case the conditional probability distribution is a collection of 
+probability distributions over $X$ indexed by the base point $y \in Y$,
 $$
 \begin{alignat*}{6}
 \mathbb{P}_{X \mid Y} :\; &\mathcal{X} \times Y& &\rightarrow& \; &[0, 1]&
@@ -388,7 +388,7 @@ $$
 &(y, x)& &\mapsto& &\pi_{Y \mid X} (y \mid x)&.
 \end{alignat*}
 $$
-Giving a probability density function for the marginal distribution, 
+Given a probability density function for the marginal distribution, 
 $\pi_{X}(x)$, we can immediately construct a probability density function for 
 the corresponding joint distribution as
 $$
@@ -490,7 +490,7 @@ $$
 \begin{align*}
 \pi(x \mid y) 
 &=
-\frac{ \pi(y \mid x) \pi(x) }{ \pi_{y} }
+\frac{ \pi(y \mid x) \pi(x) }{ \pi(y) }
 \\
 &=
 \pi(x \mid y) =
@@ -606,7 +606,7 @@ provides a way of _updating_ marginal distributions into conditional
 distributions on a product space, giving a way to unfurl the probability at a 
 base point across the corresponding fiber.
 
-At a fundamental Bayes' Theorem defines a relationship between _marginal 
+Fundamentally Bayes' Theorem defines a relationship between _marginal 
 expectations_ and _conditional expectations_.  For example,
 $$
 \mathbb{E}_{\pi_{X}}[\lambda(x, y) \cdot f(x)] 
@@ -755,12 +755,13 @@ advanced techniques like Markov chain Monte Carlo.
 Bayesian inference exploits conditional probability theory to construct a formal
 procedure for learning from data.
 
-We start with a model configuration space, $\pi(y ; \theta)$ that defines a
-collection of mathematical narratives for how observations, $y$, are generated 
-encoded as probability distributions indexed by parameters, $\theta$.  If we
-allow probability distributions to encode information about the parameter
-space, then the model configuration space also defines a conditional probability
-distribution, $\pi (y \mid \theta)$ over the product space $Y \times \Theta$.
+We start with a collection of probability distributions over the observational
+space, $\pi(y ; \theta)$.  Each model configuration $\theta$ identifies a 
+probability distribution that defines a mathematical narratives for how 
+observations, $y$. If we allow probability distributions to encode information 
+about the parameter space, then the model configuration space also defines a 
+conditional probability distribution, $\pi (y \mid \theta)$ over the product 
+space $Y \times \Theta$.
 
 Given a an explicit observation, $\tilde{y}$, we can use Bayes' Theorem to 
 update a _prior distribution_, $\pi(\theta)$, encoding domain expertise into a 
@@ -795,8 +796,8 @@ practice.
 
 # Acknowlegements
 
-I thank Aki Vehtari for helpful comments and everyone who has attended my 
-courses, especially those who contributed feedback.
+I thank Aki Vehtari and Max Kesin for helpful comments and everyone who has 
+attended my courses, especially those who contributed feedback.
 
 A very special thanks to everyone supporting me on Patreon: Aki Vehtari, Austin 
 Rochford, Bo Schwartz Madsen, Cat Shark, Charles Naylor, Colin Carroll, Daniel 
