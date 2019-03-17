@@ -1,0 +1,33 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal pdfcairo transparent enhanced size 12in, 8in font 'Times, 60'
+set output "eye_chart_example.pdf"
+
+set border 3
+
+set title ""
+
+set xtics scale 0
+set xlabel 'Posterior Contraction'
+set xrange[0:1]
+
+set ytics scale 0
+set ylabel 'Posterior z Score'
+set yrange[-5:5]
+
+set style fill transparent solid 0.5 noborder
+set style circle radius 0.004
+
+plot 'nominally_identified.csv' every 5 u (1-\$2):(rand(0) > 0.5 ? \$1 : - \$1 ) \
+w circles lc rgb "$dark_highlight" notitle
+
+END

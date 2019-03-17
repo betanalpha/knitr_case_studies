@@ -1,0 +1,75 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "compromise.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics nomirror scale 0
+set xlabel '{/Symbol m}'
+set xrange[-5.5:3]
+set format x ''
+
+set ytics scale 0
+set ylabel "Probability Density"
+#set format y ''
+
+set label "Prior" at 1, 0.9 center tc rgb "$light_highlight"
+set label "Likelihood" at -3, 1 center tc rgb "$mid_highlight"
+set label "Posterior" at -0.5955, 1.125 center tc rgb "$dark_highlight"
+
+m = 1
+s = 0.5
+
+log_gauss(x, l, t) = -0.5 * ( (x - l) / t )**2 - log(2.506628274631001 * t)
+log_prior(x) = log_gauss(x, m, s)
+
+sigma = 2.0
+N = 10
+
+s2 = s * s
+s2N = sigma**2 / N
+norm = s2 + s2N
+
+# set.seed(9513833); ys <- rnorm(10, -3, 2); mean(ys); mean(ys * ys)
+ybar = -3.148529
+y2bar = 14.00955
+
+log_like(x) = - N * log(2.506628274631001 * sigma) \
+              - 0.5 * (ybar - x)**2 / s2N - 0.5 * (y2bar - ybar**2) / s2N
+log_like_ratio(x) = sqrt(norm / s2N) * exp( 0.5 * ( \
+                     - (ybar - x)**2 / s2N + (m - ybar)**2 / norm) )
+
+log_post(x) = log_gauss(x, (ybar * s2 + m * s2N) / norm, sqrt( s2 * s2N / norm ) )
+
+print(log_like_ratio(-2))
+print(exp(log_post(-2) - log_prior(-2)))
+print("")
+print(log_like_ratio(0))
+print(exp(log_post(0) - log_prior(0)))
+print("")
+print(log_like_ratio(2))
+print(exp(log_post(2) - log_prior(2)))
+
+set samples 1000
+
+plot \
+exp(log_prior(x)) w l lt 1 lw 8 lc rgb "$light_highlight" notitle, \
+1.3e-6 * exp(log_post(x) - log_prior(x)) w l lt 1 lw 8 lc rgb "$mid_highlight" notitle, \
+exp(log_post(x)) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
