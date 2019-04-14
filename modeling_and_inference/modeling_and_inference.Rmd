@@ -24,7 +24,7 @@ knitr::opts_chunk$set(comment=NA)
 
 Decision making is a critical task that spans not just science and industry but
 arguably the entire human experience.  At the same time, decision making in
-complex applications is notoriously subtle and counterintuitive.  
+complex applications is notoriously subtle and counterintuitive.
 
 How do we make a principled selection between a set of actions, $A$?  This 
 decision becomes straightforward if each possible action is assigned a
@@ -56,9 +56,9 @@ domain expertise.
 I take an observational perspective here that presumes the existence of a true
 data generating process that generates the observations from which we learn.
 This perspective is not universal and clashes with some philosophical 
-perspectives on statistics that are not uncommon in popular introductory texts.  
+perspectives on statistics that are not uncommon in popular introductory texts. 
 Fortunately, in most cases the differences between these perspectives don't have 
-any consequences for how the resulting methodology is implemented in practice.  
+any consequences for how the resulting methodology is implemented in practice. 
 That said, it helps to keep in mind the differing perspectives when comparing 
 this material to other literature.  Prevalent frequentist texts include 
 @CasellaEtAl:2002, @Lehmann:2006 and @Keener:2011.  There are a wide array of 
@@ -221,7 +221,7 @@ repeated.
 
 Fortunately the exact philosophical nature of this variation isn't relevant in 
 practice because these different perspectives all manifest in the _same_ 
-mathematical assumptions for the realization of the observational process.  
+mathematical assumptions for the realization of the observational process.
 Regardless of its interpretation we presume that this variation is sufficiently
 regular that, while an observational process cannot be quantified by any single
 observation, it can be quantified with a _distribution_ of observations.  More 
@@ -278,7 +278,8 @@ knitr::include_graphics("figures/inferential_config/dgp/dgp6/dgp6.png")
 
 Ignorance of the true data generating process also complicates the _calibration_
 of any decision making process informed by our inferences.  Consider formalizing 
-a decision making process as map from the observation space to the action space,
+a decision making process as a map from the observation space to the action 
+space,
 $$ 
 \begin{alignat*}{6}
 a :\; &Y& &\rightarrow& \; &A&
@@ -303,7 +304,7 @@ If we knew the true data generating process then we could calibrate the
 decision making process by evaluating the outcome utilities corresponding to 
 possible observations.  More formally, we could push the true data generating 
 process through this composite utility function to give a probability 
-distribution over outcome utilities, $\pi(U)$, and then use shape of this 
+distribution over outcome utilities, $\pi(U)$, and then use the shape of this 
 utility distribution to determine the effectiveness of the decision making 
 process.
 
@@ -336,8 +337,8 @@ of all probability distributions over the observation space.
 
 Unfortunately this _big world_ of data generating processes is just too large
 and complex to be able to quantify in any practical application.  Indeed the 
-depths of this space are where mathematicians lurk, and that alone should be 
-reason enough to stay away...
+depths of this space are where pure mathematicians lurk, and that alone should 
+be reason enough to stay away...
 
 In any case, we have to limit our search to something more tractable in 
 practical applications.  That is we have to consider only a _small world_, 
@@ -457,11 +458,11 @@ application and careful work can we develop an observational model that contains
 model configurations that sufficiently well approximate the true data generating 
 process, providing the foundation for useful inferences.
 
-Principled model development strives for an the observational process that 
-captures the relevant structure of the phenomenon, environment, and probe that 
-give rise to the true data generating process.  We always have to be careful,
-to recognize the limitations of the even the most carefully designed 
-observational model in any given analysis.
+Principled model development strives for an observational process that captures
+the relevant structure of the phenomenon, environment, and probe that give rise
+to the true data generating process.  We always have to be careful, to recognize
+the limitations of the even the most carefully designed observational model in 
+any given analysis.
 
 ### The Generative Structure of an Observational Model
 
@@ -479,7 +480,7 @@ $$
 Keep in mind that the separation between environmental and probe parameters, 
 need not always be so clean, especially for cruder approximations to the true 
 data generating process.  For example is the influence of the person collecting 
-the data better classified as a part of the environment or a part of the probe?  
+the data better classified as a part of the environment or a part of the probe?
 Taken together the non-phenomenological parameters are sometimes denoted 
 _systematic parameters_. 
 
@@ -885,12 +886,13 @@ $$
 as a point estimator for the location parameter, $\mu$, is particularly useful
 because it features a conveniently analytic pushforward probability density 
 function,
-%
+$$
 \begin{equation*}
 \pi( \hat{\mu} ; \mu, \sigma)
 =
 \mathcal{N} \left( \hat{\mu} ; \mu, \frac{\sigma}{\sqrt{N}} \right).
 \end{equation*}
+$$
 
 In terms of the estimator the squared error utility function becomes
 $$
@@ -1260,9 +1262,9 @@ worst case expected utility  is simply
 $$
 \overline{U}^{*} = 2 \, \Phi ( - \delta \cdot \sqrt{N}; 0, 1 ) - 1.
 $$
-Note that this worst case expected utility decreases towards zero as $N$ increases; the 
-interval estimator becomes more and more accurate as the size of the observation
-increases.  
+Note that this worst case expected utility increases towards zero as $N$ 
+increases; the interval estimator becomes more and more accurate as the size of 
+the observation increases.  
 
 In many introductory statistics textbooks one commonly finds the choice 
 $\delta = z_{1 - \alpha / 2} / \sqrt{N}$ for a given $\alpha$, where $z_{q}$ is 
@@ -1412,20 +1414,20 @@ for(m in 1:N_mu) {
 
 ## Frequentist Inference in Practice
 
-As we saw above, the worst case calibration used by frequentist methods can be  
+As we saw above, the worst case calibration used by frequentist methods can be
 very conservative.  An estimator might be well-behaved for most reasonable model 
-configurations but have its worst case behavior can be dominated by the 
-boundaries of the model configuration space populated by extreme, but not 
-impossible, model configurations.  That said, if we are fortunate enough to 
-engineer an estimator with an acceptable worst case expected utility then we can 
-have confidence that its behavior will be extremely robust, at least within the 
-context of the observational model.  The practical challenge is whether or not
-such an estimator even exists and we can find it.
+configurations but have its worst case behavior determined by the boundaries of 
+the model configuration space populated by extreme, but not impossible, model
+configurations.  That said, if we are fortunate enough to engineer an estimator 
+with an acceptable worst case expected utility then we can have confidence that 
+its behavior will be extremely robust, at least within the context of the 
+observational model.  The practical challenge is whether or not such an 
+estimator even exists and we can find it.
 
 Even if such an estimator does exist, however, performing the proper frequentist 
 calibration needed to determine the worst case expected utility isn't always 
 feasible.  Despite the simplicity of the observational model in the examples 
-shown above, for example, the calculations were not for the faint of heart.  
+shown above, for example, the calculations were not for the faint of heart.
 Even with the advantageous properties of the complementary models, estimators, 
 and utility functions we had to know exactly what manipulations would lead to 
 fruitful analytic results.  Upon perturbing any of those inputs the convenience 
@@ -1586,7 +1588,8 @@ $$
 \frac{ \mathrm{d} \pi_{\mathcal{S} \mid \tilde{y}} }
 { \mathrm{d} \pi_{\mathcal{S}} } (\theta)
 =
-\frac{ \pi_{\mathcal{S}}(\tilde{y} \mid \theta) }{ \pi_{\mathcal{S}}.
+\frac{ \pi_{\mathcal{S}}(\tilde{y} \mid \theta) }
+{ \pi_{\mathcal{S} (\tilde{y}) }.
 }
 $$
 The likelihood ratio defines a numerical quantification of data consistency 
@@ -1605,7 +1608,7 @@ between a likelihood function and the likelihood ratio is usually irrelevant.
 
 One we have a prior distribution and a likelihood function we can immediately 
 construct a posterior distribution using Bayes' Theorem.  Within a 
-parameterization of the model configuration spac, Bayes' Theorem defines the
+parameterization of the model configuration space, Bayes' Theorem defines the
 posterior density function as 
 $$
 \begin{align*}
@@ -1940,10 +1943,10 @@ concentrates.  We can answer this with posterior means or even posterior
 medians, which are derived from the difference of expectation values. Similarly 
 the _breadth_ of this concentration can be quantified by posterior standard 
 deviations or perhaps posterior tail quantiles.  More sophisticated questions 
-are answered with expectation values of more sophisticated functions.  
+are answered with expectation values of more sophisticated functions.
 
 The key step in _implementing_ a Bayesian analysis is _evaluating_ the posterior
-expectation values for whatever functions are deemed relevant to the analysis.  
+expectation values for whatever functions are deemed relevant to the analysis.
 
 If the posterior density can be worked out analytically then certain expectation 
 values are given exactly.  The model introduced in 
@@ -1972,7 +1975,7 @@ $$
 { \frac{\sigma^{2}}{N} + s^{2} } }
 $$
 Similarly, quantiles can be readily computed using the inverse Gaussian 
-cumulative distribution function, which is available is most computational
+cumulative distribution function, which is available in most computational
 statistical libraries. 
 
 Even with a closed-form posterior density function, however, the expectation 
@@ -2189,7 +2192,7 @@ an observational model.
 The posterior predictive distribution is influenced by the model configurations
 consistent with not just the relevant domain expertise but also the particular
 data we've observed.  This makes it ideal for informing predictions about 
-future interactions with the latent system.  
+future interactions with the latent system.
 
 Comparisons between the posterior predictive distribution and the observed data 
 also provide a measure of how well our model approximates the latent system.
@@ -2322,7 +2325,7 @@ these calibration simulations allows us to identify common pathologies, such as
 overfitting and poor identifiability, that limit the utility of any resulting
 inferences.  In addition to evaluating specific decision making processes we
 can also study the more general properties that can identify suspicious 
-behavior.  
+behavior.
 
 For example, if $\tilde{\theta}$ is the true model configuration then we can 
 quantify how closely the posterior distribution is to the true model configuration 
@@ -2334,13 +2337,13 @@ $$
 were $\mathbb{m}_{\mathrm{post}}$ is the marginal posterior mean and
 $\mathbb{V}_{\mathrm{post}}$ is the marginal posterior variance.  Smaller 
 z-scores indicate that the posterior distribution concentrates around the true
-model configuration while and larger values indicating concentration away from 
-the true model configuration.
+model configuration while larger values indicate concentration away from the 
+true model configuration.
 
 At the same time the _contraction_ of a given parameter,
 $$
 c = 1 - \frac{ \mathbb{V}_{\mathrm{post}} }
-{ \mathbb{V}_{\mathrm{post}} }
+{ \mathbb{V}_{\mathrm{prior}} }
 $$
 provides one possible quantification for how much the posterior is influenced by 
 the information encoded in the observed likelihood function.  Contraction near 
@@ -2386,8 +2389,8 @@ We see that most of the resulting posterior distributions are reasonably
 well-behaved with small z-scores and moderate contraction.  Occasionally, 
 however, the posterior distribution chases some irrelevant structure in the 
 data resulting in strong contraction and much larger z-scores.  This indicates
-that are model isn't quite as robust as we might hope, and it has nasty habit of
-being its most confident exactly when it's the most wrong.
+that are model isn't quite as robust as we might hope, and it has the nasty 
+habit of being its most confident exactly when it's the most wrong.
 
 ### Calibrating Posterior Computation
 
@@ -2409,7 +2412,7 @@ accurate.
 
 What can we do, however, if our computational tool isn't self-diagnostic?
 Fortunately Bayesian inference provides a subtle consistency property that 
-allows us to check _any_ method capable of generating posterior samples.  
+allows us to check _any_ method capable of generating posterior samples.
 Regardless of our particular model, averaging the posterior distributions fit 
 from observations simulated from the prior predictive distribution will _always_ 
 recover the prior distribution,
@@ -2619,8 +2622,8 @@ the asymptotic limit we no longer need to rely on general Bayesian tools for
 computing posterior expectations and can instead utilize approximate algorithms 
 that exploit the asymptotic structure. If the limit well approximates the 
 observational model in a given application then any fair comparison has to allow 
-both methodologies to take advantage in which case the computational burden 
-becomes practically equivalent.
+both methodologies to take advantage of it.  In that case the computational 
+burden of both approaches becomes nearly equivalent.
 
 On the other hand, if the asymptotic limit poorly approximates the observational
 model then we have to rely the general frequentist and Bayesian methodologies.
@@ -2635,7 +2638,7 @@ Bayesian inference is a versatile methodology for fusing information from
 observations and domain expertise into coherent inferences and decision-making
 processes.  The probabilistic foundations of the methodology ensure that the 
 mechanisms for evaluating, analyzing, and criticizing inferences are all 
-implemented by natural operations in probability theory.  
+implemented by natural operations in probability theory.
 
 Conceptually this makes Bayesian computation particularly well-suited to 
 automation once a complete Bayesian model has been specified.  In practice 
@@ -2655,6 +2658,31 @@ helpful comments and discussions.  I am also indebted for the feedback from
 those who have attended my courses and talks.
 
 A very special thanks to everyone supporting me on Patreon: 
+Abhinav Katoch, AdamMaruf, Aki Vehtari, Alan O'Donnell, Alexander Bartik, 
+Alexander Noll, Andre Zapico, Andrea Serafino, Andrew Rouillard, 
+Anthony Anderson, Anthony Santistevan, Arya Alexander Pourzanjani, 
+Ashton P Griffin, Austin Rochford, Aviv Keshet, Avraham Adler, Benjamin Nelson, 
+Bo Schwartz Madsen, Brian Clough, Brian Hartley, Bryan Yu, Cat Shark, 
+Charles Naylor, Chase Dwelle, Chris Cote, Chris Zawora, Chrysta Hall, 
+Cole Monnahan, Colin Carroll, Colin McAuliffe, Dan W Joyce, Daniel Elnatan, 
+Daniel Simpson, David Pascall, David Roher, David Stanard, Ed Cashin, 
+Eddie Landesberg, Elizaveta Semenova, Eren Elci, Eric Jonas, Eric Novik, 
+Erik Banek, Ethan Goan, Finn Lindgren, Granville Matheson, Hamed Bastan-Hagh, 
+Haonan Zhu, Hernan Bruno, J Michael Burgess, Jessica Graves, Joel Kronander, 
+Johannes Björk, Jonas Beltoft Gehrlein, Josh Weinstock, Joshua Duncan, 
+Joshua Mayer, Justin Bois, Karim Naguib, Karim Osman, Kejia Shi, 
+Konsta Happonen, Kyle Barlow, Kádár András, Lars Barquist, Luiz Carvalho, 
+Marc, Marc Dotson, Marek Kwiatkowski, Markus P., Matthew Kay, Matthew Quick, 
+Maurits van der Meer, Maxim Ananyev, Maxim Kesin, Michael Colaresi, 
+Michael DeWitt, Michael Dillon, Michael Redman, Murali Sarguru, N.S., 
+Nicolas Frisby, Ole Rogeberg, Onuralp Soylemez, Patrick Boehnke, Paul Chang, 
+Paul Oreto, Peter Heinrich, Reed Harder, Riccardo Fusaroli, Richard Jiang, 
+Richard Torkar, Robert Frost, Robin Taylor, Sam Petulla, Sam Zimmerman, 
+Sam Zorowitz, Scott Alder, Sean Talts, Seo-young Kim, Sergiy Protsiv, Seth Axen, 
+Sharan Banagiri, Simon DIrmeier, Simon Duane, Stephen Lienhard, Stephen Oates, 
+Stijn, Suyog Chandramouli, Taco Cohen, Thomas Pinder, Tim Radtke, Tristan Mahr, 
+Ville Inkilä, Vladislavs Dovgalecs, Will Farr, Z, mikko heikkilä, vasa, 
+and yolhaj.
 
 # References {-}
 
