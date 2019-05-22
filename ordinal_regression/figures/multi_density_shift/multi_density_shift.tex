@@ -1,0 +1,170 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function logistic_density(\x) {
+    if \x > 0 then {
+      return 12 * 4 * exp(-\x) / ((1 + exp(-\x)) * (1 + exp(-\x)));
+    } else {
+      return 12 * 4 * exp(\x) / ((1 + exp(\x)) * (1 + exp(\x)));
+    };
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.25, thick]
+
+  \pgfmathsetmacro{\dx}{0}
+  \pgfmathsetmacro{\eps}{0.1}
+  
+  \fill[domain=-9:9, smooth, samples=150, line width=1, variable=\x, color=dark] 
+    plot ({\x + \dx},{logistic_density(\x - 1.5)});
+
+  \node[] at (-9.25 + \dx, -2) { $c_{0}$ };
+  \draw[dashed, color=gray70] (-9.25 + \dx, -1) -- +(0, 13.5);
+  
+  \foreach \x [count=\i] in {-2, -0.05, 1.9} {
+    \fill[color=white] (\x - \eps + \dx, 0) rectangle(\x + \eps + \dx, 13);
+    \node[] at (\x + \dx, -2) { $c_{\i}$ };
+    \draw[dashed, color=gray70] (\x + \dx, -1) -- +(0, 13.5);
+  }
+
+  \node[] at (9.25 + \dx, -2) { $c_{4}$ };
+  \draw[dashed, color=gray70] (9.25 + \dx, -1) -- +(0, 13.5);
+  
+  \draw [-, >=stealth, line width=1] (-8 + \dx, 0) -- +(16, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (8 + \dx, 0) -- +(1.25, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (-8 + \dx, 0) -- +(-1.25, 0);
+  \node[] at (0 + \dx, -4) { $X$ };
+  
+  \node[] at (0 + \dx, 16) { $\pi_{c}(x + \gamma)$ };  
+  
+  \node[] at (-6 + \dx, -17.5) { $p_{1}$ };
+  \fill[color=dark] (-7.95 + \dx, -16) rectangle +(3.9, 0.04742587 * 20);
+  
+  \node[] at (-2 + \dx, -17.5) { $p_{2}$ };
+  \fill[color=dark] (-3.95 + \dx, -16) rectangle +(3.9, 0.2117992 * 20);
+  
+  \node[] at (+2 + \dx, -17.5) { $p_{3}$ };
+  \fill[color=dark] (0.05 + \dx, -16) rectangle +(3.9, 0.4517244 * 20);
+  
+  \node[] at (+6 + \dx, -17.5) { $p_{4}$ };
+  \fill[color=dark] (4.05 + \dx, -16) rectangle +(3.9, 0.2890505 * 20);
+  
+  \draw [-, >=stealth, line width=1] (-8.05 + \dx, -16) -- +(16.1, 0);
+  \draw [-, >=stealth, line width=1] (-8 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (-4 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (-0 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (+4 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (+8 + \dx, -16) -- +(0, -0.25);
+  
+  \pgfmathsetmacro{\dx}{27}
+  
+  \fill[domain=-8:8, smooth, samples=150, line width=1, variable=\x, color=dark] 
+    plot ({\x + \dx},{logistic_density(\x)});
+
+  \node[] at (-9.25 + \dx, -2) { $c_{0}$ };
+  \draw[dashed, color=gray70] (-9.25 + \dx, -1) -- +(0, 13.5);
+  
+  \foreach \x [count=\i] in {-2, -0.05, 1.9} {
+    \fill[color=white] (\x - \eps + \dx, 0) rectangle(\x + \eps + \dx, 13);
+    \node[] at (\x + \dx, -2) { $c_{\i}$ };
+    \draw[dashed, color=gray70] (\x + \dx, -1) -- +(0, 13.5);
+  }
+
+  \node[] at (9.25 + \dx, -2) { $c_{4}$ };
+  \draw[dashed, color=gray70] (9.25 + \dx, -1) -- +(0, 13.5);
+  
+  \draw [-, >=stealth, line width=1] (-8 + \dx, 0) -- +(16, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (8 + \dx, 0) -- +(1.25, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (-8 + \dx, 0) -- +(-1.25, 0);
+  \node[] at (0 + \dx, -4) { $X$ };
+  
+  \node[] at (0 + \dx, 16) { $\pi_{c}(x)$ };
+  
+  \node[] at (-6 + \dx, -17.5) { $p_{1}$ };
+  \fill[color=dark] (-7.95 + \dx, -16) rectangle +(3.9, 0.1192029 * 20);
+  
+  \node[] at (-2 + \dx, -17.5) { $p_{2}$ };
+  \fill[color=dark] (-3.95 + \dx, -16) rectangle +(3.9, 0.3682997 * 20);
+  
+  \node[] at (+2 + \dx, -17.5) { $p_{3}$ };
+  \fill[color=dark] (0.05 + \dx, -16) rectangle +(3.9, 0.3823889 * 20);
+  
+  \node[] at (+6 + \dx, -17.5) { $p_{4}$ };
+  \fill[color=dark] (4.05 + \dx, -16) rectangle +(3.9, 0.1301085 * 20);
+  
+  \draw [-, >=stealth, line width=1] (-8.05 + \dx, -16) -- +(16.1, 0);
+  \draw [-, >=stealth, line width=1] (-8 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (-4 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (-0 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (+4 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (+8 + \dx, -16) -- +(0, -0.25);
+  
+  \pgfmathsetmacro{\dx}{54}
+  
+  \fill[domain=-8:8, smooth, samples=150, line width=1, variable=\x, color=dark] 
+    plot ({\x + \dx},{logistic_density(\x + 1.5)});
+
+  \node[] at (-9.25 + \dx, -2) { $c_{0}$ };
+  \draw[dashed, color=gray70] (-9.25 + \dx, -1) -- +(0, 13.5);
+  
+  \foreach \x [count=\i] in {-2, -0.05, 1.9} {
+    \fill[color=white] (\x - \eps + \dx, 0) rectangle(\x + \eps + \dx, 13);
+    \node[] at (\x + \dx, -2) { $c_{\i}$ };
+    \draw[dashed, color=gray70] (\x + \dx, -1) -- +(0, 13.5);
+  }
+
+  \node[] at (9.25 + \dx, -2) { $c_{4}$ };
+  \draw[dashed, color=gray70] (9.25 + \dx, -1) -- +(0, 13.5);
+  
+  \draw [-, >=stealth, line width=1] (-8 + \dx, 0) -- +(16, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (8 + \dx, 0) -- +(1.25, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (-8 + \dx, 0) -- +(-1.25, 0);
+  \node[] at (0 + \dx, -4) { $X$ };
+  
+  \node[] at (0 + \dx, 16) { $\pi_{c}(x - \gamma)$ };
+    
+  \node[] at (-6 + \dx, -17.5) { $p_{1}$ };
+  \fill[color=dark] (-7.95 + \dx, -16) rectangle +(3.9, 0.2689414 * 20);
+  
+  \node[] at (-2 + \dx, -17.5) { $p_{2}$ };
+  \fill[color=dark] (-3.95 + \dx, -16) rectangle +(3.9, 0.4521738 * 20);
+  
+  \node[] at (+2 + \dx, -17.5) { $p_{3}$ };
+  \fill[color=dark] (0.05 + \dx, -16) rectangle +(3.9, 0.2267313 * 20);
+  
+  \node[] at (+6 + \dx, -17.5) { $p_{4}$ };
+  \fill[color=dark] (4.05 + \dx, -16) rectangle +(3.9, 0.05215356 * 20);
+  
+  \draw [-, >=stealth, line width=1] (-8.05 + \dx, -16) -- +(16.1, 0);
+  \draw [-, >=stealth, line width=1] (-8 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (-4 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (-0 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (+4 + \dx, -16) -- +(0, -0.25);
+  \draw [-, >=stealth, line width=1] (+8 + \dx, -16) -- +(0, -0.25);
+    
+\end{tikzpicture}
+
+\end{document}  

@@ -1,0 +1,68 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\newcommand*{\offset}{0.025}
+
+\tikzmath{
+  function logistic_density(\x) {
+    if \x > 0 then {
+      return 12 * 4 * exp(-\x) / ((1 + exp(-\x)) * (1 + exp(-\x)));
+    } else {
+      return 12 * 4 * exp(\x) / ((1 + exp(\x)) * (1 + exp(\x)));
+    };
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.35, thick]
+
+  \pgfmathsetmacro{\dx}{0}
+  \pgfmathsetmacro{\eps}{0.05}
+  
+  \fill[domain=-8:8, smooth, samples=150, line width=1, variable=\x, color=dark] 
+    plot ({\x + \dx},{logistic_density(\x)});
+    
+  \node[] at (-9.25 + \dx, -2) { $c_{0} = -\infty$ };
+  \draw[dashed, color=gray70] (-9.25 + \dx, -1) -- +(0, 13);
+ 
+  \fill[color=white] (-1 - \eps + \dx, 0) rectangle(-1 + \eps + \dx, 13);
+  \node[] at (-1 + \dx, -2) { $c_{1}$ };
+  \draw[dashed, color=gray70] (-1 + \dx, -1) -- +(0, 13);
+  
+  \node[] at (9.25 + \dx, -2) { $c_{2} = +\infty$ };
+  \draw[dashed, color=gray70] (9.25 + \dx, -1) -- +(0, 13);
+  
+  \node[color=white] at (-2.25 + \dx, 1) { $p_{1}$ };
+  \node[color=white] at (1.25 + \dx, 1) { $p_{2}$ };
+  
+  \draw [-, >=stealth, line width=1] (-8 + \dx, 0) -- +(16, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (8 + \dx, 0) -- +(1.25, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (-8 + \dx, 0) -- +(-1.25, 0);
+  \node[] at (0 + \dx, -3.5) { $X$ };
+  
+  \node[] at (-13, 6) { $\pi_{c}(x)$ };
+    
+\end{tikzpicture}
+
+\end{document}  
