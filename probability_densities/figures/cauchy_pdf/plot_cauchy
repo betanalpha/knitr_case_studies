@@ -1,0 +1,280 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "cauchy_pdf.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.4]
+
+nu = 1
+mu = 0
+sigma = 1
+
+student_t(x, nu, mu, sigma) = exp(  lgamma(0.5 * (nu + 1)) \
+- 0.5 * log(3.141592) - 0.5 * log(nu) - log(sigma) \
+- lgamma(0.5 * nu) \
+- 0.5 * (nu + 1) * log(1.0 + (1.0 / nu) * ((x - mu) / sigma)**2) )
+
+set samples 200
+
+plot \
+student_t(x, nu, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "cauchy_cdf_64.eps"
+
+set border 3 lw 2
+
+set title "Cauchy"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror (-2, -1, 0, 1, 2)
+set xlabel 'x'
+set xrange[-2:2]
+
+set ytics scale 0
+set ylabel "Cumulative Distribution Function"
+set format y ''
+set yrange[0:1]
+
+set arrow from -2, 0.841 to 2, 0.841 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.841" at 2.05, 0.841 left tc rgb "#888888"
+
+set arrow from -2, 0.159 to 2, 0.159 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.159"  at 2.05, 0.159 left tc rgb "#888888"
+
+mu = 0
+sigma = 1
+
+cauchy_cdf(x, mu, sigma) = 0.318309886183791 * atan( (x - mu) / sigma ) + 0.5
+
+set samples 200
+
+plot \
+cauchy_cdf(x, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "normal_cdf_64.eps"
+
+set border 3 lw 2
+
+set title "Normal"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror (-1, -0.5, 0, 0.5, 1)
+set xlabel 'x'
+set xrange[-1:1]
+
+set ytics scale 0
+set ylabel "Cumulative Distribution Function"
+set format y ''
+set yrange[0:1]
+
+set arrow from -1, 0.841 to 1, 0.841 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.841" at 1.1, 0.841 left tc rgb "#888888"
+
+set arrow from -1, 0.159 to 1, 0.159 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.159"  at 1.1, 0.159 left tc rgb "#888888"
+
+mu = 0
+sigma = 1
+
+normal_cdf(x, mu, sigma) = 0.5 * (1 + erf( (x - mu) / (1.41421 * sigma) ) )
+
+set samples 200
+
+plot \
+normal_cdf(x, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "cauchy_cdf_95.eps"
+
+set border 3 lw 2
+
+set title "Cauchy"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror (-14, -7, 0, 7, 14)
+set xlabel 'x'
+set xrange[-14:14]
+
+set ytics scale 0
+set ylabel "Cumulative Distribution Function"
+set format y ''
+set yrange[0:1]
+
+set arrow from -14, 0.977 to 14, 0.977 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.977" at 14.35, 0.977 left tc rgb "#888888"
+
+set arrow from -14, 0.023 to 14, 0.023 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.023"  at 14.35, 0.025 left tc rgb "#888888"
+
+mu = 0
+sigma = 1
+
+cauchy_cdf(x, mu, sigma) = 0.318309886183791 * atan( (x - mu) / sigma ) + 0.5
+
+set samples 200
+
+plot \
+cauchy_cdf(x, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "normal_cdf_95.eps"
+
+set border 3 lw 2
+
+set title "Normal"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror (-2, -1, 0, 1, 2)
+set xlabel 'x'
+set xrange[-2:2]
+
+set ytics scale 0
+set ylabel "Cumulative Distribution Function"
+set format y ''
+set yrange[0:1]
+
+set arrow from -2, 0.977 to 2, 0.977 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.977" at 2.1, 0.977 left tc rgb "#888888"
+
+set arrow from -2, 0.023 to 2, 0.023 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.023"  at 2.1, 0.025 left tc rgb "#888888"
+
+mu = 0
+sigma = 1
+
+normal_cdf(x, mu, sigma) = 0.5 * (1 + erf( (x - mu) / (1.41421 * sigma) ) )
+
+set samples 200
+
+plot \
+normal_cdf(x, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "cauchy_cdf_99.eps"
+
+set border 3 lw 2
+
+set title "Cauchy"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror (-236, -118, 0, 118, 236)
+set xlabel 'x'
+set xrange[-236:236]
+
+set ytics scale 0
+set ylabel "Cumulative Distribution Function"
+set format y ''
+set yrange[0:1]
+
+set arrow from -236, 0.999 to 236, 0.999 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.999" at 240, 0.999 left tc rgb "#888888"
+
+set arrow from -236, 0.001 to 236, 0.001 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.001"  at 240, 0.001 left tc rgb "#888888"
+
+mu = 0
+sigma = 1
+
+cauchy_cdf(x, mu, sigma) = 0.318309886183791 * atan( (x - mu) / sigma ) + 0.5
+
+set samples 200
+
+plot \
+cauchy_cdf(x, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "normal_cdf_99.eps"
+
+set border 3 lw 2
+
+set title "Normal"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror (-3, -1.5, 0, 1.5, 3)
+set xlabel 'x'
+set xrange[-3:3]
+
+set ytics scale 0
+set ylabel "Cumulative Distribution Function"
+set format y ''
+set yrange[0:1]
+
+set arrow from -3, 0.999 to 3, 0.999 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.999" at 3.1, 0.999 left tc rgb "#888888"
+
+set arrow from -3, 0.001 to 3, 0.001 nohead dt '-' lw 4 lc rgb "#888888"
+set label "0.001"  at 3.1, 0.001 left tc rgb "#888888"
+
+mu = 0
+sigma = 1
+
+normal_cdf(x, mu, sigma) = 0.5 * (1 + erf( (x - mu) / (1.41421 * sigma) ) )
+
+set samples 200
+
+plot \
+normal_cdf(x, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END

@@ -1,0 +1,132 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "beta1_pdf.eps"
+
+set border 11 lw 2
+
+set title "{/Symbol a} > 1, {/Symbol b} < 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[0:1]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+
+alpha = 3
+beta = 0.5
+
+beta(x, alpha, beta) = exp( lgamma(alpha + beta) - lgamma(alpha) - lgamma(beta) \
+                           + (alpha - 1) * log(x) + (beta - 1) * log(1 - x) )
+set samples 400
+
+plot beta(x, alpha, beta) w l lt 1 lw 8 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "beta2_pdf.eps"
+
+set border 11 lw 2
+
+set title "{/Symbol a} < 1, {/Symbol b} > 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[0:1]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+
+alpha = 0.3
+beta = 5
+
+beta(x, alpha, beta) = exp( lgamma(alpha + beta) - lgamma(alpha) - lgamma(beta) \
++ (alpha - 1) * log(x) + (beta - 1) * log(1 - x) )
+set samples 400
+
+plot beta(x, alpha, beta) w l lt 1 lw 8 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "beta3_pdf.eps"
+
+set border 11 lw 2
+
+set title "{/Symbol a} < 1, {/Symbol b} < 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[0:1]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+
+alpha = 0.3
+beta = 0.5
+
+beta(x, alpha, beta) = exp( lgamma(alpha + beta) - lgamma(alpha) - lgamma(beta) \
++ (alpha - 1) * log(x) + (beta - 1) * log(1 - x) )
+set samples 400
+
+plot beta(x, alpha, beta) w l lt 1 lw 8 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "beta4_pdf.eps"
+
+set border 11 lw 2
+
+set title "{/Symbol a} > 1, {/Symbol b} > 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[0:1]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+
+alpha = 3
+beta = 5
+
+beta(x, alpha, beta) = exp( lgamma(alpha + beta) - lgamma(alpha) - lgamma(beta) \
++ (alpha - 1) * log(x) + (beta - 1) * log(1 - x) )
+set samples 400
+
+plot beta(x, alpha, beta) w l lt 1 lw 8 lc rgb "$dark" notitle
+
+END

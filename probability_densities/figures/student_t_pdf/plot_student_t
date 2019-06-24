@@ -1,0 +1,328 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "student_t_inf_pdf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol n} = {/Symbol \245}, {/Symbol m} = 0, {/Symbol s} = 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.4]
+
+nu = 1000
+mu = 0
+sigma = 1
+
+student_t(x, nu, mu, sigma) = exp(  lgamma(0.5 * (nu + 1)) \
+- 0.5 * log(3.141592) - 0.5 * log(nu) - log(sigma) \
+- lgamma(0.5 * nu) \
+- 0.5 * (nu + 1) * log(1.0 + (1.0 / nu) * ((x - mu) / sigma)**2) )
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot \
+"+" using 1:(0):(gauss(x, 0, 1)) w filledcurve lt 1 lw 1 lc rgb "$light" notitle, \
+student_t(x, nu, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "student_t_inf_inv_pdf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol u} = 0, {/Symbol m} = 0, {/Symbol s} = 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.4]
+
+nu = 1000
+mu = 0
+sigma = 1
+
+student_t(x, nu, mu, sigma) = exp(  lgamma(0.5 * (nu + 1)) \
+- 0.5 * log(3.141592) - 0.5 * log(nu) - log(sigma) \
+- lgamma(0.5 * nu) \
+- 0.5 * (nu + 1) * log(1.0 + (1.0 / nu) * ((x - mu) / sigma)**2) )
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot \
+"+" using 1:(0):(gauss(x, 0, 1)) w filledcurve lt 1 lw 1 lc rgb "$light" notitle, \
+student_t(x, nu, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "student_t_5_pdf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol n} = 5, {/Symbol m} = 0, {/Symbol s} = 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.4]
+
+nu = 5
+mu = 0
+sigma = 1
+
+student_t(x, nu, mu, sigma) = exp(  lgamma(0.5 * (nu + 1)) \
+                                  - 0.5 * log(3.141592) - 0.5 * log(nu) - log(sigma) \
+                                  - lgamma(0.5 * nu) \
+                                  - 0.5 * (nu + 1) * log(1.0 + (1.0 / nu) * ((x - mu) / sigma)**2) )
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot \
+"+" using 1:(0):(gauss(x, 0, 1)) w filledcurve lt 1 lw 1 lc rgb "$light" notitle, \
+student_t(x, nu, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "student_t_5_inv_pdf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol u} = 0.2, {/Symbol m} = 0, {/Symbol s} = 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.4]
+
+nu = 5
+mu = 0
+sigma = 1
+
+student_t(x, nu, mu, sigma) = exp(  lgamma(0.5 * (nu + 1)) \
+- 0.5 * log(3.141592) - 0.5 * log(nu) - log(sigma) \
+- lgamma(0.5 * nu) \
+- 0.5 * (nu + 1) * log(1.0 + (1.0 / nu) * ((x - mu) / sigma)**2) )
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot \
+"+" using 1:(0):(gauss(x, 0, 1)) w filledcurve lt 1 lw 1 lc rgb "$light" notitle, \
+student_t(x, nu, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "student_t_2_pdf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol n} = 2, {/Symbol m} = 0, {/Symbol s} = 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.4]
+
+nu = 2
+mu = 0
+sigma = 1
+
+student_t(x, nu, mu, sigma) = exp(  lgamma(0.5 * (nu + 1)) \
+                                  - 0.5 * log(3.141592) - 0.5 * log(nu) - log(sigma) \
+                                  - lgamma(0.5 * nu) \
+                                  - 0.5 * (nu + 1) * log(1.0 + (1.0 / nu) * ((x - mu) / sigma)**2) )
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot \
+"+" using 1:(0):(gauss(x, 0, 1)) w filledcurve lt 1 lw 1 lc rgb "$light" notitle, \
+student_t(x, nu, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "student_t_2_inv_pdf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol u} = 0.5, {/Symbol m} = 0, {/Symbol s} = 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.4]
+
+nu = 2
+mu = 0
+sigma = 1
+
+student_t(x, nu, mu, sigma) = exp(  lgamma(0.5 * (nu + 1)) \
+- 0.5 * log(3.141592) - 0.5 * log(nu) - log(sigma) \
+- lgamma(0.5 * nu) \
+- 0.5 * (nu + 1) * log(1.0 + (1.0 / nu) * ((x - mu) / sigma)**2) )
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot \
+"+" using 1:(0):(gauss(x, 0, 1)) w filledcurve lt 1 lw 1 lc rgb "$light" notitle, \
+student_t(x, nu, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "student_t_1_pdf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol n} = 1, {/Symbol m} = 0, {/Symbol s} = 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.4]
+
+nu = 1
+mu = 0
+sigma = 1
+
+student_t(x, nu, mu, sigma) = exp(  lgamma(0.5 * (nu + 1)) \
+                                  - 0.5 * log(3.141592) - 0.5 * log(nu) - log(sigma) \
+                                  - lgamma(0.5 * nu) \
+                                  - 0.5 * (nu + 1) * log(1.0 + (1.0 / nu) * ((x - mu) / sigma)**2) )
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot \
+"+" using 1:(0):(gauss(x, 0, 1)) w filledcurve lt 1 lw 1 lc rgb "$light" notitle, \
+student_t(x, nu, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "student_t_1_inv_pdf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol u} = 1, {/Symbol m} = 0, {/Symbol s} = 1"
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.4]
+
+nu = 1
+mu = 0
+sigma = 1
+
+student_t(x, nu, mu, sigma) = exp(  lgamma(0.5 * (nu + 1)) \
+- 0.5 * log(3.141592) - 0.5 * log(nu) - log(sigma) \
+- lgamma(0.5 * nu) \
+- 0.5 * (nu + 1) * log(1.0 + (1.0 / nu) * ((x - mu) / sigma)**2) )
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot \
+"+" using 1:(0):(gauss(x, 0, 1)) w filledcurve lt 1 lw 1 lc rgb "$light" notitle, \
+student_t(x, nu, mu, sigma) w l lt 1 lw 8 lc rgb "$dark_highlight" notitle
+
+END

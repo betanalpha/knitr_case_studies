@@ -1,0 +1,206 @@
+\documentclass[11pt, oneside]{article}
+\usepackage{geometry} 
+\geometry{letterpaper}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{url}
+
+\begin{document}
+
+One possible motivation for a probability distribution
+$\pi$, is uniformity relative to a base measure, $\mu$,
+which we can quantify with the Kullback-Leibler from
+$\mu$ to $\pi$,
+%
+\begin{equation*}
+\mathrm{KL}(\pi \mid\mid \mu)
+=
+\mathbb{E}_{\pi} \left[ \log \frac{ \mathrm{d} \pi}{ \mathrm{d} \mu } \right].
+\end{equation*}
+%
+If both $\pi$ and $\mu$ admit probability density 
+functions relative to some reference measure, such
+as the counting measure on discrete spaces or the 
+Lebesgue measure on a continuous space, then we can
+write this as
+%
+\begin{equation*}
+\mathrm{KL}(\pi \mid\mid \mu)
+=
+\int_{X} \mathrm{d} x \, \pi(x) \, \log \frac{ \pi(x) }{ \mu(x) }.
+\end{equation*}
+
+Identifying the most uniform probability distribution 
+relative to the base measure then becomes a \emph{variational}
+optimization problem of finding the measure that minimizes 
+the Kullback-Leibler divergence subject to the measure 
+integrating to one.
+
+The solution to this variational optimization problem, 
+however, many not be well-posed without additional 
+constraints on $\pi$ beyond normalization.  From a 
+probabilistic perspective any such constraint takes
+the form of an expectation of some function,
+%
+\begin{equation*}
+t_{m} 
+= \mathbb{E}_{\pi} [ T_{m} ]
+= \int_{X} \mathrm{d} x \, \pi(x) \, T(x).
+\end{equation*}
+
+Any \emph{smooth} variational solution subject to these 
+constraints, if a solution exists at all, is given by 
+the constrained Euler-Lagrange equations which in this 
+case take the form
+%
+\begin{equation*}
+\frac{\partial L}{\partial \pi} = 0
+\end{equation*}
+%
+where the \emph{Lagrangian}, $L$, is given by
+%
+\begin{equation*}
+L = \pi(x) \, \log \frac{ \pi(x) }{ \mu(x) }
++ \sum_{m = 1}^{M} \lambda_{m} \left(t_{m} - \int_{X} \mathrm{d} x \, \pi(x) \, T(x) \right)
++ \lambda_{0} \left(1 - \int_{X} \mathrm{d} x \, \pi(x) \right).
+\end{equation*}
+%
+The \emph{Lagrange multipliers}, $\lambda_{m}$ are implicitly
+defined by the $M + 1$ constraints and can be solved by 
+imposing those constraints on any proposed solution.
+
+Differentiating through the Lagrangian gives
+%
+\begin{align*}
+0 &=
+\frac{\partial L}{\partial \pi}
+\\
+0 &=
+\log \frac{ \pi(x) }{ \mu(x) } + 1 - \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x) - \lambda_{0}
+\\
+\log \frac{ \pi(x) }{ \mu(x) } 
+&= \lambda_{0} - 1 + \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x)
+\\
+\pi(x)
+&=
+\mu(x) \,
+\exp \left( \lambda_{0} - 1 \right)
+\exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x) \right).
+\end{align*}
+
+Imposing the normalization constraint gives
+%
+\begin{align*}
+1 
+&= \int_{X} \mathrm{d} x \, \pi(x)
+\\
+&= \int_{X} \mathrm{d} x \, \mu(x)
+\exp \left( \lambda_{0} - 1 \right)
+\exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x) \right)
+\\
+&= \exp \left( \lambda_{0} - 1 \right) \int_{X} \mathrm{d} x \, \mu(x) \,
+\exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x) \right)
+\end{align*}
+%
+or
+%
+\begin{equation*}
+\exp \left( \lambda_{0} - 1 \right) 
+=
+\frac{1}{ \int_{X} \mathrm{d} x \, \mu(x) \,
+\exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x) \right) }
+\equiv
+\frac{1}{Z(\lambda_{1}, \ldots, \lambda_{M})}.
+\end{equation*}
+
+Substituting this into the variational solution finally gives
+%
+\begin{equation*}
+\pi(x) = 
+\frac{ \mu(x) \, \exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x) \right) }
+{ \int_{X} \mathrm{d} x \,
+\mu(x) \, \exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x) \right) }
+=
+\frac{ \mu(x) \, \exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x) \right) }
+{ Z(\lambda_{1}, \ldots, \lambda_{M}) }.
+\end{equation*}
+%
+The Lagrange multipliers are implicit functions of the 
+constraining expectation values and are identified by
+simultaneously solving the system of equations
+%
+\begin{align*}
+t_{m} 
+&= \int_{X} \mathrm{d} x \, \pi(x) \, T(x)
+\\
+&= 
+\frac{ \int_{X} \mathrm{d} x \, 
+\mu(x) \, \exp \left( \sum_{m' = 1}^{M} \lambda_{m'} \, T_{m'}(x) \right) \, T_{m}(x) }
+{ \int_{X} \mathrm{d} x
+\mu(x) \, \exp \left( \sum_{m = 1}^{M} \lambda_{m'} \, T_{m'}(x) \right) }
+\\
+&=
+\frac{ \frac{\partial}{\partial \lambda_{m}} \int_{X} \mathrm{d} x \, 
+\mu(x) \, \exp \left( \sum_{m' = 1}^{M} \lambda_{m'} \, T_{m'}(x) \right) }
+{ \int_{X} \mathrm{d} x
+\mu(x) \, \exp \left( \sum_{m = 1}^{M} \lambda_{m'} \, T_{m'}(x) \right) }
+\\
+&=
+\frac{1}{ Z(\lambda_{1}, \ldots, \lambda_{M})}
+\frac{\partial}{\partial \lambda_{m}}  Z(\lambda_{1}, \ldots, \lambda_{M})
+\\
+&=
+\frac{\partial}{\partial \lambda_{m}} \log Z(\lambda_{1}, \ldots, \lambda_{M}).
+\end{align*}
+
+Such a solution, if it exists, defines the probability density function 
+for a \emph{maximum entropy} distribution relative to the given reference
+measure.  Entropy here refers to the Kullback-Leibler divergence used
+to define the original variational objective function, although the
+reference is somewhat sloppy mathematically as entropy is defined on
+the \emph{symplectic manifolds} that arise in classical mechanics and
+not a general space that we might be considering.
+
+We can also avoid solving for the Lagrange multipliers and instead
+treat them as variables parameterizing an entire \emph{family} of
+probability densities,
+%
+\begin{equation*}
+\pi(x; \lambda_{1}, \ldots, \lambda_{M}) = 
+\frac{ \mu(x) \, \exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x) \right) }
+{ \int_{X} \mathrm{d} x \,
+\mu(x) \, \exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x) \right) }.
+\end{equation*}
+%
+Any family of this form defines an \emph{exponential family}
+relative to the reference measure with the \emph{natural parameters}, 
+$\left\{ \lambda_{1}, \ldots, \lambda_{M} \right\}$.  Note that
+depending on the choice of the $T_{m}(x)$ the natural parameters may 
+be constrained to ensure self-consistent probability density functions.
+
+Exponential families enjoy many convenient mathematical properties 
+that make them particularly easy to manipulate in practice.  For 
+example the product of probability density functions within an
+exponential family falls within the same family,
+%
+\begin{align*}
+\pi(x_{1}; \lambda_{1}, \ldots, \lambda_{M}) 
+\times
+\pi(x_{2}; \lambda_{1}, \ldots, \lambda_{M}) 
+&=
+\frac{ \mu(x_{1}) \, \exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x_{1}) \right) }
+{ Z(\lambda_{1}, \ldots, \lambda_{M}) }
+\frac{ \mu(x_{2}) \, \exp \left( \sum_{m = 1}^{M} \lambda_{m} \, T_{m}(x_{2}) \right) }
+{ Z(\lambda_{1}, \ldots, \lambda_{M}) }
+\\
+&=
+\frac{ \mu(x_{1}) \, \mu(x_{2}) \, \exp \left( \sum_{m = 1}^{M} \lambda_{m} ( T_{m}(x_{1}) + T_{m}(x_{2}) \right) }
+{ Z(\lambda_{1}, \ldots, \lambda_{M})^{2} }
+\end{align*}
+%
+Something something about how this is useful because we need
+to keep only $\sum_{n = 1}^{N} T(x_{n})$ instead of the 
+entire data set $\left\{x_{1}, \ldots, x_{N}\right\}$.
+
+
+\end{document}  

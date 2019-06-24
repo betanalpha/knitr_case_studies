@@ -1,0 +1,135 @@
+w#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "gamma_comp.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[0:20]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set yrange[0:0.18]
+set format y ''
+
+set label "Gamma" at 10, 0.1 center tc rgb "$mid"
+set label "Inv-Gamma" at 8.5, 0.16 center tc rgb "$dark"
+
+alpha_gamma = 4.08211
+beta_gamma = 0.650733
+
+alpha_inv_gamma = 4.08211
+beta_inv_gamma = 20.8234
+
+gamma_pdf(x, alpha, beta) = exp(alpha * log(beta) - lgamma(alpha) + (alpha - 1) * log(x) - beta * x)
+inv_gamma(x, alpha, beta) = exp(  alpha * log(beta) - lgamma(alpha) \
+                                - (alpha + 1) * log(x) - beta / x)
+
+set samples 200
+
+plot \
+gamma_pdf(x, alpha_gamma, beta_gamma) w l lt 1 lw 8 lc rgb "$mid" notitle, \
+inv_gamma(x, alpha_inv_gamma, beta_inv_gamma) w l lt 1 lw 8 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "gamma_comp_zoom_left.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[0:20]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set yrange[0:0.18]
+set format y ''
+
+set label "Gamma" at 4.5, 0.135 left tc rgb "$mid"
+set label "Inv-Gamma" at 4.5, 0.17 left tc rgb "$dark"
+
+alpha_gamma = 4.08211
+beta_gamma = 0.650733
+
+alpha_inv_gamma = 4.08211
+beta_inv_gamma = 20.8234
+
+gamma_pdf(x, alpha, beta) = exp(alpha * log(beta) - lgamma(alpha) + (alpha - 1) * log(x) - beta * x)
+inv_gamma(x, alpha, beta) = exp(  alpha * log(beta) - lgamma(alpha) \
+- (alpha + 1) * log(x) - beta / x)
+
+set samples 200
+
+plot \
+x < 4 ? gamma_pdf(x, alpha_gamma, beta_gamma) : 1 / 0 w l lt 1 lw 8 lc rgb "$mid" notitle, \
+x < 4 ? inv_gamma(x, alpha_inv_gamma, beta_inv_gamma) : 1 / 0 w l lt 1 lw 8 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "gamma_comp_zoom_right.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[0:20]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set yrange[0:0.18]
+set format y ''
+
+set label "Gamma" at 8.5, 0.065 right tc rgb "$mid"
+set label "Inv-Gamma" at 8.5, 0.05 right tc rgb "$dark"
+
+alpha_gamma = 4.08211
+beta_gamma = 0.650733
+
+alpha_inv_gamma = 4.08211
+beta_inv_gamma = 20.8234
+
+gamma_pdf(x, alpha, beta) = exp(alpha * log(beta) - lgamma(alpha) + (alpha - 1) * log(x) - beta * x)
+inv_gamma(x, alpha, beta) = exp(  alpha * log(beta) - lgamma(alpha) \
+- (alpha + 1) * log(x) - beta / x)
+
+set samples 200
+
+plot \
+x > 9 ? gamma_pdf(x, alpha_gamma, beta_gamma) : 1 / 0 w l lt 1 lw 8 lc rgb "$mid" notitle, \
+x > 9 ? inv_gamma(x, alpha_inv_gamma, beta_inv_gamma) : 1 / 0 w l lt 1 lw 8 lc rgb "$dark" notitle
+
+END
+

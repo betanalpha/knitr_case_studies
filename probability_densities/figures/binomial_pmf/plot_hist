@@ -1,0 +1,43 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 40' size 6, 4
+set output "binomial_pmf.eps"
+
+set border 11 lw 2
+
+set lmargin screen 0.075
+set rmargin screen 0.95
+
+set xtics out nomirror
+set xlabel "x"
+set xrange[-0.5:20.5]
+
+unset ytics
+set ylabel "Probability Mass Function"
+
+p = 0.6
+N = 20
+pmf(x, p, N) = exp(lgamma(N + 1) - lgamma(x + 1) - lgamma(N - x + 1) + x * log(p) + (N - x) * log(1 - p))
+
+binwidth = 1
+set boxwidth binwidth
+bin(x, width) = x
+
+set style fill solid
+
+set samples 22
+
+plot \
+"+" using (bin(\$1 + 0.5, binwidth)):(pmf(\$1 + 0.5, p, N)) smooth freq \
+with boxes lt 1 lc rgb "white" lw 4 fs fill border lc rgbcolor "$dark_highlight" notitle
+
+END

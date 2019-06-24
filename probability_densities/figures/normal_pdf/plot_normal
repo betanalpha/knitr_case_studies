@@ -1,0 +1,104 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "normal_pdf.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.5]
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot gauss(x, 0, 1) w l lt 1 lw 8 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "normal_location_pdf.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.5]
+
+set arrow from 0, 0 to 0, 0.45 nohead lw 8 lc rgb "$mid" front
+set label "{/Symbol m}" at 0, 0.48 center tc rgb "$mid"
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot gauss(x, 0, 1) w l lt 1 lw 8 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "normal_location_scale_pdf.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set lmargin screen 0.125
+set rmargin screen 0.875
+
+set xtics out nomirror
+set xlabel 'x'
+set xrange[-6:6]
+
+set ytics scale 0
+set ylabel "Probability Density Function"
+set format y ''
+set yrange[0:0.5]
+
+set arrow from -3, 0 to -3, 0.45 nohead lw 8 lc rgb "$mid" front
+set label "{/Symbol m} - 3 {/Symbol s}" at -3, 0.48 center tc rgb "$mid"
+
+set arrow from 3, 0 to 3, 0.45 nohead lw 8 lc rgb "$mid" front
+set label "{/Symbol m} + 3 {/Symbol s}" at 3, 0.48 center tc rgb "$mid"
+
+gauss(x, mu, sigma2) = exp(-0.5 * (x - mu)**2 / sigma2) / sqrt(2 * pi * sigma2)
+
+set samples 200
+
+plot gauss(x, 0, 1) w l lt 1 lw 8 lc rgb "$dark" notitle
+
+END

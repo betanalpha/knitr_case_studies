@@ -1,0 +1,360 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 40' size 6, 4
+set output "neg_binomial_2_inf_pmf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol m} = 5, {/Symbol f} = {/Symbol \245}"
+
+set lmargin screen 0.075
+set rmargin screen 0.95
+
+set xtics out nomirror
+set xlabel "x"
+set xrange[-0.5:20.5]
+
+unset ytics
+set ylabel "Probability Mass Function"
+
+mu = 5
+phi = 10000
+pmf(x, mu, phi) = exp( lgamma(x + phi) - lgamma(x + 1) - lgamma(phi) \
+                      + x * log(mu) - x * log(mu + phi) \
+                      + phi * log(phi) - phi * log(mu + phi))
+
+lambda = 5
+poisson(x, l) = exp( x * log(l) - l - lgamma(x + 1) )
+
+binwidth = 1
+set boxwidth binwidth
+bin(x, width) = x
+
+set style fill solid
+
+set samples 22
+
+plot \
+"+" using (bin(\$1 + 0.5, binwidth)):(poisson(\$1 + 0.5, lambda)) smooth freq \
+with boxes lt 1 lc rgb "$light" lw 4 fs fill border lc rgbcolor "$light_highlight" notitle, \
+"+" using (bin(\$1 + 0.5, binwidth)):(pmf(\$1 + 0.5, mu, phi)) smooth freq \
+with boxes lt 1 lw 6 lc rgb "$dark" fs fill empty border notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 40' size 6, 4
+set output "neg_binomial_2_inf_inv_pmf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol m} = 5, {/Symbol y} = 0"
+
+set lmargin screen 0.075
+set rmargin screen 0.95
+
+set xtics out nomirror
+set xlabel "x"
+set xrange[-0.5:20.5]
+
+unset ytics
+set ylabel "Probability Mass Function"
+
+mu = 5
+phi = 10000
+pmf(x, mu, phi) = exp( lgamma(x + phi) - lgamma(x + 1) - lgamma(phi) \
++ x * log(mu) - x * log(mu + phi) \
++ phi * log(phi) - phi * log(mu + phi))
+
+lambda = 5
+poisson(x, l) = exp( x * log(l) - l - lgamma(x + 1) )
+
+binwidth = 1
+set boxwidth binwidth
+bin(x, width) = x
+
+set style fill solid
+
+set samples 22
+
+plot \
+"+" using (bin(\$1 + 0.5, binwidth)):(poisson(\$1 + 0.5, lambda)) smooth freq \
+with boxes lt 1 lc rgb "$light" lw 4 fs fill border lc rgbcolor "$light_highlight" notitle, \
+"+" using (bin(\$1 + 0.5, binwidth)):(pmf(\$1 + 0.5, mu, phi)) smooth freq \
+with boxes lt 1 lw 6 lc rgb "$dark" fs fill empty border notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 40' size 6, 4
+set output "neg_binomial_2_100_pmf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol m} = 5, {/Symbol f} = 100"
+
+set lmargin screen 0.075
+set rmargin screen 0.95
+
+set xtics out nomirror
+set xlabel "x"
+set xrange[-0.5:20.5]
+
+unset ytics
+set ylabel "Probability Mass Function"
+
+mu = 5
+phi = 100
+pmf(x, mu, phi) = exp( lgamma(x + phi) - lgamma(x + 1) - lgamma(phi) \
++ x * log(mu) - x * log(mu + phi) \
++ phi * log(phi) - phi * log(mu + phi))
+
+lambda = 5
+poisson(x, l) = exp( x * log(l) - l - lgamma(x + 1) )
+
+binwidth = 1
+set boxwidth binwidth
+bin(x, width) = x
+
+set style fill solid
+
+set samples 22
+
+plot \
+"+" using (bin(\$1 + 0.5, binwidth)):(poisson(\$1 + 0.5, lambda)) smooth freq \
+with boxes lt 1 lc rgb "$light" lw 4 fs fill border lc rgbcolor "$light_highlight" notitle, \
+"+" using (bin(\$1 + 0.5, binwidth)):(pmf(\$1 + 0.5, mu, phi)) smooth freq \
+with boxes lt 1 lw 6 lc rgb "$dark" fs fill empty border notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 40' size 6, 4
+set output "neg_binomial_2_100_inv_pmf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol m} = 5, {/Symbol y} = 0.01"
+
+set lmargin screen 0.075
+set rmargin screen 0.95
+
+set xtics out nomirror
+set xlabel "x"
+set xrange[-0.5:20.5]
+
+unset ytics
+set ylabel "Probability Mass Function"
+
+mu = 5
+phi = 100
+pmf(x, mu, phi) = exp( lgamma(x + phi) - lgamma(x + 1) - lgamma(phi) \
++ x * log(mu) - x * log(mu + phi) \
++ phi * log(phi) - phi * log(mu + phi))
+
+lambda = 5
+poisson(x, l) = exp( x * log(l) - l - lgamma(x + 1) )
+
+binwidth = 1
+set boxwidth binwidth
+bin(x, width) = x
+
+set style fill solid
+
+set samples 22
+
+plot \
+"+" using (bin(\$1 + 0.5, binwidth)):(poisson(\$1 + 0.5, lambda)) smooth freq \
+with boxes lt 1 lc rgb "$light" lw 4 fs fill border lc rgbcolor "$light_highlight" notitle, \
+"+" using (bin(\$1 + 0.5, binwidth)):(pmf(\$1 + 0.5, mu, phi)) smooth freq \
+with boxes lt 1 lw 6 lc rgb "$dark" fs fill empty border notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 40' size 6, 4
+set output "neg_binomial_2_5_pmf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol m} = 5, {/Symbol f} = 5"
+
+set lmargin screen 0.075
+set rmargin screen 0.95
+
+set xtics out nomirror
+set xlabel "x"
+set xrange[-0.5:20.5]
+
+unset ytics
+set ylabel "Probability Mass Function"
+
+mu = 5
+phi = 5
+pmf(x, mu, phi) = exp( lgamma(x + phi) - lgamma(x + 1) - lgamma(phi) \
+                      + x * log(mu) - x * log(mu + phi) \
+                      + phi * log(phi) - phi * log(mu + phi))
+
+lambda = 5
+poisson(x, l) = exp( x * log(l) - l - lgamma(x + 1) )
+
+binwidth = 1
+set boxwidth binwidth
+bin(x, width) = x
+
+set style fill solid
+
+set samples 22
+
+plot \
+"+" using (bin(\$1 + 0.5, binwidth)):(poisson(\$1 + 0.5, lambda)) smooth freq \
+with boxes lt 1 lc rgb "$light" lw 4 fs fill border lc rgbcolor "$light_highlight" notitle, \
+"+" using (bin(\$1 + 0.5, binwidth)):(pmf(\$1 + 0.5, mu, phi)) smooth freq \
+with boxes lt 1 lw 6 lc rgb "$dark"  fs fill empty notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 40' size 6, 4
+set output "neg_binomial_2_5_inv_pmf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol m} = 5, {/Symbol y} = 0.2"
+
+set lmargin screen 0.075
+set rmargin screen 0.95
+
+set xtics out nomirror
+set xlabel "x"
+set xrange[-0.5:20.5]
+
+unset ytics
+set ylabel "Probability Mass Function"
+
+mu = 5
+phi = 5
+pmf(x, mu, phi) = exp( lgamma(x + phi) - lgamma(x + 1) - lgamma(phi) \
++ x * log(mu) - x * log(mu + phi) \
++ phi * log(phi) - phi * log(mu + phi))
+
+lambda = 5
+poisson(x, l) = exp( x * log(l) - l - lgamma(x + 1) )
+
+binwidth = 1
+set boxwidth binwidth
+bin(x, width) = x
+
+set style fill solid
+
+set samples 22
+
+plot \
+"+" using (bin(\$1 + 0.5, binwidth)):(poisson(\$1 + 0.5, lambda)) smooth freq \
+with boxes lt 1 lc rgb "$light" lw 4 fs fill border lc rgbcolor "$light_highlight" notitle, \
+"+" using (bin(\$1 + 0.5, binwidth)):(pmf(\$1 + 0.5, mu, phi)) smooth freq \
+with boxes lt 1 lw 6 lc rgb "$dark"  fs fill empty notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 40' size 6, 4
+set output "neg_binomial_2_1_pmf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol m} = 5, {/Symbol f} = 1"
+
+set lmargin screen 0.075
+set rmargin screen 0.95
+
+set xtics out nomirror
+set xlabel "x"
+set xrange[-0.5:20.5]
+
+unset ytics
+set ylabel "Probability Mass Function"
+
+mu = 5
+phi = 1
+pmf(x, mu, phi) = exp( lgamma(x + phi) - lgamma(x + 1) - lgamma(phi) \
+                      + x * log(mu) - x * log(mu + phi) \
+                      + phi * log(phi) - phi * log(mu + phi))
+
+lambda = 5
+poisson(x, l) = exp( x * log(l) - l - lgamma(x + 1) )
+
+binwidth = 1
+set boxwidth binwidth
+bin(x, width) = x
+
+set style fill solid
+
+set samples 22
+
+plot \
+"+" using (bin(\$1 + 0.5, binwidth)):(poisson(\$1 + 0.5, lambda)) smooth freq \
+with boxes lt 1 lc rgb "$light" lw 4 fs fill border lc rgbcolor "$light_highlight" notitle, \
+"+" using (bin(\$1 + 0.5, binwidth)):(pmf(\$1 + 0.5, mu, phi)) smooth freq \
+with boxes lt 1 lw 6 lc rgb "$dark"  fs fill empty notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 40' size 6, 4
+set output "neg_binomial_2_1_inv_pmf.eps"
+
+set border 3 lw 2
+
+set title "{/Symbol m} = 5, {/Symbol y} = 1"
+
+set lmargin screen 0.075
+set rmargin screen 0.95
+
+set xtics out nomirror
+set xlabel "x"
+set xrange[-0.5:20.5]
+
+unset ytics
+set ylabel "Probability Mass Function"
+
+mu = 5
+phi = 1
+pmf(x, mu, phi) = exp( lgamma(x + phi) - lgamma(x + 1) - lgamma(phi) \
++ x * log(mu) - x * log(mu + phi) \
++ phi * log(phi) - phi * log(mu + phi))
+
+lambda = 5
+poisson(x, l) = exp( x * log(l) - l - lgamma(x + 1) )
+
+binwidth = 1
+set boxwidth binwidth
+bin(x, width) = x
+
+set style fill solid
+
+set samples 22
+
+plot \
+"+" using (bin(\$1 + 0.5, binwidth)):(poisson(\$1 + 0.5, lambda)) smooth freq \
+with boxes lt 1 lc rgb "$light" lw 4 fs fill border lc rgbcolor "$light_highlight" notitle, \
+"+" using (bin(\$1 + 0.5, binwidth)):(pmf(\$1 + 0.5, mu, phi)) smooth freq \
+with boxes lt 1 lw 6 lc rgb "$dark"  fs fill empty notitle
+
+END

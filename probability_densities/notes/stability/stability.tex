@@ -1,0 +1,83 @@
+\documentclass[11pt, oneside]{article}
+\usepackage{geometry} 
+\geometry{letterpaper}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{url}
+
+\begin{document}
+
+Let $X = X_{1} \times \ldots X_{N}$ with each
+component having the same distribution, $\pi$,
+such that the joint probability density function 
+on $X$ is given by 
+%
+\begin{equation*}
+\pi(x_{1}, \ldots, x_{N})
+=
+\prod_{n = 1}^{N} \pi(x_{n}).
+\end{equation*}
+%
+Additionally consider the weighted summation 
+function
+%
+\begin{equation*}
+s_{w} : (x_{1}, \ldots, x_{N}) \mapsto \sum_{n = 1}^{N} w_{n} \, x_{n}.
+\end{equation*}
+
+If the component distribution is represented by
+a Gaussian probability density function with locations
+$\mu_{n}$ and scales $\sigma_{n}$ then the pushforward 
+distribution of the joint distribution along $s_{w}$ 
+is 
+%
+\begin{equation*}
+\pi(s) = \mathcal{N} \left( s ; 
+\sum_{n = 1}^{N} w_{n} \, \mu_{n}, 
+\sqrt{ \sum_{n = 1}^{N} w^{2}_{n} \, \sigma^{2}_{n}} \right).
+\end{equation*}
+%
+In the special case of identically distributed
+components the pushforward distribution becomes
+%
+\begin{equation*}
+\pi(s) = \mathcal{N} \left( s ; 
+\sum_{n = 1}^{N} w_{n} \cdot \mu, 
+\sqrt{ \sum_{n = 1}^{N} w^{2}_{n} } \cdot \sigma \right).
+\end{equation*}
+
+
+If the component distribution is represented by
+a Cauchy probability density function with locations
+$\mu_{n}$ and scales $\sigma_{n}$ then the pushforward 
+distribution of the joint distribution along $s_{w}$ 
+is 
+%
+\begin{equation*}
+\pi(s) = \mathcal{C} \left( s ; 
+\sum_{n = 1}^{N} w_{n} \, \mu_{n}, 
+\sum_{n = 1}^{N} w_{n} \, \sigma_{n} \right).
+\end{equation*}
+%
+In the special case of identically distributed
+components the pushforward distribution becomes
+%
+\begin{equation*}
+\pi(s) = \mathcal{N} \left( s ; 
+\sum_{n = 1}^{N} w_{n} \cdot \mu, 
+\sum_{n = 1}^{N} w_{n} \cdot \sigma \right).
+\end{equation*}
+
+Notice the difference -- in the Cauchy case the 
+scales add linearly with the weights while in the
+Gaussian case the scales add quadratically with
+the weights.  This has an important difference 
+when considering averages with $w_{n} = 1 / N$.
+Here $\sum_{n = 1}^{N} w_{n} = 1$ and the
+distribution of the average for the Cauchy is
+the same as the distribution for any individual,
+where as the distribution for the Gaussian average
+concentrates around the common location. 
+
+
+\end{document}  

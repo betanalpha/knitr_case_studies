@@ -1,0 +1,215 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "multi_normal1.eps"
+
+set border 10  lw 4
+
+set tmargin screen 0.95
+set lmargin screen 0.1
+set rmargin screen 0.95
+
+set pm3d map implicit at s
+
+set title ""
+
+set xtics scale 0
+set xlabel 'x_{1}' offset 0, 1.5
+set format x ''
+set xrange[-4:4]
+
+set ytics scale 0
+set ylabel 'x_{2}'
+set format y ''
+set yrange[-3:3]
+
+set zlabel ''
+set zrange[1e-2:1]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 250
+set isosamples 250
+
+rho=0.0
+mu_x=0
+sigma_x=1
+mu_y=0
+sigma_y=1
+
+splot exp( - 0.5 * ( ((x - mu_x) / sigma_x)**2 - \
+                      2 * rho * ((x - mu_x) / sigma_x) * ((y - mu_y) / sigma_y) + \
+                     ((y - mu_y) / sigma_y)**2) / (1 - rho * rho) ) \
+      / (6.28318 * sigma_x * sigma_y * sqrt(1 - rho * rho)) notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "multi_normal2.eps"
+
+set border 10  lw 4
+
+set tmargin screen 0.95
+set lmargin screen 0.1
+set rmargin screen 0.95
+
+set pm3d map implicit at s
+
+set title ""
+
+set xtics scale 0
+set xlabel 'x_{1}' offset 0, 1.5
+set format x ''
+set xrange[-4:4]
+
+set ytics scale 0
+set ylabel 'x_{2}'
+set format y ''
+set yrange[-3:3]
+
+set zlabel ''
+set zrange[1e-2:1]
+
+unset cbtics
+unset colorbox
+
+set arrow from -2, 1.75 to 2, 1.75 heads filled size first 0.1, 35, 0 lw 8 lc rgb "black" front
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 250
+set isosamples 250
+
+rho=0.0
+mu_x=0
+sigma_x=1.25
+mu_y=0
+sigma_y=1
+
+splot exp( - 0.5 * ( ((x - mu_x) / sigma_x)**2 - \
+                     2 * rho * ((x - mu_x) / sigma_x) * ((y - mu_y) / sigma_y) + \
+                     ((y - mu_y) / sigma_y)**2) / (1 - rho * rho) ) \
+      / (6.28318 * sigma_x * sigma_y * sqrt(1 - rho * rho)) notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "multi_normal3.eps"
+
+set border 10  lw 4
+
+set tmargin screen 0.95
+set lmargin screen 0.1
+set rmargin screen 0.95
+
+set pm3d map implicit at s
+
+set title ""
+
+set xtics scale 0
+set xlabel 'x_{1}' offset 0, 1.5
+set format x ''
+set xrange[-4:4]
+
+set ytics scale 0
+set ylabel 'x_{2}'
+set format y ''
+set yrange[-3:3]
+
+set zlabel ''
+set zrange[1e-2:1]
+
+unset cbtics
+unset colorbox
+
+set object 2 circle at 0, 0 arc [-120:15] size 2 fc rgb "black" lw 8
+set object 3 circle at 0, 0 arc [15:-120] size 2 fc rgb "white" lw 9
+
+set arrow from 1.9935, -0.2 rto 0, 0.2 \
+  head filled size first 0.1, 35, 0 lw 8 lc rgb "black" front
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 250
+set isosamples 250
+
+rho=0.7
+mu_x=0
+sigma_x=1.25
+mu_y=0
+sigma_y=1
+
+splot exp( - 0.5 * ( ((x - mu_x) / sigma_x)**2 - \
+                      2 * rho * ((x - mu_x) / sigma_x) * ((y - mu_y) / sigma_y) + \
+                     ((y - mu_y) / sigma_y)**2) / (1 - rho * rho) ) \
+      / (6.28318 * sigma_x * sigma_y * sqrt(1 - rho * rho)) notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "multi_normal4.eps"
+
+set border 10  lw 4
+
+set tmargin screen 0.95
+set lmargin screen 0.1
+set rmargin screen 0.95
+
+set pm3d map implicit at s
+
+set title ""
+
+set xtics scale 0
+set xlabel 'x_{1}' offset 0, 1.5
+set format x ''
+set xrange[-4:4]
+
+set ytics scale 0
+set ylabel 'x_{2}'
+set format y ''
+set yrange[-3:3]
+
+set zlabel ''
+set zrange[1e-2:1]
+
+unset cbtics
+unset colorbox
+
+set arrow from 0, 0 rto 0.5, -0.5 \
+  head filled size first 0.1, 35, 0 lw 8 lc rgb "black" front
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 250
+set isosamples 250
+
+rho=0.7
+mu_x=1
+sigma_x=1.25
+mu_y=-1
+sigma_y=1
+
+splot exp( - 0.5 * ( ((x - mu_x) / sigma_x)**2 - \
+                     2 * rho * ((x - mu_x) / sigma_x) * ((y - mu_y) / sigma_y) + \
+                     ((y - mu_y) / sigma_y)**2) / (1 - rho * rho) ) \
+      / (6.28318 * sigma_x * sigma_y * sqrt(1 - rho * rho)) notitle
+
+END
