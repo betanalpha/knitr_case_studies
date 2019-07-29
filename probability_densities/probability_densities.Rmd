@@ -35,7 +35,7 @@ Fortunately we can exploit
 to build up high-dimensional probability distributions from many
 one-dimensional probability distributions about which we can more easily reason. 
 With only a modest collection of probability distributions at their disposal
-a practitioner has to potential to construct a wide array of sophisticated
+a practitioner has the potential to construct a wide array of sophisticated
 probability distributions.  A cache of interpretable, well-understood 
 probability distributions is a critical piece of any practitioner's statistical
 toolkit.
@@ -154,7 +154,7 @@ joint probability distribution.
 Consider, for example, modeling each component with replicates of a single
 one-dimensional space, $X$, and modeling the complex system with the product 
 space, $X_{N} = \prod_{n = 1}^{N} X$.  We can specify a probability 
-distribution over each component using individual, and in general heterogenous,
+distribution over each component using individual, and in general heterogeneous,
 probability density functions, $\pi_{n}(x_{n})$.
 
 These component probability density functions then define an _independent_ joint
@@ -177,7 +177,7 @@ $$
 \varpi: X_{N} \rightarrow X.
 $$
 
-A common example, and the one that we will utilize most often is an _additive_
+A common example, and the one that we will utilize most often, is an _additive_
 projection,
 $$
 \begin{alignat*}{6}
@@ -377,7 +377,7 @@ The closure inherit to stable families is relevant only when each component
 is modeled by a probability distribution within a particular stable family.
 What use does that closure have, however, when the more realistic complex 
 systems of applied interest would not be accurately modeled with only a single
-family, instead requiring heterogenous component probability density functions 
+family, instead requiring heterogeneous component probability density functions
 not contained within any single family?
 
 If we begin within a stable family of probability density functions then any
@@ -409,14 +409,6 @@ member of the normal family.  This helps explain why the normal family is so
 ubiquitous in statistical modeling -- even if a normal is a poor choice for any
 single component of a complex system it can be an excellent choice for modeling 
 the emergent behavior derived from their coalescence.
-
-<center>
-<br>
-```{r, out.width = "75%", echo=FALSE}
-knitr::include_graphics("figures/stability/stability4/stability4.png")
-```
-<br><br>
-</center>
 
 When the component distributions have ill-defined means and variances then these
 sequences will converge to _other_ stable families of probability density 
@@ -472,7 +464,7 @@ If we fix one of the input measures then the Kullback-Leibler divergence
 defines a _variational objective function_ whose minimum identifies the measure 
 that is closest to the other measure.  Variational here refers to the 
 optimization being over a space of measures instead of just a space of points. 
-Fixing the second argument, $\nu$, and minimizing the first argument, $\mu$,
+Fixing the second argument, $\nu$, and minimizing with respect to the first argument, $\mu$,
 prioritizes matching the behavior of $\mu$ in neighborhoods where $\mu$ assigns
 significant measure.  In other words the variational minimum is the measure that
 is _best approximated_ by the fixed measure $\nu$ [@CsiszarEtAl:2004].
@@ -484,7 +476,7 @@ divergence under _expectation value constraints_.  For example we could consider
 only probability distributions as candidate solutions, instead of any 
 arbitrary measure, by introducing a normalization constraint,
 $$
-\int_{X} \mathrm{d} \mu(x) \, 1 = 1.
+\int_{X} \mathrm{d} x \, \mu(x) = 1.
 $$
 With this constraint the variational minimum becomes much less trivial; it may
 not be unique and it may not exist at all!  The more sophisticated the 
@@ -1265,7 +1257,7 @@ $$
   </tr>
   <tr style="background-color:#F9F9F9;">
     <td>Dispersion</td>
-    <td>$$\phi$$</td> 
+    <td>$$\psi$$</td>
     <td>$$[0, 1]$$</td>
     <td>None</td>
   </tr>
@@ -2681,7 +2673,7 @@ with probability density functions that feature such heavy tails.
 ### Dispersion Parameterization
 
 If we want to emphasize how Student's t family expands the normal family then
-it's often easer to parameterize the family with the reciprocal of the degrees 
+it's often easier to parameterize the family with the reciprocal of the degrees
 of freedom parameter,
 $$
 \upsilon  = \frac{1}{\nu}.
@@ -2782,7 +2774,7 @@ knitr::include_graphics("figures/student_t_pdf/student_t_1_inv_pdf.png")
 ## The Cauchy Family { #sec:cauchy_family }
 
 The subfamily that defines the boundary between well-defined means and 
-ill-defined means is sufficiently common that it deservers its own dedicated
+ill-defined means is sufficiently common that it deserves its own dedicated
 discussion.  By taking $\nu = \upsilon = 1$ Student's t family reduces to the
 _Cauchy family_.
 
@@ -2898,7 +2890,7 @@ knitr::include_graphics("figures/cauchy_pdf/cauchy_cdf_99.png")
 </center>
 
 This extreme diffusion can lead to counterintuitive behavior when the Cauchy
-family is deployed in a practical application and consequetly serious care must 
+family is deployed in a practical application and consequently serious care must
 be taken whenever the family is unleashed.  Indeed the Cauchy family is often 
 used as an adversarial example in theoretical statistics, its pathological 
 behavior identifying unstated assumptions and other limitations in mathematical
