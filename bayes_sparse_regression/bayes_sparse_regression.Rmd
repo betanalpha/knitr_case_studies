@@ -45,8 +45,8 @@ with the outcome variate.
 
 For example we might be interested in classifying individuals in a population
 into two groups, with many individual characteristics possibly influencing the
-probabilty of being associated with each group.  Without any sparsity
-assumptions the uncertainty in the irrelevant characterisics will propagate
+probability of being associated with each group.  Without any sparsity
+assumptions the uncertainty in the irrelevant characteristics will propagate
 to large uncertainties in inferred associations.  If we can isolate only the
 relevant covariates, however, then we can significantly reduce the
 uncertainties in how the covariates influence the classification.
@@ -88,7 +88,7 @@ proceeds and ultimately discarded.
 For sufficiently simple data generating processes and large enough data sets
 these methods tend to be reasonably well-calibrated.  We will, on average,
 discard most of the irrelevant covariates while retaining most of the relevant
-covariates, and our abilty ot model the variate outcome, regardless of the
+covariates, and our ability of model the variate outcome, regardless of the
 exact data that we observe.
 
 ## Inducing Sparse Inferences
@@ -108,16 +108,16 @@ It's tempting to appeal to the penalty function that is so critical to the
 success in the frequentist setting.  In particular, if we reinterpret a
 sparsity-inducing penalty function as a log probability density over parameter
 space then does that always define a sparsity-inducing prior distribution?
-Unfortunately it does not.  In fact the implied prior distibution can stretch
+Unfortunately it does not.  In fact the implied prior distribution can stretch
 the corresponding posterior distribution _away_ from the desired neighborhood
-where the irrelevan slopes vanish.
+where the irrelevant slopes vanish.
 
 The problem is that the sparsity-inducing penalty function has to influence only
 a single point in parameter space at any given time, whereas a
 sparsity-inducing prior distribution has to consider the entire parameter space
 at once.
 
-## Sparsity-Inducing Estimators verses Sparsity-Inducing Distributions
+## Sparsity-Inducing Estimators versus Sparsity-Inducing Distributions
 
 To highlight the difference between inducing sparsity in a point estimator and
 inducing sparsity in an entire distribution, let's consider the $L_{1}$ penalty
@@ -127,11 +127,11 @@ R_{L_{1}} ( \boldsymbol{\beta} ) =
 \sum_{m = 1}^{M} \lambda_{m} \left| \beta_{m} \right|.
 $$
 
-When the maximum likeihood estimate of the slope $\beta_{m}$ falls below the
+When the maximum likelihood estimate of the slope $\beta_{m}$ falls below the
 scale $\lambda_{m}$ it is regularized towards zero but, because the penalty is
 nearly flat above the scale, estimates above $\lambda_{m}$ experience negligible
 regularization.  Given a suitable choice of scales for each covariate this
-dichotomous behavior of the penalty facilitates the suppresion of the irrelevant
+dichotomous behavior of the penalty facilitates the suppression of the irrelevant
 slopes below the selection threshold while leaving the relevant slopes
 undisturbed.
 
@@ -148,17 +148,17 @@ With this prior the mode of the resulting posterior distribution will coincide
 with the penalized maximum likelihood estimator; unfortunately the mode is not
 a well-posed inference drawn from the posterior distribution.  Proper inferences
 correspond instead of posterior expectation values that are informed by the
-_entire_ posterior distribution.  The affect of the Laplace prior on the full
-posterior distribution is not nearly as useful as its affect on the mode.
+_entire_ posterior distribution.  The effect of the Laplace prior on the full
+posterior distribution is not nearly as useful as its effect on the mode.
 
 Because the maximum likelihood estimator considers only a single point in
-parameter space at a time, it is influenced by the either the regularizing
+parameter space at a time, it is influenced by either the regularizing
 behavior of the penalty below each $\lambda_{m}$ or the laissez faire behavior
 above each $\lambda_{m}$, but not both.  The expanse of the posterior
 distribution, however, is influenced by both of these behaviors _at the same
 time_.  While the shape of the Laplace prior below $\lambda_{m}$ does induce
 some concentration of the posterior towards smaller values of $\beta_{m}$, the
-heavy tail also drags significant posterior probabilty far above $\lambda_{m}$.
+heavy tail also drags significant posterior probability far above $\lambda_{m}$.
 
 These opposing behaviors induce regrettable features in the posterior for
 both the irrelevant slopes, which leak significant probability mass towards
@@ -184,9 +184,9 @@ are not.
 
 In order to provide the desired flexibility in the posterior for each slope we
 need a prior distribution that enforces a global scale while also giving each
-of slopes the flexibilty to transcend that scale as needed.  Because we don't
-know which slopes will need that flexibilty the desired prior will have to be
-exchangeable with respect to the slopes and hence manifest a hierachical
+of slopes the flexibility to transcend that scale as needed.  Because we don't
+know which slopes will need that flexibility the desired prior will have to be
+exchangeable with respect to the slopes and hence manifest a hierarchical
 structure.
 
 The _horseshoe_ prior [@CarvalhoEtAl:2009] accomplishes this flexibility by
@@ -239,12 +239,12 @@ $s$ around zero.
 ## Sparsity-Inducing Thresholds
 
 With the shape of a sparsity-inducing prior established we are left only with
-determining the prior hyperparameter $\tau_{0}$ which effetively determines
+determining the prior hyperparameter $\tau_{0}$ which effectively determines
 the scale below which slopes are irrelevant to the modeling of the output
 variate.  The subtlety with specifying $\tau_{0}$ is that irrelevance is
 determined not by the prior distribution itself but rather our
 _measurement process_ -- the contribution of a slope is negligible only when it
-is indistinguishable from the inherent variabiltiy of our observations.  As
+is indistinguishable from the inherent variability of our observations.  As
 always the consequences of the prior depend on the context of the likelihood
 [@GelmanEtAl:2017].
 
@@ -267,7 +267,7 @@ When we consider the posterior behavior, however, we have to recognize that the
 data will typically inform our inferences beyond the scale of the measurement
 variability -- with $N$ independent observations we will be sensitive to effects
 as small as $\sigma / \sqrt{N}$.  If we ignore the number of observations then
-the consequnces of the resulting prior will change with the size of the data!
+the consequences of the resulting prior will change with the size of the data!
 This suggests instead that we take $\tau_{0} = \sigma / \sqrt{N}$.
 
 Our logic so far has relied on the expected contribution from each slope
@@ -286,7 +286,7 @@ reasonable estimate is typically sufficient.
 If we move away from pure linear regression then this argument has to be
 modified to account for nonlinearities in the measurement process.
 @PiironenEtAl:2017a derives approximate scales appropriate to general linear
-models.  In order to faciliate the optimal performance of the horseshoe family
+models.  In order to facilitate the optimal performance of the horseshoe family
 of prior distributions we must take care to ensure that the prior scale is
 compatible with the measurement process.
 
@@ -355,7 +355,7 @@ unif_fit <- stan(file='linear_regression_unif.stan',
                  data=input_data, seed=4938483)
 ```
 
-The uniform prior allows that non-identifiabilty of the likelihood to propagate
+The uniform prior allows that non-identifiability of the likelihood to propagate
 to the posterior.  The fit of the resulting posterior unsurprisingly fails in
 spectacular fashion, with vanishing effective sample sizes, large $\hat{R}$, and
 failing HMC diagnostics.
@@ -399,7 +399,7 @@ util$plot_aux_posteriors(unif_fit, "Uniform Prior")
 ## Narrow Weakly Informative Prior
 
 We definitely need a prior to compensate for the non-identified likelihood,
-but just how much prior informationt do we need?  Let's try a weakly-informative
+but just how much prior information do we need?  Let's try a weakly-informative
 prior for all of the slopes that strongly concentrates below the scale of the
 measurement variability.
 
@@ -509,7 +509,7 @@ util$check_energy(laplace_fit)
 The Laplace prior finally yields some of the behavior that we need to encode
 sparsity, resulting in much better behavior compared to the failures up to
 this point.  Still, the relevant slopes exhibit signs of overregularization
-while the irrelvant slopes aren't as strongly regularized as we'd like.
+while the irrelevant slopes aren't as strongly regularized as we'd like.
 
 ```{r}
 util$plot_post_quantiles(laplace_fit, input_data, "Laplace Prior")
@@ -666,7 +666,7 @@ measurement process.
 Finally, sparse inferences and sparse decisions are not mutually exclusive.
 Indeed inferential sparsity is critical for enabling robust sparse decisions
 in a Bayesian framework.  For example, @PiironenEtAl:2017b use
-inferential sparsity to faciliate variable selection that minimizes the loss
+inferential sparsity to facilitate variable selection that minimizes the loss
 of predictive performance.
 
 # Acknowledgements
