@@ -1,0 +1,193 @@
+---
+title: "Introduction"
+author: "Michael Betancourt"
+date: "October 2019"
+csl: institute-of-mathematical-statistics.csl
+link-citations: yes
+linkcolor: blue
+output:
+  html_document:
+    fig_caption: yes
+    theme: spacelab #sandstone #spacelab #flatly
+    highlight: pygments
+    toc: TRUE
+    toc_depth: 3
+    number_sections: TRUE
+    toc_float:
+      smooth_scroll: FALSE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA)
+```
+
+Humans are particularly gifted at recognizing patterns and telling stories.  It
+is no surprise, then, that we rely on stories to explain the patterns that 
+permeate the world around us.  At the same time we are prone to centering those
+stories flourished with exaggeration, and a nontrivial amount of drama.  We 
+envision deities and the supernatural while ignoring more mundane explanations.
+We presume poor intentions of our friends and partners instead of giving them 
+the benefit of the doubt and considering all of their possible motivations.
+
+Whether our applications lie in science, industry, or even in our social 
+interactions, robust decision making must be informed by not just _one_ story 
+consistent with our knowledge but rather _all_ of the stories consistent with 
+our knowledge.  _Statistics_ provides formal methods for informing such decision 
+making processes, with _probabilistic models_ specifying the possible stories 
+and _statistical inference_ quantifying which of those stories are consistent 
+with the domain expertise and observations available.
+
+From this perspective modeling is the act of writing a collection of possible 
+stories using the language of probability theory.  Probability theory is the
+grammar of this modeling language while probability density functions and more
+sophisticated modeling techniques form the vocabulary from which we can weave 
+ever richer stories.  Inference is the curation the stories compatible with
+our perceptions.
+
+This analogical view is useful because it clarifies why modeling and inference
+is so challenging in practice: at the same time that we're trying to formulate 
+our stories we also have to learn the language in which we need to record and 
+curate those stories!  In order to tell our stories we first need to learn the
+language in a principled way. 
+
+Moreover we can use the experience of learning foreign languages to establish 
+reasonable expectations for the difficulties ahead of us, and set progressive 
+goals that are less overwhelming.  As with learning any new language, we want to 
+read as much as we write. We want to start slowly and deliberately with simple 
+examples; beginning with children's books instead of jumping directly into 
+novels.  Fluency is facilitated by iteration and immersion.
+
+# Objectives
+
+Unlike other many other introductions to statistics, this book attempts to build
+enough fluency with probabilistic modeling and statistical inference so that you
+can develop bespoke models and inferences uniquely suited to your own 
+applications.  In other words this book is just as much about model building as 
+it is probability theory and the basics of inference.  This is an ambitious 
+goal, but I have strived to make it an accessible one by provided careful 
+motivation and definition for all of the concepts that are needed for that 
+fluency while avoiding any technical details--and all of those annoying 
+proofs--that aren't ultimately relevant to practical applications.
+
+Given the breadth of material required for a comprehensive understanding of
+modeling and inference, working through this book will require a reasonable 
+investment of time and effort.  That effort, however, will be rewarded with a 
+fluency to tell your own stores--the stories only you and your unique domain 
+expertise are equipped to tell--and not just the oversimplified platitudes 
+common to so many introductory statistics classes. 
+
+If you fulfill the prerequisites listed below then you will be able to make it 
+through this book with patience and dedication.  Don't let anyone discourage 
+you from learning how to tell your own story. 
+
+# Prerequisites
+
+Probability is a mathematical language, and consequently it requires a 
+reasonable mathematical background.  While I will carefully define mathematical 
+notations that are introduced, you will need a conceptual and practical 
+familiarity with linear algebra and calculus.  For example you will need to be 
+familiar with concepts like vectors and matrices, as well as operations like 
+matrix-vector products and matrix inversion.  Similarly you will need to know 
+about the integers, the real numbers, derivatives, and integrals.
+
+At no point will the material consider proofs, and so you will not need to be 
+well-versed in more technical machinery such as epsilon-delta proofs, limits, 
+and the like.
+
+Much of the book focus on practical implementations through `Stan`, particularly
+the `RStan` interface.  Consequently you will need a very basic familiarity with 
+`R` and a working installation of `RStan` if you want to follow along with any 
+of the examples.  All of the material is also paralleled in `Python` through 
+the `PyStan` interface, but I have yet to find the best way to make that 
+material available.
+
+# Table of Contents
+
+Before learning how to tell our own stories we first need to develop a solid 
+understanding of our probabilistic language, both in theory and in practice.
+We will begin in Part I by learning the grammar and some basic vocabulary
+before moving on to Part II where we will learn how to parse that language 
+in practice.  With that foundation we will be equipped to learn how to apply 
+probability theory to modeling and inference in Part III.  Finally we will 
+continue to Part IV where we will learn an ever growing sequence of modular 
+modeling techniques that expand our probabilistic vocabulary, and the 
+sophistication of the stories that we can tell.
+
+The links included here are for case studies that serve as preliminary drafts 
+for many of the upcoming book chapters.  In the next few months these case  
+studies will undergo significant improvements as they evolve into proper book
+chapters, but for now they provide an outline of the material that will be
+covered.
+
+## Part I: Probability Theory {-}
+
+[Probability Theory](https://betanalpha.github.io/assets/case_studies/probability_theory.html)
+
+[Conditional Probability Theory](https://betanalpha.github.io/assets/case_studies/conditional_probability_theory.html)
+ 
+[Probabilistic Building Blocks](https://betanalpha.github.io/assets/case_studies/probability_densities.html)
+
+## Part II: Probability Practice {-}
+
+Probabilistic Computation in High Dimensions [Coming Soon, for now consult my [HMC introduction](https://arxiv.org/abs/1701.02434)]
+
+Markov Chain Monte Carlo [Coming Soon, for now consult my [HMC introduction](https://arxiv.org/abs/1701.02434)]
+
+Hamiltonian Monte Carlo [Coming Soon, for now consult my [HMC introduction](https://arxiv.org/abs/1701.02434)]
+
+## Part III: Modeling and Inference {-}
+
+[Modeling and Inference](https://betanalpha.github.io/assets/case_studies/modeling_and_inference.html)
+
+Stan [Coming Soon, for now consult my [RStan](https://betanalpha.github.io/assets/case_studies/rstan_workflow.html)
+or [PyStan](https://betanalpha.github.io/assets/case_studies/pystan_workflow.html) introductions]
+
+Identifiability in Practice [Coming Soon, for now see my [divergence case study](https://betanalpha.github.io/assets/case_studies/divergences_and_bias.html)]
+
+[A Principled Bayesian Model Building Workflow](https://betanalpha.github.io/assets/case_studies/principled_bayesian_workflow.html)
+
+## Part IV: Modeling Techniques {-}
+
+Generic Prior Modeling Techniques [Coming Soonish, for now see [weakly informative prior case study](https://betanalpha.github.io/assets/case_studies/weakly_informative_shapes.html)]
+
+Regression Modeling with Linear and General Linear Models [Coming Soonish]
+
+[Underdetermined Regression I](https://betanalpha.github.io/assets/case_studies/underdetermined_linear_regression.html)
+
+[Underdetermined Regression II](https://betanalpha.github.io/assets/case_studies/qr_regression.html)
+
+[Ordinal Regression](https://betanalpha.github.io/assets/case_studies/ordinal_regression.html)
+
+[Sparse Regression](https://betanalpha.github.io/assets/case_studies/underdetermined_linear_regression.html)
+
+[Gaussian Process Regression I](https://betanalpha.github.io/assets/case_studies/gp_part1/part1.html)
+
+[Gaussian Process Regression II](https://betanalpha.github.io/assets/case_studies/gp_part2/part2.html)
+
+[Gaussian Process Regression III](https://betanalpha.github.io/assets/case_studies/gp_part3/part3.html)
+
+Hierarchical Modeling [Coming Soonish]
+
+Multilevel Modeling [Coming Soonish]
+
+[Mixture Modeling](https://betanalpha.github.io/assets/case_studies/identifying_mixture_models.html)
+
+Time Series [Coming Later]
+
+Hidden Markov Models [Coming Later]
+
+Meta-analyses [Coming Later]
+
+Spectral Modeling [Coming Later]
+
+# License {-}
+
+The code in this case study is copyrighted by Michael Betancourt and licensed 
+under the new BSD (3-clause) license:
+
+https://opensource.org/licenses/BSD-3-Clause
+
+The text and figures in this case study are copyrighted by Michael Betancourt 
+and licensed under the CC BY-NC 4.0 license: 
+
+https://creativecommons.org/licenses/by-nc/4.0/
