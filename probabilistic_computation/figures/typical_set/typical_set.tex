@@ -1,0 +1,35 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.90}
+\definecolor{gray95}{gray}{0.95}
+\newcommand{\dd}{ \mathrm{d} }
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.35, thick]
+
+  \begin{scope}
+  \clip (-12, -7) rectangle (12, 10);
+  \foreach \i in {1, 0.99, ..., 0} {
+    \pgfmathsetmacro{\prop}{100 * exp(-10.0 * \i * \i)};
+    \colorlet{custom}{dark!\prop!white};
+    \draw[line width={30 * \i}, color=custom] 
+      (-10, 0) .. controls (-10, 15) and (-5, 5) .. (0, 5)
+      .. controls (5, 5) and (10, 8) .. (10, 0)
+      .. controls (10, -8) and (5, -3) .. (0, -3)
+      .. controls (-5, -3) and (-10, -5) .. (-10, 0);
+  }
+  \end{scope}
+  
+\end{tikzpicture}
+
+
+\end{document}  

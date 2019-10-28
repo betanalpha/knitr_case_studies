@@ -1,0 +1,206 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function x(\x, \y) {
+    \xa = \x / (1 + \x * \x + \y * \y);
+    return \xa;
+    %return \xa * (-0.4 * \y + 2) / 2;
+  };
+  function y(\x, \y, \phi) {
+    \sumsq = \x * \x + \y * \y;
+    \denom = 1 / (1 + \sumsq);
+    \ya = \y * \denom;
+    \za = \sumsq * \denom;
+    \yb = \ya * cos(\phi) - \za * sin(\phi);
+    return \yb;
+  };
+  function z(\x, \y, \phi) {
+    \sumsq = \x * \x + \y * \y;
+    \denom = 1 / (1 + \sumsq);
+    \ya = \y * \denom;
+    \za = \sumsq * \denom;
+    \zb = \za * cos(\phi) + \ya * sin(\phi);
+    return \zb;
+  };
+  function xi(\x, \y) {
+    return \x * (-0.4 * \y + 2) / 2;
+  };
+  function zeta(\y, \phi) {
+    return \y * sin(\phi);
+  };
+  function mineta(\x, \phi) {
+    \sphi = sin(\phi);
+    \xsq = \x * \x;
+    \spsi = (1 - \xsq) / (1 + \xsq);
+    return \spsi * (1 - sqrt(1 - \sphi * \sphi * (1 + \xsq) )) / \sphi;
+  };
+  function maxeta(\x, \phi) {
+    return (\x * \x - 1) / 6;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.35]
+  \pgfmathsetmacro{\phi}{15}
+  \pgfmathsetmacro{\lmin}{-1}
+  \pgfmathsetmacro{\lmax}{1}
+  \pgfmathsetmacro{\scale}{10}
+  
+  % Horizontal lines
+  \draw[dashed, gray60] 
+       ({\scale * xi(\lmin, \lmin)}, {\scale * zeta(\lmin, \phi)}) 
+    -- ({\scale * xi(\lmin, \lmax)}, {\scale * zeta(\lmax, \phi)});
+  \foreach \xi in {-0.8, -0.6, ..., 0.8} {
+    \draw[gray60]    ({\scale * xi(\xi, \lmin)}, {\scale * zeta(\lmin, \phi)}) 
+                  -- ({\scale * xi(\xi, \lmax)}, {\scale * zeta(\lmax, \phi)});
+  }
+  \draw[dashed, gray60] 
+       ({\scale * xi(\lmax, \lmin)}, {\scale * zeta(\lmin, \phi)}) 
+    -- ({\scale * xi(\lmax, \lmax)}, {\scale * zeta(\lmax, \phi)});
+ 
+  % Vertical lines
+  \draw[dashed, gray60] 
+      ({\scale * xi(\lmin, \lmin)}, {\scale * zeta(\lmin, \phi)})
+   -- ({\scale * xi(\lmax, \lmin)}, {\scale * zeta(\lmin, \phi)});
+  \foreach \eta in {-0.8, -0.6, ..., 0.8} {
+    \draw[gray60]    ({\scale * xi(\lmin, \eta)}, {\scale * zeta(\eta, \phi)}) 
+                  -- ({\scale * xi(\lmax, \eta)}, {\scale * zeta(\eta, \phi)});
+  }
+  \draw[dashed, gray60]
+       ({\scale * xi(\lmin, \lmax)}, {\scale * zeta(\lmax, \phi)}) 
+    -- ({\scale * xi(\lmax, \lmax)}, {\scale * zeta(\lmax, \phi)});
+  
+  % Highlighted horizontal line
+  \pgfmathsetmacro{\xi}{0.4}
+  \draw[light, line width=1.05]    ({\scale * xi(\xi, \lmin)}, {\scale * zeta(\lmin, \phi)}) 
+                                -- ({\scale * xi(\xi, \lmax)}, {\scale * zeta(\lmax, \phi)});
+  
+  % Highlighted vertical line
+  \pgfmathsetmacro{\eta}{-0.4}
+  \draw[mid, line width=1.05]    ({\scale * xi(\lmin, \eta)}, {\scale * zeta(\eta, \phi)}) 
+                              -- ({\scale * xi(\lmax, \eta)}, {\scale * zeta(\eta, \phi)});
+  
+  % Sphere outline
+  \fill[gray95] (0, {\scale * 0.5 * cos(\phi)}) circle ({\scale * 0.5025});
+  \fill[white] (0, {\scale * 0.5 * cos(\phi)}) circle ({\scale * 0.5});
+ 
+  % Background line aggregate
+  \begin{scope} {
+    \clip ({-\scale * 0.25}, {\scale * 0.905}) rectangle ({\scale * 0.25}, {\scale * 0.5 * (1 + cos(\phi))});
+    \fill[gray95] (0, {\scale * 0.5 * cos(\phi)}) circle ({\scale * 0.5});
+  }
+  \end{scope}
+  
+  % Background stereographic vertical lines
+  \foreach \xi in {-1, -0.8, ..., 1.0} {
+    \draw [gray95, domain=-8:-1, samples=60, variable=\eta] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi)});
+  }
+
+  \foreach \xi in {-8, -7.8, ..., -1.2} {
+    \draw [gray95, domain=-8:{maxeta(\xi, \phi)}, samples=40, variable=\eta] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi)});
+  }
+
+  \foreach \xi in {1.2, 1.4, ..., 8} {
+    \draw [gray95, domain=-8:{maxeta(\xi, \phi)}, samples=40, variable=\eta] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi)});
+  }
+  
+  % Background stereographic horizontal lines
+  \foreach \eta in {-1.2, -1.4, ..., -8} {
+    \draw [gray95, domain=-8:8, samples=100, variable=\xi] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+  }
+
+  \foreach \eta in {-0.2, -0.4, ..., -1}  {
+    \draw [gray95, domain=1:10, samples=50, variable=\xi] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+  }
+  
+  \pgfmathsetmacro{\eta}{0.0}
+  \draw [gray95, domain=-1:-10, samples=100, variable=\xi] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+  \draw [gray95, domain=1:10, samples=100, variable=\xi] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+
+  \pgfmathsetmacro{\eta}{0.2}
+  \draw [gray95, domain=-1.25:-10, samples=100, variable=\xi] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+  \draw [gray95, domain=1.25:10, samples=100, variable=\xi] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+
+  
+  \pgfmathsetmacro{\eta}{0.4}
+  \draw [gray95, domain=-1.5:-10, samples=100, variable=\xi] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+  \draw [gray95, domain=1.5:10, samples=100, variable=\xi] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+
+  \foreach \eta in {-0.2, -0.4, ..., -1}  {
+    \draw [gray95, domain=-1:-10, samples=50, variable=\xi] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+  }
+  
+  % Stereographic vertical lines
+  \foreach \xi in {-0.8, -0.6, ..., 0.8} {
+    \draw [gray60, domain=-1:{-mineta(\xi, \phi)}, samples=50, variable=\eta] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi)});
+  }
+  
+  \pgfmathsetmacro{\xi}{1.0}
+  \draw [dashed, gray60, domain=-1:0, samples=50, variable=\eta] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi)});
+
+  \pgfmathsetmacro{\xi}{-1.0}
+  \draw [dashed, gray60, domain=-1:0, samples=50, variable=\eta] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi)});
+  
+  % Stereographic horizontal lines
+  \foreach \eta in {-0.2, -0.4, ..., -0.8} {
+    \draw [gray60, domain=-1:1, samples=200, variable=\xi] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+  }
+  
+  \pgfmathsetmacro{\eta}{-1.0}
+  \draw [dashed, gray60, domain=-1:1, samples=200, variable=\xi] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+  
+  % Highlighted stereographic vertical line  
+  \pgfmathsetmacro{\xi}{0.4}
+  \draw [light, line width=1.05, domain=-1:{-mineta(\xi, \phi)}, samples=100, variable=\eta] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi)});
+  
+  % Highlighted stereographic horizontal line  
+  \pgfmathsetmacro{\eta}{-0.4}
+  \draw [mid, line width=1.05, domain=-1:1, samples=200, variable=\xi] 
+    plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+ 
+  % Point at infinity
+  \node[] at (0, {\scale * 1.05}) {$\infty$};
+  \fill[color=dark] (0, {\scale * cos(\phi)}) circle (5pt);
+ 
+\end{tikzpicture}
+
+\end{document}  

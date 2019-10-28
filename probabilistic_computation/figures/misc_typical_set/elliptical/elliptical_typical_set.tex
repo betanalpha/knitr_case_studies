@@ -1,0 +1,30 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.90}
+\definecolor{gray95}{gray}{0.95}
+\newcommand{\dd}{ \mathrm{d} }
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3, thick]
+
+  \foreach \i in {0, 0.05,..., 1} {
+    \draw[line width={30 * \i}, opacity={exp(-8 * \i)}, mid] 
+      (0, 0) ellipse (10 and 5);
+  }  
+  
+\end{tikzpicture}
+
+
+\end{document}  

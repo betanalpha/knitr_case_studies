@@ -1,0 +1,33 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{0, 255, 0}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+\definecolor{comment}{gray}{0.50}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3, thick]
+
+  \draw[color=white] (-13, 0) to (13, 0);
+  \draw[color=white] (0, -13) to (0, 13);
+
+  \foreach \i in {0, 0.05,..., 1} {
+    \draw[line width={30 * \i}, opacity={exp(-8 * \i)}, dark] 
+      (0, 0) ellipse (10 and 10);
+  }
+  
+\end{tikzpicture}
+
+
+\end{document}  

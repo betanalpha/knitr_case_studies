@@ -1,0 +1,63 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\newcommand*{\offset}{0.025}
+
+\tikzmath{
+  function gaussian_density(\x) {
+    return exp(-0.5 * \x * \x / 4) * 0.398942280401433;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.35, thick]
+
+  \draw[color=white] (-13, 0) -- (13, 0);
+  
+  \fill[domain=-8:8, smooth, samples=150, line width=1, variable=\x, color=dark] 
+    plot ({\x},{7 * (\x * \x) * gaussian_density(\x)});
+   
+  \draw [-, >=stealth, line width=1] (-9, 0) -- +(18, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (9, 0) -- +(1.25, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (-9, 0) -- +(-1.25, 0);
+  \node[] at (0, -3.5) { $Q$ };
+  
+  \node[] at (-11, 3.5) { $\pi(x) \, f(x)$ };
+  
+  \foreach \x [count=\n] in {-8, -6, ..., 8} { 
+    \pgfmathsetmacro{\idx}{int(\n - 1)}
+    \node[] at (\x, -1) { $q_{\idx}$ };
+    
+    \draw[dashed, color=gray70] (-\x, 0) -- +(0, 9);
+    
+    \fill[color=dark] (\x, 0) circle (7pt);  
+    \fill[color=light] (\x, 0) circle (5pt);
+  }
+  
+  \draw[<->, >=stealth] (4, -2) -- +(2, 0);
+  \node[] at (5, -3) { $\Delta q_{7}$ };
+    
+\end{tikzpicture}
+
+\end{document}  

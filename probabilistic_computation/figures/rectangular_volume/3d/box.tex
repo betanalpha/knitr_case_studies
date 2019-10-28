@@ -1,0 +1,812 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function x(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %  
+    return \xb;
+  };
+  function y(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %   
+    return \yb;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.10, thick]
+  
+  \pgfmathsetmacro{\theta}{35}
+  \pgfmathsetmacro{\phi}{15}
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Phase One
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{0}
+ 
+  \draw[white] (-11 + \S, -11) rectangle (11 + \S, 11);
+ 
+  % Back Face
+  \pgfmathsetmacro{\z}{2}
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-6, -2, 2, 6} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)})
+                         -- ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)});
+  }
+
+  % Crosses
+  \foreach \x in {-6, -2, 2, 6} {
+    \foreach \y in {-2, 2} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -2, \theta, \phi) + \S}, {y(\x, \y, -2, \theta, \phi)})
+                           -- ({x(\x, \y, +2, \theta, \phi) + \S}, {y(\x, \y, +2, \theta, \phi)});
+    }
+  }
+  
+  % Central Box
+  \pgfmathsetmacro{\xa}{-2} 
+  \pgfmathsetmacro{\xb}{+2} 
+  \pgfmathsetmacro{\xc}{+2} 
+  \pgfmathsetmacro{\xd}{-2} 
+  
+  \pgfmathsetmacro{\ya}{-2} 
+  \pgfmathsetmacro{\yb}{-2} 
+  \pgfmathsetmacro{\yc}{+2} 
+  \pgfmathsetmacro{\yd}{+2}
+  
+  \pgfmathsetmacro{\z}{-2}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)})
+                          -- ({x(\xb, \yb, \z, \theta, \phi) + \S}, {y(\xb, \yb, \z, \theta, \phi)})
+                          -- ({x(\xc, \yc, \z, \theta, \phi) + \S}, {y(\xc, \yc, \z, \theta, \phi)})
+                          -- ({x(\xd, \yd, \z, \theta, \phi) + \S}, {y(\xd, \yd, \z, \theta, \phi)})
+                          -- ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)});
+  
+  \pgfmathsetmacro{\ya}{-2} 
+  \pgfmathsetmacro{\yb}{-2} 
+  \pgfmathsetmacro{\yc}{+2} 
+  \pgfmathsetmacro{\yd}{+2}
+  
+  \pgfmathsetmacro{\za}{-2} 
+  \pgfmathsetmacro{\zb}{+2} 
+  \pgfmathsetmacro{\zc}{+2} 
+  \pgfmathsetmacro{\zd}{-2} 
+  
+  \pgfmathsetmacro{\x}{2}
+  \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)})
+                          -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi)})
+                          -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi)})
+                          -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi)})
+                          -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)});
+  
+
+  \pgfmathsetmacro{\xa}{-2} 
+  \pgfmathsetmacro{\xb}{+2} 
+  \pgfmathsetmacro{\xc}{+2} 
+  \pgfmathsetmacro{\xd}{-2} 
+  
+  \pgfmathsetmacro{\za}{-2} 
+  \pgfmathsetmacro{\zb}{-2} 
+  \pgfmathsetmacro{\zc}{+2} 
+  \pgfmathsetmacro{\zd}{+2}
+  
+  \pgfmathsetmacro{\y}{2}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)})
+                          -- ({x(\xb, \y, \zb, \theta, \phi) + \S}, {y(\xb, \y, \zb, \theta, \phi)})
+                          -- ({x(\xc, \y, \zc, \theta, \phi) + \S}, {y(\xc, \y, \zc, \theta, \phi)})
+                          -- ({x(\xd, \y, \zd, \theta, \phi) + \S}, {y(\xd, \y, \zd, \theta, \phi)})
+                          -- ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)});
+
+  % Front Face
+  \pgfmathsetmacro{\z}{-2}
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)});
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-6, 6} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)})
+                         -- ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)});
+  }
+
+  \node[] at (0 + \S, -12) {$\frac{1}{3}$};
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Phase Two
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{25}
+ 
+  \draw[white] (-11 + \S, -11) rectangle (11 + \S, 11);
+ 
+  % Back Face
+  \pgfmathsetmacro{\z}{2}
+  
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)})
+                         -- ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-6, 6} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)})
+                         -- ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-2, 2} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+
+  % Occluded Crosses
+  \foreach \x in {-6, 6} {
+    \foreach \y in {-2, 2} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -2, \theta, \phi) + \S}, {y(\x, \y, -2, \theta, \phi)})
+                           -- ({x(\x, \y, +2, \theta, \phi) + \S}, {y(\x, \y, +2, \theta, \phi)});
+    }
+  }
+  
+  \foreach \x in {-2, 2} {
+    \foreach \y in {-6, 6} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -2, \theta, \phi) + \S}, {y(\x, \y, -2, \theta, \phi)})
+                           -- ({x(\x, \y, +2, \theta, \phi) + \S}, {y(\x, \y, +2, \theta, \phi)});
+    }
+  }
+
+  % Central Box
+  \pgfmathsetmacro{\xa}{-2} 
+  \pgfmathsetmacro{\xb}{+2} 
+  \pgfmathsetmacro{\xc}{+2} 
+  \pgfmathsetmacro{\xd}{-2} 
+  
+  \pgfmathsetmacro{\ya}{-2} 
+  \pgfmathsetmacro{\yb}{-2} 
+  \pgfmathsetmacro{\yc}{+2} 
+  \pgfmathsetmacro{\yd}{+2}
+  
+  \pgfmathsetmacro{\z}{-2}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)})
+                          -- ({x(\xb, \yb, \z, \theta, \phi) + \S}, {y(\xb, \yb, \z, \theta, \phi)})
+                          -- ({x(\xc, \yc, \z, \theta, \phi) + \S}, {y(\xc, \yc, \z, \theta, \phi)})
+                          -- ({x(\xd, \yd, \z, \theta, \phi) + \S}, {y(\xd, \yd, \z, \theta, \phi)})
+                          -- ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)});
+  
+  \pgfmathsetmacro{\ya}{-2} 
+  \pgfmathsetmacro{\yb}{-2} 
+  \pgfmathsetmacro{\yc}{+2} 
+  \pgfmathsetmacro{\yd}{+2}
+  
+  \pgfmathsetmacro{\za}{-2} 
+  \pgfmathsetmacro{\zb}{+2} 
+  \pgfmathsetmacro{\zc}{+2} 
+  \pgfmathsetmacro{\zd}{-2} 
+  
+  \pgfmathsetmacro{\x}{2}
+  \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)})
+                          -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi)})
+                          -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi)})
+                          -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi)})
+                          -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)});
+  
+
+  \pgfmathsetmacro{\xa}{-2} 
+  \pgfmathsetmacro{\xb}{+2} 
+  \pgfmathsetmacro{\xc}{+2} 
+  \pgfmathsetmacro{\xd}{-2} 
+  
+  \pgfmathsetmacro{\za}{-2} 
+  \pgfmathsetmacro{\zb}{-2} 
+  \pgfmathsetmacro{\zc}{+2} 
+  \pgfmathsetmacro{\zd}{+2}
+  
+  \pgfmathsetmacro{\y}{2}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)})
+                          -- ({x(\xb, \y, \zb, \theta, \phi) + \S}, {y(\xb, \y, \zb, \theta, \phi)})
+                          -- ({x(\xc, \y, \zc, \theta, \phi) + \S}, {y(\xc, \y, \zc, \theta, \phi)})
+                          -- ({x(\xd, \y, \zd, \theta, \phi) + \S}, {y(\xd, \y, \zd, \theta, \phi)})
+                          -- ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)});
+
+  % Front Face
+  \pgfmathsetmacro{\z}{-2}
+
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)});
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)})
+                         -- ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-6, 6} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)})
+                         -- ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-2, 2} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)});
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \node[] at (0 + \S, -12) {$\frac{1}{5}$};
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Phase Three
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{50}
+ 
+  \draw[white] (-11 + \S, -11) rectangle (11 + \S, 11);
+  
+  % Back Face
+  \pgfmathsetmacro{\z}{6}
+  
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)})
+                         -- ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-2, 2} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)})
+                         -- ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)});
+  }
+
+  \pgfmathsetmacro{\z}{2}
+  
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)})
+                         -- ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-6, 6} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)})
+                         -- ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-2, 2} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+
+  % Occluded Crosses
+  \foreach \x in {-6, 6} {
+    \foreach \y in {-2, 2} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -2, \theta, \phi) + \S}, {y(\x, \y, -2, \theta, \phi)})
+                           -- ({x(\x, \y, +2, \theta, \phi) + \S}, {y(\x, \y, +2, \theta, \phi)});
+    }
+  }
+  
+  \foreach \x in {-2, 2} {
+    \foreach \y in {-6, 6} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -2, \theta, \phi) + \S}, {y(\x, \y, -2, \theta, \phi)})
+                           -- ({x(\x, \y, +2, \theta, \phi) + \S}, {y(\x, \y, +2, \theta, \phi)});
+    }
+  }
+  
+  \foreach \x in {-2, 2} {
+    \foreach \y in {-2, 2} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -6, \theta, \phi) + \S}, {y(\x, \y, -6, \theta, \phi)})
+                           -- ({x(\x, \y, +6, \theta, \phi) + \S}, {y(\x, \y, +6, \theta, \phi)});
+    }
+  }
+  
+  % Central Box
+  \pgfmathsetmacro{\xa}{-2} 
+  \pgfmathsetmacro{\xb}{+2} 
+  \pgfmathsetmacro{\xc}{+2} 
+  \pgfmathsetmacro{\xd}{-2} 
+  
+  \pgfmathsetmacro{\ya}{-2} 
+  \pgfmathsetmacro{\yb}{-2} 
+  \pgfmathsetmacro{\yc}{+2} 
+  \pgfmathsetmacro{\yd}{+2}
+  
+  \pgfmathsetmacro{\z}{-2}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)})
+                          -- ({x(\xb, \yb, \z, \theta, \phi) + \S}, {y(\xb, \yb, \z, \theta, \phi)})
+                          -- ({x(\xc, \yc, \z, \theta, \phi) + \S}, {y(\xc, \yc, \z, \theta, \phi)})
+                          -- ({x(\xd, \yd, \z, \theta, \phi) + \S}, {y(\xd, \yd, \z, \theta, \phi)})
+                          -- ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)});
+  
+  \pgfmathsetmacro{\ya}{-2} 
+  \pgfmathsetmacro{\yb}{-2} 
+  \pgfmathsetmacro{\yc}{+2} 
+  \pgfmathsetmacro{\yd}{+2}
+  
+  \pgfmathsetmacro{\za}{-2} 
+  \pgfmathsetmacro{\zb}{+2} 
+  \pgfmathsetmacro{\zc}{+2} 
+  \pgfmathsetmacro{\zd}{-2} 
+  
+  \pgfmathsetmacro{\x}{2}
+  \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)})
+                          -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi)})
+                          -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi)})
+                          -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi)})
+                          -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)});
+  
+
+  \pgfmathsetmacro{\xa}{-2} 
+  \pgfmathsetmacro{\xb}{+2} 
+  \pgfmathsetmacro{\xc}{+2} 
+  \pgfmathsetmacro{\xd}{-2} 
+  
+  \pgfmathsetmacro{\za}{-2} 
+  \pgfmathsetmacro{\zb}{-2} 
+  \pgfmathsetmacro{\zc}{+2} 
+  \pgfmathsetmacro{\zd}{+2}
+  
+  \pgfmathsetmacro{\y}{2}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)})
+                          -- ({x(\xb, \y, \zb, \theta, \phi) + \S}, {y(\xb, \y, \zb, \theta, \phi)})
+                          -- ({x(\xc, \y, \zc, \theta, \phi) + \S}, {y(\xc, \y, \zc, \theta, \phi)})
+                          -- ({x(\xd, \y, \zd, \theta, \phi) + \S}, {y(\xd, \y, \zd, \theta, \phi)})
+                          -- ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)});
+
+  % Non-Occluded Crosses
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(2, 2, -6, \theta, \phi) + \S}, {y(2, 2, -6, \theta, \phi)})
+                       -- ({x(2, 2, -2, \theta, \phi) + \S}, {y(2, 2, -2, \theta, \phi)});
+
+  % Front Face
+  \pgfmathsetmacro{\z}{-2}
+
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)});
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)})
+                         -- ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-6, 6} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)})
+                         -- ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-2, 2} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)});
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \pgfmathsetmacro{\z}{-6}
+  
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)})
+                         -- ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-2, 2} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)})
+                         -- ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)});
+  }
+  
+  \node[] at (0 + \S, -12) {$\frac{1}{7}$};
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Phase Four
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{75}
+ 
+  \draw[white] (-11 + \S, -11) rectangle (11 + \S, 11);
+  
+  % Back Face
+  \pgfmathsetmacro{\z}{6}
+  
+  \foreach \y in {-6, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)})
+                         -- ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+
+  \foreach \x in {-6, 6} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)})
+                         -- ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-2, 2} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+
+  \pgfmathsetmacro{\z}{2}
+  
+  \foreach \y in {-6, -2, 2, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)})
+                         -- ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-6, 6} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-2, 2} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+
+  % Occluded Crosses
+  \foreach \x in {-6, 6} {
+    \foreach \y in {-2, 2} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -6, \theta, \phi) + \S}, {y(\x, \y, -6, \theta, \phi)})
+                           -- ({x(\x, \y, +6, \theta, \phi) + \S}, {y(\x, \y, +6, \theta, \phi)});
+    }
+  }
+  
+  \foreach \x in {-2, 2} {
+    \foreach \y in {-6} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -6, \theta, \phi) + \S}, {y(\x, \y, -6, \theta, \phi)})
+                           -- ({x(\x, \y, +6, \theta, \phi) + \S}, {y(\x, \y, +6, \theta, \phi)});
+    }
+  }
+
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, 6, -6, \theta, \phi) + \S}, {y(-2, 6, -6, \theta, \phi)})
+                    -- ({x(-2, 6, +6, \theta, \phi) + \S}, {y(-2, 6, +6, \theta, \phi)});
+  
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(2, 6, -2, \theta, \phi) + \S}, {y(2, 6, -2, \theta, \phi)})
+                    -- ({x(2, 6, +6, \theta, \phi) + \S}, {y(2, 6, +6, \theta, \phi)});
+  
+  \foreach \x in {-2, 2} {
+    \foreach \y in {-2, 2} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -6, \theta, \phi) + \S}, {y(\x, \y, -6, \theta, \phi)})
+                           -- ({x(\x, \y, +6, \theta, \phi) + \S}, {y(\x, \y, +6, \theta, \phi)});
+    }
+  }
+
+  \foreach \x in {-6, 6} {
+    \foreach \y in {-6, 6} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -2, \theta, \phi) + \S}, {y(\x, \y, -2, \theta, \phi)})
+                           -- ({x(\x, \y, +2, \theta, \phi) + \S}, {y(\x, \y, +2, \theta, \phi)});
+    }
+  }
+  
+  % Central Box
+  \pgfmathsetmacro{\xa}{-2} 
+  \pgfmathsetmacro{\xb}{+2} 
+  \pgfmathsetmacro{\xc}{+2} 
+  \pgfmathsetmacro{\xd}{-2} 
+  
+  \pgfmathsetmacro{\ya}{-2} 
+  \pgfmathsetmacro{\yb}{-2} 
+  \pgfmathsetmacro{\yc}{+2} 
+  \pgfmathsetmacro{\yd}{+2}
+  
+  \pgfmathsetmacro{\z}{-2}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)})
+                          -- ({x(\xb, \yb, \z, \theta, \phi) + \S}, {y(\xb, \yb, \z, \theta, \phi)})
+                          -- ({x(\xc, \yc, \z, \theta, \phi) + \S}, {y(\xc, \yc, \z, \theta, \phi)})
+                          -- ({x(\xd, \yd, \z, \theta, \phi) + \S}, {y(\xd, \yd, \z, \theta, \phi)})
+                          -- ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)});
+  
+  \pgfmathsetmacro{\ya}{-2} 
+  \pgfmathsetmacro{\yb}{-2} 
+  \pgfmathsetmacro{\yc}{+2} 
+  \pgfmathsetmacro{\yd}{+2}
+  
+  \pgfmathsetmacro{\za}{-2} 
+  \pgfmathsetmacro{\zb}{+2} 
+  \pgfmathsetmacro{\zc}{+2} 
+  \pgfmathsetmacro{\zd}{-2} 
+  
+  \pgfmathsetmacro{\x}{2}
+  \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)})
+                          -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi)})
+                          -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi)})
+                          -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi)})
+                          -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)});
+  
+
+  \pgfmathsetmacro{\xa}{-2} 
+  \pgfmathsetmacro{\xb}{+2} 
+  \pgfmathsetmacro{\xc}{+2} 
+  \pgfmathsetmacro{\xd}{-2} 
+  
+  \pgfmathsetmacro{\za}{-2} 
+  \pgfmathsetmacro{\zb}{-2} 
+  \pgfmathsetmacro{\zc}{+2} 
+  \pgfmathsetmacro{\zd}{+2}
+  
+  \pgfmathsetmacro{\y}{2}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)})
+                          -- ({x(\xb, \y, \zb, \theta, \phi) + \S}, {y(\xb, \y, \zb, \theta, \phi)})
+                          -- ({x(\xc, \y, \zc, \theta, \phi) + \S}, {y(\xc, \y, \zc, \theta, \phi)})
+                          -- ({x(\xd, \y, \zd, \theta, \phi) + \S}, {y(\xd, \y, \zd, \theta, \phi)})
+                          -- ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)});
+
+  % Non-Occluded Crosses
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(2, 2, -6, \theta, \phi) + \S}, {y(2, 2, -6, \theta, \phi)})
+                       -- ({x(2, 2, -2, \theta, \phi) + \S}, {y(2, 2, -2, \theta, \phi)});
+
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(2, 6, -6, \theta, \phi) + \S}, {y(2, 6, -6, \theta, \phi)})
+                       -- ({x(2, 6, -2, \theta, \phi) + \S}, {y(2, 6, -2, \theta, \phi)});
+
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(6, 2, -6, \theta, \phi) + \S}, {y(6, 2, -6, \theta, \phi)})
+                       -- ({x(6, 2, -2, \theta, \phi) + \S}, {y(6, 2, -2, \theta, \phi)});
+
+  % Front Face
+  \pgfmathsetmacro{\z}{-2}
+
+  \foreach \y in {-6, -2, 2, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)});
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)})
+                         -- ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-6, 6} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-2, 2} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)});
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \pgfmathsetmacro{\z}{-6}
+  
+  \foreach \y in {-6, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)})
+                         -- ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+
+  \foreach \x in {-6, 6} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)})
+                         -- ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)});
+  }
+  
+  \foreach \x in {-2, 2} {          
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \node[] at (0 + \S, -12) {$\frac{1}{19}$};
+   
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Phase Five
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{100}
+ 
+  \draw[white] (-11 + \S, -11) rectangle (11 + \S, 11);
+  
+  % Back Face
+  \pgfmathsetmacro{\z}{6}
+  
+  \foreach \x in {-6, -2, 2, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, -2, 2, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+
+  \pgfmathsetmacro{\z}{2}
+  
+  \foreach \x in {-6, -2, 2, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, -2, 2, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+
+  % Occluded Crosses
+  \foreach \x in {-6, 6} {
+    \foreach \y in {-6, -2, 2, 6} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -6, \theta, \phi) + \S}, {y(\x, \y, -6, \theta, \phi)})
+                           -- ({x(\x, \y, +6, \theta, \phi) + \S}, {y(\x, \y, +6, \theta, \phi)});
+    }
+  }
+  
+  \foreach \x in {-2, 2} {
+    \foreach \y in {-6} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -6, \theta, \phi) + \S}, {y(\x, \y, -6, \theta, \phi)})
+                           -- ({x(\x, \y, +6, \theta, \phi) + \S}, {y(\x, \y, +6, \theta, \phi)});
+    }
+  }
+
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-2, 6, -6, \theta, \phi) + \S}, {y(-2, 6, -6, \theta, \phi)})
+                    -- ({x(-2, 6, +6, \theta, \phi) + \S}, {y(-2, 6, +6, \theta, \phi)});
+  
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(2, 6, -2, \theta, \phi) + \S}, {y(2, 6, -2, \theta, \phi)})
+                    -- ({x(2, 6, +6, \theta, \phi) + \S}, {y(2, 6, +6, \theta, \phi)});
+  
+  \foreach \x in {-2, 2} {
+    \foreach \y in {-2, 2} {
+      \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, \y, -6, \theta, \phi) + \S}, {y(\x, \y, -6, \theta, \phi)})
+                           -- ({x(\x, \y, +6, \theta, \phi) + \S}, {y(\x, \y, +6, \theta, \phi)});
+    }
+  }
+  
+  % Central Box
+  \pgfmathsetmacro{\xa}{-2} 
+  \pgfmathsetmacro{\xb}{+2} 
+  \pgfmathsetmacro{\xc}{+2} 
+  \pgfmathsetmacro{\xd}{-2} 
+  
+  \pgfmathsetmacro{\ya}{-2} 
+  \pgfmathsetmacro{\yb}{-2} 
+  \pgfmathsetmacro{\yc}{+2} 
+  \pgfmathsetmacro{\yd}{+2}
+  
+  \pgfmathsetmacro{\z}{-2}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)})
+                          -- ({x(\xb, \yb, \z, \theta, \phi) + \S}, {y(\xb, \yb, \z, \theta, \phi)})
+                          -- ({x(\xc, \yc, \z, \theta, \phi) + \S}, {y(\xc, \yc, \z, \theta, \phi)})
+                          -- ({x(\xd, \yd, \z, \theta, \phi) + \S}, {y(\xd, \yd, \z, \theta, \phi)})
+                          -- ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)});
+  
+  \pgfmathsetmacro{\ya}{-2} 
+  \pgfmathsetmacro{\yb}{-2} 
+  \pgfmathsetmacro{\yc}{+2} 
+  \pgfmathsetmacro{\yd}{+2}
+  
+  \pgfmathsetmacro{\za}{-2} 
+  \pgfmathsetmacro{\zb}{+2} 
+  \pgfmathsetmacro{\zc}{+2} 
+  \pgfmathsetmacro{\zd}{-2} 
+  
+  \pgfmathsetmacro{\x}{2}
+  \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)})
+                          -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi)})
+                          -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi)})
+                          -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi)})
+                          -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)});
+  
+
+  \pgfmathsetmacro{\xa}{-2} 
+  \pgfmathsetmacro{\xb}{+2} 
+  \pgfmathsetmacro{\xc}{+2} 
+  \pgfmathsetmacro{\xd}{-2} 
+  
+  \pgfmathsetmacro{\za}{-2} 
+  \pgfmathsetmacro{\zb}{-2} 
+  \pgfmathsetmacro{\zc}{+2} 
+  \pgfmathsetmacro{\zd}{+2}
+  
+  \pgfmathsetmacro{\y}{2}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)})
+                          -- ({x(\xb, \y, \zb, \theta, \phi) + \S}, {y(\xb, \y, \zb, \theta, \phi)})
+                          -- ({x(\xc, \y, \zc, \theta, \phi) + \S}, {y(\xc, \y, \zc, \theta, \phi)})
+                          -- ({x(\xd, \y, \zd, \theta, \phi) + \S}, {y(\xd, \y, \zd, \theta, \phi)})
+                          -- ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)});
+
+  % Non-Occluded Crosses
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(2, 2, -6, \theta, \phi) + \S}, {y(2, 2, -6, \theta, \phi)})
+                       -- ({x(2, 2, -2, \theta, \phi) + \S}, {y(2, 2, -2, \theta, \phi)});
+
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(2, 6, -6, \theta, \phi) + \S}, {y(2, 6, -6, \theta, \phi)})
+                       -- ({x(2, 6, -2, \theta, \phi) + \S}, {y(2, 6, -2, \theta, \phi)});
+
+  \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(6, 2, -6, \theta, \phi) + \S}, {y(6, 2, -6, \theta, \phi)})
+                       -- ({x(6, 2, -2, \theta, \phi) + \S}, {y(6, 2, -2, \theta, \phi)});
+
+  % Front Face
+  \pgfmathsetmacro{\z}{-2}
+
+  \foreach \x in {-6, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+
+  \foreach \x in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, -2, \z, \theta, \phi) + \S}, {y(\x, -2, \z, \theta, \phi)});
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, +2, \z, \theta, \phi) + \S}, {y(\x, +2, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-2, 2} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(-2, \y, \z, \theta, \phi) + \S}, {y(-2, \y, \z, \theta, \phi)});
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(+2, \y, \z, \theta, \phi) + \S}, {y(+2, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+  
+  \pgfmathsetmacro{\z}{-6}
+  
+  \foreach \x in {-6, -2, 2, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(\x, -6, \z, \theta, \phi) + \S}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi) + \S}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, -2, 2, 6} {
+    \draw[gray60, line width=0.3, dash pattern={on 1pt off 1pt}]   ({x(-6, \y, \z, \theta, \phi) + \S}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+6, \y, \z, \theta, \phi) + \S}, {y(+6, \y, \z, \theta, \phi)});
+  }
+         
+  \node[] at (0 + \S, -12) {$\frac{1}{27}$};
+         
+\end{tikzpicture}
+
+\end{document}  

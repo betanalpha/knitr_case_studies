@@ -1,0 +1,45 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+\newcommand{\dd}{ \mathrm{d} }
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.35, thick]
+  \draw[white] (-8, -8) rectangle (8, 8);
+  
+  \draw[dashed, color=gray60] (3, -0.5) -- (3, 0.5);
+  \draw[dashed, color=gray60] (-3, -0.5) -- (-3, 0.5);
+  
+  \draw[color=gray70] (-8, 0) -- (8, 0);
+  \fill[color=dark] (0, 0) circle (5pt);  
+  \fill[color=light] (0, 0) circle (3pt);
+  
+  \draw[|-|, >=stealth, black] (2.9, 0) -- (1.5, 0);
+  \draw[|-|, >=stealth, black] (3.1, 0) -- (4.5, 0);
+      
+  \draw[|<->|, >=stealth, light] (3.1, -1.5) -- (4.5, -1.5);
+  \node[below] at (3.75, -2) { $\delta$};
+  \draw[|<->|, >=stealth, light] (2.9, -1.5) -- (1.5, -1.5);
+  \node[below] at (2.25, -2) { $\delta$};
+\end{tikzpicture}
+
+\end{document}  
