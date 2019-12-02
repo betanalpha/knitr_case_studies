@@ -1,0 +1,177 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "gauss_trace.eps"
+
+set datafile separator ','
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'Iteration'
+set xrange[0:1000]
+
+set ytics scale 0
+set ylabel 'f(q)'
+set format y ''
+set yrange[-5:20]
+
+plot \
+"gauss_trace.csv" using 0:5 with points pt 7 ps 1 lc rgb '$dark' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "gauss_multi_init_trace.eps"
+
+set datafile separator ','
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'Iteration'
+set xrange[0:1000]
+
+set ytics scale 0
+set ylabel 'f(q)'
+set format y ''
+set yrange[-10:20]
+
+set label at 1000, -5 "Initialization 1" tc rgb "$dark" right
+set label at 1000, 9 "Initialization 2" tc rgb "$light" right
+
+plot \
+"gauss_trace.csv" using 0:5 with points pt 7 ps 1 lc rgb '$dark' notitle, \
+"gauss_trace2.csv" using 0:5 with points pt 7 ps 1 lc rgb '$light' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "gauss_multi_chain_trace.eps"
+
+set datafile separator ','
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'Iteration'
+set xrange[0:1000]
+
+set ytics scale 0
+set ylabel 'f(q)'
+set format y ''
+set yrange[-10:20]
+
+set label at 1000, -5 "Chain 1" tc rgb "$dark" right
+set label at 1000, 9 "Chain 2" tc rgb "$light" right
+
+plot \
+"gauss_trace.csv" using 0:5 with points pt 7 ps 1 lc rgb '$dark' notitle, \
+"gauss_trace2.csv" using 0:5 with points pt 7 ps 1 lc rgb '$light' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "funnel_trace.eps"
+
+set datafile separator ','
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'Iteration'
+set xrange[0:1000]
+
+set ytics scale 0
+set ylabel 'f(q)'
+set format y ''
+set yrange[-5:5]
+
+set object rectangle from 397, -5 to 603, 5 fc rgb '#72DF72' fs solid noborder
+
+plot \
+"funnel_trace.csv" using 0:5 every ::0::1000 \
+with points pt 7 ps 1 lc rgb '$dark' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "funnel_short_trace.eps"
+
+set datafile separator ','
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'Iteration'
+set xrange[0:1000]
+
+set ytics scale 0
+set ylabel 'f(q)'
+set format y ''
+set yrange[-5:5]
+
+plot \
+"funnel_trace.csv" using 0:5 every ::0::1000 \
+with points pt 7 ps 1 lc rgb 'gray' notitle, \
+"funnel_trace.csv" using 0:5 every ::0::400 \
+with points pt 7 ps 1 lc rgb '$dark' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "funnel_multi_chain_trace.eps"
+
+set datafile separator ','
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'Iteration'
+set xrange[0:400]
+
+set ytics scale 0
+set ylabel 'f(q)'
+set format y ''
+set yrange[-5:5]
+
+set label at 300, 0.5 "Chain 1" tc rgb "$dark" left
+set label at 300, -4 "Chain 2" tc rgb "$light" left
+
+plot \
+"funnel_trace.csv" using 0:5 every ::0::400 \
+with points pt 7 ps 1 lc rgb '$dark' notitle, \
+"funnel_trace2.csv" using 0:2 with points pt 7 ps 1 lc rgb '$light' notitle
+
+END

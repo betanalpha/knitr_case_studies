@@ -1,0 +1,140 @@
+#!/bin/bash
+
+hyperlight="#F5ECEC"
+sublight="#EBDADA"
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 55' size 5, 4
+set output "trace0.eps"
+
+set datafile separator ','
+
+set border 3 lw 2
+
+set lmargin screen 0.005
+set rmargin screen 0.995
+set bmargin screen 0.2
+set tmargin screen 1
+
+set title ""
+
+set xtics scale 0
+set format x ''
+set xlabel 'Iteration' offset 0, 0.25
+set xrange[0:200]
+
+set ytics scale 0
+set ylabel ''
+set format y ''
+set yrange[-8:6]
+
+plot 1 / 0 notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 55' size 5, 4
+set output "trace1.eps"
+
+
+set border 3 lw 2
+
+set lmargin screen 0.005
+set rmargin screen 0.995
+set bmargin screen 0.2
+set tmargin screen 1
+
+set title ""
+
+set xtics scale 0
+set format x ''
+set xlabel 'Iteration' offset 0, 0.25
+set xrange[0:200]
+
+set ytics scale 0
+set ylabel ''
+set format y ''
+set yrange[-8:6]
+
+plot \
+"trace.csv" using 0:2 every ::0::175 \
+with points pt 7 ps 2 lc rgb '$dark' notitle, \
+"trace.csv" using 0:2 every ::0::175 \
+with points pt 7 ps 1 lc rgb '$light' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 55' size 5, 4
+set output "trace2.eps"
+
+
+set border 3 lw 2
+
+set lmargin screen 0.005
+set rmargin screen 0.995
+set bmargin screen 0.2
+set tmargin screen 1
+
+set title ""
+
+set xtics scale 0
+set format x ''
+set xlabel 'Iteration' offset 0, 0.25
+set xrange[0:200]
+
+set ytics scale 0
+set ylabel ''
+set format y ''
+set yrange[-8:6]
+
+plot \
+"trace.csv" using 0:2 every ::0::175 \
+with points pt 7 ps 2 lc rgb '$light' notitle, \
+"trace.csv" using 0:2 every ::0::175 \
+with points pt 7 ps 1 lc rgb '$hyperlight' notitle, \
+"trace.csv" using (\$0+175):2 every ::176::200 \
+with points pt 7 ps 2 lc rgb '$dark' notitle, \
+"trace.csv" using (\$0+175):2 every ::176::200 \
+with points pt 7 ps 1 lc rgb '$light' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 55' size 5.5, 4
+set output "estimator_error_axes.eps"
+
+set datafile separator ','
+
+set border 3 lw 2
+
+set lmargin screen 0.075
+set rmargin screen 1
+set bmargin screen 0.2
+set tmargin screen 1
+
+set title ""
+
+set xtics scale 0
+set format x ''
+set xlabel 'Iteration' offset 0, 0.25
+set xrange[0:200]
+
+set ytics scale 0
+set format y ''
+set ylabel ''
+set yrange[-5:5]
+
+plot 0 w l lw 4 lc "#777777" dt "-" notitle
+
+END

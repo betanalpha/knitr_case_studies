@@ -1,0 +1,390 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.90}
+\definecolor{gray95}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.25, thick]
+  \draw[-,color=white] (-12, 0) to (12, 0);
+  
+  \begin{scope}
+  \clip (-12, -8) rectangle (12, 11);
+  
+  \foreach \i in {1, 0.99, ..., 0} {
+    \pgfmathsetmacro{\prop}{100 * exp(-10.0 * \i * \i)};
+    \colorlet{custom}{dark!\prop!white};
+    \draw[line width={30 * \i}, color=custom] 
+      (-10, 0) .. controls (-10, 15) and (-5, 5) .. (0, 5)
+      .. controls (5, 5) and (10, 8) .. (10, 0)
+      .. controls (10, -8) and (5, -3) .. (0, -3)
+      .. controls (-5, -3) and (-10, -5) .. (-10, 0);
+  }
+  
+  % Convergence
+  
+  \fill[color=dark] (-11, -7.75) circle (7pt);  
+  \fill[color=light] (-11, -7.75) circle (5pt);
+  
+  \fill[color=dark] (-10, -6.5) circle (7pt);  
+  \fill[color=light] (-10, -6.5) circle (5pt);
+  
+  \fill[color=dark] (-9, -6.75) circle (7pt);  
+  \fill[color=light] (-9, -6.75) circle (5pt);
+  
+  \fill[color=dark] (-8.25, -5) circle (7pt);  
+  \fill[color=light] (-8.25, -5) circle (5pt);
+  
+  \fill[color=dark] (-7.5, -4) circle (7pt);  
+  \fill[color=light] (-7.5, -4) circle (5pt);
+  
+  \fill[color=dark] (-7, -3.5) circle (7pt);  
+  \fill[color=light] (-7, -3.5) circle (5pt);
+  
+  \fill[color=dark] (-6.5, -3.6) circle (7pt);  
+  \fill[color=light] (-6.5, -3.6) circle (5pt);  
+  
+  % Mixing
+  
+  %\fill[color=dark] (-6, -3) circle (7pt);  
+  %\fill[color=light] (-6, -3) circle (5pt);
+  
+  \fill[color=dark] (-5.5, -3.5) circle (7pt);  
+  \fill[color=light] (-5.5, -3.5) circle (5pt);
+  
+  %\fill[color=dark] (-5, -3.75) circle (7pt);  
+  %\fill[color=light] (-5, -3.75) circle (5pt);
+  
+  \fill[color=dark] (-4.75, -3.25) circle (7pt);  
+  \fill[color=light] (-4.75, -3.25) circle (5pt);
+  
+  %\fill[color=dark] (-5, -3.5) circle (7pt);  
+  %\fill[color=light] (-5, -3.5) circle (5pt);  
+  
+  %\fill[color=dark] (-4, -3.8) circle (7pt);  
+  %\fill[color=light] (-4, -3.8) circle (5pt);
+  
+  \fill[color=dark] (-3, -3.5) circle (7pt);  
+  \fill[color=light] (-3, -3.5) circle (5pt);
+  
+  %\fill[color=dark] (-2.8, -3) circle (7pt);  
+  %\fill[color=light] (-2.8, -3) circle (5pt);
+  
+  %\fill[color=dark] (-2.9, -3.3) circle (7pt);  
+  %\fill[color=light] (-2.9, -3.3) circle (5pt);  
+  
+  \fill[color=dark] (-2, -3.5) circle (7pt);  
+  \fill[color=light] (-2, -3.5) circle (5pt);
+  
+  %\fill[color=dark] (-1.25, -3) circle (7pt);  
+  %\fill[color=light] (-1.25, -3) circle (5pt);
+  
+  %\fill[color=dark] (-0.5, -2.75) circle (7pt);  
+  %\fill[color=light] (-0.5, -2.75) circle (5pt);
+  
+  \fill[color=dark] (-0.3, -3) circle (7pt);  
+  \fill[color=light] (-0.3, -3) circle (5pt);  
+  
+  %\fill[color=dark] (0.1, -2.75) circle (7pt);  
+  %\fill[color=light] (0.1, -2.75) circle (5pt);
+  
+  %\fill[color=dark] (0.15, -3.1) circle (7pt);  
+  %\fill[color=light] (0.15, -3.1) circle (5pt);  
+  
+  \fill[color=dark] (0.4, -3.4) circle (7pt);  
+  \fill[color=light] (0.4, -3.4) circle (5pt);
+  
+  %\fill[color=dark] (1.1, -3.25) circle (7pt);  
+  %\fill[color=light] (1.1, -3.25) circle (5pt);
+  
+  %\fill[color=dark] (2.7, -3.45) circle (7pt);  
+  %\fill[color=light] (2.7, -3.45) circle (5pt);
+  
+  \fill[color=dark] (2.9, -3.2) circle (7pt);  
+  \fill[color=light] (2.9, -3.2) circle (5pt);
+  
+  %\fill[color=dark] (3.1, -3.7) circle (7pt);  
+  %\fill[color=light] (3.1, -3.7) circle (5pt);
+  
+  %\fill[color=dark] (4.2, -3.9) circle (7pt);  
+  %\fill[color=light] (4.2, -3.9) circle (5pt);
+  
+  \fill[color=dark] (4, -4.1) circle (7pt);  
+  \fill[color=light] (4, -4.1) circle (5pt);
+  
+  %\fill[color=dark] (5, -4) circle (7pt);  
+  %\fill[color=light] (5, -4) circle (5pt);
+  
+  %\fill[color=dark] (5.8, -4.3) circle (7pt);  
+  %\fill[color=light] (5.8, -4.3) circle (5pt);
+  
+  \fill[color=dark] (6.5, -4.8) circle (7pt);  
+  \fill[color=light] (6.5, -4.8) circle (5pt);
+  
+  %\fill[color=dark] (6.8, -4.5) circle (7pt);  
+  %\fill[color=light] (6.8, -4.5) circle (5pt);
+  
+  %\fill[color=dark] (7, -4.6) circle (7pt);  
+  %\fill[color=light] (7, -4.6) circle (5pt);
+  
+  \fill[color=dark] (6.8, -4.7) circle (7pt);  
+  \fill[color=light] (6.8, -4.7) circle (5pt);
+  
+  %\fill[color=dark] (7.75, -4.2) circle (7pt);  
+  %\fill[color=light] (7.75, -4.2) circle (5pt);
+  
+  %\fill[color=dark] (8.5, -4.25) circle (7pt);  
+  %\fill[color=light] (8.5, -4.25) circle (5pt);
+  
+  %\fill[color=dark] (8.6, -4.75) circle (7pt);  
+  %\fill[color=light] (8.6, -4.75) circle (5pt);
+  
+  \fill[color=dark] (8.8, -4.5) circle (7pt);  
+  \fill[color=light] (8.8, -4.5) circle (5pt);
+  
+  %\fill[color=dark] (9.25, -3.5) circle (7pt);  
+  %\fill[color=light] (9.25, -3.5) circle (5pt);
+  
+  %\fill[color=dark] (9.65, -2.75) circle (7pt);  
+  %\fill[color=light] (9.65, -2.75) circle (5pt);
+  
+  \fill[color=dark] (9.5, -2) circle (7pt);  
+  \fill[color=light] (9.5, -2) circle (5pt);
+
+  %\fill[color=dark] (9.8, -3) circle (7pt);  
+  %\fill[color=light] (9.8, -3) circle (5pt);
+  
+  \fill[color=dark] (9.85, -0.8) circle (7pt);  
+  \fill[color=light] (9.85, -0.8) circle (5pt);
+  
+  %\fill[color=dark] (10.1, -0.4) circle (7pt);  
+  %\fill[color=light] (10.1, -0.4) circle (5pt);
+
+  \fill[color=dark] (10.25, 0.3) circle (7pt);  
+  \fill[color=light] (10.25, 0.3) circle (5pt);
+  
+  \fill[color=dark] (10, 0.7) circle (7pt);  
+  \fill[color=light] (10, 0.7) circle (5pt);
+  
+  %\fill[color=dark] (9.7, 0.9) circle (7pt);  
+  %\fill[color=light] (9.7, 0.9) circle (5pt);
+  
+  %\fill[color=dark] (10.3, 1.4) circle (7pt);  
+  %\fill[color=light] (10.3, 1.4) circle (5pt);
+  
+  \fill[color=dark] (9.8, 2.25) circle (7pt);  
+  \fill[color=light] (9.8, 2.25) circle (5pt);
+  
+  %\fill[color=dark] (10, 2.5) circle (7pt);  
+  %\fill[color=light] (10, 2.5) circle (5pt);
+  
+  %\fill[color=dark] (10, 3) circle (7pt);  
+  %\fill[color=light] (10, 3) circle (5pt);
+  
+  \fill[color=dark] (9.6, 3.75) circle (7pt);  
+  \fill[color=light] (9.6, 3.75) circle (5pt);
+  
+  %\fill[color=dark] (9.1, 4.4) circle (7pt);  
+  %\fill[color=light] (9.1, 4.4) circle (5pt);
+  
+  %\fill[color=dark] (9.1, 4.1) circle (7pt);  
+  %\fill[color=light] (9.1, 4.1) circle (5pt);
+  
+  \fill[color=dark] (8.5, 4.75) circle (7pt);  
+  \fill[color=light] (8.5, 4.75) circle (5pt);
+  
+  %\fill[color=dark] (8.1, 5.75) circle (7pt);  
+  %\fill[color=light] (8.1, 5.75) circle (5pt);
+  
+  %\fill[color=dark] (7.7, 5.2) circle (7pt);  
+  %\fill[color=light] (7.7, 5.2) circle (5pt);
+  
+  %\fill[color=dark] (7.3, 5.3) circle (7pt);  
+  %\fill[color=light] (7.3, 5.3) circle (5pt);
+  
+  \fill[color=dark] (6.6, 5.8) circle (7pt);  
+  \fill[color=light] (6.6, 5.8) circle (5pt);
+  
+  %\fill[color=dark] (6, 6) circle (7pt);  
+  %\fill[color=light] (6, 6) circle (5pt);
+  
+  \fill[color=dark] (5.25, 5.45) circle (7pt);  
+  \fill[color=light] (5.25, 5.45) circle (5pt);
+  
+  %\fill[color=dark] (4.75, 5.75) circle (7pt);  
+  %\fill[color=light] (4.75, 5.75) circle (5pt);
+  
+  %\fill[color=dark] (3.5, 5.28) circle (7pt);  
+  %\fill[color=light] (3.5, 5.28) circle (5pt);
+  
+  \fill[color=dark] (5, 5.65) circle (7pt);  
+  \fill[color=light] (5, 5.65) circle (5pt);
+  
+  %\fill[color=dark] (3, 5.5) circle (7pt);  
+  %\fill[color=light] (3, 5.5) circle (5pt);
+  
+  %\fill[color=dark] (2.75, 5.3) circle (7pt);  
+  %\fill[color=light] (2.75, 5.3) circle (5pt);
+  
+  \fill[color=dark] (2.25, 4.8) circle (7pt);  
+  \fill[color=light] (2.25, 4.8) circle (5pt);
+  
+  %\fill[color=dark] (2, 5.2) circle (7pt);  
+  %\fill[color=light] (2, 5.2) circle (5pt);
+  
+  %\fill[color=dark] (1.75, 4.9) circle (7pt);  
+  %\fill[color=light] (1.75, 4.9) circle (5pt);
+  
+  \fill[color=dark] (1.5, 5.1) circle (7pt);  
+  \fill[color=light] (1.5, 5.1) circle (5pt);
+  
+  %\fill[color=dark] (0.8, 5.2) circle (7pt);  
+  %\fill[color=light] (0.8, 5.2) circle (5pt);
+ 
+  \fill[color=dark] (0, 4.7) circle (7pt);  
+  \fill[color=light] (0, 4.7) circle (5pt);
+  
+  %\fill[color=dark] (-0.6, 5) circle (7pt);  
+  %\fill[color=light] (-0.6, 5) circle (5pt);
+  
+  %\fill[color=dark] (-1.25, 5.2) circle (7pt);  
+  %\fill[color=light] (-1.25, 5.2) circle (5pt);
+  
+  %\fill[color=dark] (-1.55, 5.4) circle (7pt);  
+  %\fill[color=light] (-1.55, 5.4) circle (5pt);
+  
+  \fill[color=dark] (-1.85, 5) circle (7pt);  
+  \fill[color=light] (-1.85, 5) circle (5pt);
+  
+  %\fill[color=dark] (-2.75, 5.5) circle (7pt);  
+  %\fill[color=light] (-2.75, 5.5) circle (5pt);
+  
+  %\fill[color=dark] (-3.5, 6.6) circle (7pt);  
+  %\fill[color=light] (-3.5, 6.6) circle (5pt);
+  
+  \fill[color=dark] (-4.25, 6.5) circle (7pt);  
+  \fill[color=light] (-4.25, 6.5) circle (5pt);
+  
+  %\fill[color=dark] (-4.9, 7.2) circle (7pt);  
+  %\fill[color=light] (-4.9, 7.2) circle (5pt);
+  
+  %\fill[color=dark] (-5.2, 7) circle (7pt);  
+  %\fill[color=light] (-5.2, 7) circle (5pt);
+  
+  \fill[color=dark] (-5.75, 7.4) circle (7pt);  
+  \fill[color=light] (-5.75, 7.4) circle (5pt);
+  
+  %\fill[color=dark] (-6, 7.9) circle (7pt);  
+  %\fill[color=light] (-6, 7.9) circle (5pt);
+  
+  %\fill[color=dark] (-6.25, 7.8) circle (7pt);  
+  %\fill[color=light] (-6.25, 7.8) circle (5pt);
+  
+  \fill[color=dark] (-6.5, 7.5) circle (7pt);  
+  \fill[color=light] (-6.5, 7.5) circle (5pt);
+  
+  %\fill[color=dark] (-6.75, 8) circle (7pt);  
+  %\fill[color=light] (-6.75, 8) circle (5pt);
+  
+  %\fill[color=dark] (-7.5, 8.5) circle (7pt);  
+  %\fill[color=light] (-7.5, 8.5) circle (5pt);
+  
+  \fill[color=dark] (-8.25, 8) circle (7pt);  
+  \fill[color=light] (-8.25, 8) circle (5pt);
+  
+  %\fill[color=dark] (-8.65, 7.8) circle (7pt);  
+  %\fill[color=light] (-8.65, 7.8) circle (5pt);
+  
+  %\fill[color=dark] (-8.4, 7.7) circle (7pt);  
+  %\fill[color=light] (-8.4, 7.7) circle (5pt);
+  
+  \fill[color=dark] (-9.2, 7) circle (7pt);  
+  \fill[color=light] (-9.2, 7) circle (5pt);
+  
+  %\fill[color=dark] (-9.5, 6.75) circle (7pt);  
+  %\fill[color=light] (-9.5, 6.75) circle (5pt);
+  
+  %\fill[color=dark] (-10, 6) circle (7pt);  
+  %\fill[color=light] (-10, 6) circle (5pt);
+  
+  \fill[color=dark] (-9.7, 5.3) circle (7pt);  
+  \fill[color=light] (-9.7, 5.3) circle (5pt);
+  
+  %\fill[color=dark] (-9.6, 5) circle (7pt);  
+  %\fill[color=light] (-9.6, 5) circle (5pt);
+  
+  %\fill[color=dark] (-9.9, 4.75) circle (7pt);  
+  %\fill[color=light] (-9.9, 4.75) circle (5pt);
+  
+  \fill[color=dark] (-10.1, 4) circle (7pt);  
+  \fill[color=light] (-10.1, 4) circle (5pt);
+  
+  %\fill[color=dark] (-9.7, 3.5) circle (7pt);  
+  %\fill[color=light] (-9.7, 3.5) circle (5pt);
+  
+  %\fill[color=dark] (-9.8, 3) circle (7pt);  
+  %\fill[color=light] (-9.8, 3) circle (5pt);
+  
+  \fill[color=dark] (-10, 2.2) circle (7pt);  
+  \fill[color=light] (-10, 2.2) circle (5pt);  
+  
+  %\fill[color=dark] (-10.25, 1.9) circle (7pt);  
+  %\fill[color=light] (-10.25, 1.9) circle (5pt);  
+  
+  %\fill[color=dark] (-9.7, 1.8) circle (7pt);  
+  %\fill[color=light] (-9.7, 1.8) circle (5pt);  
+  
+  \fill[color=dark] (-10.2, 1.4) circle (7pt);  
+  \fill[color=light] (-10.2, 1.4) circle (5pt);  
+  
+  %\fill[color=dark] (-9.8, 0.7) circle (7pt);  
+  %\fill[color=light] (-9.8, 0.7) circle (5pt);  
+  
+  %\fill[color=dark] (-10.2, 0.1) circle (7pt);  
+  %\fill[color=light] (-10.2, 0.1) circle (5pt);  
+  
+  \fill[color=dark] (-9.9, -0.1) circle (7pt);  
+  \fill[color=light] (-9.9, -0.1) circle (5pt);  
+  
+  %\fill[color=dark] (-10, -0.9) circle (7pt);  
+  %\fill[color=light] (-10, -0.9) circle (5pt);  
+  
+  %\fill[color=dark] (-9.6, -1.5) circle (7pt);  
+  %\fill[color=light] (-9.6, -1.5) circle (5pt);  
+  
+  \fill[color=dark] (-9.5, -1.8) circle (7pt);  
+  \fill[color=light] (-9.5, -1.8) circle (5pt);  
+  
+  %\fill[color=dark] (-9.7, -2.1) circle (7pt);  
+  %\fill[color=light] (-9.7, -2.1) circle (5pt);  
+  
+  %\fill[color=dark] (-9.3, -2.8) circle (7pt);  
+  %\fill[color=light] (-9.3, -2.8) circle (5pt);  
+  
+  \fill[color=dark] (-8.3, -3) circle (7pt);  
+  \fill[color=light] (-8.3, -3) circle (5pt);  
+  
+  %\fill[color=dark] (-7.8, -3.4) circle (7pt);  
+  %\fill[color=light] (-7.8, -3.4) circle (5pt);  
+  
+  %\fill[color=dark] (-7.6, -3) circle (7pt);  
+  %\fill[color=light] (-7.6, -3) circle (5pt);   
+  
+  \end{scope}
+  
+  \draw[-,color=white] (14, 0) to (38, 0);  
+  \node[] at (28, 0.5) {\includegraphics[width=5cm]{gnuplot/convergence2.eps}};
+  \node[rotate=90] at (16.25, 1.75) { $\left| \mathbb{E} \! \left[ f \right] - \hat{f} \right|$ };
+\end{tikzpicture}
+
+\end{document}  

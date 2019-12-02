@@ -1,0 +1,47 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+\newcommand{\dd}{ \mathrm{d} }
+
+\newcommand{\mcpoint}[2]{  
+  \fill[color=dark] (#1, #2) circle (7pt); 
+  \fill[color=light] (#1, #2) circle (5pt);
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.35, thick]
+  \draw[-,color=white] (39, 0) to (64, 0);  
+  \node[] at (53,-2) {\includegraphics[width=8.4cm]{funnel_trace_empty3.eps}};
+  \node[rotate=90] at (41, -1) { $\mathbb{E} \! \left[ q_{2} \right] - \hat{q_{2}}$ };
+  
+  \draw[-,color=black, line width=0.5] (44, 4)
+                                       .. controls (46, 1.5) and (52, 1.5) 
+                                       .. (54.9, 1.5);
+  \draw[-,color=black, line width=0.5] (54.9, 1.5) 
+                                       .. controls (57.8, 1.5) and (58.25, -1.5) 
+                                       .. (60.25, -3.5);
+  \draw[-,color=black, line width=0.5] (60.25, -3.5)
+                                       .. controls (61, -4.25) and (62, -1.25)
+                                       .. (62.975, -1);
+\end{tikzpicture}
+
+\end{document}  

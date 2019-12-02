@@ -1,0 +1,137 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 55' size 4.8, 4
+set output "convergence0.eps"
+
+set border 3 lw 2
+
+set lmargin screen 0
+set rmargin screen 1
+set bmargin screen 0.2
+set tmargin screen 1
+
+set xtics nomirror scale 0
+set xlabel "Iteration" offset 0, 0.25
+set format x ''
+set xrange[0:20]
+
+set ytics nomirror scale 0
+set ylabel ''
+set format y ''
+set yrange[0:1.1]
+
+set samples 100
+
+f(x) = ((1 / (1 + exp(5 - x)) - 1 / (1 + exp(5))) / sqrt(1 + 25 * x) \
++ (1 + exp(-6)) / (1 + exp(x - 6)))
+
+plot 1 / 0 notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 55' size 4.8, 4
+set output "convergence1.eps"
+
+set border 3 lw 2
+
+set lmargin screen 0
+set rmargin screen 1
+set bmargin screen 0.2
+set tmargin screen 1
+
+set xtics nomirror scale 0
+set xlabel "Iteration" offset 0, 0.25
+set format x ''
+set xrange[0:20]
+
+set ytics nomirror scale 0
+set ylabel ''
+set format y ''
+set yrange[0:1.1]
+
+set samples 100
+
+f(x) = ((1 / (1 + exp(5 - x)) - 1 / (1 + exp(5))) / sqrt(1 + 25 * x) \
+       + (1 + exp(-6)) / (1 + exp(x - 6)))
+
+plot \
+x > 4.5 ? 1 / 0 : f(x) w l lw 5 lc rgb 'black' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 55' size 4.8, 4
+set output "convergence2.eps"
+
+set border 3 lw 2
+
+set lmargin screen 0
+set rmargin screen 1
+set bmargin screen 0.2
+set tmargin screen 1
+
+set xtics nomirror scale 0
+set xlabel "Iteration" offset 0, 0.25
+set format x ''
+set xrange[0:20]
+
+set ytics nomirror scale 0
+set ylabel ''
+set format y ''
+set yrange[0:1.1]
+
+set samples 100
+
+f(x) = ((1 / (1 + exp(5 - x)) - 1 / (1 + exp(5))) / sqrt(1 + 25 * x) \
++ (1 + exp(-6)) / (1 + exp(x - 6)))
+
+plot \
+x > 4.7 ? 1 / 0 : f(x) w l lw 5 lc rgb 'grey' notitle, \
+x < 4.5 || x > 9 ? 1 / 0 : f(x) w l lw 5 lc rgb 'black' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 55' size 4.8, 4
+set output "convergence3.eps"
+
+set border 3 lw 2
+
+set lmargin screen 0
+set rmargin screen 1
+set bmargin screen 0.2
+set tmargin screen 1
+
+set xtics nomirror scale 0
+set xlabel "Iteration" offset 0, 0.25
+set format x ''
+set xrange[0:20]
+
+set ytics nomirror scale 0
+set ylabel ''
+set format y ''
+set yrange[0:1.1]
+
+set samples 100
+
+f(x) = ((1 / (1 + exp(5 - x)) - 1 / (1 + exp(5))) / sqrt(1 + 25 * x) \
++ (1 + exp(-6)) / (1 + exp(x - 6)))
+
+plot \
+x > 9.2 ? 1 / 0 : f(x) w l lw 5 lc rgb 'grey' notitle, \
+x < 9 ? 1 / 0 : f(x) w l lw 5 lc rgb 'black' notitle
+
+END

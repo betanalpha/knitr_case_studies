@@ -1,0 +1,141 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "estimated_autocorr.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'l'
+set xrange[0:50]
+
+set ytics scale 0
+set ylabel '~{/Symbol r}{.4\^}_{l}[f]' offset 1, 0
+set yrange[-0.1:1]
+
+plot \
+0 w l lt 1 dt "-" lw 3 lc rgb "#BBBBBB" notitle, \
+"gauss_autocorr_rep.txt" using 1:2 with lines lt 1 lw 3 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "cutoff_low.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'l'
+set xrange[0:50]
+
+set ytics scale 0
+set ylabel '~{/Symbol r}{.4\^}_{l}[f]' offset 1, 0
+set yrange[-0.1:1]
+
+set arrow from 2.5, -0.1 to 2.5, 1 lw 3 lc rgb "$dark" dt "." nohead
+set label at 2.5, 1.05 "L" tc rgb "$dark" center
+
+plot \
+0 w l lt 1 dt "-" lw 3 lc rgb "#BBBBBB" notitle, \
+"gauss_autocorr_rep.txt" using 1:2 every ::0::7 \
+with lines lt 1 lw 3 lc rgb "$dark" notitle, \
+"gauss_autocorr_rep.txt" using 1:2 every ::8 \
+with lines lt 1 lw 3 lc rgb "$light" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "cutoff_high.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'l'
+set xrange[0:50]
+
+set ytics scale 0
+set ylabel '~{/Symbol r}{.4\^}_{l}[f]' offset 1, 0
+set yrange[-0.1:1]
+
+set arrow from 40.5, -0.1 to 40.5, 1 lw 3 lc rgb "$dark" dt "." nohead
+set label at 40.5, 1.05 "L" tc rgb "$dark" center
+
+plot \
+0 w l lt 1 dt "-" lw 3 lc rgb "#BBBBBB" notitle, \
+"gauss_autocorr_rep.txt" using 1:2 every ::0::83 \
+with lines lt 1 lw 3 lc rgb "$dark" notitle, \
+"gauss_autocorr_rep.txt" using 1:2 every ::84 \
+with lines lt 1 lw 3 lc rgb "$light" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "cutoff_ideal.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'l'
+set xrange[0:50]
+
+set ytics scale 0
+set ylabel '~{/Symbol r}{.4\^}_{l}[f]' offset 1, 0
+set yrange[-0.1:1]
+
+set arrow from 4.5, -0.1 to 4.5, 1 lw 3 lc rgb "$dark" dt "." nohead
+set label at 4.5, 1.05 "L" tc rgb "$dark" center
+
+plot \
+0 w l lt 1 dt "-" lw 3 lc rgb "#BBBBBB" notitle, \
+"gauss_autocorr_rep.txt" using 1:2 every ::0::11 \
+with lines lt 1 lw 3 lc rgb "$dark" notitle, \
+"gauss_autocorr_rep.txt" using 1:2 every ::12 \
+with lines lt 1 lw 3 lc rgb "$light" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "estimated_autocorr_ringing.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'l'
+set xrange[0:500]
+
+set ytics scale 0
+set ylabel '~{/Symbol r}{.4\^}_{l}[f]' offset 1, 0
+set yrange[-0.2 :1]
+
+plot \
+0 w l lt 1 dt "-" lw 3 lc rgb "#BBBBBB" notitle, \
+"funnel_autocorr_long_rep.txt" using 1:2 with lines lt 1 lw 3 lc rgb "$dark" notitle
+
+END

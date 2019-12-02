@@ -1,0 +1,54 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'l'
+set xrange[-50:50]
+
+set ytics scale 0
+set ylabel '{/Symbol r}_{l}[f]' offset 1, 0
+set yrange[-0.1:1]
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "low_rho_sym.eps"
+
+plot \
+0 w l lt 1 dt "." lw 3 lc rgb "#BBBBBB" notitle, \
+"low_rho.dat" using 1:2 with lines lt 1 lw 3 lc rgb "$light" notitle, \
+"low_rho.dat" using (-\$1):2 with lines lt 1 lw 3 lc rgb "$light" notitle
+
+set xrange[0:50]
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "low_rho.eps"
+
+plot \
+0 w l lt 1 dt "." lw 3 lc rgb "#BBBBBB" notitle, \
+"low_rho.dat" using 1:2 with lines lt 1 lw 3 lc rgb "$light" notitle, \
+"low_rho.dat" using (-\$1):2 with lines lt 1 lw 3 lc rgb "$light" notitle
+
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "both_rho.eps"
+
+
+plot \
+0 w l lt 1 dt "." lw 3 lc rgb "#BBBBBB" notitle, \
+"low_rho.dat" using 1:2 with lines lt 1 lw 3 lc rgb "$light" notitle, \
+"low_rho.dat" using (-\$1):2 with lines lt 1 lw 3 lc rgb "$light" notitle, \
+"high_rho.dat" using 1:2 with lines lt 1 lw 3 lc rgb "$dark" notitle, \
+"high_rho.dat" using (-\$1):2 with lines lt 1 lw 3 lc rgb "$dark" notitle
+
+END

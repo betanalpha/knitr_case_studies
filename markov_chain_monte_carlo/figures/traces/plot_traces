@@ -1,0 +1,54 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "low_rho.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'Iteration'
+set xrange[0:1000]
+
+set ytics scale 0
+set ylabel 'f(q)'
+set format y ''
+set yrange[-10:10]
+
+plot "low_rho.dat" using 1:2 with lines lt 1 lw 3 lc rgb "$light" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 6, 4
+set output "both_rho.eps"
+
+set border 3 lw 2
+
+set title ""
+
+set xtics scale 0
+set xlabel 'Iteration'
+set xrange[0:1000]
+
+set ytics scale 0
+set ylabel 'f(q)'
+set format y ''
+set yrange[-10:10]
+
+plot \
+"low_rho.dat" using 1:2 with lines lt 1 lw 3 lc rgb "$light" notitle, \
+"high_rho.dat" using 1:2 with lines lt 1 lw 3 lc rgb "$dark" notitle
+
+END

@@ -1,0 +1,273 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, arrows}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray60}{gray}{0.95}
+
+\tikzset{
+  double -latex/.style args={#1 colored by #2 and #3}{    
+    -latex,line width=#1,#2,
+    postaction={draw,-latex,#3,line width=(#1)/3,shorten <=(#1)/4,shorten >=4.5*(#1)/3},
+  },
+  double round cap-latex/.style args={#1 colored by #2 and #3}{    
+    round cap-latex,line width=#1,#2,
+    postaction={draw,round cap-latex,#3,line width=(#1)/3,shorten <=(#1)/4,shorten >=4.5*(#1)/3},
+  },
+  double round cap-stealth/.style args={#1 colored by #2 and #3}{
+    round cap-stealth,line width=#1,#2,
+    postaction={round cap-stealth,draw,,#3,line width=(#1)/3,shorten <=(#1)/3,shorten >=2*(#1)/3},
+  },
+  double -stealth/.style args={#1 colored by #2 and #3}{
+    -stealth,line width=#1,#2,
+    postaction={-stealth,draw,,#3,line width=(#1)/3,shorten <=(#1)/3,shorten >=2*(#1)/3},
+  },
+}
+
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.35, thick]
+
+  \begin{scope}
+  \clip (-12, -7) rectangle (12, 10);
+  \foreach \i in {1, 0.99, ..., 0} {
+    \pgfmathsetmacro{\prop}{100 * exp(-10.0 * \i * \i)};
+    \colorlet{custom}{dark!\prop!white};
+    \draw[line width={30 * \i}, color=custom] 
+      (-10, 0) .. controls (-10, 15) and (-5, 5) .. (0, 5)
+      .. controls (5, 5) and (10, 8) .. (10, 0)
+      .. controls (10, -8) and (5, -3) .. (0, -3)
+      .. controls (-5, -3) and (-10, -5) .. (-10, 0);
+  }
+  
+ 
+  \fill[color=dark] (-9, -2.2) circle (7pt);  
+  \fill[color=light] (-9, -2.2) circle (5pt);  
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-8.3, -3.2) -- (-9, -2.2);         
+
+  \fill[color=dark] (-8.3, -3.2) circle (7pt);  
+  \fill[color=light] (-8.3, -3.2) circle (5pt);  
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-10, -2.2) -- (-8.3, -3.2);     
+
+  \fill[color=dark] (-10, -2.2) circle (7pt);  
+  \fill[color=light] (-10, -2.2) circle (5pt);  
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-10.3, -0.7) -- (-10, -2.2);     
+  
+  \fill[color=dark] (-10.3, -0.7) circle (7pt);  
+  \fill[color=light] (-10.3, -0.7) circle (5pt);  
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-9.7, -0.1) -- (-10.3, -0.7);     
+
+  \fill[color=dark] (-9.7, -0.1) circle (7pt);  
+  \fill[color=light] (-9.7, -0.1) circle (5pt);  
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-10.3, 1.4) -- (-9.7, -0.1);     
+
+  \fill[color=dark] (-10.3, 1.4) circle (7pt);  
+  \fill[color=light] (-10.3, 1.4) circle (5pt);  
+  
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-10.2, 4) -- (-10.3, 1.4);     
+
+  \fill[color=dark] (-10.2, 4) circle (7pt);  
+  \fill[color=light] (-10.2, 4) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-9.7, 5.3) -- (-10.2, 4);     
+ 
+  \fill[color=dark] (-9.7, 5.3) circle (7pt);  
+  \fill[color=light] (-9.7, 5.3) circle (5pt);
+  
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-9.6, 2.2) -- (-9.7, 5.3);     
+  
+  \fill[color=dark] (-9.6, 2.2) circle (7pt);  
+  \fill[color=light] (-9.6, 2.2) circle (5pt);  
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-9.2, 7) -- (-9.6, 2.2);     
+
+  \fill[color=dark] (-9.2, 7) circle (7pt);  
+  \fill[color=light] (-9.2, 7) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-8.25, 8) -- (-9.2, 7);   
+ 
+  \fill[color=dark] (-8.25, 8) circle (7pt);  
+  \fill[color=light] (-8.25, 8) circle (5pt);
+  
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-5.85, 7.95) -- (-8.25, 8); 
+
+  \fill[color=dark] (-5.85, 7.95) circle (7pt);  
+  \fill[color=light] (-5.85, 7.95) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-6.5, 7.5) -- (-5.85, 7.95); 
+
+  \fill[color=dark] (-6.5, 7.5) circle (7pt);  
+  \fill[color=light] (-6.5, 7.5) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-4.25, 6.5) -- (-6.5, 7.5); 
+
+  \fill[color=dark] (-4.25, 6.5) circle (7pt);  
+  \fill[color=light] (-4.25, 6.5) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-2, 5.2) -- (-4.25, 6.5); 
+
+  \fill[color=dark] (-2, 5.2) circle (7pt);  
+  \fill[color=light] (-2, 5.2) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (1.25, 5.6) -- (-2, 5.2); 
+
+  \fill[color=dark] (1.25, 5.6) circle (7pt);  
+  \fill[color=light] (1.25, 5.6) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (2.5, 5.1) -- (1.25, 5.6); 
+
+  \fill[color=dark] (2.5, 5.1) circle (7pt);  
+  \fill[color=light] (2.5, 5.1) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (5.5, 5.35) -- (2.5, 5.1); 
+
+  \fill[color=dark] (5.5, 5.35) circle (7pt);  
+  \fill[color=light] (5.5, 5.35) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (4.8, 5.65) -- (5.5, 5.35); 
+
+  \fill[color=dark] (4.8, 5.65) circle (7pt);  
+  \fill[color=light] (4.8, 5.65) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-0.6, 5) -- (4.8, 5.65); 
+
+  \fill[color=dark] (-0.6, 5) circle (7pt);  
+  \fill[color=light] (-0.6, 5) circle (5pt);
+  
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (2.25, 4.6) -- (-0.6, 5); 
+
+  \fill[color=dark] (2.25, 4.6) circle (7pt);  
+  \fill[color=light] (2.25, 4.6) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (7.3, 5.3) -- (2.25, 4.6); 
+
+  \fill[color=dark] (7.3, 5.3) circle (7pt);  
+  \fill[color=light] (7.3, 5.3) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (9.6, 4) -- (7.3, 5.3);  
+
+  \fill[color=dark] (9.6, 4) circle (7pt);  
+  \fill[color=light] (9.6, 4) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (9.8, 2.5) -- (9.6, 4);
+
+  \fill[color=dark] (9.8, 2.5) circle (7pt);  
+  \fill[color=light] (9.8, 2.5) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (8.5, 4.15) -- (9.8, 2.5);
+
+  \fill[color=dark] (8.5, 4.15) circle (7pt);  
+  \fill[color=light] (8.5, 4.15) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (10, 0.5) -- (8.5, 4.15);
+
+  \fill[color=dark] (10, 0.5) circle (7pt);  
+  \fill[color=light] (10, 0.5) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (9.6, -0.8) -- (10, 0.5);
+ 
+  \fill[color=dark] (9.6, -0.8) circle (7pt);  
+  \fill[color=light] (9.6, -0.8) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (9.65, -2.75) -- (9.6, -0.8);
+
+  \fill[color=dark] (9.65, -2.75) circle (7pt);  
+  \fill[color=light] (9.65, -2.75) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (6.7, -4.1) -- (9.65, -2.75);
+
+  \fill[color=dark] (6.7, -4.1) circle (7pt);  
+  \fill[color=light] (6.7, -4.1) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (2.9, -3.2) -- (6.7, -4.1);
+
+  \fill[color=dark] (2.9, -3.2) circle (7pt);  
+  \fill[color=light] (2.9, -3.2) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (6.5, -4.8) -- (2.9, -3.2);
+
+  \fill[color=dark] (6.5, -4.8) circle (7pt);  
+  \fill[color=light] (6.5, -4.8) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (8.8, -4.5) -- (6.5, -4.8);
+
+  \fill[color=dark] (8.8, -4.5) circle (7pt);  
+  \fill[color=light] (8.8, -4.5) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (4, -4.1) -- (8.8, -4.5);
+
+  \fill[color=dark] (4, -4.1) circle (7pt);  
+  \fill[color=light] (4, -4.1) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-0.3, -3.5) -- (4, -4.1);
+
+  \fill[color=dark] (-0.3, -3.5) circle (7pt);  
+  \fill[color=light] (-0.3, -3.5) circle (5pt);  
+    
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (0.1, -2.75) -- (-0.3, -3.5);
+  
+  \fill[color=dark] (0.1, -2.75) circle (7pt);  
+  \fill[color=light] (0.1, -2.75) circle (5pt);
+  
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-3, -2.75) -- (0.1, -2.75);
+  
+  \fill[color=dark] (-3, -2.75) circle (7pt);  
+  \fill[color=light] (-3, -2.75) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-2, -3.5) -- (-3, -2.75);
+   
+  \fill[color=dark] (-2, -3.5) circle (7pt);  
+  \fill[color=light] (-2, -3.5) circle (5pt);
+  
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-4.75, -3.25) -- (-2, -3.5);
+   
+  \fill[color=dark] (-4.75, -3.25) circle (7pt);  
+  \fill[color=light] (-4.75, -3.25) circle (5pt);
+  
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-7, -3.5) -- (-4.75, -3.25);
+  
+  \fill[color=dark] (-7, -3.5) circle (7pt);  
+  \fill[color=light] (-7, -3.5) circle (5pt);
+  
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-8.25, -5) -- (-7, -3.5);
+  
+  \fill[color=dark] (-8.25, -5) circle (7pt);  
+  \fill[color=light] (-8.25, -5) circle (5pt);
+
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-9, -6.75) -- (-8.25, -5);
+
+  \fill[color=dark] (-9, -6.75) circle (7pt);  
+  \fill[color=light] (-9, -6.75) circle (5pt);
+  
+  \draw[double round cap-stealth=2pt colored by dark and light, opacity=0.25] (-10, -6.5) -- (-9, -6.75);
+  
+  \fill[color=dark] (-10, -6.5) circle (7pt);  
+  \fill[color=light] (-10, -6.5) circle (5pt);
+  
+  \end{scope} 
+  
+\end{tikzpicture}
+
+
+\end{document}  

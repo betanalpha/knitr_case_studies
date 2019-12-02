@@ -1,0 +1,64 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 40' size 6, 4
+set output "converge.eps"
+
+set border 3 lw 2
+
+#set lmargin at screen 0
+set tmargin at screen 1
+set rmargin at screen 1
+#set bmargin at screen 0
+
+set title ""
+
+set xtics scale 0
+set xlabel 'Q'
+set format x ''
+set xrange[-3:6]
+
+set ytics scale 0
+set ylabel 'Probability Density'
+set format y ''
+set yrange[0:5]
+
+set samples 500
+
+mu(n) = 5 * exp( -n)
+tau(n) = 1.0 / ( (exp(-n / 4.0) - 0.9) * (exp(-n / 4.0) - 0.9) )
+gauss(x, n) = exp( - 0.5 * (x - mu(n)) * (x - mu(n)) * tau(n) ) * sqrt(tau(n) / 6.28318530717959)
+
+n = 0
+set label at mu(n), gauss(mu(n), n) + 0.4 "{/Symbol r}" tc rgb "$light" center
+
+n = 1
+set label at mu(n), gauss(mu(n), n) + 0.4 "T {/Symbol r}" tc rgb "$light_highlight" center
+
+n = 2
+set label at mu(n), gauss(mu(n), n) + 0.4 "T^{2} {/Symbol r}" tc rgb "$mid" center
+
+n = 3
+set label at mu(n) - 0.5, gauss(mu(n), n) + 0.4 "T^{3} {/Symbol r}" tc rgb "$mid_highlight" center
+
+n = 4
+set label at mu(n) - 1, gauss(mu(n), n) + 0.2 "T^{4} {/Symbol r}" tc rgb "$dark" center
+
+
+plot \
+gauss(x, 0) with lines lt 1 lw 3 lc rgb '$light' notitle , \
+gauss(x, 1) with lines lt 1 lw 3 lc rgb '$light_highlight' notitle , \
+gauss(x, 2) with lines lt 1 lw 3 lc rgb '$mid' notitle , \
+gauss(x, 3) with lines lt 1 lw 3 lc rgb '$mid_highlight' notitle , \
+gauss(x, 4) with lines lt 1 lw 3 lc rgb '$dark' notitle
+
+
+END
