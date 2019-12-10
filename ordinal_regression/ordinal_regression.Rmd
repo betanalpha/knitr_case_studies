@@ -168,7 +168,7 @@ $$
 $$
 whose cumulative distribution function is given by the logistic function,
 $$
-\Pi_{c} = \frac{1}{1 + e^{-x}},
+\Pi = \frac{1}{1 + e^{-x}},
 $$
 defines an _ordinal logistic_ or _ordered logistic_ model.  Employing a 
 probability distribution specified by a Gaussian probability density function
@@ -176,17 +176,17 @@ defines an _ordinal probit_ or _ordered probit_ model.
 
 ## Cut to the Feeling
 
-How do we model the influence of some latent effect, $\gamma$, on the ordinal 
-probabilities?  In particular how can we design our model such that a positive
-effect, $\gamma > 0$ drags probability to higher ordinals while a negative 
-effect, $\gamma < 0$, drags probability to lower ordinals?
+How do we model the influence of some latent effect or _affinity_, $\gamma$, on 
+the ordinal probabilities?  In particular how can we design our model such that 
+a positive affinity, $\gamma > 0$ drags probability to higher ordinals while a 
+negative affinity, $\gamma < 0$, drags probability to lower ordinals?
 
 Fortunately we can readily accomplish this moderation in our construction by 
-translating $X$ upwards by the effect size, $x \mapsto x + \gamma$, while
-keeping the cut points fixed.  Because of our prescient use of complementary
-probability density functions and cumulative distribution functions above, a 
-positive translation by $\gamma$ will correspond to probabilities 
-concentrating towards higher ordinals as desired.
+translating $X$ upwards by the size of the affinity, $x \mapsto x + \gamma$, 
+while keeping the cut points fixed.  Because of our prescient use of 
+complementary probability density functions and cumulative distribution 
+functions above, a positive translation by $\gamma$ will correspond to 
+probabilities concentrating towards higher ordinals as desired.
 
 <center>
 <br>
@@ -196,7 +196,8 @@ knitr::include_graphics("figures/multi_density_shift/multi_density_shift.png")
 <br><br>
 </center>
 
-In the presence of a moderating effect the ordinal probabilities are computed as
+In the presence of a moderating affinity the ordinal probabilities are computed 
+as
 $$
 p_{k}
 = \Pi_{c}(c_{k - 1} - \gamma) - \Pi_{c}(c_{k} - \gamma),
@@ -213,18 +214,18 @@ $$
 corresponding to the definitions given in the Stan functions reference guide.
 
 Note that we can accomplish this same behavior by keeping $X$ fixed but 
-translating all of the interior cut points down by the effect size.  In other
+translating all of the interior cut points down by the affinity.  In other
 words the ordinal probabilities inform only the _relative_ location of the
-effect size and the cut points in this construction.  When the latent effect and 
+affinity and the cut points in this construction.  When the latent affinity and 
 cut points are modeled jointly this induces a non-identifiability in the 
 observational model.  In order to avoid the propagation of this 
 non-identifiability from the observational model into the posterior distribution 
-we have to carefully anchor the effect size, the cut points, or perhaps even 
+we have to carefully anchor the affinity, the cut points, or perhaps even 
 both to some base line values in the prior model.
 
-An even better approach is to avoid modeling any baseline latent effect at all
-and instead use this construction to model _heterogeneity_ in the latent effect
-across varying circumstances.  For example consider a latent effect itself
+An even better approach is to avoid modeling any baseline affinity at all
+and instead use this construction to model _heterogeneity_ in the affinity
+across varying circumstances.  For example consider an affinity itself
 influenced by an external covariate, $\gamma = \alpha + \beta \cdot x$.  The
 intercept $\alpha$ is not identified from the cut points and consequently isn't
 really well-defined.  Ideally we would instead drop the intercept
@@ -264,7 +265,7 @@ The observed ordinals are distributed across each of the five categories but
 concentrate around the fourth category.
 
 The Stan program implementing our ordinal regression model with uniform priors 
-for both the internal cut points and the latent effect $\gamma$ is given by
+for both the internal cut points and the latent affinity $\gamma$ is given by
 ```{r}
 writeLines(readLines("ordered_logistic_uniform.stan"))
 ```
@@ -283,7 +284,7 @@ util$check_all_diagnostics(fit)
 
 The saturated tree depth is consistent with a non-identified posterior 
 distribution, and indeed the lack of identification between the internal cut 
-points and the latent effect is clear from scatter plots of the posterior 
+points and the latent affinity is clear from scatter plots of the posterior 
 samples,
 ```{r}
 c_light <- c("#DCBCBC")
@@ -312,7 +313,7 @@ plot(params$c[,4], params$gamma, xlab="c[4]", ylab="gamma",
 
 In order to suppress the non-identifiability inherent to our construction of
 ordinal probabilities we need a stronger prior model.  Let's consider a 
-Gaussian prior density function for the latent effect,
+Gaussian prior density function for the affinity,
 ```{r}
 writeLines(readLines("ordered_logistic_weak.stan"))
 ```
@@ -469,10 +470,10 @@ introduction to pushforward probability density functions see
 Because of the simplex constraint on the ordinal probabilities we have to be a
 particularly careful in the construction of the pushforward probability density
 function here.  One might, for example, be tempted to transform the $K$ 
-probabilities into the $K - 1$ internal cut points and a latent effect $\gamma$ 
+probabilities into the $K - 1$ internal cut points and an affinity $\gamma$ 
 only to find that this transformation is singular and yields an ill-posed 
 probability density function.  This is because the internal cut points and 
-latent effect are non-identified and the map to probabilities is many-to-one.
+affinity are non-identified and the map to probabilities is many-to-one.
 
 Instead we condition on an _anchor point_, $\phi$, and then map the $K$ 
 probabilities and their sum-to-one constraint to the $K - 1$ cut points and a 
@@ -510,19 +511,19 @@ $$
 The Jacobian matrix for this transformation is given by a left column of ones,
 $$
 J_{k, 1} 
-= \frac{ \partial S }{ \partial p_{k} }
+= \frac{ \partial p_{k} }{ \partial S }
 = 1,
 $$
 a diagonal band,
 $$
 J_{k + 1, k + 1} 
-= \frac{ \partial c_{k} }{ \partial p_{k + 1} }
+= \frac{ \partial p_{k + 1} }{ \partial c_{k + 1} }
 = - \rho(c_{k}),
 $$
 an off-diagonal band,
 $$
 J_{k, k + 1} 
-= \frac{ \partial c_{k} }{ \partial p_{k + 1} }
+= \frac{ \partial p_{k + 1} }{ \partial c_{k} }
 = \rho(c_{k}),
 $$
 and zeroes everywhere else.  For example a five category model would give the 
@@ -703,8 +704,8 @@ critical tools in the construction of principled priors in practice.
 
 # Acknowledgements {-}
 
-I thank Max Kesin for helpful comments.  Additionally I am indebted for the
-feedback from those who have attended my courses and talks.
+I thank Max Kesin and Mark Donoghoe for helpful comments.  Additionally I am 
+indebted for the feedback from those who have attended my courses and talks.
 
 A very special thanks to everyone supporting me on Patreon: 
 Abhinav Katoch, AdamMaruf, Aki Vehtari, Alan O'Donnell, Alexander Bartik, 
