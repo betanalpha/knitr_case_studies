@@ -30,7 +30,7 @@ this is no easy task, especially when our ambient space exceeds a few dimensions
 and the target probability distribution concentrates into a typical set.
 
 As we saw in my
-[probabilistic computation case study](https://www.patreon.com/posts/31112147),
+[probabilistic computation case study](https://betanalpha.github.io/assets/case_studies/probabilistic_computation.html),
 stochastic methods offer the _possibility_ of quantifying high-dimensional
 target distributions with increasing accuracy given a corresponding increase in
 computation.  In particular, stochastic methods efficiently compress the target
@@ -303,7 +303,7 @@ plot(possible_transitions[,1], possible_transitions[,2],
      main="Possible Transitions From Initial Point",
      col="green", pch=16, cex=1.2,
      xlab="q^1", xlim=c(-3, 3), ylab="q^2", ylim=c(-3, 3))
- 
+
 points(q0[1], q0[2], col=c_dark, pch=16, cex=1.2)
 points(q0[1], q0[2], col=c_light, pch=16, cex=0.8)
 ```
@@ -1311,9 +1311,10 @@ transient behavior it manifests.
 
 ## Extra Credit: Quantifying Initialization Bias
 
-We can quantify the influence of the initialization on the evolution of a Markov
-chain by analyzing its effect on the $N$-step distributions.  The expected
-Markov chain Monte Carlo estimator of a function $f$ is the average of the
+We can approximately quantify the influence of the initialization on the
+evolution of a Markov chain by analyzing its effect on the $N$-step
+distributions.  If we ignore correlations between the states then the expected
+Markov chain Monte Carlo estimator of a function $f$ becomes the average of the
 expectation values of that function with respect to each of the $N$-step
 distributions,
 $$
@@ -1325,7 +1326,7 @@ $$
 &=
 \frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}[f(q_{n})]
 \\
-&=
+&\approx
 \frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}_{T^{n} \rho}[f].
 \end{align*}
 $$
@@ -1337,18 +1338,18 @@ $$
 \mathbb{E} \left[ \hat{f}_{N}^{\text{MCMC}} \right]
 - \mathbb{E}_{\pi}[f]
 \right|
-&=
+&\approx
 \left|
 \frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}_{T^{n} \rho}[f] - \mathbb{E}_{\pi}[f]
 \right|
 \\
-&=
+&\approx
 \left|
 \frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}_{T^{n} \rho}[f]
 - \frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}_{\pi}[f]
 \right|
 \\
-&=
+&\approx
 \frac{1}{N + 1} \left|
 \sum_{n = 0}^{N}
 \mathbb{E}_{T^{n} \rho}[f] - \mathbb{E}_{\pi}[f]
@@ -1394,16 +1395,18 @@ $$
 \frac{ C(\rho) }{N + 1} \frac{ 1 - r^{N + 1} }{1 - r}.
 \end{align*}
 $$
-Consequently the bias monotonically decreases with an increasing number of
-iterations, at least for the functions where geometric ergodicity implies a
-bound on the distance between $N$-step expectation values and stationary
-expectation values.
+Consequently the approximate bias monotonically decreases with an increasing
+number of iterations, at least for the functions where geometric ergodicity
+implies a bound on the distance between $N$-step expectation values and
+stationary expectation values.  In truth the bias should even larger because
+nonzero correlations between the point in the Markov chain maintain the effect
+of the initialization even more strongly.
 
-Geometric ergodicity is typically sufficient to ensure that the initialization
-bias vanishes fast enough that a central limit theorem will hold for
-sufficiently long Markov chains.  That Markov chain Monte Carlo central limit
-theorem will only ever be an approximation, but an arbitrarily accurate one for
-sufficiently long Markov chains.
+Geometric ergodicity is typically sufficient to ensure that the exact
+initialization bias vanishes fast enough that a central limit theorem will hold
+for sufficiently long Markov chains.  The Markov chain Monte Carlo central
+limit theorem will only ever be an approximation, but an arbitrarily accurate
+one for sufficiently long Markov chains.
 
 ## The Effective Sample Size
 
@@ -2469,67 +2472,96 @@ inconsistency of the _entire ensemble_.  Throwing out "bad" Markov chains just
 conceals the inconsistencies and spoils any diagnostic power, giving the user
 false confidence in the validity of the remaining Markov chains.
 
-The term "warmup" is meant to invoke the process of equilibration itself, which
-in the context of Markov chain Monte Carlo under ideal circumstances means
-finding and then making enough tours of the typical set that the Markov chains
-have become approximately stationary.
+The term "warmup" is meant to invoke the process of equilibration, but in
+practice there are three similar but different ways the term is applied in
+practice.
 
-We can also take advantage of this initial exploration time to _tune_ a family
-of Markov transition distributions using feedback from the Markov chains
-themselves.  For example a Random Walk Metropolis transition distributions is
-defined by the covariance of the proposal density function, and various
-heuristics have been developed for setting the optimal covariance based on
-expectation values of the target distribution itself.  Although we won't know
-these expectation values in practice we can estimate them using the early
-history of the Markov chains provided that they have equilibrated sufficiently
-well.
+### Theoretical Warmup
 
-In particular we can initialize our Markov transition distributions with a
-default configuration and then dynamically adapt the covariance based on running
-Markov chain Monte Carlo estimators generated during warmup.  In order to ensure
-robust adaptation we will need sufficiently precise expectation value
-estimators, which means running the Markov chains long enough in each adapted
-configuration of the Markov transition.
+If we assume a Markov chain Monte Carlo central limit theorem then
+_theoretical warmup_ is the process of running long enough for the
+initialization bias to become negligible and the central limit theorem to become
+a reasonable approximation.  More geometrically we can think of theoretical
+warmup as the time it takes for our Markov chains to find and then explore the
+stationary typical set sufficiently well that they become approximately
+stationary.
 
-Consequently warmup is best thought of as proceeding in two phases.  In the
-initial phase the default configuration of the Markov transition distribution is
-given time to find and initially explore the stationary typical set, and in the
-second phase the continued exploration of the typical set informs Markov chain
-Monte Carlo estimators which advises adaptation of the Markov transition itself.
-Contrary to common folklore, the first phase is relatively quick if the Markov
+Contrary to common folklore, this process is relatively quick if the Markov
 transition is well-behaved.  If the Markov chains eventually equilibrate and
 concepts like the effective sample size and relaxation time are well-defined,
-then this initial phase will require only a few relaxation times.  Expectation
-valued-based adaptation is much more demanding, requiring the same order of
-iterations as we would use to construct the Markov chain Monte Carlo estimators
-of ultimate interest.
+then this initial phase will require only a few relaxation times.
 
-If we adapt the Markov transition distribution during warmup then we have to
-treat the warmup segments of our Markov chains with care.  Under some
+### Adaptive Warmup
+
+We can also take advantage of the initial exploration time to _tune_ a family
+of Markov transition distributions using feedback from the Markov chains
+themselves.  For example Random Walk Metropolis transition distributions are
+defined by the covariance of the proposal density function, and various
+heuristics have been developed for setting the optimal covariance based on
+expectation values with respect to the target distribution. 
+
+Although we won't know these expectation values in practice we can estimate them
+using the early history of the Markov chains provided that they have
+equilibrated sufficiently well.  If we initialize our Markov transition
+distributions with a default configuration and then we can dynamically adapt the
+exact configuration based on sequential Markov chain Monte Carlo estimators.  In
+order to ensure robust adaptation we will need sufficiently precise expectation
+value estimators, which means running the Markov chains long enough to inform
+how a given configuration is behaving.
+
+_Adaptive warmup_ extends theoretical warmup to include the adaption of the
+Markov transition.  While theoretical warmup is relatively fast, requiring only
+a few relaxation times when everything is well-behaved, adaptive warmup is much
+more demanding.  In order to collect enough information to inform an effective
+transition we need to accumulate many tours through the stationary typical set,
+typically requiring the same order of iterations as we would use to construct
+the Markov chain Monte Carlo estimators of ultimate interest.
+
+If we adapt the Markov transition distribution in an adaptive warmup then we
+have to treat the warmup segments of our Markov chains with care.  Under some
 circumstances they can be used to inform well-behaved Markov chain Monte Carlo
-estimators, but they can induce large biases in other circumstances.  At the
-same time the segments of the Markov chains generated during the initial
-exploration phase tend to bias Markov chain Monte Carlo estimators because they
-are too strongly influenced by the initialization outside of the typical set of
-the target probability distribution.  The safest way to handle warmup is to
-disregard these initial segments of the Markov chains entirely.  This not only
-suppresses any bias from the initialization but also gives us the most
-flexibility when designing adaption strategies.
+estimators, but they can also induce large biases in less ideal circumstances.
+This especially true for the segments of the Markov chains generated during the
+initial exploration phase that are most strongly biased by the initialization
+outside of the stationary typical set.  The safest way to handle an adaptive
+warmup is to disregard these initial segments of the Markov chains entirely,
+waiting for for a theoretical warmup before starting to tune the Markov
+transition.  This not only helps to suppresses any bias from the initialization
+but also gives us the most flexibility when designing adaption strategies.
 
-The most common question asked about warmup is exactly how long we should
-warmup.  Unfortunately there is no generic answer.  In practice all we can do
-is warmup for some default amount of time and inspect the subsequent behavior of
-the Markov chains.  If there are indications of transient behavior after warmup
-has finished, or poor adaptation of the Markov transition distribution, then we
-have to go back run longer a longer warmup.  If we find indications that the
-Markov transition might not admit a sufficiently nice equilibrium at all then we
-may have to consider other Markov transition distributions entirely.
+### Empirical Warmup
+
+Most importantly _empirical warmup_ is how long we run our Markov chains before
+we enter the main sampling phase and start using points to inform our final
+Markov chain Monte Carlo estimators.  The _hope_ is that our empirical warmup is
+long enough that our Markov chains have achieved theoretical warmup, as well as
+adaptive warmup if we're tuning our Markov transition configuration.
+
+In practice, however, we have no guarantee that any empirical warmup we define
+before running our Markov chains will be long enough to ensure equilibrated
+Markov chains and a reasonably effective Markov transition configuration going
+forwards.  Specifically we can very rarely estimate the necessary warmup from
+theoretical considerations or the behavior from other Markov chains targeting
+other probability distributions.  The most common question in Markov chain Monte
+Carlo is exactly how long one should set the empirical warmup, but ultimately
+_there is no generic answer_. 
+
+The best way we can manage the risk of an overly hurried empirical warmup is to
+carefully inspect the subsequent evolution of our Markov chains for any sign of
+transient behavior or poor adaptation.  If we start with a default empirical
+warmup and find evidence of problems in our Markov chains after that empirical
+warmup has concluded then we can go back and run longer before assuming
+equilibrium.  At the same time if longer empirical warmups do not help, or if
+we find indications that the Markov transition might not admit a sufficiently
+nice equilibrium at all, then we may have to stop and consider other Markov
+transitions entirely.
 
 ## Supply Chain
 
-After warmup we sit back and watch our Markov chains explore what is _hopefully_
-the extent of the stationary typical set.  In this main sampling phase we save
-each point generated in our Markov chains for diagnostic and analysis to follow.
+After empirical warmup we sit back and watch our Markov chains explore what is
+_hopefully_ the extent of the stationary typical set.  In this main sampling
+phase we save each point generated in our Markov chains for diagnostic and
+analysis to follow.
 
 ## Chain of Custody
 
@@ -2767,7 +2799,7 @@ fast_monitor <- function(sims, warmup, names=NULL) {
 ```
 
 We can now compute our diagnostics and Markov chain Monte Carlo estimators after
-leaving out the first 100 samples to let the Markov chain equilibrate.
+leaving out the first 100 samples as the empirical warmup.
 
 ```{r}
 parameter_names <- c("varpi_1", "varpi_2", "accept_prob")
