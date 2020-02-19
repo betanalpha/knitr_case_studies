@@ -1,0 +1,133 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function x(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %  
+    return \xb;
+  };
+  function y(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %   
+    return \yb;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.20, thick]
+  
+  \pgfmathsetmacro{\theta}{35}
+  \pgfmathsetmacro{\phi}{15}
+   
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Three Dimensional
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{0}
+ 
+  \draw[white] (-19 + \S, -17) rectangle (22 + \S, 35);
+
+  \node[] at (0 + \S + 4, -12) {$\varpi_{1}^{-1}(x_{1}) = x_{1} \times X_{2} \times X_{3}$};
+  \node[] at (3.3 + \S + 4, -14.5) {$\equiv X_{2} \times X_{3} \mid x_{1}$};
+
+  % Side
+  \pgfmathsetmacro{\ya}{-5} 
+  \pgfmathsetmacro{\yb}{-5} 
+  \pgfmathsetmacro{\yc}{+5} 
+  \pgfmathsetmacro{\yd}{+5}
+
+  \pgfmathsetmacro{\za}{-5} 
+  \pgfmathsetmacro{\zb}{+5} 
+  \pgfmathsetmacro{\zc}{+5} 
+  \pgfmathsetmacro{\zd}{-5}
+  
+  \foreach \x in {-5, -4, ..., 5} {
+    \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + 17 - 2 * \x})
+                            -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi) + 17 - 2 *\x})
+                            -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi) + 17 - 2 * \x})
+                            -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi) + 17 - 2 * \x})
+                            -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + 17 - 2 * \x});
+                            
+    \pgfmathsetmacro{\xcenter}{0.5 * (x(\x, \ya, \za, \theta, \phi) + \S + x(\x, \ya, \zb, \theta, \phi) + \S)}
+                               
+    \begin{scope}
+      \clip    ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + 17 - 2 * \x})
+            -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi) + 17 - 2 * \x})
+            -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi) + 17 - 2 * \x})
+            -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi) + 17 - 2 * \x})
+            -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + 17 - 2 * \x});
+      \foreach \i in {1, 0.99, ..., 0} {
+        \pgfmathsetmacro{\prop}{100 * exp(-3 * \i * \i)};
+        \colorlet{custom}{light!\prop!dark};
+        \pgfmathsetmacro{\r}{\i}
+        \fill[color=custom] 
+          (\xcenter, 17 - 2 * \x) ellipse ({4 * \r} and {10 * \r});
+      }
+    \end{scope}
+    
+    \draw[black, ->, >=stealth]   ({x(\x, -5, -5, \theta, \phi) + \S}, {y(\x, -5, -5, \theta, \phi) + 17 - 2 * \x})
+                               -- ({x(\x, -5, 6, \theta, \phi) + \S}, {y(\x, -5, 6, \theta, \phi) + 17 - 2 * \x});
+                               
+    \draw[black, ->, >=stealth]   ({x(\x, -5, -5, \theta, \phi) + \S}, {y(\x, -5, -5, \theta, \phi) + 17 - 2 * \x})
+                               -- ({x(\x, 6, -5, \theta, \phi) + \S}, {y(\x, 6, -5, \theta, \phi) + 17 - 2 * \x});
+                               
+                   
+  }
+  
+  \node[] at (-13, 15) {$\pi_{X_{2} \times X_{3} \mid x_{1}}$};
+  
+  \draw[black, ->, >=stealth]   ({x(5, -5, -5, \theta, \phi) + \S}, {y(5, -5, -5, \theta, \phi)})
+                             -- ({x(-6, -5, -5, \theta, \phi) + \S}, {y(-6, -5, -5, \theta, \phi)});
+
+  \foreach \i in {1, 0.99, ..., 0} {
+    \pgfmathsetmacro{\prop}{100 * exp(-1 * \i * \i)};
+    \colorlet{custom}{light!\prop!dark};
+    \pgfmathsetmacro{\x}{5 * \i}
+    \draw[color=custom]   ({x(\x, -5, -5, \theta, \phi) + \S}, {y(\x, -5, -5, \theta, \phi)})
+                       -- ({x(-\x, -5, -5, \theta, \phi) + \S}, {y(-\x, -5, -5, \theta, \phi)});
+  }
+  
+  \node[] at (-13, -5) {$\pi_{X_{1}}$};
+    
+  \node[] at (-3 + \S, -8) {$X_{1}$};
+
+  \node[] at (5 + \S, 0) {$X_{2}$};
+  
+  \node[] at (3 + \S, 5.75) {$X_{3}$};
+         
+\end{tikzpicture}
+
+\end{document}  

@@ -1,0 +1,359 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function x(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %  
+    return \xb;
+  };
+  function y(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %   
+    return \yb;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.20, thick]
+  
+  \pgfmathsetmacro{\theta}{35}
+  \pgfmathsetmacro{\phi}{15}
+   
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Three Dimensional
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{0}
+ 
+  \draw[white] (-10 + \S, -16) rectangle (18 + \S, 10);
+
+  % Side
+  \pgfmathsetmacro{\ya}{-5} 
+  \pgfmathsetmacro{\yb}{-5} 
+  \pgfmathsetmacro{\yc}{+5} 
+  \pgfmathsetmacro{\yd}{+5}
+
+  \pgfmathsetmacro{\za}{-5} 
+  \pgfmathsetmacro{\zb}{+5} 
+  \pgfmathsetmacro{\zc}{+5} 
+  \pgfmathsetmacro{\zd}{-5}
+  
+  \pgfmathsetmacro{\x}{5}
+  \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)})
+                          -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi)})
+                          -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi)})
+                          -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi)})
+                          -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)});
+
+  % Top
+  \pgfmathsetmacro{\xa}{-5} 
+  \pgfmathsetmacro{\xb}{+5} 
+  \pgfmathsetmacro{\xc}{+5} 
+  \pgfmathsetmacro{\xd}{-5} 
+
+  \pgfmathsetmacro{\za}{-5} 
+  \pgfmathsetmacro{\zb}{-5} 
+  \pgfmathsetmacro{\zc}{+5} 
+  \pgfmathsetmacro{\zd}{+5}
+  
+  \pgfmathsetmacro{\y}{5}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)})
+                          -- ({x(\xb, \y, \zb, \theta, \phi) + \S}, {y(\xb, \y, \zb, \theta, \phi)})
+                          -- ({x(\xc, \y, \zc, \theta, \phi) + \S}, {y(\xc, \y, \zc, \theta, \phi)})
+                          -- ({x(\xd, \y, \zd, \theta, \phi) + \S}, {y(\xd, \y, \zd, \theta, \phi)})
+                          -- ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi)});
+ 
+  % Front
+  \pgfmathsetmacro{\xa}{-5} 
+  \pgfmathsetmacro{\xb}{+5} 
+  \pgfmathsetmacro{\xc}{+5} 
+  \pgfmathsetmacro{\xd}{-5} 
+  
+  \pgfmathsetmacro{\ya}{-5} 
+  \pgfmathsetmacro{\yb}{-5} 
+  \pgfmathsetmacro{\yc}{+5} 
+  \pgfmathsetmacro{\yd}{+5}
+  
+  \pgfmathsetmacro{\z}{-5}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)})
+                          -- ({x(\xb, \yb, \z, \theta, \phi) + \S}, {y(\xb, \yb, \z, \theta, \phi)})
+                          -- ({x(\xc, \yc, \z, \theta, \phi) + \S}, {y(\xc, \yc, \z, \theta, \phi)})
+                          -- ({x(\xd, \yd, \z, \theta, \phi) + \S}, {y(\xd, \yd, \z, \theta, \phi)})
+                          -- ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi)});
+  
+  \draw[black, ->, >=stealth]   ({x(5, -5, -5, \theta, \phi) + \S}, {y(5, -5, -5, \theta, \phi)})
+                         -- ({x(-6, -5, -5, \theta, \phi) + \S}, {y(-6, -5, -5, \theta, \phi)});
+  \node[] at (-3 + \S, -8) {$X_{1}$};
+
+  \draw[black, ->, >=stealth]   ({x(5, -5, -5, \theta, \phi) + \S}, {y(5, -5, -5, \theta, \phi)})
+                         -- ({x(5, -5, 6, \theta, \phi) + \S}, {y(5, -5, 6, \theta, \phi)});
+  \node[] at (5 + \S, -7) {$X_{2}$};
+  
+  \draw[black, ->, >=stealth]   ({x(5, -5, -5, \theta, \phi) + \S}, {y(5, -5, -5, \theta, \phi)})
+                         -- ({x(5, 6, -5, \theta, \phi) + \S}, {y(5, 6, -5, \theta, \phi)});
+  \node[] at (3 + \S, -1.25) {$X_{3}$};
+  
+  \node[] at (0 + \S, -12) {$X_{1} \times X_{2} \times X_{3}$};
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Three Dimensional
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{30}
+  
+  \draw[white] (-10 + \S, -16) rectangle (18 + \S, 10);
+ 
+  % Side
+  \pgfmathsetmacro{\ya}{-5} 
+  \pgfmathsetmacro{\yb}{-5} 
+  \pgfmathsetmacro{\yc}{+5} 
+  \pgfmathsetmacro{\yd}{+5}
+
+  \pgfmathsetmacro{\za}{-5} 
+  \pgfmathsetmacro{\zb}{+5} 
+  \pgfmathsetmacro{\zc}{+5} 
+  \pgfmathsetmacro{\zd}{-5}
+  
+  \foreach \x in {-5, -3, ..., 5} {
+    \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)})
+                            -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi)})
+                            -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi)})
+                            -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi)})
+                            -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)});
+                            
+    \draw[black, ->, >=stealth]   ({x(\x, -5, -5, \theta, \phi) + \S}, {y(\x, -5, -5, \theta, \phi)})
+                               -- ({x(\x, -5, 6, \theta, \phi) + \S}, {y(\x, -5, 6, \theta, \phi)});
+  
+    \draw[black, ->, >=stealth]   ({x(\x, -5, -5, \theta, \phi) + \S}, {y(\x, -5, -5, \theta, \phi)})
+                               -- ({x(\x, 6, -5, \theta, \phi) + \S}, {y(\x, 6, -5, \theta, \phi)});
+  }
+  
+  \draw[black, ->, >=stealth]   ({x(5, -5, -5, \theta, \phi) + \S}, {y(5, -5, -5, \theta, \phi)})
+                         -- ({x(-6, -5, -5, \theta, \phi) + \S}, {y(-6, -5, -5, \theta, \phi)});
+  \node[] at (-3.5 + \S, -8) {$X_{1}$};
+  
+  \node[] at (13 + \S, -0) {$X_{2} \times X_{3} \mid x_{1}$};
+         
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Three Dimensional
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{0}
+  \pgfmathsetmacro{\T}{-25}
+ 
+  \draw[white] (-10 + \S, -16 + \T) rectangle (18 + \S, 10 + \T);
+
+  % Side
+  \pgfmathsetmacro{\ya}{-5} 
+  \pgfmathsetmacro{\yb}{-5} 
+  \pgfmathsetmacro{\yc}{+5} 
+  \pgfmathsetmacro{\yd}{+5}
+
+  \pgfmathsetmacro{\za}{-5} 
+  \pgfmathsetmacro{\zb}{+5} 
+  \pgfmathsetmacro{\zc}{+5} 
+  \pgfmathsetmacro{\zd}{-5}
+  
+  \pgfmathsetmacro{\x}{5}
+  \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + \T})
+                          -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi) + \T})
+                          -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi) + \T})
+                          -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi) + \T})
+                          -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + \T});
+
+  \begin{scope}
+    \clip    ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + \T})
+          -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi) + \T})
+          -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi) + \T})
+          -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi) + \T})
+          -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + \T});
+    \foreach \i in {1, 0.99, ..., 0} {
+      \pgfmathsetmacro{\prop}{100 * exp(-3 * \i * \i)};
+      \colorlet{custom}{light!\prop!dark};
+      \pgfmathsetmacro{\r}{\i}
+      \fill[color=custom] 
+        (4.25 + \S, -0.75 + \T) ellipse ({4.5 * \r} and {7.5 * \r});
+    }
+  \end{scope}
+
+
+  % Top
+  \pgfmathsetmacro{\xa}{-5} 
+  \pgfmathsetmacro{\xb}{+5} 
+  \pgfmathsetmacro{\xc}{+5} 
+  \pgfmathsetmacro{\xd}{-5} 
+
+  \pgfmathsetmacro{\za}{-5} 
+  \pgfmathsetmacro{\zb}{-5} 
+  \pgfmathsetmacro{\zc}{+5} 
+  \pgfmathsetmacro{\zd}{+5}
+  
+  \pgfmathsetmacro{\y}{5}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi) + \T})
+                          -- ({x(\xb, \y, \zb, \theta, \phi) + \S}, {y(\xb, \y, \zb, \theta, \phi) + \T})
+                          -- ({x(\xc, \y, \zc, \theta, \phi) + \S}, {y(\xc, \y, \zc, \theta, \phi) + \T})
+                          -- ({x(\xd, \y, \zd, \theta, \phi) + \S}, {y(\xd, \y, \zd, \theta, \phi) + \T})
+                          -- ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi) + \T});
+ 
+  \begin{scope}
+    \clip    ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi) + \T})
+          -- ({x(\xb, \y, \zb, \theta, \phi) + \S}, {y(\xb, \y, \zb, \theta, \phi) + \T})
+          -- ({x(\xc, \y, \zc, \theta, \phi) + \S}, {y(\xc, \y, \zc, \theta, \phi) + \T})
+          -- ({x(\xd, \y, \zd, \theta, \phi) + \S}, {y(\xd, \y, \zd, \theta, \phi) + \T})
+          -- ({x(\xa, \y, \za, \theta, \phi) + \S}, {y(\xa, \y, \za, \theta, \phi) + \T});
+    \foreach \i in {1, 0.99, ..., 0} {
+      \pgfmathsetmacro{\prop}{100 * exp(-3 * \i * \i)};
+      \colorlet{custom}{light!\prop!dark};
+      \pgfmathsetmacro{\r}{\i}
+      \fill[color=custom] 
+        (0 + \S, +5 + \T) ellipse ({7.5 * \r} and {3 * \r});
+    }
+  \end{scope}
+ 
+  % Front
+  \pgfmathsetmacro{\xa}{-5} 
+  \pgfmathsetmacro{\xb}{+5} 
+  \pgfmathsetmacro{\xc}{+5} 
+  \pgfmathsetmacro{\xd}{-5} 
+  
+  \pgfmathsetmacro{\ya}{-5} 
+  \pgfmathsetmacro{\yb}{-5} 
+  \pgfmathsetmacro{\yc}{+5} 
+  \pgfmathsetmacro{\yd}{+5}
+  
+  \pgfmathsetmacro{\z}{-5}
+  \draw[black, line width=0.3, fill=white]   ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi) + \T})
+                          -- ({x(\xb, \yb, \z, \theta, \phi) + \S}, {y(\xb, \yb, \z, \theta, \phi) + \T})
+                          -- ({x(\xc, \yc, \z, \theta, \phi) + \S}, {y(\xc, \yc, \z, \theta, \phi) + \T})
+                          -- ({x(\xd, \yd, \z, \theta, \phi) + \S}, {y(\xd, \yd, \z, \theta, \phi) + \T})
+                          -- ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi) + \T});
+  
+  \begin{scope}
+    \clip    ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi) + \T})
+          -- ({x(\xb, \yb, \z, \theta, \phi) + \S}, {y(\xb, \yb, \z, \theta, \phi) + \T})
+          -- ({x(\xc, \yc, \z, \theta, \phi) + \S}, {y(\xc, \yc, \z, \theta, \phi) + \T})
+          -- ({x(\xd, \yd, \z, \theta, \phi) + \S}, {y(\xd, \yd, \z, \theta, \phi) + \T})
+          -- ({x(\xa, \ya, \z, \theta, \phi) + \S}, {y(\xa, \ya, \z, \theta, \phi) + \T});
+    \foreach \i in {1, 0.99, ..., 0} {
+      \pgfmathsetmacro{\prop}{100 * exp(-3 * \i * \i)};
+      \colorlet{custom}{light!\prop!dark};
+      \pgfmathsetmacro{\r}{\i}
+      \fill[color=custom] 
+        (-3 + \S, -1 + \T) ellipse ({7 * \r} and {7 * \r});
+    }
+  \end{scope}
+  
+  \draw[black, ->, >=stealth]   ({x(5, -5, -5, \theta, \phi) + \S}, {y(5, -5, -5, \theta, \phi) + \T})
+                         -- ({x(-5, -5, -5, \theta, \phi) + \S}, {y(-5, -5, -5, \theta, \phi) + \T});
+
+  \draw[black, ->, >=stealth]   ({x(5, -5, -5, \theta, \phi) + \S}, {y(5, -5, -5, \theta, \phi) + \T})
+                         -- ({x(5, -5, 5, \theta, \phi) + \S}, {y(5, -5, 5, \theta, \phi) + \T});
+  
+  \draw[black, ->, >=stealth]   ({x(5, -5, -5, \theta, \phi) + \S}, {y(5, -5, -5, \theta, \phi) + \T})
+                         -- ({x(5, 5, -5, \theta, \phi) + \S}, {y(5, 5, -5, \theta, \phi) + \T});
+  
+  \node[] at (0 + \S, -12 + \T) {$\pi_{X_{1} \times X_{2} \times X_{3}}$};
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Three Dimensional
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{30}
+  \pgfmathsetmacro{\T}{-25}
+  
+  \draw[white] (-10 + \S, -16 + \T) rectangle (18 + \S, 10 + \T);
+ 
+  % Side
+  \pgfmathsetmacro{\ya}{-5} 
+  \pgfmathsetmacro{\yb}{-5} 
+  \pgfmathsetmacro{\yc}{+5} 
+  \pgfmathsetmacro{\yd}{+5}
+
+  \pgfmathsetmacro{\za}{-5} 
+  \pgfmathsetmacro{\zb}{+5} 
+  \pgfmathsetmacro{\zc}{+5} 
+  \pgfmathsetmacro{\zd}{-5}
+  
+  \foreach \x in {-5, -3, ..., 5} {
+    \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + \T})
+                            -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi) + \T})
+                            -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi) + \T})
+                            -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi) + \T})
+                            -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + \T});                     
+                            
+    \pgfmathsetmacro{\xcenter}{0.5 * (x(\x, \ya, \za, \theta, \phi) + \S + x(\x, \ya, \zb, \theta, \phi) + \S)}
+    \pgfmathsetmacro{\ycenter}{0.5 * (y(\x, \ya, \za, \theta, \phi) + \T + y(\x, \ya, \zb, \theta, \phi) + \T)}
+                               
+    \begin{scope}
+      \clip    ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + \T})
+            -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi) + \T})
+            -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi) + \T})
+            -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi) + \T})
+            -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi) + \T});
+      \foreach \i in {1, 0.99, ..., 0} {
+        \pgfmathsetmacro{\prop}{100 * exp(-3 * \i * \i)};
+        \colorlet{custom}{light!\prop!dark};
+        \pgfmathsetmacro{\r}{\i}
+        \fill[color=custom] 
+          (\xcenter, \ycenter + 4) ellipse ({4 * \r} and {10 * \r});
+      }
+    \end{scope}
+                            
+    \draw[black, ->, >=stealth]   ({x(\x, -5, -5, \theta, \phi) + \S}, {y(\x, -5, -5, \theta, \phi) + \T})
+                               -- ({x(\x, -5, 6, \theta, \phi) + \S}, {y(\x, -5, 6, \theta, \phi) + \T});
+  
+    \draw[black, ->, >=stealth]   ({x(\x, -5, -5, \theta, \phi) + \S}, {y(\x, -5, -5, \theta, \phi) + \T})
+                               -- ({x(\x, 6, -5, \theta, \phi) + \S}, {y(\x, 6, -5, \theta, \phi) + \T});
+  }
+  
+  \draw[black, ->, >=stealth]   ({x(5, -5, -5, \theta, \phi) + \S}, {y(5, -5, -5, \theta, \phi) + \T})
+                         -- ({x(-6, -5, -5, \theta, \phi) + \S}, {y(-6, -5, -5, \theta, \phi) + \T});
+  
+  \foreach \i in {1, 0.975, ..., 0} {
+    \pgfmathsetmacro{\prop}{100 * exp(-1 * \i * \i)};
+    \colorlet{custom}{light!\prop!dark};
+    \pgfmathsetmacro{\x}{5 * \i}
+    \draw[color=custom]   ({x(\x, -5, -5, \theta, \phi) + \S}, {y(\x, -5, -5, \theta, \phi) + \T})
+                       -- ({x(-\x, -5, -5, \theta, \phi) + \S}, {y(-\x, -5, -5, \theta, \phi) + \T});
+  }
+  
+  \node[] at (-3.75 + \S, -8 + \T) {$\pi_{X_{1}}$};
+  
+  \node[] at (12.5 + \S, -0 + \T) {$\pi_{X_{2} \times X_{3} \mid x_{1}}$};
+
+\end{tikzpicture}
+
+\end{document}  

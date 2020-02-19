@@ -1,0 +1,130 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function x(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %  
+    return \xb;
+  };
+  function y(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %   
+    return \yb;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.20, thick]
+  
+  \pgfmathsetmacro{\theta}{35}
+  \pgfmathsetmacro{\phi}{15}
+   
+  \draw[white] (-11, -17) rectangle (61, 35);
+   
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Three Dimensional
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{0}
+  
+  % Side
+  \pgfmathsetmacro{\ya}{-5} 
+  \pgfmathsetmacro{\yb}{-5} 
+  \pgfmathsetmacro{\yc}{+5} 
+  \pgfmathsetmacro{\yd}{+5}
+
+  \pgfmathsetmacro{\za}{-5} 
+  \pgfmathsetmacro{\zb}{+5} 
+  \pgfmathsetmacro{\zc}{+5} 
+  \pgfmathsetmacro{\zd}{-5}
+  
+  \pgfmathsetmacro{\x}{-2}
+  \draw[black, line width=0.3, fill=white]   ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)})
+                          -- ({x(\x, \yb, \zb, \theta, \phi) + \S}, {y(\x, \yb, \zb, \theta, \phi)})
+                          -- ({x(\x, \yc, \zc, \theta, \phi) + \S}, {y(\x, \yc, \zc, \theta, \phi)})
+                          -- ({x(\x, \yd, \zd, \theta, \phi) + \S}, {y(\x, \yd, \zd, \theta, \phi)})
+                          -- ({x(\x, \ya, \za, \theta, \phi) + \S}, {y(\x, \ya, \za, \theta, \phi)});
+  
+  \node[] at (0 + \S, -12) {$X_{2} \times X_{3} \mid x_{1}$};
+
+  \draw[black, ->, >=stealth]   ({x(-2, -5, -5, \theta, \phi) + \S}, {y(-2, -5, -5, \theta, \phi)})
+                         -- ({x(-2, -5, 6, \theta, \phi) + \S}, {y(-2, -5, 6, \theta, \phi)});
+  \node[] at (-1 + \S, -6.5) {$X_{2}$};
+  
+  \draw[black, ->, >=stealth]   ({x(-2, -5, -5, \theta, \phi) + \S}, {y(-2, -5, -5, \theta, \phi)})
+                         -- ({x(-2, 6, -5, \theta, \phi) + \S}, {y(-2, 6, -5, \theta, \phi)});
+  \node[] at (-6.75 + \S, -1) {$X_{3}$};
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Three Dimensional
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{25}
+ 
+  \foreach \z in {-5, -3, ..., 5} {
+    \draw[black, ->, >=stealth]    ({x(-2, -5, \z, \theta, \phi) + \S}, {y(-2, -5, \z, \theta, \phi)})
+                                -- ({x(-2, 5, \z, \theta, \phi) + \S}, {y(-2, 5, \z, \theta, \phi)});  
+  }
+  
+  \node[] at (0 + \S + 12.5, -12) {$\varpi_{X_{2} \mid x_{1}}^{-1} (x_{2}, x_{3}) = x_{2} \times X_{3} \mid x_{1}$};
+  \node[] at (5.1 + \S + 12.5, -14.5) {$\equiv X_{3} \mid x_{1}, x_{2}$};
+
+  \draw[black, ->, >=stealth]   ({x(-2, -5, -5, \theta, \phi) + \S}, {y(-2, -5, -5, \theta, \phi)})
+                         -- ({x(-2, -5, 6, \theta, \phi) + \S}, {y(-2, -5, 6, \theta, \phi)});
+  \node[] at (-1 + \S, -6.5) {$X_{2}$};
+  
+  \node[] at (-6.75 + \S, -1) {$X_{3}$};
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Three Dimensional
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  \pgfmathsetmacro{\S}{50}
+ 
+  \foreach \z in {-5, -4, ..., 5} {
+    \draw[black, ->, >=stealth]    ({x(-2, -5, \z, \theta, \phi) + \S}, {y(-2, -5, \z, \theta, \phi) + 15 + 1.5 * \z})
+                                -- ({x(-2, 6, \z, \theta, \phi) + \S}, {y(-2, 6, \z, \theta, \phi) + 15 + 1.5 * \z});  
+  }
+  
+  \draw[black, ->, >=stealth]   ({x(-2, -5, -5, \theta, \phi) + \S}, {y(-2, -5, -5, \theta, \phi)})
+                         -- ({x(-2, -5, 6, \theta, \phi) + \S}, {y(-2, -5, 6, \theta, \phi)});
+  \node[] at (-1 + \S, -6.5) {$X_{2}$};
+  
+  \node[] at (4 + \S, 25) {$X_{3}$};
+
+\end{tikzpicture}
+
+\end{document}  
