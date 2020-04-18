@@ -1,0 +1,106 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function mu(\x) {
+    return 6 - 0.1 * \x - 0.01 * \x * \x + 0.003 * \x * \x * \x;
+  };
+  function tu(\x) {
+    return 7.5 - 0.125 * \x - 0.005 * \x * \x + 0.0022 * \x * \x * \x;
+  };
+  function tl(\x) {
+    return 3 + 0.2 * \x + 0.002 * \x * \x - 0.001 * \x * \x * \x;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3, thick]
+  \draw[white] (-15, -2) rectangle (12, 12);
+
+  \foreach \x in {-9, -7, ..., 9} {
+    \foreach \i in {3, 2.95, ..., 0} {
+      \pgfmathsetmacro{\prop}{100 * exp(-0.5 * \i * \i)};
+      \colorlet{custom}{dark!\prop!white};
+      \pgfmathsetmacro{\dy}{\i}
+      \fill[color=custom] ({\x - 0.95}, {mu(\x) + \dy}) rectangle ({\x + 0.95}, {mu(\x) - \dy});
+    }
+    
+    \fill[color=gray80, opacity=0.33] ({\x - 0.95}, {tu(\x)}) rectangle ({\x + 0.95}, 10.5);
+    \draw[color=gray70] ({\x - 0.95}, {tu(\x)}) -- ({\x + 0.95}, {tu(\x)});
+    \draw[->, >=stealth, line width=1, color=gray70] (\x, {tu(\x)}) -- +(0, 1); 
+    
+    \fill[color=gray80, opacity=0.33] ({\x - 0.95}, {tl(\x)}) rectangle ({\x + 0.95}, 0);
+    \draw[color=gray70] ({\x - 0.95}, {tl(\x)}) -- ({\x + 0.95}, {tl(\x)});
+    \draw[->, >=stealth, line width=1, color=gray70] (\x, {tl(\x)}) -- +(0, -1); 
+  }
+
+  \node[] at (-12.5, 5) { $t_{n}(y, \theta)$ };
+
+  \draw [->, >=stealth, line width=1] (-10.05, 0) -- +(20.5, 0);
+  \draw [->, >=stealth, line width=1] (-10, -0.05) -- +(0, 11);
+  \node[] at (0, -1) { $n$ };
+  
+  \pgfmathsetmacro{\dx}{30}
+  \draw[white] (-15 + \dx, -2) rectangle (12 + \dx, 12);
+  
+  \foreach \i in {3, 2.95, ..., 0} {
+    \pgfmathsetmacro{\prop}{100 * exp(-0.5 * \i * \i)};
+    \colorlet{custom}{dark!\prop!white};
+    \pgfmathsetmacro{\dy}{\i}
+    \fill[color=custom]    (-10 + \dx, 3 + \dy) 
+                        .. controls (-2.5 + \dx, 9.9 + \dy) and (3 + \dx, 2.75 + \dy) 
+                        .. (10 + \dx, 6.025 + \dy + 1)
+                        -- (10 + \dx, 6.025 - \dy + 1) 
+                        .. controls (3 + \dx, 2.75 - \dy) and (-3 + \dx, 9.9 - \dy) 
+                        .. (-10 + \dx, 3 - \dy);
+  }
+
+  \fill[color=gray80, opacity=0.33]   (-10 + \dx, 6.05) 
+                                    .. controls (-3.3 + \dx, 10.3) and (3.2 + \dx, 5) 
+                                    .. (10 + \dx, 7.95) -- (10 + \dx, 10.5) -- (-10 + \dx, 10.5) -- cycle;
+  
+  \draw[color=gray70]   (-10 + \dx, 6.05) 
+                      .. controls (-3.3 + \dx, 10.3) and (3.2 + \dx, 5) 
+                      .. (10 + \dx, 7.95);
+  \draw[->, >=stealth, line width=1, color=gray70] (0 + \dx, {tu(0)}) -- +(0, 1); 
+
+
+  \fill[color=gray80, opacity=0.33]    (-10 + \dx, 2.2) 
+                                    .. controls (-3.25 + \dx, 1.2) and (3 + \dx, 4.6) 
+                                    .. (10 + \dx, 4.2) -- (10 + \dx, 0) -- (-10 + \dx, 0) -- cycle;
+
+  \draw[color=gray70]    (-10 + \dx, 2.2) 
+                      .. controls (-3.25 + \dx, 1.2) and (3 + \dx, 4.6) 
+                      .. (10 + \dx, 4.2);
+  \draw[->, >=stealth, line width=1, color=gray70] (0 + \dx, {tl(0)}) -- +(0, -1); 
+
+  \node[] at (-12.5 + \dx, 5) { $t_{x}(y, \theta)$ };
+
+  \draw [->, >=stealth, line width=1] (-10.05 + \dx, 0) -- +(20.5, 0);
+  \draw [->, >=stealth, line width=1] (-10 + \dx, -0.05) -- +(0, 11);
+  \node[] at (0 + \dx, -1) { $x$ };
+  
+\end{tikzpicture}
+
+\end{document}  

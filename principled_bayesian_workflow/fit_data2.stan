@@ -4,14 +4,14 @@ data {
 }
 
 parameters {
-  real<lower=0, upper=1> theta; // Excess zero probability
   real<lower=0> lambda;         // Poisson intensity
+  real<lower=0, upper=1> theta; // Excess zero probability
 }
 
 model {
   // Prior model
+  lambda ~ normal(0, 5.82337);
   theta ~ beta(1, 1);
-  lambda ~ normal(0, 6.44787);
 
   // Observational model that mixes a Poisson with excess zeros
   for (n in 1:N) {

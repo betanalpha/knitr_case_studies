@@ -1,0 +1,119 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\newcommand*{\offset}{0.025}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.2, thick] 
+
+  % Prior
+  \pgfmathsetmacro{\dx}{-27}
+  \pgfmathsetmacro{\dy}{-25}
+
+  \begin{scope}
+    \clip [rounded corners=2pt] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+    \node[] at (0 + \dx, 2 + \dy) {\includegraphics[width=3.2cm]{gnuplot/prior.eps}};
+  \end{scope}
+
+  \draw [rounded corners=2pt, color=black, line width=1] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+  
+  \node [] at (0 + \dx, -8 + \dy) { $\log \pi_{\mathcal{S}}(\theta)$ };
+
+  \node [] at (-27, 15) { Prior Density };
+
+  % Likelihoods   
+  \node [] at (0, 15) { Likelihood Functions };
+              
+  \pgfmathsetmacro{\dx}{0}
+  \pgfmathsetmacro{\dy}{0}
+  
+  \begin{scope}
+    \clip [rounded corners=2pt] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+    \node[] at (0 + \dx, 2 + \dy) {\includegraphics[width=3.2cm]{gnuplot/like1.eps}};
+  \end{scope}
+  
+  \draw [rounded corners=2pt, color=black, line width=1] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+  \node [] at (0 + \dx, -8 + \dy) { $\log \pi_{\mathcal{S}}(\tilde{y}_{1} \mid \theta)$ };
+                        
+  \pgfmathsetmacro{\dx}{0}
+  \pgfmathsetmacro{\dy}{-25}
+  
+  \begin{scope}
+    \clip [rounded corners=2pt] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+    \node[] at (0 + \dx, 2 + \dy) {\includegraphics[width=3.2cm]{gnuplot/like2.eps}};
+  \end{scope}
+  
+  \draw [rounded corners=2pt, color=black, line width=1] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+  \node [] at (0 + \dx, -8 + \dy) { $\log \pi_{\mathcal{S}}(\tilde{y}_{2} \mid \theta)$ };
+                 
+  \pgfmathsetmacro{\dx}{0}
+  \pgfmathsetmacro{\dy}{-50}
+  
+  \begin{scope}
+    \clip [rounded corners=2pt] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+    \node[] at (0 + \dx, 2 + \dy) {\includegraphics[width=3.2cm]{gnuplot/like3.eps}};
+  \end{scope}
+  
+  \draw [rounded corners=2pt, color=black, line width=1] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+  \node [] at (0 + \dx, -8 + \dy) { $\log \pi_{\mathcal{S}}(\tilde{y}_{3} \mid \theta)$ };
+          
+  % Posterior    
+  \node [] at (27, 15) { Posterior Densities };
+         
+  \pgfmathsetmacro{\dx}{+27}
+  \pgfmathsetmacro{\dy}{0}
+  
+  \begin{scope}
+    \clip [rounded corners=2pt] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+    \node[] at (0 + \dx, 2 + \dy) {\includegraphics[width=3.2cm]{gnuplot/post1.eps}};
+  \end{scope}
+
+  \draw [rounded corners=2pt, color=black, line width=1] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+  \node [] at (0 + \dx, -8 + \dy) { $\log \pi_{\mathcal{S}}(\theta \mid \tilde{y}_{1})$ };
+                  
+  \pgfmathsetmacro{\dx}{+27}
+  \pgfmathsetmacro{\dy}{-25}
+  
+  \begin{scope}
+    \clip [rounded corners=2pt] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+    \node[] at (0 + \dx, 2 + \dy) {\includegraphics[width=3.2cm]{gnuplot/post2.eps}};
+  \end{scope}
+  
+  \draw [rounded corners=2pt, color=black, line width=1] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+  \node [] at (0 + \dx, -8 + \dy) { $\log \pi_{\mathcal{S}}(\theta \mid \tilde{y}_{2})$ };
+           
+  \pgfmathsetmacro{\dx}{+27}
+  \pgfmathsetmacro{\dy}{-50}
+  
+  \begin{scope}
+    \clip [rounded corners=2pt] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+    \node[] at (0 + \dx, 2 + \dy) {\includegraphics[width=3.2cm]{gnuplot/post3.eps}};
+  \end{scope}
+
+  \draw [rounded corners=2pt, color=black, line width=1] (-10 + \dx, -6 + \dy) rectangle (10 + \dx, 10 + \dy);
+  \node [] at (0 + \dx, -8 + \dy) { $\log \pi_{\mathcal{S}}(\theta \mid \tilde{y}_{3})$ };
+  
+  
+\end{tikzpicture}
+
+\end{document}   

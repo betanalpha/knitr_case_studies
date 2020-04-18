@@ -1,0 +1,50 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function mu(\x) {
+    return 6 + -0.1 * \x - 0.01 * \x * \x + 0.003 * \x * \x * \x;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3, thick]
+  \draw[color=dark] (-10, 4.5) -- (10, 6);
+  \node[color=dark] at (13, 6) { $f(x; \hat{\theta}(\tilde{y}))$ };
+  
+  %  Data simulated from f(x) = 0.05 * x * x + 0.075 * x + 2.5
+  \foreach \y [count=\x from -9] in {6.3991766, 6.4846362, 3.3198315, 3.8073684, 3.1635356, 1.0125648, 0.7514169, 
+                                     1.1018832, 3.7334525, 3.2791996, 2.5275629, 4.3457949, 2.3209916, 3.0106284,
+                                     2.8846685, 5.7750073, 4.7163106, 6.5934671, 8.1578489} {
+    \fill [fill=black] (\x, \y) circle (0.15);   
+  }
+
+  \draw [->, >=stealth, line width=1] (-10.05, 0) -- +(20.5, 0);
+  \draw [->, >=stealth, line width=1] (-10, -0.05) -- +(0, 11);
+  \node[] at (0, -1) { $x$ };
+  \node[] at (-11, 5) { $y$ };
+  
+\end{tikzpicture}
+
+\end{document}  

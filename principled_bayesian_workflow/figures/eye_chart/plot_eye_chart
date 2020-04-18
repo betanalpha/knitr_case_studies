@@ -9,33 +9,39 @@ dark_highlight="#7C0000"
 
 gnuplot << END
 
-set terminal pdfcairo transparent enhanced size 12in, 8in font 'Times, 60'
-set output "eye_chart_regimes.pdf"
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 6, 4
+set output "eye_chart_regimes.eps"
 
-set border 3
+set border 3 lw 2
 
 set title ""
 
 set xtics scale 0
-set xlabel 'Posterior Shrinkage'
+set xlabel 'Posterior Contraction'
 set xrange[0:1]
 
 set ytics scale 0
 set ylabel 'Posterior z Score'
-set yrange[0:5]
+set yrange[-5:5]
 
 set label "Ideal" at 0.7, 1.25 center tc rgb "black"
-set arrow from 0.825, 0.875 rto +0.1, -0.5 lw 5 head filled
+set arrow from 0.825, 0.875 rto +0.1, -0.5 lw 3 head filled
 
-set label "Poorly\nIdentified" at 0.3, 1.5 center tc rgb "black"
-set arrow from 0.175, 0.875 rto -0.1, -0.5 lw 5 head filled
+set label "Poorly\nIdentified" at 0.3, -1 center tc rgb "black"
+set arrow from 0.175, -0.875 rto -0.1, +0.5 lw 3 head filled
 
-set label "Prior/Observational\nConflict" at 0.3, 3.75 center tc rgb "black"
-set arrow from 0.175, 4.125 rto -0.1, +0.5 lw 5 head filled
+set label "Bad Prior Model" at 0.3, 3.75 center tc rgb "black"
+set arrow from 0.175, 4.125 rto -0.1, +0.5 lw 3 head filled
+
+set label "Bad Prior Model" at 0.3, -3.5 center tc rgb "black"
+set arrow from 0.175, -4.125 rto -0.1, -0.5 lw 3 head filled
 
 set label "Overfit" at 0.7, 3.5 center tc rgb "black"
-set arrow from 0.825, 4.125 rto +0.1, +0.5 lw 5 head filled
+set arrow from 0.825, 4.125 rto +0.1, +0.5 lw 3 head filled
 
-plot 0 lc "white" notitle
+set label "Overfit" at 0.7, -3.5 center tc rgb "black"
+set arrow from 0.825, -4.125 rto +0.1, -0.5 lw 3 head filled
+
+plot 0 lc "gray" dt "-" lw 3 notitle
 
 END

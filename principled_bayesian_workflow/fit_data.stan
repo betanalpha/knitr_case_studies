@@ -8,6 +8,6 @@ parameters {
 }
 
 model {
-  lambda ~ normal(0, 6.44787); // Prior model
+  lambda ~ normal(0, 5.82337); // Prior model
   y ~ poisson(lambda);         // Observational model
 }

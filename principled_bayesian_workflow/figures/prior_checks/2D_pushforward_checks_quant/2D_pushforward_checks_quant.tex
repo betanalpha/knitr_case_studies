@@ -1,0 +1,74 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function mu(\x) {
+    return 6 - 0.1 * \x - 0.01 * \x * \x + 0.003 * \x * \x * \x;
+  };
+  function tu(\x) {
+    return 7.5 - 0.125 * \x - 0.005 * \x * \x + 0.0022 * \x * \x * \x;
+  };
+  function tl(\x) {
+    return 3 + 0.2 * \x + 0.002 * \x * \x - 0.001 * \x * \x * \x;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3, thick]
+  \draw[white] (-15, -2) rectangle (12, 12);
+
+  \foreach \x in {-9, -7, ..., 9} {
+    \foreach \i in {3, 2.95, ..., 0} {
+      \pgfmathsetmacro{\prop}{100 * exp(-0.5 * \i * \i)};
+      \colorlet{custom}{dark!\prop!white};
+      \pgfmathsetmacro{\dy}{\i}
+      \fill[color=custom] ({\x - 0.95}, {mu(\x) + \dy}) rectangle ({\x + 0.95}, {mu(\x) - \dy});
+    }
+    
+    \fill[color=white] ({\x - 0.97}, {tl(\x)}) rectangle ({\x + 0.97}, {tu(\x)});
+    
+    \draw[color=gray70] ({\x - 0.95}, {tu(\x)}) -- ({\x + 0.95}, {tu(\x)});
+    %\draw[->, >=stealth, line width=1, color=gray70] (\x, {tu(\x)}) -- +(0, 1); 
+    
+    \draw[color=gray70] ({\x - 0.95}, {tl(\x)}) -- ({\x + 0.95}, {tl(\x)});
+    %\draw[->, >=stealth, line width=1, color=gray70] (\x, {tl(\x)}) -- +(0, -1); 
+  }
+  
+  \foreach \pu [count=\n from 0] in {0.0, 0.1, 0.3, 0.5, 0.6, 0.7, 0.7, 0.81, 1.0, 1.4} {
+    \node at ({2 * \n - 9}, 10) { \tiny $\pu\%$ };
+  }
+
+  \foreach \pl [count=\n from 0] in {3.5, 0.1, 0.0, 0.0, 0.1, 0.4, 1.9, 4.5, 4.6, 1.2} {
+    \node at ({2 * \n - 9}, 0.5) { \tiny $\pl\%$ };
+  }
+
+  \node[] at (-12.5, 5) { $t_{n}(y, \theta)$ };
+
+  \draw [->, >=stealth, line width=1] (-10.05, 0) -- +(20.5, 0);
+  \draw [->, >=stealth, line width=1] (-10, -0.05) -- +(0, 11);
+  \node[] at (0, -1) { $n$ };
+  
+\end{tikzpicture}
+
+\end{document}  

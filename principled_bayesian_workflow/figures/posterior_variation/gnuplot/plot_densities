@@ -1,0 +1,309 @@
+#!/bin/bash
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "prior.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-3.5:3.5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:2]
+
+set zlabel ''
+set zrange[-7:7]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 200
+set isosamples 200
+
+splot - 0.5 * x**2 - 0.5 * exp(2 * y) + y notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "like1.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+#set xlabel '{/Symbol q}_{1}'
+#set xlabel offset 0, screen 0.05
+set xrange[-3.5:3.5]
+
+set ytics nomirror scale 0
+set format y ''
+#set ylabel '{/Symbol q}_{2}'
+set yrange[-5:2]
+
+set zlabel ''
+set zrange[-7:7]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 200
+set isosamples 200
+
+N = 3
+y_ave = 0.008027802
+y2_ave = 0.0006139891
+
+splot -0.5 * N * ((y_ave - x) / exp(y))**2 - 0.5 * (N / exp(y)**2) * (y2_ave - y_ave**2) \\
+      - N * y - 0.5 * N * log(6.283185307179586) notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "post1.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-3.5:3.5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:2]
+
+set zlabel ''
+set zrange[-7:7]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 200
+set isosamples 200
+
+N = 3
+y_ave = 0.008027802
+y2_ave = 0.0006139891
+
+splot -0.5 * N * ((y_ave - x) / exp(y))**2 - 0.5 * (N / exp(y)**2) * (y2_ave - y_ave**2) \\
+      - N * y - 0.5 * N * log(6.283185307179586) \\
+      - 0.5 * x**2 - 0.5 * exp(2 * y) + y notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "like2.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+#set xlabel '{/Symbol q}_{1}'
+#set xlabel offset 0, screen 0.05
+set xrange[-3.5:3.5]
+
+set ytics nomirror scale 0
+set format y ''
+#set ylabel '{/Symbol q}_{2}'
+set yrange[-5:2]
+
+set zlabel ''
+set zrange[-7:7]
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 200
+set isosamples 200
+
+N = 3
+y_ave = -0.331415450
+y2_ave = 0.4083622
+
+splot -0.5 * N * ((y_ave - x) / exp(y))**2 - 0.5 * (N / exp(y)**2) * (y2_ave - y_ave**2) \\
+      - N * y - 0.5 * N * log(6.283185307179586) notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "post2.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-3.5:3.5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:2]
+
+set zlabel ''
+set zrange[-7:7]
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 200
+set isosamples 200
+
+N = 3
+y_ave = -0.331415450
+y2_ave = 0.4083622
+
+splot -0.5 * N * ((y_ave - x) / exp(y))**2 - 0.5 * (N / exp(y)**2) * (y2_ave - y_ave**2) \\
+      - N * y - 0.5 * N * log(6.283185307179586) \\
+      - 0.5 * x**2 - 0.5 * exp(2 * y) + y notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "like3.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-3.5:3.5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:2]
+
+set zlabel ''
+set zrange[-7:7]
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 200
+set isosamples 200
+
+N = 3
+y_ave = 1.534131
+y2_ave = 2.727151
+
+splot -0.5 * N * ((y_ave - x) / exp(y))**2 - 0.5 * (N / exp(y)**2) * (y2_ave - y_ave**2) \\
+      - N * y - 0.5 * N * log(6.283185307179586) notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "post3.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-3.5:3.5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:2]
+
+set zlabel ''
+set zrange[-7:7]
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 200
+set isosamples 200
+
+N = 3
+y_ave = 1.534131
+y2_ave = 2.727151
+
+splot -0.5 * N * ((y_ave - x) / exp(y))**2 - 0.5 * (N / exp(y)**2) * (y2_ave - y_ave**2) \\
+      - N * y - 0.5 * N * log(6.283185307179586) \\
+      - 0.5 * x**2 - 0.5 * exp(2 * y) + y notitle
+
+END

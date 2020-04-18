@@ -1,0 +1,74 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function mu(\x) {
+    return 6 - 0.1 * \x - 0.01 * \x * \x + 0.003 * \x * \x * \x;
+  };
+  function tu(\x) {
+    return 7.5 - 0.125 * \x - 0.005 * \x * \x + 0.0022 * \x * \x * \x;
+  };
+  function tl(\x) {
+    return 3 + 0.2 * \x + 0.002 * \x * \x - 0.001 * \x * \x * \x;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3, thick]
+  \foreach \x in {-9, -7, ..., 9} {
+    \foreach \i in {1.2815516, 0.8416212, 0.5244005, 0.2533471} {
+      \pgfmathsetmacro{\prop}{100 * exp(-0.5 * 1.5 * \i * \i)};
+      \colorlet{custom}{dark!\prop!white};
+      \pgfmathsetmacro{\dy}{\i}
+      \fill[color=custom] ({\x - 0.95}, {mu(\x) + \dy}) rectangle ({\x + 0.95}, {mu(\x) - \dy});
+    }
+    
+    \draw[color=dark] ({\x - 0.95}, {mu(\x)}) -- ({\x + 0.95}, {mu(\x)});
+  }
+
+  \draw[color=white, line width=1.25] 
+       (-10, 3.576599) -- (-8, 3.576599) -- (-8, 5.950348) -- (-6, 5.950348) 
+    -- (-6, 5.913584) -- (-4, 5.913584) -- (-4, 7.805717) -- (-2, 7.805717) 
+    -- (-2, 6.556985) -- (0, 6.556985) -- (0, 3.977647) -- (2, 3.977647) 
+    -- (2, 4.930308) -- (4, 4.930308) -- (4, 4.622153) -- (6, 4.622153) 
+    -- (6, 5.153301) -- (8, 5.153301) -- (8, 7.130570) -- (10, 7.130570);
+
+  \draw[color=black] 
+       (-10, 3.576599) -- (-8, 3.576599) -- (-8, 5.950348) -- (-6, 5.950348) 
+    -- (-6, 5.913584) -- (-4, 5.913584) -- (-4, 7.805717) -- (-2, 7.805717) 
+    -- (-2, 6.556985) -- (0, 6.556985) -- (0, 3.977647) -- (2, 3.977647) 
+    -- (2, 4.930308) -- (4, 4.930308) -- (4, 4.622153) -- (6, 4.622153) 
+    -- (6, 5.153301) -- (8, 5.153301) -- (8, 7.130570) -- (10, 7.130570);
+
+  \node[] at (-11.5, 5) { $t(y)$ };
+  
+  \draw [->, >=stealth, line width=1] (-10.05, 0) -- +(20.5, 0);
+  \draw [->, >=stealth, line width=1] (-10, -0.05) -- +(0, 11);
+  \node[] at (0, -1) { $x$ };
+  
+  
+  
+\end{tikzpicture}
+
+\end{document}  

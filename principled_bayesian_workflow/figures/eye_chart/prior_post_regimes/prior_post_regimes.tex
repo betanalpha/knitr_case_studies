@@ -1,0 +1,124 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function g(\x, \m, \s) {
+    return exp(-0.5 * (\x - \m) * (\x - \m) / (\s * \s)) / (6.28318 * \s * \s);
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3, thick]
+
+  % One
+  \pgfmathsetmacro{\dx}{0}
+  \pgfmathsetmacro{\dy}{0}
+
+  \draw[color=white] (-11 + \dx, -6 + \dy) rectangle (11 + \dx, 12 + \dy);
+
+  \draw[color=dark, domain=-10:10, smooth, samples=100, variable=\x] 
+    plot ({\x + \dx}, {50 * g(\x, 2.8, 0.9) + \dy});
+  \node[dark] at (3 + \dx, 11 + \dy) { Posterior };
+    
+  \draw[color=light, domain=-10:10, smooth, samples=100, variable=\x] 
+    plot ({\x + \dx}, {50 * g(\x, 3, 1.2) + \dy});
+  \node[color=light] at (6.5 + \dx, 3 + \dy) { Prior };
+        
+  \draw[color=black, dashed] (-3 + \dx, 0 + \dy) -- +(0, 10);
+  \node[] at (-3 + \dx, 11 + \dy) { Truth };
+
+  \draw [<->, >=stealth, line width=1] (-10.05 + \dx, 0 + \dy) -- +(20.5, 0);
+  \node[] at (0 + \dx, -1 + \dy) { $\theta$ };
+
+  \node[align=center] at (0 + \dx, -4 + \dy) { Bad Prior Model };
+
+  % Two
+  \pgfmathsetmacro{\dx}{25}
+  \pgfmathsetmacro{\dy}{0}
+
+  \draw[color=white] (-11 + \dx, -6 + \dy) rectangle (11 + \dx, 12 + \dy);
+
+  \draw[color=dark, domain=-10:10, smooth, samples=100, variable=\x] 
+    plot ({\x + \dx}, {90 * g(\x, 2, 1.2) + \dy});
+  \node[dark] at (6 + \dx, 8 + \dy) { Posterior };
+    
+  \draw[color=light, domain=-10:10, smooth, samples=100, variable=\x] 
+    plot ({\x + \dx}, {90 * g(\x, 0, 3) + \dy});
+  \node[color=light] at (-7 + \dx, 1.25 + \dy) { Prior };
+        
+  \draw[color=black, dashed] (-3 + \dx, 0 + \dy) -- +(0, 10);
+  \node[] at (-3 + \dx, 11 + \dy) { Truth };
+
+  \draw [<->, >=stealth, line width=1] (-10.05 + \dx, 0 + \dy) -- +(20.5, 0);
+  \node[] at (0 + \dx, -1 + \dy) { $\theta$ };
+  
+  \node[align=center] at (0 + \dx, -4 + \dy) { Overfitting };
+  
+  % Three
+  \pgfmathsetmacro{\dx}{0}
+  \pgfmathsetmacro{\dy}{-23}
+
+  \draw[color=white] (-11 + \dx, -6 + \dy) rectangle (11 + \dx, 12 + \dy);
+
+  \draw[color=dark, domain=-10:10, smooth, samples=100, variable=\x] 
+    plot ({\x + \dx}, {400 * g(\x, 0, 2.8) + \dy});
+  \node[dark] at (2 + \dx, 9 + \dy) { Posterior };
+    
+  \draw[color=light, domain=-10:10, smooth, samples=100, variable=\x] 
+    plot ({\x + \dx}, {400 * g(\x, 0, 3) + \dy});
+  \node[color=light] at (0.75 + \dx, 5 + \dy) { Prior };
+        
+  \draw[color=black, dashed] (-3 + \dx, 0 + \dy) -- +(0, 10);
+  \node[] at (-3 + \dx, 11 + \dy) { Truth };
+
+  \draw [<->, >=stealth, line width=1] (-10.05 + \dx, 0 + \dy) -- +(20.5, 0);
+  \node[] at (0 + \dx, -1 + \dy) { $\theta$ };
+  
+  \node[align=center] at (0 + \dx, -4 + \dy) { Poorly Identified};
+  
+  % Four
+  \pgfmathsetmacro{\dx}{25}
+  \pgfmathsetmacro{\dy}{-23}
+
+  \draw[color=white] (-11 + \dx, -6 + \dy) rectangle (11 + \dx, 12 + \dy);
+
+  \draw[color=dark, domain=-10:10, smooth, samples=100, variable=\x] 
+    plot ({\x + \dx}, {90 * g(\x, -2.5, 1.25) + \dy});
+  \node[dark] at (1 + \dx, 8 + \dy) { Posterior };
+    
+  \draw[color=light, domain=-10:10, smooth, samples=100, variable=\x] 
+    plot ({\x + \dx}, {90 * g(\x, 0, 3) + \dy});
+  \node[color=light] at (5 + \dx, 1.5 + \dy) { Prior };
+        
+  \draw[color=black, dashed] (-3 + \dx, 0 + \dy) -- +(0, 10);
+  \node[] at (-3 + \dx, 11 + \dy) { Truth };
+
+  \draw [<->, >=stealth, line width=1] (-10.05 + \dx, 0 + \dy) -- +(20.5, 0);
+  \node[] at (0 + \dx, -1 + \dy) { $\theta$ };
+  
+  \node[align=center] at (0 + \dx, -4 + \dy) { Ideal };
+  
+\end{tikzpicture}
+
+\end{document}  

@@ -26,8 +26,10 @@
 
 \begin{tikzpicture}[scale=0.3, thick]               
  \pgfmathsetmacro{\dx}{18}
- \foreach \i in {0.025, 0.05, ..., 1} {
-   \draw[line width={40 * \i}, opacity={exp(-5 * \i))}, mid] 
+ \foreach \i in {1, 0.99, ..., 0} {
+   \pgfmathsetmacro{\prop}{100 * exp(-5.0 * \i * \i)};
+   \colorlet{custom}{mid!\prop!white};
+   \draw[line width={30 * \i}, color=custom] 
      (-9.2 + \dx, -2) 
      .. controls (-11.2 + \dx, -1) and (-9 + \dx, 4.5) .. (-7 + \dx, 5.5) 
      .. controls (-5 + \dx, 6.5) and (-2 + \dx, 5) .. (0 + \dx, 4)

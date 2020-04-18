@@ -4,7 +4,7 @@
 \usepackage{color}
 
 \usepackage{tikz}
-\usetikzlibrary{intersections, backgrounds}
+\usetikzlibrary{intersections, backgrounds, arrows}
 
 \definecolor{light}{RGB}{220, 188, 188}
 \definecolor{mid}{RGB}{185, 124, 124}
@@ -25,8 +25,9 @@
 \begin{document}
 
 \begin{tikzpicture}[scale=0.25, thick] 
-  \pgfmathsetmacro{\dx}{-27}
+  \pgfmathsetmacro{\dx}{-30}
   %\draw [rounded corners=2pt, color=black] (-10 + \dx, -6) rectangle (10 + \dx, 6);
+  
   \node [] at (0 + \dx, -8) { $\mathcal{S}_{1} = \pi_{\mathcal{S}_1}(y ; \theta)$ };
  
   %\fill [color=light] (-9.2 + \dx, -2) 
@@ -54,11 +55,16 @@
                      .. controls (-3 + \dx, 4.5) and (-0.5 + \dx, 3) .. (1 + \dx, 3)
                      .. controls (2.5 + \dx, 3) and (2.5 + \dx, 2) .. (2 + \dx, 0)
                      .. controls (1.5 + \dx, -2) and (-3.2 + \dx, -3) .. (-5.2 + \dx, -2); 
+ 
                      
-  \draw [->, >=stealth, line width=10, color=black] (-16, 0) -- +(5, 0);
+  \fill [black] (7 + \dx, 5) circle (0.15)
+  node [above right, color=black] { $\pi^{\dagger}$ };
+                     
+  \draw [->, >=triangle 45, line width=4, color=black] (-17.5, 0) -- +(5, 0);
                      
   \pgfmathsetmacro{\dx}{0}
   %\draw [rounded corners=2pt, color=black] (-10 + \dx, -6) rectangle (10 + \dx, 6);
+  
   \node [] at (0 + \dx, -8) { $\mathcal{S}_{2} = \pi_{\mathcal{S}_2}(y ; \theta)$ };
  
   %\fill [color=light] (-9.2 + \dx, -2) 
@@ -86,10 +92,14 @@
                      .. controls (-3 + \dx, 4.5) and (-0.5 + \dx, 3) .. (1 + \dx, 3)
                      .. controls (2.5 + \dx, 3) and (2.5 + \dx, 2) .. (2 + \dx, 0)
                      .. controls (1.5 + \dx, -2) and (-3.2 + \dx, -3) .. (-5.2 + \dx, -2); 
-              
-  \draw [->, >=stealth, line width=10, color=black] (11, 0) -- +(5, 0);
+   
                      
-  \pgfmathsetmacro{\dx}{+27}
+  \fill [black] (7 + \dx, 5) circle (0.15)
+  node [above right, color=black] { $\pi^{\dagger}$ };
+              
+  \draw [->, >=triangle 45, line width=4, color=black] (12.5, 0) -- +(5, 0);
+                     
+  \pgfmathsetmacro{\dx}{+30}
   %\draw [rounded corners=2pt, color=black] (-10 + \dx, -6) rectangle (10 + \dx, 6);
   \node [] at (0 + \dx, -8) { $\mathcal{S}_{3} = \pi_{\mathcal{S}_3}(y ; \theta)$ };
  
@@ -118,6 +128,10 @@
                      .. controls (-3 + \dx, 4.5) and (-0.5 + \dx, 3) .. (1 + \dx, 3)
                      .. controls (2.5 + \dx, 3) and (2.5 + \dx, 2) .. (2 + \dx, 0)
                      .. controls (1.5 + \dx, -2) and (-3.2 + \dx, -3) .. (-5.2 + \dx, -2); 
+                     
+  \fill [black] (7 + \dx, 5) circle (0.15)
+  node [above right, color=black] { $\pi^{\dagger}$ };
+                     
 \end{tikzpicture}
 
 \end{document}   
