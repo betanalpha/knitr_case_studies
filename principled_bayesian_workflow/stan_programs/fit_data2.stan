@@ -10,8 +10,8 @@ parameters {
 
 model {
   // Prior model
-  lambda ~ inv_gamma(3.48681, 9.21604);
-  theta ~ beta(2.8663, 2.8663);
+  lambda ~ normal(0, 6);
+  theta ~ beta(1, 1);
 
   // Observational model that mixes a Poisson with excess zeros
   for (n in 1:N) {

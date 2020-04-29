@@ -960,9 +960,9 @@ distribution that can identify a variety of possible problems.
 First let's consider the _posterior $z$-score_ of a given parameter in the model
 configuration space,
 $$
-z[f \mid \tilde{y}, \theta^{\dagger}] = \left|
+z[f \mid \tilde{y}, \theta^{\dagger}] =
 \frac{ \mathbb{E}_{\mathrm{post}}[f \mid \tilde{y}] - f(\theta^{\dagger}) }
-{ \mathbb{E}_{\mathrm{post}}[f \mid \tilde{y} ] } \right|,
+{ \mathbb{E}_{\mathrm{post}}[f \mid \tilde{y} ] },
 $$
 where $\theta^{\dagger}$ is the parameter corresponding to the true data
 generating process.  The posterior $z$-score quantifies how accurately the
@@ -1338,7 +1338,7 @@ respect to $\nu$.
 Most choices of $f$, however, yield divergences that are not compatible with any
 product structure on the ambient space.  More specifically consider a product
 space $X = X_{1} \times X_{2}$ with the two _independent measures_,
-$\mu = \mu_{1} \times \mu_{2}$ and $\nu = \nu_{1} \times \nu_{1}$.  Even though
+$\mu = \mu_{1} \times \mu_{2}$ and $\nu = \nu_{1} \times \nu_{2}$.  Even though
 the measures are independent over the two components, a general $f$-divergence
 between these two product measures will _not_ decompose into a sum of
 $f$-divergences between the component measures $\mu_{1}$ and $\nu_{1}$ and
@@ -1359,7 +1359,7 @@ $$
 \begin{align*}
 \mathrm{KL} \! \left( \mu \mid\mid \nu \right)
 &\equiv
-\mathbb{E}_{\nu} \left[[
+\mathbb{E}_{\nu} \left[
 \frac{ \mathrm{d} \nu }{ \mathrm{d} \mu } \cdot
 \log \frac{ \mathrm{d} \mu }{ \mathrm{d} \nu } \right]
 \\
@@ -1549,7 +1549,7 @@ $$
 $$
 then we could construct the Monte Carlo estimator
 $$
-\hat{\delta}(\pi^{\text{pred}}) \! \left( \pi \mid\mid \pi^{\text{pred}} \right)
+\hat{\delta} \! \left( \pi \mid\mid \pi^{\text{pred}} \right)
 \equiv
 \sum_{n = 1}^{N} - \log \pi^{\text{pred}} (\tilde{y}_{n}).
 $$
@@ -2866,6 +2866,11 @@ it into a file which has just arrived in our inbox.
 
 Before even reading the email we dutifully set up our local `R` environment.
 
+
+```{r, include = FALSE}
+set.seed(4838282)
+```
+
 ```{r, message=FALSE, warning=FALSE}
 library(rstan)
 rstan_options(auto_write = TRUE)
@@ -2882,6 +2887,9 @@ c_mid <- c("#B97C7C")
 c_mid_highlight <- c("#A25050")
 c_dark <- c("#8F2727")
 c_dark_highlight <- c("#7C0000")
+
+c_dark_trans <- c("#8F272780")
+c_green_trans <- c("#00FF0080")
 ```
 
 ## First Iteration: A Journey of a Thousand Models Begins with a Single Step
@@ -2903,7 +2911,7 @@ Mathematically our observation takes the form of integer counts, $y$, for each
 of the $N = 1000$ detectors.  In the Stan modeling language this is specified as
 
 ```{r}
-writeLines(readLines("fit_data.stan", n=4))
+writeLines(readLines("stan_programs/fit_data.stan", n=4))
 ```
 
 ### Step Three: Construct Summary Statistics {-}
@@ -2932,7 +2940,7 @@ $\lambda$.
 A Poisson probability density function has mean $\lambda$ and standard deviation
 $\lambda$, so we can approximate the upper tail as $\lambda + 3 \sqrt{\lambda}$.
 If we want this to be consistent with the 25 count threshold then we'll need to
-suppress $lambda$ below values satisfying
+suppress $\lambda$ below values satisfying
 $$
 \lambda + 3 \sqrt{\lambda} \approx 25,
 $$
@@ -2943,26 +2951,26 @@ out the scale that gives the right tail behavior we can use `Stan`'s algebraic
 solver.
 
 ```{r}
-writeLines(readLines("prior_tune1.stan"))
+writeLines(readLines("stan_programs/prior_tune1.stan"))
 ```
 
 ```{r}
-stan(file='prior_tune1.stan', iter=1, warmup=0, chains=1,
+stan(file='stan_programs/prior_tune1.stan', iter=1, warmup=0, chains=1,
      seed=4838282, algorithm="Fixed_param")
 ```
 
-To simplify copy and pasting we'll take the scale 5.82337, although given the
-approximate nature of this calculation there's really no reason to be keeping
-all of those decimal places!
+Because our domain expertise and tail definitions are not precise we don't have
+to be precious with the exact value returned by the algebraic solver.  Here
+we'll take the scale $6$.
 
 ```{r}
 lambda <- seq(0, 20, 0.001)
 
-plot(lambda, dnorm(lambda, 0, 5.82337), type="l", col=c_dark_highlight, lwd=2,
+plot(lambda, dnorm(lambda, 0, 6), type="l", col=c_dark_highlight, lwd=2,
      xlab="lambda", ylab="Prior Density", yaxt='n')
 
 lambda99 <- seq(0, 15, 0.001)
-dens <- dnorm(lambda99, 0, 5.82337)
+dens <- dnorm(lambda99, 0, 6)
 lambda99 <- c(lambda99, 15, 0)
 dens <- c(dens, 0, 0)
 
@@ -2974,7 +2982,7 @@ $$
 \pi( y_{1}, \ldots, y_{N}, \lambda )
 =
 \left[ \prod_{n = 1}^{N} \text{Poisson} (y_{n} \mid \lambda) \right]
-\cdot \text{normal} (\lambda \mid 0, 5.82337).
+\cdot \text{normal} (\lambda \mid 0, 6).
 $$
 
 <center>
@@ -2989,14 +2997,14 @@ Ancestral sampling from the joint probability distribution is implemented in the
 following Stan program.
 
 ```{r}
-writeLines(readLines("simu_bayesian_ensemble.stan"))
+writeLines(readLines("stan_programs/simu_bayesian_ensemble.stan"))
 ```
 
 The joint probability density function is implemented in the following
 Stan program.
 
 ```{r}
-writeLines(readLines("fit_data.stan"))
+writeLines(readLines("stan_programs/fit_data.stan"))
 ```
 
 ### Step Five: Construct Summary Functions {-}
@@ -3018,7 +3026,7 @@ N <- 1000
 
 simu_data <- list("N" = N)
 
-fit <- stan(file='simu_bayesian_ensemble.stan', data=simu_data,
+fit <- stan(file='stan_programs/simu_bayesian_ensemble.stan', data=simu_data,
             iter=R, warmup=0, chains=1, refresh=R,
             seed=4838282, algorithm="Fixed_param")
 
@@ -3041,7 +3049,7 @@ prior predictive check to perform.
 Each simulated observation in the Bayesian ensemble gives a summary histogram.
 For example, one sample gives the histogram
 ```{r}
-B <- 40
+B <- 50
 
 idx <- rep(0:B, each=2)
 x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] - 0.5)
@@ -3076,9 +3084,9 @@ We can visualize the entire prior predictive distribution of these histogram
 with quantiles of the counts in each bin.  Here the darkest red corresponds to
 the bin medians with the increasingly lighter bands corresponding to
 $(0.4, 0.6)$, $(0.3, 0.7)$, $(0.2, 0.8)$, and $(0.1, 0.9)$ intervals,
-respectively.  This visualization can obscure multimodality within a bin and
-correlations between the bins, but it still communicates a tremendous amount of
-information about the prior predictive distribution.
+respectively.  This visualization technique can obscure multimodality within a 
+bin and correlations between the bins, but it still communicates a tremendous 
+amount of information about the prior predictive distribution.
 
 ```{r}
 probs = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
@@ -3086,7 +3094,7 @@ cred <- sapply(1:(B + 1), function(b) quantile(counts[b,], probs=probs))
 pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
 
 plot(1, type="n", main="Prior Predictive Distribution",
-     xlim=c(-0.5, B + 0.5), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
+     xlim=c(-0.5, 30), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
 
 polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
         col = c_light, border = NA)
@@ -3098,8 +3106,8 @@ polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
 lines(x, pad_cred[5,], col=c_dark, lwd=2)
 
-abline(v=25, col="white", lty=1, lw=2.5)
-abline(v=25, col="black", lty=1, lw=2)
+rect(25, 0, 30, max(cred[9,]), col=c("#BBBBBB88"), border=FALSE)
+abline(v=25, col=c("#BBBBBB"), lty=1, lw=2)
 ```
 
 We see a very small prior predictive probability for observations above
@@ -3141,7 +3149,7 @@ tryCatch({
   simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_ys)))
 
   # Compile the posterior fit model
-  fit_model = stan_model(file='fit_data.stan')
+  fit_model = stan_model(file='stan_programs/fit_data.stan')
 
   ensemble_output <- foreach(simu=simu_list,
                              .combine='cbind') %dopar% {
@@ -3168,7 +3176,7 @@ tryCatch({
     post_mean_lambda <- s[,1]
     post_sd_lambda <- s[,3]
 
-    prior_sd_lambda <- 3.513
+    prior_sd_lambda <- 3.617414
 
     z_score <- (post_mean_lambda - simu_lambda) / post_sd_lambda
     contraction <- 1 - (post_sd_lambda / prior_sd_lambda)**2
@@ -3186,17 +3194,17 @@ accurately quantifying the corresponding posterior distribution.
 ```{r}
 warning_code <- ensemble_output[1,]
 if (sum(warning_code) != 0) {
-  print ("Some simulated posterior fits in the joint ensemble encountered problems!")
+  cat("Some simulated posterior fits in the Bayesian ensemble encountered problems!\n")
   for (r in 1:R) {
     if (warning_code[r] != 0) {
-      print(sprintf('Replication %s of %s', r, R))
+      cat(sprintf('Replication %s of %s\n', r, R))
       util$parse_warning_code(warning_code[r])
-      print(sprintf('Simulated lambda = %s', simu_lambdas[r]))
-      print(" ")
+      cat(sprintf('Simulated lambda = %s\n', simu_lambdas[r]))
+      cat(" \n")
     }
   }
 } else {
-  print ("No posterior fits in the Bayesian ensemble encountered problems!")
+  cat("No posterior fits in the Bayesian ensemble encountered problems!\n")
 }
 ```
 
@@ -3260,11 +3268,11 @@ Let's fit the observed data with a Stan program that also simulates posterior
 predictive samples which we can then use for posterior retrodictive checks.
 
 ```{r}
-writeLines(readLines("fit_data_post_pred.stan"))
+writeLines(readLines("stan_programs/fit_data_post_pred.stan"))
 ```
 
 ```{r}
-fit <- stan(file='fit_data_post_pred.stan', data=input_data,
+fit <- stan(file='stan_programs/fit_data_post_pred.stan', data=input_data,
             seed=4938483, refresh=2000)
 ```
 
@@ -3374,20 +3382,32 @@ distribution that concentrates entirely at zero,
 $$
 \pi(y_{n} \mid \lambda, \theta)
 =
-\theta \cdot \text{Poisson} (y_{n} \mid \lambda)
-+ (1 - \theta) \cdot \delta_{0}(y_{n}) .
+(1 - \theta) \cdot \text{Poisson} (y_{n} \mid \lambda)
++ \theta \cdot \delta_{0}(y_{n}) .
 $$
 We use the same prior for the source intensity, $\lambda$, and assign a uniform
-prior over the mixture weight, $\theta$, to give the complete Bayesian model
+prior over the mixture weight, $\theta$.
+
+```{r}
+stan(file='stan_programs/prior_tune2b.stan', iter=1, warmup=0, chains=1,
+     seed=4838282, algorithm="Fixed_param")
+
+theta <- seq(0, 1, 0.001)
+dens <- dbeta(theta, 1, 1)
+plot(theta, dens, type="l", col=c_dark_highlight, lwd=2,
+     xlab="theta", ylab="Prior Density", yaxt='n')
+```
+
+This gives the complete Bayesian model
 $$
 \begin{align*}
 \pi( y_{1}, \ldots, y_{N}, \lambda )
 &= \;\;
 \prod_{n = 1}^{N} \Big[
-\theta \cdot \mathrm{Poisson} (y_{n} \mid \lambda) + (1 - \theta) \cdot \delta_{0}(y_{n})
+(1 - \theta) \cdot \mathrm{Poisson} (y_{n} \mid \lambda) + \theta \cdot \delta_{0}(y_{n})
 \Big]
 \\
-& \quad \cdot \text{normal} (\lambda \mid 0, 5.82337)
+& \quad \cdot \text{normal} (\lambda \mid 0, 6)
 \\
 & \quad \cdot
 \text{beta} (\theta \mid 1, 1)
@@ -3408,14 +3428,14 @@ Ancestral sampling from the joint probability distribution is implemented in the
 following Stan program.
 
 ```{r}
-writeLines(readLines("simu_bayesian_ensemble2.stan"))
+writeLines(readLines("stan_programs/simu_bayesian_ensemble2.stan"))
 ```
 
 The joint probability density function is implemented in the following
 Stan program.
 
 ```{r}
-writeLines(readLines("fit_data2.stan"))
+writeLines(readLines("stan_programs/fit_data2.stan"))
 ```
 
 ### Step Five: Construct Summary Functions {-}
@@ -3429,13 +3449,17 @@ number of observed zeros or the ratio of observed zeroes to total observations.
 
 We can now simulate a new ensemble of model configurations and observations.
 
+```{r, include = FALSE}
+set.seed(4838282)
+```
+
 ```{r}
 R <- 1000
 N <- 1000
 
 simu_data <- list("N" = N)
 
-fit <- stan(file='simu_bayesian_ensemble2.stan', data=simu_data,
+fit <- stan(file='stan_programs/simu_bayesian_ensemble2.stan', data=simu_data,
             iter=R, warmup=0, chains=1, refresh=R,
             seed=4838282, algorithm="Fixed_param")
 
@@ -3460,7 +3484,7 @@ x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] 
 pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
 
 plot(1, type="n", main="Prior Predictive Distribution",
-     xlim=c(-0.5, B + 0.5), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
+     xlim=c(-0.5, 30), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
 
 polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
         col = c_light, border = NA)
@@ -3472,8 +3496,8 @@ polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
 lines(x, pad_cred[5,], col=c_dark, lwd=2)
 
-abline(v=25, col="white", lty=1, lw=2.5)
-abline(v=25, col="black", lty=1, lw=2)
+rect(25, 0, 30, max(cred[9,]), col=c("#BBBBBB88"), border=FALSE)
+abline(v=25, col=c("#BBBBBB"), lty=1, lw=2)
 ```
 
 This addition, however, doesn't change the tail of observations and hence we
@@ -3503,7 +3527,7 @@ tryCatch({
   simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
 
   # Compile the posterior fit model
-  fit_model = stan_model(file='fit_data2.stan')
+  fit_model = stan_model(file='stan_programs/fit_data2.stan')
 
   ensemble_output <- foreach(simu=simu_list,
                              .combine='cbind') %dopar% {
@@ -3532,7 +3556,7 @@ tryCatch({
     post_mean_lambda <- s[,1]
     post_sd_lambda <- s[,3]
 
-    prior_sd_lambda <- 3.513
+    prior_sd_lambda <- 3.617414
 
     z_score_lambda <- (post_mean_lambda - simu_lambda) / post_sd_lambda
     contraction_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
@@ -3560,36 +3584,140 @@ First things first we check the fit diagnostics for each replication.
 ```{r}
 warning_code <- ensemble_output[1,]
 if (sum(warning_code) != 0) {
-  print ("Some simulated posterior fits in the joint ensemble encountered problems!")
+  cat("Some simulated posterior fits in the Bayesian ensemble encountered problems!\n")
   for (r in 1:R) {
     if (warning_code[r] != 0) {
-      print(sprintf('Replication %s of %s', r, R))
+      cat(sprintf('Replication %s of %s\n', r, R))
       util$parse_warning_code(warning_code[r])
-      print(sprintf('Simulated lambda = %s', simu_lambdas[r]))
-      print(sprintf('Simulated theta = %s', simu_thetas[r]))
-      print(" ")
+      cat(sprintf('Simulated lambda = %s\n', simu_lambdas[r]))
+      cat(sprintf('Simulated theta = %s\n', simu_thetas[r]))
+      cat(" \n")
     }
   }
 } else {
-  print ("No posterior fits in the joint ensemble encountered problems!")
+  cat("No posterior fits in the Bayesian ensemble encountered problems!\n")
 }
 ```
 
-Unfortunately our computed fits are nowhere near as reliable for this expanded
-model!  Indeed if we carefully analyze the simulated model configurations for
-each of the problematic fits we notice that problems arise whenever $\lambda$ is
-small or $\theta$ is large.  That seems a little suspicious, no?
+Unfortunately the diagnostics indicate that our computed fits are not as 
+reliable for this expanded model.  In particular we seem to have trouble fitting 
+data simulated from model configurations with small $\lambda$ or extreme 
+$\theta$.  To investigate further let's look at the simulated observations that
+frustrated our computation.
 
-It should, because this is a manifestation of a _poor identifiability_ hiding in
-our zero-inflated model.  When the Poisson source strength is small enough the
-resulting distribution of counts will be indistinguishable from the Dirac
-distribution that we are using to model the excess zeroes.
+```{r}
+par(mfrow=c(3, 3))
 
-While we could try to reconfigure our computational method to better handle the
-poorly identified likelihood functions, its manifestation also provides us with
-an opportunity to reconsider our domain expertise and tweak our model.  Is it
-reasonable for the source intensity to be small enough that we would expect
-mostly zeroes from the Poisson model?
+hist(simu_ys[50,], breaks=(0:10 - 0.5),
+     main="", xlab="y[50]", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+
+hist(simu_ys[113,], breaks=(0:10 - 0.5),
+     main="", xlab="y[113]", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+
+hist(simu_ys[130,], breaks=(0:10 - 0.5),
+     main="", xlab="y[130]", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+
+hist(simu_ys[161,], breaks=(0:10 - 0.5),
+     main="", xlab="y[161]", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+
+hist(simu_ys[380,], breaks=(0:10 - 0.5),
+     main="", xlab="y[380]", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+
+hist(simu_ys[627,], breaks=(0:10 - 0.5),
+     main="", xlab="y[627]", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+
+hist(simu_ys[837,], breaks=(0:10 - 0.5),
+     main="", xlab="y[837]", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+
+hist(simu_ys[50,], breaks=(0:10 - 0.5),
+     main="", xlab="y[50]", yaxt='n', ylab="",
+     col=c_dark, border=c_dark_highlight)
+```
+
+The immediate common feature amongst these problematic observations are very 
+small counts, in many cases observations consisting of only zero counts.  To 
+see why these zero count observations impede accurate computation let's look at
+the fit in more detail.
+
+```{r}
+input_data <- list("N" = N, "y" = simu_ys[50,])
+fit <- stan(file='stan_programs/fit_data2.stan', data=input_data, 
+            seed=4938483, refresh=2000)
+util$check_all_diagnostics(fit)
+```
+
+With only one divergence the failure of our computation here is relatively 
+mild, although not ignorable.
+
+Because we have only two parameters we can examine the entire fitted posterior 
+distribution with a scatter plot of the sampled values.  Here I'll transform 
+each parameter to the _unconstrained_ values that the dynamic Hamiltonian
+Monte Carlo sampler in Stan actually explores.
+
+```{r}
+partition <- util$partition_div(fit)
+div_params <- partition[[1]]
+nondiv_params <- partition[[2]]
+
+plot(log(nondiv_params$lambda), 
+     log(nondiv_params$theta) - log(1 - nondiv_params$theta),
+     col=c_dark_trans, pch=16, cex=0.8,
+     xlab="log(lambda)", ylab="logit(theta)")
+points(log(div_params$lambda), 
+       log(div_params$theta) - log(1 - div_params$theta),
+       col=c_green_trans, pch=16, cex=0.8)
+```
+
+When we have only zero counts our model is extremely _poorly identified_, with 
+the observation unable to distinguish between a very low Poisson source strength 
+and the failure of all of the detectors at once.
+
+To be thorough let's also investigate one of the simulated observations with 
+small but not entirely zero counts in each detector.
+
+```{r}
+input_data <- list("N" = N, "y" = simu_ys[113,])
+fit <- stan(file='stan_programs/fit_data2.stan', data=input_data, 
+            seed=4938483, refresh=2000)
+
+util$check_all_diagnostics(fit)
+
+partition <- util$partition_div(fit)
+div_params <- partition[[1]]
+nondiv_params <- partition[[2]]
+
+plot(log(nondiv_params$lambda), 
+     log(nondiv_params$theta) - log(1 - nondiv_params$theta),
+     col=c_dark_trans, pch=16, cex=0.8,
+     xlab="log(lambda)", ylab="logit(theta)")
+points(log(div_params$lambda), 
+       log(div_params$theta) - log(1 - div_params$theta),
+       col=c_green_trans, pch=16, cex=0.8)
+```
+
+In this case the small number of divergent transitions leads us to a more subtle
+identifiability issue.  When the failure probability $\theta$ is small the model
+places the responsibility for the observations almost entirely on the Poisson 
+component.  Consequently the observations strongly inform the Poisson source 
+strength.  When the failure probability increases, however, the Poisson 
+component is given less responsibility and is correspondingly less informed by 
+the observation.  This shifting constraint on the Poisson source strength 
+results in a mild funnel geometry that obsructs exploration of very small 
+failure probabilities.
+
+Given the mild failures we could try to reconfigure our computational method to 
+better handle the poorly identified likelihood functions.  The nature of these 
+failures, however, also provides us with an opportunity to reconsider our domain 
+expertise and tweak our model.  Is it reasonable for the source intensity to be 
+small enough that we would expect mostly zeroes from the Poisson component of 
+our model?
 
 Because computational problems often correlate with poorly identified likelihood
 functions they have a knack for identifying the deficiency of the domain
@@ -3613,7 +3741,7 @@ development workflow.
 
 Just how reasonable is it for a working detector aimed at a well-known source
 to admit a small Poisson intensity, or for all of the detectors to be working
-or not working?  The the above computational problems identified some important
+or not working?  The previous computational problems identified some important
 questions that we hadn't initially addressed with our domain expertise.
 
 Upon reflection let's say that our domain expertise specifies that the source
@@ -3637,7 +3765,26 @@ The observation space remains the same.
 
 ### Step Three: Construct Summary Statistics {-}
 
-As does the utility of the histogram summary.
+One reason we didn't notice the simulated observations with all zero counts 
+earlier is that the histogram summary statistic doesn't fully capture the 
+correlations between the bin counts.  To provide stronger prior checking let's
+consider the observed proportion of zeros in each observation and ensure that
+it's not more than around 0.9.
+
+Indeed had we considered this summary statistic in the previous iteration of 
+the workflow we would have seen a significant conflict between the consequences
+of our modeling assumptions and our domain expertise.
+
+```{r}
+zero_pro <- sapply(1:R, function(r) sum(simu_ys[r,] == 0) / length(simu_ys[r,]))
+
+hist(zero_pro, breaks=seq(-0.5*20/R, 1 + 0.5*20/R, 20/R),
+     main="", xlab="Observed Proportion of Zero Counts", 
+     yaxt='n', ylab="Prior Predictive Distribution",
+     col=c_dark, border=c_dark_highlight)
+rect(0.9, 0, 1.01, 50, col=c("#BBBBBB88"), border=FALSE)
+abline(v=0.9, col=c("#BBBBBB"), lty=1, lw=2)
+```
 
 ### Step Four: Model Development {-}
 
@@ -3653,20 +3800,23 @@ $\lambda = 15$.  We can use `Stan`'s algebraic solver to find the member of the
 inverse gamma family satisfying these two constraints.
 
 ```{r}
-writeLines(readLines("prior_tune2a.stan"))
+writeLines(readLines("stan_programs/prior_tune2a.stan"))
 ```
 
+Again we don't need to be precious about the exact results -- here we'll take
+$\alpha = 3.5$ and $\beta = 9$.
+
 ```{r}
-stan(file='prior_tune2a.stan', iter=1, warmup=0, chains=1,
+stan(file='stan_programs/prior_tune2a.stan', iter=1, warmup=0, chains=1,
      seed=4838282, algorithm="Fixed_param")
 
 lambda <- seq(0, 20, 0.001)
-dens <- lapply(lambda, function(l) dgamma(1 / l, 3.48681, rate=9.21604) * (1 / l**2))
+dens <- lapply(lambda, function(l) dgamma(1 / l, 3.5, rate=9) * (1 / l**2))
 plot(lambda, dens, type="l", col=c_dark_highlight, lwd=2,
      xlab="lambda", ylab="Prior Density", yaxt='n')
 
 lambda98 <- seq(1, 15, 0.001)
-dens <- lapply(lambda98, function(l) dgamma(1 / l, 3.48681, rate=9.21604) * (1 / l**2))
+dens <- lapply(lambda98, function(l) dgamma(1 / l, 3.5, rate=9) * (1 / l**2))
 lambda98 <- c(lambda98, 15, 1)
 dens <- c(dens, 0, 0)
 
@@ -3678,20 +3828,22 @@ that puts only 1% probability mass below 0.1 and above 0.9.  Once again we
 appeal to the algebraic solver.
 
 ```{r}
-writeLines(readLines("prior_tune2b.stan"))
+writeLines(readLines("stan_programs/prior_tune2b.stan"))
 ```
 
+We'll take $\alpha = \beta = 3$.
+
 ```{r}
-stan(file='prior_tune2b.stan', iter=1, warmup=0, chains=1,
+stan(file='stan_programs/prior_tune2b.stan', iter=1, warmup=0, chains=1,
      seed=4838282, algorithm="Fixed_param")
 
 theta <- seq(0, 1, 0.001)
-dens <- dbeta(theta, 2.8663, 2.8663)
+dens <- dbeta(theta, 3, 3)
 plot(theta, dens, type="l", col=c_dark_highlight, lwd=2,
      xlab="theta", ylab="Prior Density", yaxt='n')
 
 theta98 <- seq(0.1, 0.9, 0.001)
-dens <- dbeta(theta98, 2.8663, 2.8663)
+dens <- dbeta(theta98, 3, 3)
 theta98 <- c(theta98, 0.9, 0.1)
 dens <- c(dens, 0, 0)
 
@@ -3704,13 +3856,13 @@ $$
 \pi( y_{1}, \ldots, y_{N}, \lambda )
 &= \;\;
 \prod_{n = 1}^{N} \Big[
-\theta \cdot \mathrm{Poisson} (y_{n} \mid \lambda) + (1 - \theta) \cdot \delta_{0}(y_{n})
+(1 - \theta) \cdot \mathrm{Poisson} (y_{n} \mid \lambda) + \theta \cdot \delta_{0}(y_{n})
 \Big]
 \\
-& \quad \cdot \text{inv-gamma} (\lambda \mid 3.48681, 9.21604)
+& \quad \cdot \text{inv-gamma} (\lambda \mid 3.5, 9)
 \\
 & \quad \cdot
-\text{beta} (\theta \mid 2.8663, 2.8663)
+\text{beta} (\theta \mid 3, 3)
 \end{align*}
 $$
 
@@ -3726,14 +3878,14 @@ Ancestral sampling from this joint probability distribution is implemented in th
 following Stan program.
 
 ```{r}
-writeLines(readLines("simu_bayesian_ensemble3.stan"))
+writeLines(readLines("stan_programs/simu_bayesian_ensemble3.stan"))
 ```
 
 The joint probability density function is implemented in the following
 Stan program.
 
 ```{r}
-writeLines(readLines("fit_data3.stan"))
+writeLines(readLines("stan_programs/fit_data3.stan"))
 ```
 
 ### Step Five: Construct Summary Functions {-}
@@ -3751,7 +3903,7 @@ N <- 1000
 
 simu_data <- list("N" = N)
 
-fit <- stan(file='simu_bayesian_ensemble3.stan', data=simu_data,
+fit <- stan(file='stan_programs/simu_bayesian_ensemble3.stan', data=simu_data,
             iter=R, warmup=0, chains=1, refresh=R,
             seed=4838282, algorithm="Fixed_param")
 
@@ -3776,7 +3928,7 @@ x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] 
 pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
 
 plot(1, type="n", main="Prior Predictive Distribution",
-     xlim=c(-0.5, B + 0.5), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
+     xlim=c(-0.5, 30), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
 
 polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
         col = c_light, border = NA)
@@ -3788,8 +3940,8 @@ polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
 lines(x, pad_cred[5,], col=c_dark, lwd=2)
 
-abline(v=25, col="white", lty=1, lw=2.5)
-abline(v=25, col="black", lty=1, lw=2)
+rect(25, 0, 30, max(cred[9,]), col=c("#BBBBBB88"), border=FALSE)
+abline(v=25, col=c("#BBBBBB"), lty=1, lw=2)
 ```
 
 In particular we still have the desired low probability for extreme
@@ -3797,6 +3949,20 @@ observations.
 
 ```{r}
 length(simu_ys[simu_ys > 25]) / length(simu_ys)
+```
+
+We also want to check our prior model against our new summary statistic, which 
+exhibits none of the conflict seen in our previous model.
+
+```{r}
+zero_pro <- sapply(1:R, function(r) sum(simu_ys[r,] == 0) / length(simu_ys[r,]))
+
+hist(zero_pro, breaks=seq(-0.5*20/R, 1 + 0.5*20/R, 20/R),
+     main="", xlab="Observed Proportion of Zero Counts", 
+     yaxt='n', ylab="Prior Predictive Distribution",
+     col=c_dark, border=c_dark_highlight)
+rect(0.9, 0, 1.01, 50, col=c("#BBBBBB88"), border=FALSE)
+abline(v=0.9, col=c("#BBBBBB"), lty=1, lw=2)
 ```
 
 ### Step Eight: Configure Algorithm {-}
@@ -3815,7 +3981,7 @@ tryCatch({
   simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
 
   # Compile the posterior fit model
-  fit_model = stan_model(file='fit_data3.stan')
+  fit_model = stan_model(file='stan_programs/fit_data3.stan')
 
   ensemble_output <- foreach(simu=simu_list,
                              .combine='cbind') %dopar% {
@@ -3844,7 +4010,7 @@ tryCatch({
     post_mean_lambda <- s[,1]
     post_sd_lambda <- s[,3]
 
-    prior_sd_lambda <- sqrt( (9.21604)**2 / ((3.48681 - 1)**2 * (3.48681 - 1)) )
+    prior_sd_lambda <- sqrt( (9)**2 / ((3.5 - 1)**2 * (3.5 - 1)) )
 
     z_score_lambda <- (post_mean_lambda - simu_lambda) / post_sd_lambda
     contraction_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
@@ -3853,7 +4019,7 @@ tryCatch({
     post_mean_theta <- s[,1]
     post_sd_theta <- s[,3]
 
-    prior_sd_theta <- sqrt( (2.8663)**2 / (4 * (2.8663)**2 * (2 * 2.8663 + 1)) )
+    prior_sd_theta <- sqrt( (3)**2 / (4 * (3)**2 * (2 * 3 + 1)) )
 
     z_score_theta <- (post_mean_theta - simu_theta) / post_sd_theta
     contraction_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
@@ -3873,20 +4039,25 @@ model there are no diagnostic indications of fitting problems.
 ```{r}
 warning_code <- ensemble_output[1,]
 if (sum(warning_code) != 0) {
-  print ("Some simulated posterior fits in the joint ensemble encountered problems!")
+  cat("Some simulated posterior fits in the Bayesian ensemble encountered problems!\n")
   for (r in 1:R) {
     if (warning_code[r] != 0) {
-      print(sprintf('Replication %s of %s', r, R))
+      cat(sprintf('Replication %s of %s\n', r, R))
       util$parse_warning_code(warning_code[r])
-      print(sprintf('Simulated lambda = %s', simu_lambdas[r]))
-      print(sprintf('Simulated theta = %s', simu_thetas[r]))
-      print(" ")
+      cat(sprintf('Simulated lambda = %s\n', simu_lambdas[r]))
+      cat(sprintf('Simulated theta = %s\n', simu_thetas[r]))
+      cat(" \n")
     }
   }
 } else {
-  print ("No posterior fits in the joint ensemble encountered problems!")
+  cat("No posterior fits in the Bayesian ensemble encountered problems!\n")
 }
 ```
+
+The lone treedepth warning here is a matter of computational efficiency, not 
+computational accuracy.  We could consider increasing `max_treedepth` to avoid 
+any potential inefficiencies, but given the rarity of the warning let's 
+continue ahead with the Stan defaults.
 
 Similarly, the simulation-based histograms for both $\lambda$ and $\theta$ show
 no signs of errors in our fits.
@@ -3950,17 +4121,16 @@ own assumptions we go back to fit the observed data once again, this time
 taking the zero-inflation into account in our posterior predictive simulations.
 
 ```{r}
-writeLines(readLines("fit_data3_post_pred.stan"))
+writeLines(readLines("stan_programs/fit_data3_post_pred.stan"))
 ```
 
 ```{r}
 input_data <- read_rdump('workflow.data.R')
-fit <- stan(file='fit_data3_post_pred.stan', data=input_data,
+fit <- stan(file='stan_programs/fit_data3_post_pred.stan', data=input_data,
             seed=4938483, refresh=2000)
 ```
 
 ### Step Thirteen: Diagnose Posterior Fit {-}
-
 
 The diagnostics look good,
 
@@ -4057,6 +4227,19 @@ When the student repeated the measurement for detectors in this state they
 unintentionally induced a _truncated observation_ where the Poisson distribution
 is cutoff at a certain value.
 
+Reviewing the detector instruction manual we see that indeed this series of 
+detectors has a default safety cutoff at $14$ counts.  In order to model the
+observations taking under this default configuration we need to explicitly model 
+the truncation at this value.
+
+Importantly we will consider a truncation at $14$ counts because of our
+expanded domain expertise after consulting the manual, _not_ because of what we 
+observed in the data.  Selecting a fixed truncation based on the observed data 
+would be a potentially dangerous overfitting transgression.  If we didn't have 
+domain expertise to select a precise truncation point then we would have to 
+model the possible values and _infer_ a truncation point jointly with our other
+parameters.
+
 ### Step Two: Define Observational Space {-}
 
 The observation space does not change.
@@ -4068,12 +4251,7 @@ The same histogram summary remains appropriate.
 ### Step Four: Model Development {-}
 
 We now have to augment out observational model to account for the truncation of
-the counts.  Ideally we would treat the truncation threshold as a systematic
-parameter here and infer it with uncertainties to avoid overfitting to our one
-observation.  That model, however, is a bit ungainly so for pedagogical
-simplification we will take the fixed threshold of $y = 14$ implied by the
-observed data assuming that it too is consistent with our hypothetical domain
-expertise.
+the counts.  
 
 The complete Bayesian model is then
 $$
@@ -4081,16 +4259,16 @@ $$
 \pi( y_{1}, \ldots, y_{N}, \lambda )
 &= \;\;
 \prod_{n = 1}^{N} \Big[
-\theta \cdot
+(1 - \theta) \cdot
 \frac{\mathrm{Poisson} (y_{n} \mid \lambda) \, \mathbb{I} [ y_{n} \le U ] }
 {\sum_{z = 0}^{U} \mathrm{Poisson} (z \mid \lambda)}
- + (1 - \theta) \cdot \delta_{0}(y_{n})
+ + \theta \cdot \delta_{0}(y_{n})
 \Big]
 \\
-& \quad \cdot \text{inv-gamma} (\lambda \mid 3.48681, 9.21604)
+& \quad \cdot \text{inv-gamma} (\lambda \mid 3.5, 9)
 \\
 & \quad \cdot
-\text{beta} (\theta \mid 2.8663, 2.8663)
+\text{beta} (\theta \mid 3, 3)
 \end{align*}
 $$
 
@@ -4106,14 +4284,14 @@ Ancestral sampling is implemented in the following Stan program that uses
 _progressive sampling_ to efficiently sample from the truncated Poisson model.
 
 ```{r}
-writeLines(readLines("simu_bayesian_ensemble4.stan"))
+writeLines(readLines("stan_programs/simu_bayesian_ensemble4.stan"))
 ```
 
 The joint probability density function requires introducing the corrected
 normalization in the Stan program.
 
 ```{r}
-writeLines(readLines("fit_data4.stan"))
+writeLines(readLines("stan_programs/fit_data4.stan"))
 ```
 
 ### Step Five: Construct Summary Functions {-}
@@ -4131,7 +4309,7 @@ N <- 1000
 
 simu_data <- list("N" = N)
 
-fit <- stan(file='simu_bayesian_ensemble4.stan', data=simu_data,
+fit <- stan(file='stan_programs/simu_bayesian_ensemble4.stan', data=simu_data,
             iter=R, warmup=0, chains=1, refresh=R,
             seed=4838282, algorithm="Fixed_param")
 
@@ -4156,7 +4334,7 @@ x <- sapply(1:length(idx), function(b) if(b %% 2 == 0) idx[b] + 0.5 else idx[b] 
 pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9,n + 1]))
 
 plot(1, type="n", main="Prior Predictive Distribution",
-     xlim=c(-0.5, B + 0.5), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
+     xlim=c(-0.5, 30), xlab="y", ylim=c(0, max(cred[9,])), ylab="")
 
 polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
         col = c_light, border = NA)
@@ -4168,9 +4346,8 @@ polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
 lines(x, pad_cred[5,], col=c_dark, lwd=2)
 
-abline(v=25, col="white", lty=1, lw=2.5)
-abline(v=25, col="black", lty=1, lw=2)
-
+rect(25, 0, 30, max(cred[9,]), col=c("#BBBBBB88"), border=FALSE)
+abline(v=25, col=c("#BBBBBB"), lty=1, lw=2)
 ```
 
 With the truncation we now have exactly zero prior predictive probability above
@@ -4178,6 +4355,20 @@ the extreme observation scale derived from our domain expertise.
 
 ```{r}
 length(simu_ys[simu_ys > 25]) / length(simu_ys)
+```
+
+Similarly the zero proportion summary statistic shows no signs of serious 
+conflict.
+
+```{r}
+zero_pro <- sapply(1:R, function(r) sum(simu_ys[r,] == 0) / length(simu_ys[r,]))
+
+hist(zero_pro, breaks=seq(-0.5*20/R, 1 + 0.5*20/R, 20/R),
+     main="", xlab="Observed Proportion of Zero Counts", 
+     yaxt='n', ylab="Prior Predictive Distribution",
+     col=c_dark, border=c_dark_highlight)
+rect(0.9, 0, 1.01, 50, col=c("#BBBBBB88"), border=FALSE)
+abline(v=0.9, col=c("#BBBBBB"), lty=1, lw=2)
 ```
 
 ### Step Eight: Configure Algorithm {-}
@@ -4195,7 +4386,7 @@ tryCatch({
   simu_list <- t(data.matrix(data.frame(simu_lambdas, simu_thetas, simu_ys)))
 
   # Compile the posterior fit model
-  fit_model = stan_model(file='fit_data4.stan')
+  fit_model = stan_model(file='stan_programs/fit_data4.stan')
 
   ensemble_output <- foreach(simu=simu_list,
                              .combine='cbind') %dopar% {
@@ -4224,7 +4415,7 @@ tryCatch({
     post_mean_lambda <- s[,1]
     post_sd_lambda <- s[,3]
 
-    prior_sd_lambda <- sqrt( (9.21604)**2 / ((3.48681 - 1)**2 * (3.48681 - 1)) )
+    prior_sd_lambda <- sqrt( (9)**2 / ((3.5 - 1)**2 * (3.5 - 1)) )
 
     z_score_lambda <- (post_mean_lambda - simu_lambda) / post_sd_lambda
     contraction_lambda <- 1 - (post_sd_lambda / prior_sd_lambda)**2
@@ -4233,7 +4424,7 @@ tryCatch({
     post_mean_theta <- s[,1]
     post_sd_theta <- s[,3]
 
-    prior_sd_theta <- sqrt( (2.8663)**2 / (4 * (2.8663)**2 * (2 * 2.8663 + 1)) )
+    prior_sd_theta <- sqrt( (3)**2 / (4 * (3)**2 * (2 * 3 + 1)) )
 
     z_score_theta <- (post_mean_theta - simu_theta) / post_sd_theta
     contraction_theta <- 1 - (post_sd_theta / prior_sd_theta)**2
@@ -4252,20 +4443,24 @@ Happily, the diagnostics all look clean.
 ```{r}
 warning_code <- ensemble_output[1,]
 if (sum(warning_code) != 0) {
-  print ("Some simulated posterior fits in the joint ensemble encountered problems!")
+  cat("Some simulated posterior fits in the Bayesian ensemble encountered problems!\n")
   for (r in 1:R) {
     if (warning_code[r] != 0) {
-      print(sprintf('Replication %s of %s', r, R))
+      cat(sprintf('Replication %s of %s\n', r, R))
       util$parse_warning_code(warning_code[r])
-      print(sprintf('Simulated lambda = %s', simu_lambdas[r]))
-      print(sprintf('Simulated theta = %s', simu_thetas[r]))
-      print(" ")
+      cat(sprintf('Simulated lambda = %s\n', simu_lambdas[r]))
+      cat(sprintf('Simulated theta = %s\n', simu_thetas[r]))
+      cat(" ")
     }
   }
 } else {
-  print ("No posterior fits in the joint ensemble encountered problems!")
+  cat("No posterior fits in the Bayesian ensemble encountered problems!\n")
 }
 ```
+
+Again the lone treedepth warning is an issue of efficiency and not validity,
+and given that it occurs only once we won't worry about modifying the default
+`Stan` configuration to accommodate it here.
 
 Similarly the simulation-based calibration histograms exhibit no problematic
 behavior.
@@ -4303,6 +4498,16 @@ segments(x0=0, x1=500, y0=mid, y1=mid, col=c("#999999"), lwd=2)
 plot(sbc_hist, col=c_dark, border=c_dark_highlight, add=T)
 ```
 
+We have to be careful not to imagine structure in the simulation-based 
+calibration histograms that isn't there.  Here the one small bin for the 
+$\lambda$ histogram and the one large bin for the $\theta$ histogram are not 
+inconsistent with the expected variation and, most importantly, they are not 
+accompanied by other deviant bins to form a systematic deviation.  
+
+If we wanted to be especially careful we could go back and rerun the posterior 
+fits with more iterations, and populate the simulation-based calibration 
+histograms with more samples to better resolve and potential deviant behavior.
+
 ### Step Eleven: Inferential Calibration {-}
 
 Moreover, the recovered posteriors for each fit perform reasonable well.
@@ -4327,12 +4532,12 @@ Exhausted, we march on to fit the observed data while also simulating from the
 posterior predictive distribution.
 
 ```{r}
-writeLines(readLines("fit_data4_post_pred.stan"))
+writeLines(readLines("stan_programs/fit_data4_post_pred.stan"))
 ```
 
 ```{r}
 input_data <- read_rdump('workflow.data.R')
-fit <- stan(file='fit_data4_post_pred.stan', data=input_data,
+fit <- stan(file='stan_programs/fit_data4_post_pred.stan', data=input_data,
             seed=4938483, refresh=2000)
 ```
 
@@ -4449,9 +4654,9 @@ possible.
 # Acknowledgements
 
 I thank Sean Talts, Marc Dotson, Tomi Peltola, David Tait, Ludger Sandig,
-Desislava Petkova, arabidopsis, Shira Mitchell, Aki Vehtari, and Adam
-Fleischhacker for helpful comments as well as the feedback from those who have
-attended my courses and talks.
+Desislava Petkova, arabidopsis, Shira Mitchell, Aki Vehtari, Adam
+Fleischhacker, and yureq for helpful comments as well as the feedback from those 
+who have attended my courses and talks.
 
 A very special thanks to everyone supporting me on Patreon:
 Abhishek Vasu, Adam Slez, Aki Vehtari, Alan O'Donnell, Alexander Bartik, 

@@ -5,10 +5,10 @@ check_div <- function(fit, quiet=FALSE) {
   n = sum(divergent)
   N = length(divergent)
 
-  if (!quiet) print(sprintf('%s of %s iterations ended with a divergence (%s%%)',
-                    n, N, 100 * n / N))
+  if (!quiet) cat(sprintf('%s of %s iterations ended with a divergence (%s%%)\n',
+                  n, N, 100 * n / N))
   if (n > 0) {
-    if (!quiet) print('  Try running with larger adapt_delta to remove the divergences')
+    if (!quiet) cat('  Try running with larger adapt_delta to remove the divergences\n')
     if (quiet) return(FALSE)
   } else {
     if (quiet) return(TRUE)
@@ -23,11 +23,11 @@ check_treedepth <- function(fit, max_depth = 10, quiet=FALSE) {
   N = length(treedepths)
 
   if (!quiet)
-    print(sprintf('%s of %s iterations saturated the maximum tree depth of %s (%s%%)',
-                            n, N, max_depth, 100 * n / N))
+    cat(sprintf('%s of %s iterations saturated the maximum tree depth of %s (%s%%)\n',
+                n, N, max_depth, 100 * n / N))
   
   if (n > 0) {
-    if (!quiet) print('  Run again with max_treedepth set to a larger value to avoid saturation')
+    if (!quiet) cat('  Run again with max_treedepth set to a larger value to avoid saturation\n')
     if (quiet) return(FALSE)
   } else {
     if (quiet) return(TRUE)
@@ -43,15 +43,15 @@ check_energy <- function(fit, quiet=FALSE) {
     numer = sum(diff(energies)**2) / length(energies)
     denom = var(energies)
     if (numer / denom < 0.2) {
-      if (!quiet) print(sprintf('Chain %s: E-FMI = %s', n, numer / denom))
+      if (!quiet) cat(sprintf('Chain %s: E-FMI = %s\n', n, numer / denom))
       no_warning <- FALSE
     }
   }
   if (no_warning) {
-    if (!quiet) print('E-FMI indicated no pathological behavior')
+    if (!quiet) cat('E-FMI indicated no pathological behavior\n')
     if (quiet) return(TRUE)
   } else {
-    if (!quiet) print('  E-FMI below 0.2 indicates you may need to reparameterize your model')
+    if (!quiet) cat('  E-FMI below 0.2 indicates you may need to reparameterize your model\n')
     if (quiet) return(FALSE)
   }
 }
@@ -67,17 +67,17 @@ check_n_eff <- function(fit, quiet=FALSE) {
   for (n in 1:N) {
     ratio <- fit_summary[,5][n] / iter
     if (ratio < 0.001) {
-      if (!quiet) print(sprintf('n_eff / iter for parameter %s is %s!',
-                        rownames(fit_summary)[n], ratio))
+      if (!quiet) cat(sprintf('n_eff / iter for parameter %s is %s!\n',
+                      rownames(fit_summary)[n], ratio))
       no_warning <- FALSE
     }
   }
   if (no_warning) {
-    if (!quiet) print('n_eff / iter looks reasonable for all parameters')
+    if (!quiet) cat('n_eff / iter looks reasonable for all parameters\n')
     if (quiet) return(TRUE)
   }
   else {
-    if (!quiet) print('  n_eff / iter below 0.001 indicates that the effective sample size has likely been overestimated')
+    if (!quiet) cat('  n_eff / iter below 0.001 indicates that the effective sample size has likely been overestimated\n')
     if (quiet) return(FALSE)
   }
 }
@@ -91,16 +91,16 @@ check_rhat <- function(fit, quiet=FALSE) {
   for (n in 1:N) {
     rhat <- fit_summary[,6][n]
     if (rhat > 1.1 || is.infinite(rhat) || is.nan(rhat)) {
-      if (!quiet) print(sprintf('Rhat for parameter %s is %s!',
-                        rownames(fit_summary)[n], rhat))
+      if (!quiet) cat(sprintf('Rhat for parameter %s is %s!\n',
+                      rownames(fit_summary)[n], rhat))
       no_warning <- FALSE
     }
   }
   if (no_warning) {
-    if (!quiet) print('Rhat looks reasonable for all parameters')
+    if (!quiet) cat('Rhat looks reasonable for all parameters\n')
     if (quiet) return(TRUE)
   } else {
-    if (!quiet) print('  Rhat above 1.1 indicates that the chains very likely have not mixed')
+    if (!quiet) cat('  Rhat above 1.1 indicates that the chains very likely have not mixed\n')
     if (quiet) return(FALSE)
   }
 }
@@ -132,15 +132,15 @@ check_all_diagnostics <- function(fit, quiet=FALSE) {
 
 parse_warning_code <- function(warning_code) {
   if (bitwAnd(warning_code, bitwShiftL(1, 0)))
-    print("n_eff / iteration warning")
+    cat("n_eff / iteration warning\n")
   if (bitwAnd(warning_code, bitwShiftL(1, 1)))
-    print("rhat warning")
+    cat("rhat warning\n")
   if (bitwAnd(warning_code, bitwShiftL(1, 2)))
-    print("divergence warning")
+    cat("divergence warning\n")
   if (bitwAnd(warning_code, bitwShiftL(1, 3)))
-    print("treedepth warning")
+    cat("treedepth warning\n")
   if (bitwAnd(warning_code, bitwShiftL(1, 4)))
-    print("energy warning")
+    cat("energy warning\n")
 }
 
 # Returns parameter arrays separated into divergent and non-divergent transitions

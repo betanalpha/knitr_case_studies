@@ -4,7 +4,7 @@ data {
 
 generated quantities {
   // Simulate model configuration from prior model
-  real<lower=0> lambda = fabs(normal_rng(0, 5.82337));
+  real<lower=0> lambda = fabs(normal_rng(0, 6));
   real<lower=0, upper=1> theta = beta_rng(1, 1);
   
   // Simulate data from observational model
