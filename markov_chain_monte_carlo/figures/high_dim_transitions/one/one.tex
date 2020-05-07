@@ -27,23 +27,18 @@
   
   \pgfmathsetmacro{\x}{-2}
   \pgfmathsetmacro{\y}{-0.75}
-  \pgfmathsetmacro{\delta}{3}
+  
   \foreach \i in {1, 0.99, ..., 0} {
-    \pgfmathsetmacro{\prop}{100 * exp(-2.0 * \i * \i)};
-    \colorlet{custom}{green!\prop!white};
-    \fill[custom]
-      ({\x - \delta * \i}, \y) 
-      .. controls ({\x - 0.5 * \delta * \i}, \y) 
-        and ({\x - 0.25 * \delta * \i}, {\y - 0.25 * \delta * \i}) 
-      .. ({\x + 0.25 * \delta * \i}, {\y - 0.75 * \delta * \i})
-      .. controls ({\x + \delta * \i}, {\y - 0.5 * \delta * \i}) 
-         and ({\x + \delta * \i}, {\y + 0.5 * \delta * \i}) 
-       .. ({\x + 0.25 * \delta * \i}, {\y + 0.75 * \delta * \i})
-       .. controls ({\x - 0.25 * \delta * \i}, {\y + 0.25 * \delta * \i}) 
-         and ({\x - 0.5 * \delta * \i}, \y) .. ({\x - \delta * \i}, \y);
+    \pgfmathsetmacro{\prop}{100 * exp(-7.0 * \i * \i)};
+    \colorlet{custom}{green!\prop!white};   
+    \draw[line width={5 * \i}, color=custom] 
+      (5 + \x, 0 + \y) .. controls (2 + \x, 0 + \y) and (1 + \x, 2 + \y) .. (0.5 + \x, 2 + \y) 
+                       .. controls (0 + \x, 2 + \y) and (-0.5 + \x, 0.75 + \y) .. (-0.5 + \x, 0 + \y) 
+                       .. controls (-0.5 + \x, -0.75 + \y) and (0 + \x, -2 + \y) .. (0.5 + \x, -2 + \y) 
+                       .. controls (1 + \x, -2 + \y) and (2 + \x, 0 + \y) ..  (5 + \x, 0 + \y);
   }
-  \fill[color=dark] (-2, -0.75) circle (7pt); 
-  \fill[color=light] (-2, -0.75) circle (5pt);
+  \fill[color=dark] (\x, \y) circle (7pt); 
+  \fill[color=light] (\x, \y) circle (5pt); 
   
   \begin{scope}
     \clip (-6, -3) rectangle (12, 6);

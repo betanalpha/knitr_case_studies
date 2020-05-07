@@ -1,7 +1,7 @@
 ---
 title: "Markov Chain Monte Carlo in Practice"
 author: "Michael Betancourt"
-date: "December 2019"
+date: "May 2020"
 bibliography: markov_chain_monte_carlo.bib
 csl: institute-of-mathematical-statistics.csl
 link-citations: yes
@@ -34,8 +34,8 @@ As we saw in my
 stochastic methods offer the _possibility_ of quantifying high-dimensional
 target distributions with increasing accuracy given a corresponding increase in
 computation.  In particular, stochastic methods efficiently compress the target
-distribution into a finite ensemble of samples that naturally concentrate in its
-typical set.  _Monte Carlo_ methods utilize exact samples to construct
+distribution into a finite ensemble of samples that naturally concentrate within
+its typical set.  _Monte Carlo_ methods utilize exact samples to construct
 incredibly well-behaved estimators, but generating those exact samples is not
 feasible for most practical problems.  _Markov chain Monte Carlo_ generates
 _correlated_ samples that share some of the same benefits as the Monte Carlo
@@ -59,10 +59,10 @@ coming from applied fields, oversimplify the method and give readers a
 treacherous overconfidence in the method which can facilitate a poor
 quantification, and hence understanding, of the target distributions they study.
 More formal treatments are more thorough but they're also overwhelmed with
-intense technical detail that is irrelevant to practitioners.  In this case
-study I attempt a compromise between these two extremes, introducing all of the
-important concepts needed to understand how Monte chain Monte Carlo performs in
-practice with clear motivations and without any extraneous technical detail.
+intense technical detail that is largely irrelevant to practitioners.  In this
+case study I attempt a compromise between these two extremes, introducing all of
+the important concepts needed to understand how Monte chain Monte Carlo performs
+in practice with clear motivations and without any extraneous technical detail.
 This compromise, however, will still be significantly more comprehensive than
 most introductory treatments so the reader should adjust their expectations
 accordingly.  Provided you can estimate those expectations accurately, of
@@ -74,7 +74,12 @@ that generate Markov chains, Markov chain Monte Carlo estimators derived from
 those Markov chains, and the delicate Markov chain Monte Carlo central limit
 theorem that is critical for the practical utility of this approach.  Finally we
 will discuss how these theoretical concepts manifest in practice and carefully
-study the behavior of a explicit implementation of Markov chain Monte Carlo.
+study the behavior of an explicit implementation of Markov chain Monte Carlo.
+[Section 2.4](#sec:n_step) and [Section 3.3](#sec:estimator-convergence)
+expand on some more technical considerations but are not strictly necessary for
+practical use of Markov chain Monte Carlo any may be skipped.  They do, however,
+connect the conceptual ideas introduced here to the more formal concepts in the
+statistical literature and are recommended for anyone looking for more context.
 
 There is a large literature of Markov chain Monte Carlo that both compliments
 and contrasts with the presentation given here, and hence may prove useful to
@@ -83,7 +88,7 @@ the reader.  [@Neal:1993] is a nice high-level introduction while
 on some of the theoretical and practical aspects of Markov chain Monte Carlo,
 with lots of references to further literature.  For a more theoretical treatment
 I recommend starting with the excellent review article [@RobertsEtAl:2004]
-and the text [@Rosenthal:2019] before consider the dense _enchiridions_,
+and the text [@Rosenthal:2019] before considering the dense _enchiridions_,
 [@MeynEtAl:2009] and [@DoucEtAl:2018].  For a history of Markov chain
 Monte Carlo see [@Betancourt:2018a].
 
@@ -94,16 +99,23 @@ arbitrarily long sequences of _independent_ points in the ambient space,
 $$
 \{ q_{1}, \ldots, q_{N} \} \in Q,
 $$
-such that the ensemble average of an real-valued, integrable function,
+such that the ensemble average of any real-valued, integrable function $f$,
 $$
 \hat{f}_{N}^{\text{MC}} = \frac{1}{N} \sum_{n = 1}^{N} f(q_{n}),
 $$
-defines an _asymtpotically consistent_ estimator of the corresponding
+is _asymptotically consistent_.  More formally the pushforward distribution of
+the ensemble average converges to a Dirac distribution concentrated at the
+target expectation value,
+$$
+\lim_{N \rightarrow \infty} \pi_{f^{\text{MC}}_{N}} = \delta_{\mathbb{E}_{\pi}[f]}.
+$$
+In other words the ensemble average in this limit evaluates to the target
 expectation value,
 $$
-\lim_{N \rightarrow \infty} \hat{f}_{N}^{\text{MC}} = \mathbb{E}_{\pi}[f].
+\lim_{N \rightarrow \infty} \hat{f}_{N}^{\text{MC}} = \mathbb{E}_{\pi}[f],
 $$
-These estimators are denoted _Monte Carlo estimators_.
+for all but a potentially finite number of realized samples.  These ensemble
+averages are denoted _Monte Carlo estimators_.
 
 By construction these exact samples concentrate in the typical set of the target
 distribution, or the _target typical set_.  As the sample size grows they define
@@ -117,59 +129,114 @@ knitr::include_graphics("figures/typical_set_samples/typical_set_samples.png")
 <br><br>
 </center>
 
-Samples provide an accurate quantification even as the target typical set
-becomes relatively narrow in higher dimensions.  This robustness to the specific
-geometry of the typical set helps explain why Monte Carlo estimators have no
-apparent dimensionality dependence -- all of the hard work needed to scale with
-dimension has already been absorbed in the generation of the exact samples.
+Importantly samples provide an accurate quantification even as the target
+typical set becomes relatively narrow in higher dimensions.  This robustness to
+the specific geometry of the typical set helps explain why Monte Carlo
+estimators have no apparent dimensionality dependence -- all of the hard work
+needed to scale with dimension has already been absorbed in the generation of
+the exact samples.
 
-Asymptotic consistency isn't particularly useful in practice because, well,
-infinity is just too big to be reasonably approximated by the small number of
-samples we can generate with only finite computational resources.  What makes
-the Monte Carlo method so useful is that the behavior of Monte Carlo estimators
-after only a finite number of samples can also be quantified.
+Asymptotic consistency, however, isn't particularly useful in practice because
+we'll never be able to generate infinity large ensembles with our finite
+computational resources.  For Monte Carlo estimators to be practical we need to
+know _how_ they converge to the limiting Dirac distribution.  Fortunately the
+finite ensemble behavior of Monte Carlo estimators can also be quantified to
+high accuracy.
 
-The estimator for any _square-integrable_ real-valued function, meaning that
-both $\mathbb{E}_{\pi}[f]$ and $\mathbb{E}_{\pi}[f^{2}]$ exist and are finite,
-satisfies a central limit theorem,
+The Monte Carlo estimator for any _square-integrable_ real-valued function,
+meaning that both $\mathbb{E}_{\pi}[f]$ and $\mathbb{E}_{\pi}[f^{2}]$ exist and
+are finite, satisfies a _central limit theorem_.  The central limit theorem
+states that as the number of samples increases the pushforward distribution of
+_standardized_ Monte Carlo estimators converges towards a probability
+distribution specified by a unit normal probability density function,
 $$
+\lim_{N \rightarrow \infty}
 \frac{ \hat{f}_{N}^{\text{MC}} - \mathbb{E}_{\pi}[f] }
-{\text{MC-SE}[f] }
-\sim \mathcal{N}(0, 1),
+{ \text{MC-SE}_{N}[f] }
+\sim \text{normal}(0, 1),
 $$
-where the _Monte Carlo Standard Error_, $\text{MC-SE}[f]$, is defined by
+where the _Monte Carlo standard error_, $\text{MC-SE}_{N}[f]$, is defined by
 $$
-\text{MC-SE}[f]
+\text{MC-SE}_{N}[f]
 = \sqrt{ \frac{ \text{Var}_{\pi}[f]}{N} }.
 $$
-This means that we can quantify the error in the Monte Carlo estimator of a
-square-integrable function _probabilistically_.  Moreover, because we know how
-the standard error varies with the number of samples, $N$, we can determine how
-many exact samples we need to achieve a given precision.  Keep in mind, however,
-that this error bound is probabilistic -- while most samples will yield Monte
-Carlo estimators with error near $\text{MC-SE}_{N}[f]$ some samples will
-inevitably yield much larger errors.
+
+Critically the relative difference between the exact probability distribution
+of the standardized estimators and the distribution specified by the unit normal
+probability density function is inversely proportional to the ensemble size and
+hence rapidly decays with increasing $N$.  Once we've generated a reasonably
+large ensemble, at least ten samples or so, the difference becomes negligible
+and for each _fixed_ ensemble size we have
+$$
+\frac{ \hat{f}_{N}^{\text{MC}} - \mathbb{E}_{\pi}[f] }
+{ \text{MC-SE}_{N}[f] }
+\sim \text{normal}(0, 1),
+$$
+or upon rearrangement,
+$$
+\hat{f}_{N}^{\text{MC}}
+\sim \text{normal}(\mathbb{E}_{\pi}[f], \text{MC-SE}_{N}[f]).
+$$
+In other words once the central limit theorem becomes an accurate approximation
+we can use the Monte Carlo standard error to quantify the total error of each
+Monte Carlo estimator for a given $N$.  While asymptotic consistency tells us
+the limiting  distribution of the Monte Carlo estimators, the central limit
+theorem tells us how the estimator distribution converges to that limit for
+reasonably large but finite ensembles.
+
+Technically the error quantification provided by the central limit theorem
+requires the exact variance, $\text{Var}_{\pi}[f]$, in order to evaluate the
+Monte Carlo standard error.  In practice we won't know the variance exactly but
+if $f^{2}$ is square-integrable, meaning that $\mathbb{E}_{\pi}[f]$,
+$\mathbb{E}_{\pi}[f^{2}]$, and $\mathbb{E}_{\pi}[f^{4}]$ exist and are finite,
+then we can approximate the variance with _another_ Monte Carlo estimator
+$$
+\text{Var}_{\pi}[f] \approx \widehat{\text{Var}}_{\pi}[f],
+$$
+to give the _empirical_ Monte Carlo standard error,
+$$
+\widehat{\text{MC-SE}}_{N}[f]
+= \sqrt{ \frac{ \widehat{\text{Var}}_{\pi}[f]}{N} }.
+$$
+Conveniently the error introduced by this approximation scales inversely with
+the ensemble size and so is negligible exactly when the errors in assuming
+exact normality are negligible.
+
+One nice feature of the exact and empirical Monte Carlo standard errors is their
+fixed scaling with the ensemble size, $N$.  In particular this allows us to
+immediately determine how many exact samples we need to achieve a given error,
+or how many more samples we need to generate in order to improve the error of
+an existing estimator by a certain amount.
+
+Besides the difficulty of generating exact samples in practice, the main
+limitation of the Monte Carlo method is that the error quantification is
+probabilistic.  While most samples will yield Monte Carlo estimators with error
+within a few $\text{MC-SE}_{N}[f]$ of the exact value, some samples will
+inevitably suffer from much larger errors and we can never quite be sure when
+we'll get unlucky.
 
 # Markov Chain of Command
 
-Let's formalize our objective as computation with a target distribution, $\pi$,
-defined on the ambient space $Q$ equipped with the $\sigma$-algebra
-$\mathcal{Q}$.  Markov chains define discrete paths through $Q$ that explore the
-ambient space.  Under mild conditions that exploration will focus on a
-particular probability distribution, which we hopefully will be able to
-manipulate into the target distribution itself.
+Markov chain Monte Carlo applies the Monte Carlo method to the _correlated_
+ensembles generated by Markov chains.  Markov chains define discrete paths
+through the ambient space that with careful engineering will explore the typical
+set of a specified target distribution.
 
 ## Markov Transitions
 
-In order to explore a target probability distribution we first have to be able
-to move through the ambient space $Q$.  One natural way to define jumps across
-$Q$ is to consider the product space, $Q \times Q$, where the first component
-defines the point at which we can start and the second component defines the
-points to which we can jump.
+Let's say that we want to evaluate expectation values with respect to a target
+distribution $\pi$ defined on the ambient space $Q$ equipped with the
+$\sigma$-algebra $\mathcal{Q}$.
 
-We can then define a distribution of possible jumps by specifying a probability
-distribution over the second $Q$ for _each_ possible initial point in the first
-$Q$.  This collection of probability distributions then defines a conditional
+In order to explore a target probability distribution we first have to be able
+to move through the ambient space.  One natural way to define jumps across $Q$
+is to consider the product space, $Q \times Q$, where the first component
+defines the points at which we can start and the second component defines the
+points to which we can jump.  We can then introduce a distribution of possible
+jumps by specifying a probability distribution over the second $Q$ for _each_
+possible initial point in the first $Q$.
+
+This collection of probability distributions, however, is exactly a conditional
 probability distribution over the product space,
 $$
 \begin{alignat*}{6}
@@ -178,9 +245,9 @@ T :\; &Q \times \mathcal{Q}& &\rightarrow& \; &[0, 1]&
 &(q, B)& &\mapsto& &T [B \mid q]&,
 \end{alignat*}
 $$
-which we denote a _Markov transition distribution_; _Markov_ refers to the fact
+which we denote a _Markov transition distribution_.  _Markov_ refers to the fact
 that each transition distribution depends only on a single point in the ambient
-space, as opposed to depending multiple points.  In practice we typically
+space, as opposed to depending on multiple points.  In practice we typically
 specify a Markov transition with a conditional probability density function
 within a given parameterization of the ambient space,
 $$
@@ -212,8 +279,7 @@ knitr::include_graphics("figures/transitions/one/one.png")
 </center>
 
 An exact sample from the probability distribution $T [\cdot \mid q_{0}]$
-realizes an explicit jump, or _Markov transition_, to a new point in the ambient
-space,
+realizes an explicit jump, or _transition_, to a new point in the ambient space,
 $$
 \tilde{q}_{1} \sim T(q_{1} \mid q_{0}).
 $$
@@ -230,9 +296,9 @@ knitr::include_graphics("figures/transitions/two/two.png")
 </center>
 
 Provided that we can readily generate exact samples from the transition
-distributions, the implementation of these Markov transitions is
-straightforward in a programming environment like `R`.  Let's consider a
-two-dimensional ambient space $Q = \mathbb{R}^{2}$ with the coordinate functions
+distribution the implementation of these Markov transitions is straightforward
+in a programming environment like `R`.  Let's consider a two-dimensional ambient
+space $Q = \mathbb{R}^{2}$ with the coordinate functions
 $$
 \begin{alignat*}{6}
 \varpi_{1} :\; &Q& &\rightarrow& \; &\mathbb{R}&
@@ -399,12 +465,12 @@ knitr::include_graphics("figures/transitions/many/many.png")
 </center>
 
 Because of this sequential sampling, each point $q_{n}$ in the sequence is
-conditionally dependent on only the previous point, $q_{n - 1}$.  If we fix
-$q_{n - 1}$ then $q_{n}$ will be independent of all previous points, but if
-$q_{n - 1}$ itself is sampled from $q_{n - 2}$ then $q_{n}$ will in general
-assume a correlation with $q_{n - 2}$ as well.  Because we are sampling all of
-the points after the initial one, the Markov chain will define a correlated
-ensemble of samples.
+conditionally dependent on only the previous point, $q_{n - 1}$: if we fix
+$q_{n - 1}$ then $q_{n}$ will be independent of all previous points.  If
+$q_{n - 1}$ itself is sampled from $q_{n - 2}$, however, then $q_{n}$ will in 
+general assume a correlation with $q_{n - 2}$ as well.  Because we are sampling 
+all of the points after the initial one, the Markov chain will define a 
+correlated ensemble of samples.
 
 The correlations spanning a Markov chain are evident if we compare multiple
 Markov chains generated from the same initial point.  The local correlations
@@ -465,11 +531,11 @@ $$
 $$
 is known as the _stationary_ or _invariant_ distribution of the Markov
 transition distribution.  Well-behaved Markov transition distributions admit a
-unique stationary distribution, and it is that stationary distribution that the
-Markov chains seek out.
+unique stationary distribution, and it is within the _stationary typical set_
+that the Markov chains are most likely to wonder.
 
-No matter where we are in the ambient space Markov transition distributions
-will concentrate towards the stationary typical set.
+No matter where we are in the ambient space the typical set of each Markov
+transition distribution will concentrate towards the stationary typical set.
 
 <center>
 <br>
@@ -483,6 +549,14 @@ Consequently realized transitions will jump towards the typical set with
 exceedingly high probability.  After jumping the circumstance repeats, with the
 following transition distribution once again concentrating towards the typical
 set.
+
+<center>
+<br>
+```{r, out.width = "50%", echo=FALSE}
+knitr::include_graphics("figures/high_dim_transitions/one_to_two/one_to_two.png")
+```
+<br><br>
+</center>
 
 <center>
 <br>
@@ -523,7 +597,7 @@ If we can engineer a Markov transition whose stationary distribution is our
 target distribution then we might even be able to use those points to construct
 expectation value estimators just as we did with Monte Carlo.
 
-## Extra Credit: Distributions of Markov Chains
+## Extra Credit: Distributions of Markov Chains {#sec:n_step}
 
 In order to formalize the intuition that Markov chains explore the stationary
 distribution we have to construct intermediate probability distributions that
@@ -535,12 +609,12 @@ Markov chain.
 First let's consider initializing our Markov chain with a sample from some
 initial probability distribution,
 $$
-\tilde{q}_{0} \sim \rho(q_{0}).
+\tilde{q}_{0} \sim \rho.
 $$
 We can always set this initial distribution to a Dirac distribution concentrated
 at a specific point,
 $$
-\rho(q) = \delta(q - q_{0}),
+\rho = \delta_{q_{0}},
 $$
 to recover the fixed initialization that we used above.
 
@@ -574,6 +648,7 @@ $$
 T(q_{2} \mid q_{1}) \, T(q_{1} \mid q_{0}) \, \rho(q_{0}).
 \end{align*}
 $$
+
 Iterating this convolution along with each transition we construct the
 _$N$-step distributions_,
 $$
@@ -586,14 +661,21 @@ $$
 which quantify the possible points our Markov chain could reach after $N$
 transitions.
 
-We can then formalize the concept of Markov chain convergence as the convergence
-of the $N$-step distributions themselves.  In particular by asking to what
-probability distribution, $\omega$, they converge,
+Equivalently the initial distribution and the Markov transition distribution
+can be used to construct a probability distribution over the product space,
+$Q^{N}$, whose $n$th component captures the state of the Markov chain after
+$n$ transitions.  From this perspective the $n$-step distributions are just
+the pushforward of the product distribution along the $n$th component projection
+function.
+
+We can formalize the concept of Markov chain convergence as the convergence of
+the $N$-step distributions themselves.  In particular we can ask to what
+probability distribution, $\omega$, the $N$-step distributions converge,
 $$
-\lim_{N \rightarrow \infty} T^{N} \rho[B] = \omega[B]
+\lim_{N \rightarrow \infty} T^{N} \rho = \omega.
 $$
-for any $B \in \mathcal{Q}$.  Equivalently, we can consider the convergence of
-probability density function representations of the $N$-step distributions.
+Equivalently, we can consider the convergence of probability density function
+representations of the $N$-step distributions.
 
 <center>
 <br>
@@ -610,7 +692,7 @@ $$
 $$
 defined by
 $$
-T^{N} \pi = T \pi = \pi.
+T \pi = \pi.
 $$
 
 The technical conditions under which a limit exists, and the $N$-step
@@ -618,18 +700,97 @@ distribution converges to the stationary distribution are subtle.  A critical
 aspect of developing new Markov chain Monte Carlo implementations is being able
 derive those conditions and how they might be obstructed in practice.
 
+### Convergence of N-Step Distributions {#sec:n_step_convergence}
+
+A well-defined limiting distribution is necessary for well-behaved Markov
+chains, but the practical utility of a given Markov transition really depends on
+how quickly the $N$-step distributions converge to that limiting distribution.
+
+In order to quantify how the $N$-step distributions converge we need some notion
+of distance between probability distributions in order to compare them to the
+limiting stationary distribution as a function of the number of iterations, $N$.
+Given a distance function $\vert\vert \cdot \vert\vert$ we say that the $N$-step
+distributions converge towards a limiting probability distribution if we can
+always find a sufficiently large $N$ such that the distance between the all of
+the subsequent $N$-step distributions is smaller than any given value.  More
+formally, for any arbitrarily small distance $\epsilon \in \mathbb{R}^{+}$ there
+has to be some finite integer that can possibly depend on the initial
+distribution, $N(\rho)$, such that
+$$
+\vert\vert T^{n} \rho - \pi \vert \vert \le \epsilon
+$$
+for all $n > N(\rho)$.
+
+In practice we aim for a more constructive result by bounding these distances
+with a monotonically decreasing function of $N$,
+$$
+\vert\vert T^{N} \rho - \pi \vert \vert \le f(\rho, N),
+$$
+which implies the formal definition of convergence but allows us to quantify
+the _rate_ of convergence using the form of the bound, $f(\rho, N)$.
+
+One of the most common definitions of distance between probability distributions
+is the _total variation distance_.  There are multiple equivalent definitions
+of the total variation distance, each with their own intuitions, but my favorite
+is as the largest difference of probabilities allocated across the ambient
+$\sigma$-algebra,
+$$
+\vert\vert \rho - \pi \vert\vert_{\mathrm{TV}}
+=
+\mathrm{sup}_{B \in \mathcal{Q}} \left| \rho[B] - \pi[B] \right|.
+$$
+Here $\mathrm{sup}$ refers to the _supremum_, which is just a very pedantic
+upper bound.
+
+If the decay of the total variation distance is bounded above by a polynomial
+in $N$,
+$$
+\vert\vert T^{N} \rho - \pi \vert \vert_{\mathrm{TV}}
+\le C(\rho) (N + 1)^{-\beta},
+$$
+then we say that the Markov transition has _polynomial ergodicity_.  Polynomial
+ergodicity is a relatively weak condition due to the slow decay of the bound,
+but it some circumstances it is enough to ensure well-behaved Markov chains.
+
+When the decay of the total variation distance is bounded above by a geometric
+series in $N$,
+$$
+\vert\vert T^{N} \rho - \pi \vert \vert_{\mathrm{TV}}
+\le C(\rho) r^{N},
+$$
+for some $r < 1$, we say that the Markov transition has
+_geometric ergodicity_.  These geometric series decay exponentially fast with
+the number of iterations which places a much stronger constraint on the
+convergence of the $N$-step distributions.
+
+Stronger still is _uniform ergodicity_ where the constant in the geometric bound
+does not depend on the initial distribution,
+$$
+\vert\vert T^{N} \rho - \pi \vert \vert_{\mathrm{TV}}
+\le C r^{N}.
+$$
+Uniform ergodicity guarantees rapid convergence no matter where we initialize
+our Markov chains, but results this strong are typically limited to ambient
+spaces with finite boundaries.
+
+Sufficiently strong ergodicity bounds ensure that as $N$ increases the $N$-step
+distributions become more and more similar to each other and the stationary
+distribution.  This increasing uniformity prevents transient behaviors that
+might hinder the effective exploration of Markov chains after only a finite
+number of iterations.
+
 ### Spectral Theory
 
-To better understand the convergence of the $N$-step distribution let's
-consider the relatively simple circumstance where our ambient space is an $I$
-dimensional vector space where we can analyze the Markov transition using linear
-algebra.  In this case a conditional probability distribution like a Markov
-transition distribution can be represented with a square matrix whose columns
-sum to one.  Similarly probability distributions can be represented with vectors
-whose elements sum to one.
+Another way to analyze the convergence of the $N$-step distributions is through
+the Markov transtition itself.  To motivate this approach let's consider a
+discrete space with only $I$ elements where we can analyze the Markov transition
+using linear algebra.  In this case a conditional probability distribution like
+a Markov transition distribution can be represented with a square matrix whose
+columns sum to one.  Similarly probability distributions can be represented with
+vectors whose elements sum to one.
 
-The Markov transition matrix admits $I$ eigenvalues,
-$\left\{\lambda_{1}, \ldots, \lambda_{I} \right\}$, and eigenvectors,
+The Markov transition matrix admits the $I$ eigenvalues,
+$\left\{\lambda_{1}, \ldots, \lambda_{I} \right\}$, and the $I$ eigenvectors,
 $\left\{\pi_{1}, \ldots, \pi_{I} \right\}$ that satisfy
 $$
 T \, v_{i} = \lambda_{i} \, v_{i}.
@@ -637,22 +798,25 @@ $$
 The collection of eigenvalues is also known as the _eigenspectrum_ of the
 Markov transition.
 
-Because of the summation constraint across the columns the eigenvalues are
-bounded between zero and one,
+Because of the summation constraint across the columns the magnitude of the
+eigenvalues are bounded by one,
 $$
-0 \le \lambda_{i} \le 1,
+-1 \le \lambda_{i} \le 1,
 $$
 with at least one of the eigenvalues saturating the upper bound.  Without loss
 of generality let's define our labels such that the smallest indices correspond
-to the largest eigenvalues,
+to the eigenvalues with the largest magnitudes,
 $$
-\lambda_{1} \ge \lambda_{2} \ge \ldots \ge \lambda_{I - 1} \ge \lambda_{I}.
+| \lambda_{1} | \ge
+| \lambda_{2} | \ge \ldots \ge
+| \lambda_{I - 1} | \ge
+| \lambda_{I} |.
 $$
 
 Let's now make the assumption that our Markov transition matrix is not
-degenerate so that all of the eigenvalues are distinct, and the eigenvectors
-form a complete basis for our space.  In this case only one eigenvalue saturates
-the upper bound,
+degenerate so that all of the eigenvalues are distinct and the eigenvectors
+form a complete basis for our ambient space.  In this case one and only one
+eigenvalue saturates the upper bound,
 $$
 \lambda_{1} = 1, \, \lambda_{i \ne 1} < 1,
 $$
@@ -661,13 +825,13 @@ distribution of the transition,
 $$
 T \, \pi_{1} = \lambda_{1} \, \pi_{1} = \pi_{1}.
 $$
-We can also expand any initial distribution in the eigenvectors of the Markov
+
+If we expand an initial distribution in the eigenvectors of the Markov
 transition matrix,
 $$
-\rho = \sum_{i = 1}^{I} \alpha_{i} \, v_{i}.
+\rho = \sum_{i = 1}^{I} \alpha_{i} \, v_{i}
 $$
-
-The $1$-step distribution is given by a single matrix multiplication,
+then the $1$-step distribution is given by a single matrix multiplication,
 $$
 \begin{align*}
 T \rho
@@ -698,33 +862,33 @@ T^{N} \rho
 + \sum_{i = 2}^{I} \alpha_{i} \, \lambda_{i}^{N} \, v_{i}.
 \end{align*}
 $$
-Because all of the eigenvalues in the second term are smaller than one, the
-powers $\lambda_{i}^{N}$ quickly vanish and suppress the parts of the initial
-distribution that aren't aligned with the stationary distribution.  So long as
-the initial distribution has some overlap with the stationary distribution,
+Because the magnitude of all of the eigenvalues in the second term are smaller
+than one, the powers $\lambda_{i}^{N}$ quickly vanish and suppress the parts of
+the initial distribution that aren't aligned with the stationary distribution.
+So long as the initial distribution has some overlap with the stationary
+distribution,
 $$
 \alpha_{1} > 0,
 $$
 the $N$-step distributions will converge to the stationary distribution
-exponentially fast with a rate proportional to the _spectral gap_,
+exponentially fast with a rate proportional to the _absolute spectral gap_,
 $$
-\delta = \lambda_{1} - \lambda_{2} = 1 - \lambda_{2}.
+\delta = \lambda_{1} - | \lambda_{2} | = 1 - | \lambda_{2} |.
 $$
 
 With a significant amount of careful mathematical machinery these ideas can be
-generalized from discrete spaces with only a finite number of elements to
-continuous spaces with an infinite number of elements that we typically work
-with in practice.  The resulting _operator spectral theory_ treats a Markov
-transition as an operator that consumes the $(N - 1)$-step distribution and
-returns the $N$-step distribution, working out the eigenspectra and spectral
-gaps of these operators and providing formal methods for studying how the
-$N$-step distributions converge.
+generalized from finite spaces to the infinite spaces with which we typically
+with in practice.  The resulting _spectral theory_ treats a Markov transition as
+an operator that consumes the $(N - 1)$-step distribution and returns the
+$N$-step distribution, working out the infinte-dimensional eigenspectra and
+absolute spectral gaps of these operators.  These then provide the foundation
+for formal methods of studying how the $N$-step distributions converge.
 
 # Markov Chain Monte Carlo Estimators
 
 As we apply our tailored Markov transition to an initial point we generate a
 Markov chain that finds and then explores the typical set of the stationary
-distribution.  If the chain is long enough then the points in the chain might
+distribution.  If the Markov chain is long enough then these points might
 provide a sufficiently thorough quantification of the stationary typical set to
 serve as the basis for an accurate stochastic estimator, just as exact samples
 provide the basis for Monte Carlo estimators.
@@ -734,7 +898,7 @@ chain Monte Carlo estimators in this way, they will converge to the exact
 expectation values only under certain conditions.  Even then that convergence
 often leaves much to be desired.
 
-## Asymptotic Convergence
+## Infinite-Iteration Convergence
 
 Given a Markov chain with points $\{\tilde{q}_{0}, \ldots, \tilde{q}_{N} \}$
 we can construct a _Markov chain Monte Carlo estimator_ in the same way that we
@@ -744,28 +908,30 @@ $$
 =
 \frac{1}{N + 1} \sum_{n = 0}^{N} f(\tilde{q}_{n}).
 $$
-The question is then how these estimators behave as the chains grow to be
-infinity long, in particular, are they asymptotically consistent,
+The question is then how the pushforward distribution of these estimators
+behaves as the chains grow to be infinitely long.  In particular, are they
+at least asymptotically consistent,
 $$
-\lim_{N \rightarrow \infty} \hat{f}^{\text{MCMC}}_{N}
-= \mathbb{E}_{\pi}[f]?
+\lim_{N \rightarrow \infty} \pi_{f^{\text{MCMC}}_{N}}
+= \delta_{\mathbb{E}_{\pi}[f]}?
 $$
 
-Unfortunately consistency is not universal.  There are a few circumstances that
-can block a Markov chain from exploring the entirely of the stationary
-distribution and recovering asymptotically consistent estimators.  To ensure
-good asymptotic behavior we need to avoid two particular behaviors.
+Unlike Monte Carlo estimators, the consistency of Markov chain Monte Carlo
+estimators is not universal.  There are a few circumstances that can block a
+Markov chain from exploring the entirety of the stationary distribution and
+recovering asymptotically consistent estimators.  To ensure good limiting
+behavior we need to avoid two particular behaviors.
 
 A Markov transition is _reducible_ if Markov chains initialized within some
-neighborhood are not able to escape that neighborhood and have the opportunity
-to explore the entirely of the ambient space.  In this case the ambient space
-might decompose into a number of partitions, with Markov chains restricted to
-the partition in which they're initialized; the resulting chains are able to
-explore the extent of their initial partition, but they're not able to explore
-any of the other partitions.  Consider, for example, a Markov transition over
-the real numbers that jumps only to points of the same sign -- a chain
-initialized at a positive number will only ever be able to jump to other
-positive numbers, completely ignoring all of the negative numbers.
+neighborhood are not able to escape that neighborhood and hence do not have the
+opportunity to explore the entirety of the ambient space.  In this case the
+ambient space might decompose into a number of partitions, with Markov chains
+restricted to the partition in which they're initialized; the resulting chains
+are able to explore the extent of their initial partition, but they're not able
+to explore any of the other partitions.  For example consider a Markov
+transition over the real numbers that jumps only to points of the same sign -- a
+Markov chain initialized at a positive number will only ever be able to jump to
+other positive numbers, completely ignoring all of the negative numbers.
 
 To ensure that Markov chains can explore anywhere in the ambient space as needed
 we have to engineer a Markov transition that is _irreducible_ and will be able
@@ -778,33 +944,30 @@ Irreducibility ensures that Markov chains have the opportunity to explore any
 nice neighborhood in the ambient space at least once, but it offers no assurance
 that Markov chains will be able to explore those neighborhoods _repeatedly_.
 A _periodic_ Markov transition is susceptible to _cycles_, neighborhoods that
-trap Markov chains and prevent them from exploring any other points.  Even if a
-Markov chain is irreducible and has a chance to reach anywhere in ambient space
-from the initial point, it can be absorbed in one of these cycles and suffer
-from insufficient exploration ever after.
+trap Markov chains and prevent them from exploring any other points afterwards.
+Even if a Markov chain is irreducible and has a chance to reach anywhere in 
+ambient space from the initialization, it can be absorbed in one of these cycles 
+and suffer from insufficient exploration ever after.
 
 A Markov transition is _aperiodic_ if it is not vulnerable to any cycles.  The
-typical way to avoid cycles is to ensure that a Markov transition always
-assigns a nonzero probability to staying exactly at the initial point.
+typical way to avoid cycles in practice is to ensure that a Markov transition
+always assigns a nonzero probability to staying at the initial point.
 
-Together irreducibility and aperiodicity of a Markov transition ensure that any
-resulting Markov chains will be able to reach anywhere within the ambient space
-they need to not only once but also over and over again.  In other words the
-chains will be able to first find the typical set and then quantify it with
-increasingly refined resolution.  This guarantees that the Markov chain Monte
-Carlo estimator for any integrable function will be asymptotically consistent,
+Together irreducibility and aperiodicity of a Markov transition ensure that
+realized Markov chains are _recurrent_.  Recurrent Markov chains from most
+initializaitons will explore any neighborhood of the ambient space not just a
+finite number of times but a _countably infinite number of times_ as the chains
+are run infinitely long.  Consequently these Markov chains will be able to find
+the typical set and then quantify it with increasingly refined resolution.  This
+guarantees that the Markov chain Monte Carlo estimator for any integrable
+function will be asymptotically consistent,
 $$
-\lim_{N \rightarrow \infty} \hat{f}^{\text{MCMC}}_{N}
-= \mathbb{E}_{\pi}[f].
+\lim_{N \rightarrow \infty} \pi_{f^{\text{MCMC}}_{N}} = \delta_{\mathbb{E}_{\pi}[f]}
 $$
-for _almost all_ initial points or initial distributions.
-
-In order to generalize this result to include _all_ initial points we have to
-improve irreducibility and aperiodicity to a technical condition called
-_Harris recurrence_.  Harris recurrence of a Markov transition ensures that all
-realized Markov chains will be able to return to a neighborhood not just a
-finite number of times but also a _countably infinite number of times_ as the
-chains are run infinitely long.
+for all but a finite number of initializations.  In order to generalize this 
+result to include _all_ initial points we have to improve the recurrence implied 
+by irreducibility and aperiodicity to a technical condition called 
+_Harris recurrence_.
 
 While these technical conditions might seem esoteric and irrelevant to the
 _practice_ of Markov chain Monte Carlo estimation, they are in fact absolutely
@@ -812,7 +975,8 @@ critical to its robust use.  We can always evaluate Markov chain Monte Carlo
 estimators from a given Markov chain, but those estimates will not have _any_
 relation to the exact expectation values unless these conditions are met.  Only
 by carefully validating these conditions can we have any confidence that the
-estimators provide useful information about the expectation values of interest.
+estimators might provide useful information about the expectation values of
+interest.
 
 As a consumer of Markov chain Monte Carlo this means that one should use Markov
 transitions designed by a trusted source with the expertise to verify these
@@ -820,15 +984,15 @@ conditions. At the same time those interested in designing their own Markov
 transitions should invest the time to understand these conditions enough to be
 able to verify them.
 
-## Preasymptotic Convergence
+## Finite-Iteration Convergence
 
 The asymptotic consistency of Markov chain Monte Carlo estimators is not
 guaranteed, but it in practice it will hold for most well-behaved Markov
 transitions.  Exactly how useful, however, is that asymptotic consistency?
 
 Asymptotic consistency is relevant only in the limit of infinitely long Markov
-chains.  Unfortunately infinity is _really_ big.  No, bigger than that; keep
-going; on and on; forever.  With finite computation we will always be bound to
+chains.  Unfortunately infinity is _really_ big.  No, bigger than that.  Keep
+going.  On and on, forever.  With finite computation we will always be bound to
 finite Markov chains and never reach that asymptotic limit where the estimators
 converge to the exact expectation values.  Asymptotic convergence is a
 probabilistic happily ever after, and unfortunately just as much of a fairy
@@ -837,22 +1001,22 @@ tale.
 Consequently what is more relevant for the practical utility of Markov chain
 Monte Carlo is not the behavior of Markov chain Monte Carlo estimators after an
 infinite number of iterations but rather their behavior after only a
-_finite number_ of iterations.  In other words the asymptotic behavior isn't as
-important as the _preasymptotic_ behavior that defines _how_ the estimators
-converge.  While asymptotic consistency is often required for good preasymptotic
-behavior, it is nowhere near _sufficient_.  Estimators that converge
-asymptotically can exhibit atrocious behavior for any finite number of
-iterations.
+_finite number_ of iterations.  In other words the limiting behavior isn't as
+important as _how_ the estimators converge.  While asymptotic consistency is
+typically required for good finite-iteration behavior, it is nowhere near
+_sufficient_.  Estimators that converge asymptotically can exhibit atrocious
+behavior for any finite number of iterations.
 
-The preasymptotic behavior of a Markov chain Monte Carlo estimators depends on
-the intimate details of the Markov transition.  Ensuring good preasymptotic
-behavior is made all the more challenging by how subtly pathologies often
-manifest, and hence how difficult it can be to find them empirically.  To
-demonstrate the intricacies of presasymptotic behavior let's consider how Markov
-chain Monte Carlo estimators behave under ideal, and not so ideal,
-circumstances.  Those interested in a more formal perspective can stay to the
-end where we will more formally define the conditions for good preasymptotic
-convergence.
+The finite-iteration behavior of a Markov chain Monte Carlo estimators depends
+on the intimate details of the Markov transition.  Ensuring good
+finite-iteration behavior is made all the more challenging by how subtly
+pathologies often manifest, and hence how difficult it can be to identify them
+empirically.  To demonstrate the intricacies of finite-iteration behavior let's
+consider how Markov chain Monte Carlo estimators behave under ideal, and not so
+ideal, circumstances.  Those interested in a more formal perspective can
+continue all the way through [Section 3.2.3](#sec:estimator_convergence) where
+we will more formally define the convergence of Markov chain Monte Carlo
+estimators.
 
 ### Ideal Circumstances
 
@@ -881,9 +1045,9 @@ set.  The Markov transition distributions outside of the typical set will be
 heavily skewed towards the typical set and any realized Markov chains will
 evolve almost as if they were attracted to all of that probability mass.
 
-Because it takes time to reach the typical set, the beginning of the Markov chain
-will poorly inform Markov chain Monte Carlo estimators.  Estimators constructed
-entirely from these early iterations will exhibit significant bias.
+Because it takes time to reach the typical set, the beginning of the Markov
+chain will poorly inform Markov chain Monte Carlo estimators.  Estimators
+constructed entirely from these early iterations will exhibit significant bias.
 
 <center>
 <br>
@@ -923,36 +1087,36 @@ knitr::include_graphics("figures/ideal_mcmc_phases/asymptotic_mixing.png")
 <br><br>
 </center>
 
-As we will see in [Section 3](#sec:mcmc_clt) the convergence of the estimators
-in this final phase reproduces the square root convergence of Monte Carlo
-estimators, allowing us to quantity the estimator error and its scaling with
-iteration. At least, however, under these so far ill-defined "ideal"
-circumstances.
+As we will see in [Section 4](#sec:mcmc_clt), under these so far ill-defined
+"ideal" circumstances the convergence of the estimators in this final phase
+will reproduce the square root convergence of Monte Carlo estimators, allowing
+us to quantity the estimator error and its scaling with iteration.
 
-This ideal behavior is characterized by an initial _transient_ phase where the
-Markov chain realizations find and then settle into the stationary typical set
-following by an _equilibrium_ phase where the Markov chains steadily survey that
-typical set to inform increasingly precise Markov chain Monte Carlo estimators.
-The consistency of the exploration in the equilibrium phase is what
+Ultimately this ideal behavior is characterized by an initial _transient_ phase
+where the Markov chain realizations find and then settle into the stationary
+typical set followed by an _equilibrium_ phase where the Markov chains steadily
+survey that typical set to inform increasingly precise Markov chain Monte Carlo
+estimators.  The consistency of the exploration in the equilibrium phase is what
 distinguishes it from the transient phase -- once a Markov chain has
-equilibrated its loses any indication of where it started and we shouldn't be
-able to tell where any subsequence is located within the full Markov chain.
-This inability to tell where we are in the Markov chain is also known as
-_stationarity_.
+equilibrated it loses any residue of where it started.  At the same time any
+finite subsequence will behave identically to any other.  This inability to tell
+where we are in the Markov chain is also known as _stationarity_.
 
 ### Adverse Circumstances
 
-Now that we've laid out the qualitative behavior of Markov chain Monte Carlo
-estimators under ideal circumstances let's consider what happens under less
-ideal, dare I say _normal_, circumstances.  These adverse circumstances should
-manifest in transient behavior that persists throughout the entire Markov chain,
-indicating that an equilibrium doesn't exist or we yet to reach it.
+Now that we've laid out the qualitative convergence behavior of Markov chain
+Monte Carlo estimators under ideal circumstances let's consider what happens
+under less ideal, dare I say _typical_, circumstances.  These adverse
+circumstances should manifest in transient behavior that persists throughout the
+entire Markov chain, indicating that an equilibrium doesn't exist or we are yet
+to reach it.
 
-There are countless deviations from ideal circumstances where we can accurately
-quantify Markov chain Monte Carlo estimator errors, but here we will consider
-only two: _suspensions_ and _metastabilities_.  In order to use Markov chain
-Monte Carlo responsible we need to be able to identifying the signs of these
-deviations empirically.
+There are countless deviations from ideal circumstances, but here we will 
+consider only two: _suspensions_ and _metastabilities_.  In order to know when
+not to trust Markov chain Monte Carlo estimators, and use Markov chain Monte
+Carlo responsibly, we need to be able to identify the signs of these deviations
+empirically so that we know when to not trust the accuracy of the resulting 
+Markov chain Monte Carlo estimators.
 
 #### Suspended Animation
 
@@ -993,7 +1157,7 @@ Let's presume that our Markov chain has already found the typical set so that it
 just needs to explore.  When exploring away from the pinch the Markov chain will
 have no problem evolving through the smooth geometry.  The trace plot exhibits
 the incremental exploration and the estimator error appears to converge towards
-an equilibrium value biased above the exact value of zero.
+an equilibrium value, albeit one biased above the exact value.
 
 <center>
 <br>
@@ -1004,7 +1168,7 @@ knitr::include_graphics("figures/patho_mcmc_phases/suspension/initial.png")
 </center>
 
 The Markov chain, however, can't enjoy that smooth geometry forever.  Eventually
-it will have to confront the pinch and that's where our problems begin.
+it will have to confront the pinch, and that's where our troubles begin.
 
 Most Markov transitions feature a length scale that characterizes how far the
 realized transitions jump on average.  When that length scale is too large the
@@ -1018,11 +1182,11 @@ chains, however, prove to be rather stubborn in their quest for consistency.
 When a Markov chain gets close to the pinch there is a very small probability
 that the blunt transitions will jump deeper into the pinch rather than passing
 by it.  After passing by it enough times it will eventually take a detour into
-the pinch; once there the Markov chain becomes entangled by the strong curvature
-and freezes, no longer able to continue on its way.  The _suspended_ Markov
-chain drags the Markov chain Monte Carlo estimator with it, inducing a crude
-correction to the initial positive bias!  This correction, however, quickly
-overcompensates and forces a negative bias in the estimator.
+the pinch and once there the Markov chain will become entangled by the strong
+curvature and freeze, no longer able to continue on its way.  The _suspended_
+Markov chain drags the Markov chain Monte Carlo estimator with it, inducing a
+crude correction to the initial positive bias!  This correction, however,
+quickly overcompensates and forces a negative bias in the estimator.
 
 <center>
 <br>
@@ -1035,7 +1199,7 @@ knitr::include_graphics("figures/patho_mcmc_phases/suspension/freeze.png")
 Eventually transitions will jump back out of the pinch, allowing the Markov
 chain to escape and explore the less frustrating regions of the typical set
 once again.  As it explores away from the pinch the estimators are pulled back
-up resulting in another positive bias, albeit a slightly smaller one.
+up resulting in another positive, although slightly smaller, bias.
 
 <center>
 <br>
@@ -1052,10 +1216,11 @@ the Markov chain is run infinitely long will these biases cancel to give the
 exact value.
 
 These transient suspensions indicate that we lack the equilibrium needed for
-well-behaved Markov chain Monte Carlo estimators.  If we can empirically
-differentiate the different behavior of Markov chains near and far from the
-pinch then we might be able to identify the lack of equilibrium, and poor
-behavior of the resulting estimators, using the history of a Markov chain.
+Markov chain Monte Carlo estimators that are well-behaved after only a finite
+number of iterations.  If we can empirically differentiate the behavior of
+Markov chains near and far from the pinch then we might be able to identify the
+lack of equilibrium, and poor behavior of the resulting estimators, using the
+history of the Markov chain itself.
 
 #### Metastable
 
@@ -1075,7 +1240,7 @@ but in practice we might exhaust our computational resources long before that
 happens.
 
 Probability distributions that exhibit metastabilities are also known as
-_multimodal_ distributions with each metastability corresponding to a
+_multimodal_ distributions, with each metastability corresponding to a
 particular mode of the representative probability density function.  Here I will
 use the metastability nomenclature to focus on the structure of the probability
 distribution and not any particular probability density function representation.
@@ -1125,261 +1290,78 @@ knitr::include_graphics("figures/patho_mcmc_phases/metastability/final.png")
 When exploring a stationary distribution with metastabilities the proper
 equilibrium is defined not by the exploration _within_ a single metastability
 but rather the exploration _between_ metastabilities.  The initial exploration
-of just one metastability is in fact just transient behavior masquerading as
-equilibrium behavior.
+of just one metastability is just transient behavior masquerading as equilibrium
+behavior.  Local equilibria mimicking the full equilibrium makes metastability
+particularly hard to identify in practice.
 
-While the full equilibrium will be reached after a finite number of iterations,
-that number might be far too long for Markov chain Monte Carlo to be feasible
-in practice.  Local equilibria mimicking the full equilibrium makes
-metastability particularly hard to identify in practice.
+While the full equilibrium might be reached after a finite number of iterations,
+that number might be far too large for Markov chain Monte Carlo to be feasible
+in practice.
 
-### Extra Credit: Ergodicity
+## Extra Credit: Theoretical Convergence {#sec:estimator-convergence}
 
-In order to formalize good preasymptotic convergence we need to consider not a
-single Markov chain realization but rather all of them through the the $N$-step
-distributions.  In particular, we need to define some notion of distance between
-probability distributions in order to quantify how the $N$-step distributions
-converge to the stationary distribution with increasing number of iterations,
-$N$.
+In [Section 2.4.2](#sec:n_step_convergence) we used the total variation distance
+to quantify the convergence of the $N$-step distributions towards the stationary
+distribution.  We can also use the total variation distance, and distances like
+it, to quantify the convergence of expectation values with respect to the
+$N$-step distributions and, eventually, the convergence of Markov chain Monte
+Carlo estimators.
 
-We say that the $N$-step distributions converge towards the target probability
-distribution if we can always find a sufficiently large $N$ such that the
-distance between the all of the subsequent $N$-step distributions is smaller
-than any given value.  More formally, for any arbitrarily small distance
-$\epsilon \in \mathbb{R}^{+}$ there has to exist some $N$ such that
+The total variation distance can be defined in terms of differences in
+probability allocations but it can also be defined in terms of the differences
+of certain expectation values.  In particular let $\mathcal{F}$ be the space of
+continuous functions with outputs in bounded interval $[-1, 1]$,
 $$
-\vert\vert T^{n} \rho - \pi \vert \vert \le \epsilon
+-1 \le f(q) \le 1, \, \forall q \in Q.
 $$
-for all $n > N$.  In practice we aim for a more constructive result by bounding
-these distances with a monotonically decreasing function of $N$,
+We can write the total variation distance in terms of the supremum of 
+differences of expectation values over this space,
 $$
-\vert\vert T^{N} \rho - \pi \vert \vert \le f(\rho, N),
+\vert\vert \pi_{1} - \pi_{2} \vert \vert_{\mathrm{TV}}
+= \frac{1}{2} \mathrm{sup}_{f \in \mathcal{F}}
+\left| \mathbb{E}_{\pi_{1}}[f] - \mathbb{E}_{\pi_{2}}[f] \right|.
 $$
-which implies the formal definition of convergence but allows us to quantify
-the _rate_ of convergence using the form of the bound, $f(\rho, N)$.
 
-One of the most common definitions of distance between probability distributions
-is the _total variation distance_.  There are multiple equivalent definitions,
-each with their own intuitions, but my favorite is as the largest difference
-of probabilities allocated across the ambient $\sigma$-algebra,
-$$
-\vert\vert \rho - \pi \vert\vert_{\mathrm{TV}}
-=
-\mathrm{sup}_{B \in \mathcal{Q}} \left| \rho[B] - \pi[B] \right|.
-$$
-Here $\mathrm{sup}$ refers to the _supremum_, which is just a very pedantic
-maximum.  Another distance metric that is becoming increasingly popular is the
-theoretical statistics literature is the _Wasserstein distance_.
-
-If the decay of the total variation distance is bounded above by a polynomial
-in $N$,
-$$
-\vert\vert T^{N} \rho - \pi \vert \vert_{\mathrm{TV}}
-\le C(\rho) (N + 1)^{-\beta},
-$$
-then we say that the Markov transition features _polynomial ergodicity_.
-Polynomial ergodicity is a relatively weak condition due to the slow decay of
-the bound, but it some circumstances it is enough to ensure good preasymptotic
-behavior of Markov chain Monte Carlo estimators.
-
-When the decay of the total variation distance is bounded above by a geometric
-series in $N$,
+Consequently geometric ergodicity of the $N$-step distributions
 $$
 \vert\vert T^{N} \rho - \pi \vert \vert_{\mathrm{TV}}
 \le C(\rho) r^{N},
 $$
-for some $r < 1$, we say that the Markov transition features
-_geometric ergodicity_.  These geometric series decay exponentially fast with
-the number of iterations which places a much stronger constraint on the
-convergence of the $N$-step distribution and, under most circumstances, the
-corresponding Markov chain Monte Carlo estimators as well.
-
-Stronger still is _uniform ergodicity_ where the constant in the geometric bound
-does not depend on the initial distribution,
+implies that the $N$-step expectation value of functions in $\mathcal{F}$ also 
+converge geometrically to the stationary expectation values,
 $$
-\vert\vert T^{N} \rho - \pi \vert \vert_{\mathrm{TV}}
-\le C r^{N}.
-$$
-Uniform ergodicity guarantees rapid convergence no matter where we initialize
-our Markov chains, but results this strong are typically limited to _compact_
-ambient spaces.
-
-Sufficiently strong ergodicity bounds ensure that the $N$-step distributions
-become more and more similar to each other and the stationary distribution.
-This increasing uniformity prevents transient behaviors that hinders the
-preasymptotic convergence Markov chain Monte Carlo estimators, at least for
-sufficiently large $N$.  In other words strong ergodicity ensures that an
-equilibrium exists, although not necessarily that we'll reach it within a finite
-number of iterations.  For continuous ambient spaces geometric ergodicity is
-almost always sufficient for good preasymptotic behavior.
-
-# The Markov Chain Monte Carlo Central Limit Theorem {#sec:mcmc_clt}
-
-Monte Carlo methods are so exceptionally useful because Monte Carlo estimators
-satisfy a central limit theorem that allows us to quantify their errors
-probabilistically.  We have already seen that Markov chain Monte Carlo
-estimators are much more fragile than Monte Carlo estimators, but in the best
-case they can still achieve lofty heights.  In particular under sufficiently
-ideal circumstances Markov chain Monte Carlo estimators also satisfy a central
-limit theorem.  The conditions for that _Markov chain Monte Carlo central limit
-theorem_, however, are significantly more complex.
-
-Let's consider a square integrable function, $f : Q \rightarrow \mathbb{R}$, and
-assume that our Markov transition distribution enjoys a central limit theorem.
-In this case the probability distribution of realized Markov chain Monte Carlo
-estimators from _sufficiently long Markov chains_ is specified by a Gaussian
-probability density function,
-$$
-\hat{f}^{\text{MCMC}}_{N} \sim \mathcal{N}( \mathbb{E} [f], \text{MCMC-SE}[f] ),
-$$
-where the _Markov chain Monte Carlo standard error_ is defined as
-$$
-\begin{align*}
-\text{MCMC-SE}[f]
-&= \sqrt{ \frac{ \text{Var} [f] }{ \text{ESS}[f] } }
-\\
-&= \sqrt{ \frac{ \text{Var} [f] }{ \lambda[f] \cdot N} }.
-\end{align*}
-$$
-The mysterious term $\text{ESS}[f] = \lambda[f] \cdot N$ is denoted the
-_effective sample size_.
-
-Just as with Monte Carlo the existence of a central limit theorem allows us to
-quantify the error of Markov chain Monte Carlo estimators, and even control the
-errors by adjusting the length of a given Markov chain.  This principled
-understanding of the estimator error elevates the method into the realm of
-robust probabilistic computation.
-
-For the pedants reading along, this more colloquial form of the Markov chain
-Monte Carlo central limit theorem is technically incorrect as the effective
-sample size depends on the total number of draws.  A more formal statement of
-the theorem moves all of the terms dependent on $N$ to the left hand side,
-$$
-\frac{ \hat{f}^{\text{MCMC}}_{N} - \mathbb{E}_{\pi} [ f ] }
-{ \lambda[f] \cdot N }
-\sim
-\mathcal{N} \! \left( 0, 1 \right).
-$$
-Once again this results holds only for sufficiently large $N$, a detail that we
-will discuss in more depth below.
-
-In this section we will carefully inspect each element of the Markov chain
-Monte Carlo central limit theorem in theory, and how it can be implemented in
-practice.  We will begin by discussing the need for sufficiently long chains
-before examining the intimate details of the effective sample size.  Finally
-we will take a more practical perspective and consider how we can approximate
-each of the terms in the central limit theorem and then attempt to verify its
-existence in the first place.
-
-## Forgetting From Where You Come
-
-One of the more subtle aspects of Markov chains is that they never quite forget
-from where they came.  Unless they're seeded with an exact sample from the
-stationary distribution every Markov chain will contain some residual influence
-from the initialization.  With each iteration the newest point in a Markov chain
-looks more like an exact sample from the stationary distribution, but after only
-a finite number of iterations the points will always remember from where they
-came.
-
-When we construct Markov chain Monte Carlo estimators we average over the
-_entire_ Markov chain, including not only the newest points but also the older
-points that are more strongly influenced by the initialization.  Even under
-ideal circumstances this results in a small bias in Markov chain Monte Carlo
-estimators that decays linearly with the number of iterations.
-
-For sufficiently long chains this bias is negligible, but for small chains it
-cannot be ignored.  One of the most important consequences of this bias is when
-trying to construct Markov chain Monte Carlo estimators from many _parallel_
-Markov chains.  Averaging over many chains might reduce the variance of the
-estimators but it can't reduce the bias.  If all of the chains are short then
-this bias will persist and dominate the error of the pooled estimator.
-
-In order for a Markov chain Monte Carlo central limit theorem to be a reasonable
-approximation we need to run our Markov chains long enough for the memories of
-the initialization, and the residual bias in Markov chain Monte Carlo estimators,
-to become negligible.  This forgetfulness starts to formalize the concept of
-equilibrium that we introduced in the previous section; the transient phase is
-characterized by a significant influence from the initialization where as
-equilibrium is characterized by a vanishing influence.  While the influence
-never exactly disappears, under ideal circumstances there is threshold where the
-influence suddenly plummets that can be used to separate the regimes.
-
-This heuristic perspective will be useful when we attempt to verify a central
-limit theorem in practice.  While we don't have many ways to quantify how much
-memory of its initialization a Markov chain retains, we can look for any
-transient behavior it manifests.
-
-## Extra Credit: Quantifying Initialization Bias
-
-We can approximately quantify the influence of the initialization on the
-evolution of a Markov chain by analyzing its effect on the $N$-step
-distributions.  If we ignore correlations between the states then the expected
-Markov chain Monte Carlo estimator of a function $f$ becomes the average of the
-expectation values of that function with respect to each of the $N$-step
-distributions,
-$$
-\begin{align*}
-\mathbb{E} \left[ \hat{f}_{N}^{\text{MCMC}} \right]
-&=
-\mathbb{E} \left[ \frac{1}{N + 1} \sum_{n = 0}^{N} f(q_{n}) \right]
-\\
-&=
-\frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}[f(q_{n})]
-\\
-&\approx
-\frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}_{T^{n} \rho}[f].
-\end{align*}
+\left| \mathbb{E}_{\pi_{1}}[f] - \mathbb{E}_{\pi_{2}}[f] \right|
+\le 2 \, C(\rho) \, r^{N},
+\, \forall f \in \mathcal{F}.
 $$
 
-The bias of the estimator is defined by
+This then allows us to quantify the finite-iteration error of Markov chain Monte
+Carlo estimators corresponding to functions in $\mathcal{F}$.  For example the 
+bias of one of these estimators is given by
 $$
 \begin{align*}
 \left|
 \mathbb{E} \left[ \hat{f}_{N}^{\text{MCMC}} \right]
 - \mathbb{E}_{\pi}[f]
 \right|
-&\approx
+&=
 \left|
-\frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}_{T^{n} \rho}[f] - \mathbb{E}_{\pi}[f]
+\Big( \frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}_{T^{n} \rho}[f] \Big)
+- \mathbb{E}_{\pi}[f]
 \right|
 \\
-&\approx
+&=
 \left|
 \frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}_{T^{n} \rho}[f]
 - \frac{1}{N + 1} \sum_{n = 0}^{N} \mathbb{E}_{\pi}[f]
 \right|
 \\
-&\approx
+&=
 \frac{1}{N + 1} \left|
-\sum_{n = 0}^{N}
-\mathbb{E}_{T^{n} \rho}[f] - \mathbb{E}_{\pi}[f]
+\sum_{n = 0}^{N} \Big(
+\mathbb{E}_{T^{n} \rho}[f] - \mathbb{E}_{\pi}[f] \Big)
 \right|
 \\
-&\le
-\frac{1}{N + 1} \sum_{n = 0}^{N} \Bigg|
-\mathbb{E}_{T^{n} \rho}[f] - \mathbb{E}_{\pi}[f]
-\Bigg|.
-\end{align*}
-$$
-
-If we have a geometrically ergodicity Markov transition,
-$$
-\vert\vert T^{n} \rho - \pi \vert \vert_{TV} \le C(\rho) \, r^{N},
-$$
-then we can bound the difference in expectations between the $N$-step
-distribution $T^{n} \rho$ and the stationary distribution $\pi$,
-$$
-\left| \mathbb{E}_{T^{n} \rho}[f] - \mathbb{E}_{\pi}[f] \right|
-\le C(\rho) \, r^{N},
-$$
-for sufficiently nice functions $f$.  Plugging this bound into the bias equation
-then gives
-$$
-\begin{align*}
-\left|
-\mathbb{E} \left[ \hat{f}_{N}^{\text{MCMC}} \right]
-- \mathbb{E}_{\pi}[f]
-\right|
 &\le
 \frac{1}{N + 1} \sum_{n = 0}^{N} \Big|
 \mathbb{E}_{T^{n} \rho}[f] - \mathbb{E}_{\pi}[f]
@@ -1395,18 +1377,156 @@ $$
 \frac{ C(\rho) }{N + 1} \frac{ 1 - r^{N + 1} }{1 - r}.
 \end{align*}
 $$
-Consequently the approximate bias monotonically decreases with an increasing
-number of iterations, at least for the functions where geometric ergodicity
-implies a bound on the distance between $N$-step expectation values and
-stationary expectation values.  In truth the bias should even larger because
-nonzero correlations between the point in the Markov chain maintain the effect
-of the initialization even more strongly.
+Because $r < 1$, the bias will monotonically decay at a geometric rate if our
+Markov transition is geometrically ergodic.
 
-Geometric ergodicity is typically sufficient to ensure that the exact
-initialization bias vanishes fast enough that a central limit theorem will hold
-for sufficiently long Markov chains.  The Markov chain Monte Carlo central
-limit theorem will only ever be an approximation, but an arbitrarily accurate
-one for sufficiently long Markov chains.
+Results like this, however, are limited to only the functions in $\mathcal{F}$.
+Unfortunately this space of bounded functions isn't expressive enough to capture
+the functions whose expectation values are of interest in typical applications.
+Consequently Markov chain Monte Carlo estimator convergence based on total 
+variation bounds can have limited practical utility.
+
+To do better we have to consider more general _integral probability metrics_
+that bound the difference in expectation values over larger classes of
+functions [@Muller:1997].  A general integral probability metric is defined by a
+_generating class_ of real-valued functions, $\mathcal{F}$, and the 
+corresponding distance
+$$
+\vert\vert \pi_{1} - \pi_{2} \vert \vert_{\mathrm{IPM}(\mathcal{F})}
+= C \, \mathrm{sup}_{f \in \mathcal{F}}
+\left| \mathbb{E}_{\pi_{1}}[f] - \mathbb{E}_{\pi_{2}}[f] \right|,
+$$
+for some constant $C$.  
+
+For example if we can establish a _drift function_, $V$, that quantifies how
+strongly a Markov transition contracts then we can extend the total variation
+integral probability metric to a _$V$-norm_ integral probability metric whose
+generating class spans all of the functions bounded by $V$ [@RobertsEtAl:1997b],
+$$
+-V(q) \le f(q) \le V(q), \, \forall q \in Q.
+$$
+The stronger the contraction of a Markov transition the larger the drift 
+function we can establish and the larger the generating class will be, and the
+more useful $V$-norm integral probability metric bounds will be.
+
+In the statistical literature the _Wasserstein-$2$ distance_, defined by a
+generating class of all square integrable functions with respect to a given
+measure, and the _Wasserstein-$1$ distance_, defined by a generating class of
+all integrable functions with respect to a given measure, are becoming
+increasingly common.
+
+Because they completely quantify the behavior of Markov chain Monte Carlo
+estimators after only a finite number of iterations, explicit bounds on the
+convergence of the $N$-step distributions to the stationary distribution with
+respect to a sufficiently rich integral probability metric are prized by
+theoretical statisticians.  Unfortunately the practical utility of these bounds
+is often less satisfying.
+
+Bounds that have been worked out in the literature, for example, are often
+limited to small generating classes that don't capture the expectation values
+of practical interest.  Moreover the bounds often apply to only simple Markov
+transition distributions that have little to do with the sophisticated Markov
+transition distributions of applied interest.  For instance Wasserstein-$2$ and
+Wasserstein-$1$ bounds are typically limited to Markov transition distributions
+whose stationary distributions are specified with strongly log concave
+probability density functions that are rare outside of the exponential family.
+Finally the bounds themselves are often too loose to ofter any practical
+constraint on convergence [@QinEtAl:2020].
+
+Some integral probability bounds, however, have other, more practical uses than
+directly constraining convergence.  In particular while geometric ergodicity in
+the total variation distance is often weak as a direct constraint, it implies
+that Markov chain Monte Carlo estimators of the expectation values of
+well-behaved functions satisfy a central limit theorem.  In other words the
+practical utility of establishing geometric ergodicity is not so much an
+explicit bound but rather a verification that we can probabilistically quantify
+the convergence of Markov chain Monte Carlo estimators just as we did for Monte
+Carlo estimators.
+
+# The Markov Chain Monte Carlo Central Limit Theorem {#sec:mcmc_clt}
+
+Monte Carlo methods are so exceptionally useful because Monte Carlo estimators
+satisfy a central limit theorem that allows us to quantify their errors.  We
+have already qualitatively seen that Markov chain Monte Carlo estimators can be
+much more fragile than Monte Carlo estimators, but every now and then they can 
+useful, too.  In particular under sufficiently ideal circumstances Markov chain
+Monte Carlo estimators satisfy their own central limit theorem.  The conditions
+for that _Markov chain Monte Carlo central limit theorem_, however, are 
+significantly more complex.
+
+Let's consider a square integrable function, $f : Q \rightarrow \mathbb{R}$, and
+assume that our Markov transition distribution enjoys a central limit theorem.
+In this case the probability distribution of realized Markov chain Monte Carlo
+estimators from sufficiently long Markov chains is approximately specified by
+a Gaussian probability density function,
+$$
+\hat{f}^{\text{MCMC}}_{N} \sim \text{normal}( \mathbb{E} [f], \text{MCMC-SE}[f] ),
+$$
+where the _Markov chain Monte Carlo standard error_ is defined as
+$$
+\begin{align*}
+\text{MCMC-SE}[f]
+&= \sqrt{ \frac{ \text{Var} [f] }{ \text{ESS}[f] } }
+\\
+&= \sqrt{ \frac{ \text{Var} [f] }{ \lambda[f] \cdot N} }.
+\end{align*}
+$$
+The mysterious term $\text{ESS}[f] = \lambda[f] \cdot N$ is called the
+_effective sample size_.
+
+Just as with Monte Carlo the existence of a central limit theorem allows us to
+quantify the error of Markov chain Monte Carlo estimators, and even control the
+errors by adjusting the length of a given Markov chain.  This principled
+understanding of the estimator error elevates the method into the realm of
+robust probabilistic computation.
+
+In this section we will carefully inspect each element of the Markov chain
+Monte Carlo central limit theorem in theory, and how it can be implemented in
+practice.  We will begin by discussing the need for sufficiently long chains
+before examining the intimate details of the effective sample size.  Finally
+we will take a more practical perspective and consider how we can approximate
+each of the terms in the central limit theorem and then attempt to verify its
+existence in the first place.
+
+## Forgetting From Where You Come
+
+One of the more subtle aspects of Markov chains is that they never quite forget
+from where they came.  Unless they're seeded with an exact sample from the
+stationary distribution every Markov chain will contain some residual influence
+from points outside of the stationary typical set.  With each iteration the 
+newest point in a Markov chain looks more like an exact sample from the 
+stationary distribution, but after only a finite number of iterations the points 
+will always have some memory of from where they came.
+
+When we construct Markov chain Monte Carlo estimators we average over the
+_entire_ Markov chain, including not only the newest points but also the older
+points that are more strongly influenced by the initialization.  Even under
+ideal circumstances this results in a small bias in Markov chain Monte Carlo
+estimators that decays linearly with the number of iterations.  For an
+derivation of this bias see [Section 3.3](#sec:estimator-convergence).
+
+For sufficiently long chains this bias is negligible, but for small chains it
+cannot be ignored.  One of the most important consequences of this bias is when
+trying to construct Markov chain Monte Carlo estimators from many _parallel_
+Markov chains.  Averaging over many chains with the same initialization might
+reduce the variance of the estimators but it can't reduce the bias.  If all of
+the chains are short then this bias will persist and dominate the error of the
+pooled estimator.
+
+In order for a Markov chain Monte Carlo central limit theorem to be a reasonable
+approximation we need to run our Markov chains long enough for the memories of
+the initialization, and the residual bias in Markov chain Monte Carlo estimators,
+to become negligible.  This forgetfulness starts to formalize the concept of
+equilibrium that we introduced in the previous section; the transient phase is
+characterized by a significant influence from the initialization where as
+equilibrium is characterized by a vanishing influence.  While the influence
+never exactly disappears, under ideal circumstances there is threshold where the
+influence suddenly plummets that we can use to separate the regimes.
+
+This heuristic perspective will be useful when we attempt to verify a central
+limit theorem in practice.  While we don't have many ways to quantify how much
+memory of its initialization a Markov chain retains, we can look for any
+transient behavior it manifests.
 
 ## The Effective Sample Size
 
@@ -1415,8 +1535,8 @@ move our attention to the effective sample size that defines the Markov chain
 Monte Carlo standard error.  The effective sample size, commonly denoted
 $\text{ESS}$ or $N_{\text{eff}}$, is a critical component of the Markov chain
 Monte Carlo central limit theorem and may even come to stalk not only your
-dreams but also your waking hours.  For example, on trip to Germany a few years
-ago I encountered not only the essBar cafe,
+dreams but also your waking hours.  On trip to Germany a few years ago I
+encountered not only the essBar cafe,
 
 <center>
 <br>
@@ -1444,9 +1564,9 @@ central limit theorem we immediately see that the effective sample size
 determines how many exact samples we would need to construct a Monte Carlo
 estimator for the given expectation value with the same standard error.  If we
 think about exact samples as containing a certain about of information about the
-stationary distribution through the lens of a given function then we can think
-of the effective sample size as a measure of how much information is contained
-in our Markov chain relative to an exact ensemble of the same size.
+stationary distribution, at least through the lens of a given function, then we
+can think of the effective sample size as a measure of how much information is
+contained in our Markov chain relative to an exact ensemble of the same size.
 
 When discussing the performance of a Markov transition it's often easier to
 reason about the number of effective samples relative to the total number of
@@ -1497,27 +1617,27 @@ the _asymptotic variance_ of our Markov chain Monte Carlo estimators.
 ### Autocorrelations
 
 Because the distribution of each new point in a Markov chain is conditionally
-dependent on the previous point, neighboring points will be correlated.  These
-neighboring correlations then propagate through the entire Markov chain,
+dependent on the previous point, neighboring points will be dependent.  These
+neighboring dependencies then propagate through the entire Markov chain,
 inducing weaker dependencies between remote points as well.  The more
 concentrated each Markov transition distribution is around the initial point,
-the stronger these correlations will be and the more sluggishly the Markov chain
+the stronger these dependencies will be and the more sluggishly the Markov chain
 will meander through the ambient space.
 
 Importantly these dependencies can, and will, manifest differently for different
 functions whose expectation values are being estimated.  Some functions
 $f : Q \rightarrow \mathbb{R}$ might not be strongly influenced by the
-features of each point that exhibit the strongest correlations, limiting how
-much the correlations in the Markov chain points, $q_{n}$, propagate to the
-function values, $f(q_{n})$.  On the other hand some functions might isolate
-exactly those features and enhance the correlations in the function values.
-When discussing correlation we have to be careful to specify not only the
-Markov transition distribution but also which output functions we are interested
-in evaluating.
+features of each point that exhibit the strongest dependencies, limiting how
+much the dependencies in the Markov chain points, $q_{n}$, propagate to
+correlations between the function values, $f(q_{n})$.  On the other hand some
+functions might isolate exactly those features and enhance the correlations
+between the function values.  When discussing correlation we have to be careful
+to specify not only the Markov transition distribution but also which functions
+we are interested in evaluating.
 
 When the output function values are only weakly correlated, either because the
-Markov chain itself is weakly correlated or the function output largely ignores
-the correlations, then they will make large jumps from one iteration to another.
+Markov chain itself is weakly dependent or the function output largely ignores
+the correlations, they will make large jumps from one iteration to another.
 
 <center>
 <br>
@@ -1546,26 +1666,26 @@ to the stationary distribution,
 $$
 \mu_{f} = \mathbb{E}_{\pi}[f].
 $$
-The difference $(f(q_{n_{1}}) - \mu_{f})$ then quantifies how the function value
+The difference $f(q_{n_{1}}) - \mu_{f}$ then quantifies how the function value
 at the $n_{1}$th iteration of the Markov chain deviates from that expected
-value, while $(f(q_{n_{2}}) - \mu_{f})$ quantifies the deviation at the
+value, while $f(q_{n_{2}}) - \mu_{f}$ quantifies the deviation at the
 $n_{2}$th iteration.
 
-The expectation value of the product of these differences across all possible
+The expectation value of the product of these deviations across all possible
 realizations of the Markov chain defines the _autocovariance_ between the
 function values,
 $$
 \kappa_{n_{1}, n_{2}}[f]
-= \mathbb{E}[ ( f (q{n_{2}}) - \mu_{f} ) ( f(q_{n_{1}}) - \mu_{f}) ].
+= \mathbb{E}[ ( f (q_{n_{2}}) - \mu_{f} ) ( f(q_{n_{1}}) - \mu_{f}) ].
 $$
-"auto" refers to the fact that we are comparing the output at different
+"auto" here refers to the fact that we are comparing the output at different
 iterations of the _same_ Markov chain, as opposed to trying to compare states
 between _different_ Markov chains.
 
 Once we've settled into an equilibrium the autocovariance will depend not on
-which points we're comparing but rather on just the relative number of
-iterations between them.  In this case our Markov chains become _stationary_ and
-the autocorrelations depend only on the _lag_, $l$,
+which particular points we're comparing but rather on just the relative number
+of iterations between them.  In this case our Markov chains become _stationary_
+and the autocorrelations depend only on the _lag_, $l$,
 $$
 \begin{align*}
 \kappa_{n_{1}, n_{2}} [f]
@@ -1574,14 +1694,11 @@ $$
 \\
 &=
 \kappa_{n_{1}, n_{1} + l} [f]
-\\
-&=
-\kappa_{n_{3}, n_{3} + l} [f]
 \end{align*}
 $$
-for any $n_{1}$ and $n_{3}$ past the equilibration of the Markov chains.  In
-this case we can refer to a single _lag-$l$ autocovariance_ $\kappa_{l}[f]$
-instead of any specific autocovariance, $\kappa_{n, n + l}[f]$.
+for any iteration number $n_{1}$ past equilibration.  In this case we can refer
+to a single _lag-$l$ autocovariance_ $\kappa_{l}[f]$ instead of any specific
+autocovariance, $\kappa_{n, n + l}[f]$.
 
 Finally we normalize the autocovariance by the variance of the function being
 considered,
@@ -1611,17 +1728,17 @@ function outputs will be approximately independent.  Consequently the lag at
 which the autocorrelations approximately vanish can be interpreted as the number
 of transitions needed to forget the past and generate an approximately
 independent sample from the stationary distribution, at least _in the context of
-a function $f$_.
+a particular function $f$_.
 
-Moreover, because correlations depend only on the absolute number of iterations
+Moreover, because correlations depend on only the absolute number of iterations
 between two points the autocorrelations corresponding to positive and negative
 lags will always be equal, $\rho_{l}[f]  = \rho_{-l}[f]$.  Once our Markov
-chains have equilibrated the future correlates with the present in the same way
-as the past.
+chains have equilibrated the present correlates with the future in the same way
+as it correlates with the past.
 
 Autocorrelations can be visualized with a _correlogram_ which plots the lag-$l$
-autocorrelation as a function of lag.  This visualization also demonstrates the
-many properties of autocorrelations we have already introduced.
+autocorrelation as a function of lag.  This visualization also demonstrates
+many of the properties of autocorrelations we have already introduced.
 
 If our Markov transition distribution induces only weak correlations in a
 function output then the correlogram will manifest rapidly decaying
@@ -1672,7 +1789,7 @@ induced by different Markov chains in the context of the specific function $f$.
 Once our Markov chains have equilibrated, the variance of a Markov chain Monte
 Carlo estimator is straightforward to compute in terms of the autocorrelations,
 at least when the chain is sufficiently long.  The _asymptotic variance_ for an
-infinitely long chain is given by
+infinitely long chain is defined by
 $$
 \lim_{N \rightarrow \infty}
 N \cdot \text{Var}[\hat{f}^{\text{MCMC}}_{N}]
@@ -1690,16 +1807,22 @@ $$
 \begin{align*}
 \text{MCMC-SE}[f]
 &=
+\sqrt{
 \frac{\text{Var}_{\pi}[ f ] \sum_{l = -\infty}^{\infty} \rho_{l}[f] }{N}
+}
 \\
 &=
+\sqrt{
 \frac{ \text{Var}_{\pi}[ f ] }{ N / \sum_{l = -\infty}^{\infty} \rho_{l}[f] }
+}
 \\
 &\equiv
-\frac{ \text{Var}_{\pi}[ f ] }{ \text{ESS}[f] },
+\sqrt{
+\frac{ \text{Var}_{\pi}[ f ] }{ \text{ESS}[f] }
+},
 \end{align*}
 $$
-where we have derived the _effective sample size_ as
+where we have defined the _effective sample size_ as
 $$
 \text{ESS}[f] = \frac{N}{\sum_{l = -\infty}^{\infty} \rho_{l}[f]}.
 $$
@@ -1745,9 +1868,9 @@ In other words
 $$
 \text{ESS}[f] = \frac{N}{1 + 2 \, \sum_{l = 1}^{\infty} \rho_{l}[f]}.
 $$
-This form clearl demonstrates how the autocorrelations of a given function value
-affect the corresponding effective sample size, and hence Markov chain Monte
-Carlo standard error.  If the values are independent, corresponding to no
+This form clearly demonstrates how the autocorrelations of a given function
+value affect the corresponding effective sample size, and hence the Markov chain
+Monte Carlo standard error.  If the values are independent, corresponding to no
 dependencies between the points in the Markov chain, then all autocorrelations
 will vanish and
 $$
@@ -1759,10 +1882,11 @@ reduces to the Monte Carlo standard error.
 Positive autocorrelations,
 $$
 \sum_{l = 1}^{\infty} \rho_{l}[f] > 0,
-$$ suppress the effective sample size which in turn increases the Markov chain
+$$
+suppress the effective sample size which in turn increases the Markov chain
 Monte Carlo standard error.
 
-Negative autocorrelations or anticorrelations,
+Negative autocorrelations,
 $$
 \sum_{l = 1}^{\infty} \rho_{l}[f] < 0,
 $$
@@ -1786,19 +1910,20 @@ chains end,
 $$
 \rho_{l}[f] \approx 0 \text{ for } l > N,
 $$
-however, the asymptotic quantities will be reasonably appropriate,
+however, sums of autocorrelations over finite Markov will reasonably approximate
+the sums over infinite Markov chains,
 $$
-\sum_{l = 1}^{\infty} \rho_{l}[f] \approx
-\sum_{l = 1}^{N} \rho_{l}[f].
+\sum_{l = 1}^{N} \rho_{l}[f] \approx
+\sum_{l = 1}^{\infty} \rho_{l}[f].
 $$
-In practice this means running chains long enough to accumulate at least a few
-effective samples, which we already need to do to ensure the equilibrium in
-which a central limit theorem, and stationarity of the Markov chains, are decent
-approximations.
+In practice this means that we need to run our chains long enough to accumulate
+at least a few effective samples, which we already need to do to ensure the
+equilibrium in which a central limit theorem, and stationarity of the Markov
+chains, are decent approximations.
 
 ### Effective Sample Size Estimators
 
-Even if a central limit theorem holds for our Markov transition distribution,
+Even if a central limit theorem holds for a Markov transition distribution,
 and realized Markov chains settle into a well-behaved equilibrium, we won't be
 able to derive the effective sample size, and hence the Markov chain Monte Carlo
 standard error, analytically.  Instead we have to _estimate_ it from the
@@ -1814,10 +1939,10 @@ $$
 { \widehat{\mathrm{Var}}[f] },
 $$
 once we have estimated the expectation value $\hat{\mu}_{f}$ and the variance
-$\widehat{\mathrm{Var}}[f]$ of the specified _cube-integrable_ function, $f$.
-Note that estimators for higher lags includes fewer terms and are consequently
-subject to larger variation.  We use biased estimators here, normalizing by $N$
-instead of $N - l$, to regularize some of this variation.
+$\widehat{\mathrm{Var}}[f]$ of the specified function, $f$.  Note that
+estimators for higher lags includes fewer terms and are consequently subject to
+larger variation.  We use biased estimators here, normalizing by $N$ instead of
+$N - l$, to regularize some of this variation.
 
 We can collect these estimated autocorrelations into an _empirical correlogram_
 that visualizes our best understanding of the autocorrelation structure of the
@@ -1841,12 +1966,12 @@ $$
 The challenge with this estimator is choosing a cutoff, $L$, that ensures a
 sufficiently small error.
 
-For a finite Markov chain we can estimated lags only up to the total length of
+For a finite Markov chain we can estimate lags only up to the total length of
 the chain, which puts a bound on how large the cutoff can be, $L \le N$.  At the
 same time the large lag autocorrelation estimators near that bound will be
 dominated by noise.  Setting $L$ too large will incorporate enough of these
-noisy estimators that the effective sample size estimator will too variable to
-be useful in practice.
+noisy estimators that the effective sample size estimator will be too variable
+to be useful in practice.
 
 <center>
 <br>
@@ -1871,7 +1996,7 @@ knitr::include_graphics("figures/estimated_autocorrelation/cutoff_low.png")
 
 In other words too small of a cutoff introduces significant bias and too large
 of a cutoff introduces significant variance.  To construct an effective sample
-size estimator with reasonably overall error we need to cut off the summation
+size estimator with reasonable overall error we need to cut off the summation
 after the autocorrelations have mostly decayed but before too much noise builds
 up.
 
@@ -1915,13 +2040,14 @@ autocorrelations.
 
 Another worry are Markov transition distributions that exhibit large positive
 autocorrelations at high lags.  Accurate estimation of these high lag
-autocorrelations already requires _very_ long chains, but when the incremental
-effective sample size is too low we can run into an even more insidious problem.
-Because they all use the same points in our Markov chain, the autocorrelation
-estimators are not independent.  When the function values are strongly
-correlated the autocorrelation estimators of that function will also be strongly
-correlated.  The empirical correlograms, for example, can exhibit "ringing"
-across lags that violates the assumptions of the cutoff heuristic.
+autocorrelations already requires _very_ long Markov chains, but when the
+incremental effective sample size is too low we can run into an even more
+insidious problem.  Because they all use the same points in our Markov chain,
+the autocorrelation estimators are not independent.  When the function values
+are strongly correlated the autocorrelation estimators of that function will
+also be strongly correlated.  The empirical correlograms, for example, can
+exhibit "ringing" across lags that violates the assumptions of the cutoff
+heuristic.
 
 <center>
 <br>
@@ -1934,10 +2060,10 @@ knitr::include_graphics("figures/estimated_autocorrelation/estimated_autocorr_ri
 When these rings are strong the effective sample size estimators will typically
 cut off at too small a lag and exclude the large autocorrelations at larger
 lags, resulting in overestimated effective sample sizes.  The Markov chains just
-don't seem to accumulate information fast enough to stabilize the estimation.
-It is challenging to work out analytic results for when we can trust these
-estimators, but based on my own experience I don't trust estimated effective
-sample size estimators when
+don't accumulate information fast enough to stabilize the estimation.  It is
+challenging to work out analytic results for when we can trust these estimators,
+but based on my own experience I don't trust estimated effective sample size
+estimators when
 $$
 \hat{\lambda}[f] = \frac{\widehat{\mathrm{ESS}}[f] }{N} < \frac{1}{10000}.
 $$
@@ -1963,7 +2089,7 @@ Even when we assume that a Markov chain Monte Carlo central limit theorem holds
 we have to estimate the standard error using our estimated effective sample
 sizes,
 $$
-\hat{f} \sim \mathcal{N}( \mathbb{E} [f], \widehat{\text{MCMC-SE}}[f] ),
+\hat{f} \sim \text{normal}( \mathbb{E} [f], \widehat{\text{MCMC-SE}}[f] ),
 $$
 where
 $$
@@ -1971,21 +2097,22 @@ $$
 \sqrt{ \frac{ \widehat{ \text{Var}} [f] }{ \widehat{\text{ESS}} [ f ] } }
 $$
 In practice this means using the points in our Markov chain to construct not
-only the Markov chain Monte Carlo estimator of a given cube integrable function,
-but also the variance of that function, its autocorrelations, and finally its
-effective sample size.  If we are interested in the expectation values of
-multiple functions then we have to repeat this estimates for each of those
-functions.
+only the Markov chain Monte Carlo estimator of a given function but also the 
+variance of that function, its autocorrelations, and finally its effective 
+sample size.  If we are interested in the expectation values of multiple 
+functions then we have to repeat this estimates for each of those functions.
 
 The error quantification provided by a Markov chain Monte Carlo central limit
 theorem is then only as good as the estimates of all of these auxiliary
-quantities.  Fortunately the error in these estimates all contribute corrections
-on the order of $\mathcal{O}(N^{-1})$ which is the same scale as the residual
-bias from starting out of equilibrium and much smaller than the square root
-scaling of the standard error itself, $\mathcal{O}(N^{-\frac{1}{2}})$.
+quantities.  As in Monte Carlo, however, the error in these estimates all
+contribute corrections on the order of $\mathcal{O}(N^{-1})$ which is the same
+scale as the error from assuming the central limit theorem holds after only a
+finite number of iterations and the residual bias from starting out of
+equilibrium.  All of these errors are much smaller than the square root scaling
+of the standard error itself, $\mathcal{O}(N^{-\frac{1}{2}})$.
 
-If we can run our chain long enough to reach a reasonable equilibrium, and
-adequately explore the stationary typical set, then all of these corrections
+If we can run our Markov chain long enough to reach a reasonable equilibrium,
+and adequately explore the stationary typical set, then all of these corrections
 will be negligible compared to the Markov chain Monte Carlo standard error and
 we can safely ignore them.  Importantly, however, long enough cannot be defined
 by any absolute number of iterations but rather depends on the specific
@@ -2005,13 +2132,13 @@ how well we can confirm the existence of a central limit theorem and then verify
 that we have equilibrated sufficiently well.  Unfortunately this is by no means
 a straightforward task.
 
-The existence of a central limit theorem, and the equilibration time, is very
-sensitive to the details of a given Markov transition distribution.  Moreover
-this existence is fragile -- seemingly inconsequential changes to the Markov
-transition distribution can ruin the conditions necessary for a central limit
-theorem to hold.  This means that we can't talk about the validity of a central
-limit theorem in any generality but instead have to analyze it in the specific
-context of each bespoke application.
+The existence of a central limit theorem, and the resulting equilibration time,
+is very sensitive to the details of a given Markov transition distribution.
+Moreover this existence is fragile -- seemingly inconsequential changes to the
+Markov transition distribution can ruin the conditions necessary for a central
+limit theorem to hold.  This means that we can't talk about the validity of a
+central limit theorem in any generality but instead have to analyze it in the
+specific context of each bespoke application.
 
 Theoretical analysis of Markov chain Monte Carlo central limit theorems is both
 subtle and mathematically demanding.  Even if we could all find, and then
@@ -2023,7 +2150,7 @@ These theoretical limitations result in our not having _sufficient_ conditions
 for the existence of a central limit theorem, let alone equilibration of a
 Markov chain, that we can check empirically.  Our most powerful tools are
 instead a handful of _necessary conditions_, some more rigorous and some more
-intuitive, that identify _obstructions_ to equilibrium.
+intuitive, that must hold if a central limit theorem is to exist.
 
 In practice we have to arm ourselves with an arsenal of diagnostics sensitive to
 the violation of as many necessary conditions as possible.  If the diagnostics
@@ -2036,7 +2163,7 @@ How much optimism is needed depends on how robust our diagnostics are.  Sadly
 we have precious few general diagnostics for Markov chain Monte Carlo, and the
 ones we have feature some notable limitations.
 
-### Visualizing Consistency
+### Visualizing Transient Behavior
 
 Once a Markov chain has reached equilibrium its behavior should be stationary.
 We can visualize the progression from transient behavior to equilibrium behavior
@@ -2139,7 +2266,7 @@ knitr::include_graphics("figures/diagnostic_traces/funnel_multi_chain_trace.png"
 
 At the same time multiple Markov chains provide sensitivity to metastabilities.
 Each Markov chain has the opportunity to fall into separate metastabilities
-depending on their initialization and random realizations each Markov
+depending on their initialization and the random realizations of each Markov
 transition.  The more Markov chains we run the more opportunity we have to see
 different metastabilities and the better we can diagnose the inability to
 transition between them.
@@ -2165,7 +2292,7 @@ many functions of interest.  When the ambient space is high-dimensional this
 might require looking through hundreds if not thousands of figures, which
 quickly becomes infeasible and facilitates the oversight of important details.
 
-### Quantifying Consistency
+### Quantifying Transient Behavior
 
 One way to help scale diagnostics to high-dimensional problems is to build
 _quantitative_ summaries of the Markov chain behaviors instead of the
@@ -2179,11 +2306,12 @@ the right information.
 Trace plots allowed us to study the evolution of the Markov chain, or even
 multiple Markov chains, and identify transient behaviors uncharacteristic of
 equilibrium.  A Markov chain appears stationary when its behaviors are
-consistent across iterations, and an ensemble of Markov chains appears to all
-have reached stationarity when their behaviors are consistent with each other.
-In order to quantify this behavior we need to develop numerical summaries of
-_consistency_.  Conveniently, classical statistics is rich with tests of
-consistency between two ensembles that can form the basis of diagnostics.
+consistent across iterations, and an ensemble of Markov chains appears
+stationary when all of the individual Markov chains are consistent with each
+other.  In order to quantify this behavior we need to develop numerical
+summaries of _consistency_.  Conveniently, classical statistics is rich with
+tests of consistency between two ensembles that can form the basis of
+diagnostics.
 
 [@Geweke:1992] considered comparing the Markov chain Monte Carlo estimators
 derived at the beginning and end of a single Markov chain; if the Markov chain
@@ -2238,12 +2366,12 @@ $$
 + \frac{1}{N} \frac{ \hat{B} [ f ] }{ \hat{W} [ f] } }.
 $$
 
-As the ensembles Markov chains reach the same equilibrium $\hat{R}$ should
+As the ensemble of Markov chains reach the same equilibrium $\hat{R}$ should
 approach one.  Moreover, if the Markov chains have been initialized from points
 outside the stationary typical set then the value of $\hat{R}$ should converge
 to one from above.  We can convert this into a heuristic diagnostic by verifying
 that $\hat{R}$ does not deviate above a specified threshold.  While there is no
-universal threshold but $1.1$ and $1.3$ are common heuristics.
+universal threshold $1.1$ and $1.3$ are common heuristics.
 
 The _split potential scale reduction factor_, or split $\hat{R}[f]$, combines
 the qualitative features of both diagnostics by generating an ensemble of Markov
@@ -2255,9 +2383,9 @@ Diagnostics like Geweke, $\hat{R}[f]$, and split $\hat{R}[f]$ are attractive
 because of their generality, but that generality does not guarantee strong
 diagnostic power in practice.  Because they depend on a particular Markov chain
 Monte Carlo estimator they depend on the validity of that estimator.  In
-particular, if the function whose expectation is being estimated is not square
-integrable then these diagnostics will not offer useful information even when
-the Markov chains have equilibrated.
+particular, if the square of the function whose expectation is being estimated 
+is not square integrable then these diagnostics will not offer useful 
+information even when the Markov chains have equilibrated.
 
 Furthermore we have to keep in mind that these diagnostics are based on
 necessary conditions for equilibrium and not sufficient ones.  We know how they
@@ -2291,10 +2419,10 @@ chains and longer Markov chains.  The debate on the optimal compromise has long
 raged in the statistics literature but honestly the specific nature of one's
 computational resources if often more important than one's statistical dogmas.
 For example parallel computational resources, such as independent cores within
-a processor or independent processors in a cluster, are better suited to running
-more Markov chains than longer Markov chains.  Ultimately we have to make a
-choice that helps us to best manage the diagnostic risk based on the particular
-resources available in any given application.
+a processor or independent processors in a cluster, may be better suited to
+running more Markov chains than longer Markov chains.  Ultimately we have to
+make a choice that helps us to best manage the diagnostic risk based on the
+particular resources available in any given application.
 
 Ideally the Markov transition being used also admits bespoke diagnostics that
 exploit the particular structure of a Markov transition distribution.  Because
@@ -2302,7 +2430,7 @@ they are based on particular details these bespoke diagnostics tend to be much
 more sensitive than generic diagnostics which have only limited information at
 their disposal.
 
-# A Robust Markov chain Monte Carlo Workflow
+# Robust Application Of Markov Chain Monte Carlo In Practice
 
 Markov chain Monte Carlo offers the _potential_ of practical probabilistic
 computation with quantifiable error, but only when employed and evaluated
@@ -2325,8 +2453,8 @@ $$
 
 We have to keep in mind that this is fundamentally an ill-posed problem -- in
 general a given target distribution will be invariant with respect to infinitely
-many Markov transition distributions.  Even if finding one i possible, finding
-one that performs well in practice may not be.  Moreover, the utility of this
+many Markov transition distributions.  Even if finding one is possible, finding
+one that performs well in practice may not be.  Moreover the utility of this
 search tends to be quite fragile. A procedure that yields an efficient Markov
 transition distribution for one target distribution may yield a poorly
 performing Markov transition for another target distribution, even one that is
@@ -2355,9 +2483,9 @@ K :\; &Q \times \mathcal{Q} & &\rightarrow& \; &[0, 1]&
 \end{alignat*}
 $$
 only without any requirement on the existence or form of an stationary
-distribution.  As usually we typically specify a proposal distribution in
-practice with a conditional probability density function within a given
-parameterization of the ambient space,
+distribution.  As usual we typically specify a proposal distribution in practice
+with a conditional probability density function within a given parameterization
+of the ambient space,
 $$
 \begin{alignat*}{6}
 K :\; &Q \times Q& &\rightarrow& \; &\mathbb{R}^{+}&
@@ -2388,7 +2516,7 @@ probability $1 - a(q', q)$.  The resulting Markov transition distribution can be
 specified with the conditional probability density function,
 $$
 T(q' \mid q) = a(q', q) \cdot Q (q' \mid q )
-+ \left(1 - a(q, q') \right) \cdot \delta(q - q').
++ \left(1 -  \int \mathrm{d} q' \, Q(q' \mid q) \, a(q, q') \right) \cdot \delta(q - q').
 $$
 
 This procedure defines a Markov transition distribution with the target
@@ -2416,11 +2544,11 @@ first Markov chain Monte Carlo algorithm ever, considered uniform perturbations
 in each direction of the ambient space.  Today Random Walk Metropolis is usually
 defined by a multivariate Normal proposal density function,
 $$
-Q(q' \mid q, \Sigma) = \mathcal{N}(q' \mid q, \Sigma).
+Q(q' \mid q, \Sigma) = \text{normal}(q' \mid q, \Sigma).
 $$
 The expanse of the proposal to the entire ambient space ensures that the
-resulting Metropolis-Hastings transition distribution is irreducibile, while
-the non-zero probability of rejecting a proposal ensures that it is aperiodic.
+resulting Metropolis-Hastings transition distribution is irreducible, while the
+non-zero probability of rejecting a proposal ensures that it is aperiodic.
 
 This Random Walk Metropolis construction defines a _family_ of transition
 distributions indexed by the choice of covariance, $\Sigma$.  This choice is
@@ -2457,11 +2585,10 @@ transient behavior and achieve equilibrium.
 Traditionally warmup is often referred to as _burn-in_ in analogy to industrial
 testing procedures, but that nomenclature carries with it some dangerously
 false intuition.  Many industrial machines have heavy-tailed lifetimes --
-machines that will fail tend to fail early while those machines don't fail
-early will tend to survive for very long times.  Industrial burn-in is the
-process of running new machines for some set amount of time to identify and
-reject those early failing machines, leaving an "equilibrium" of functional
-machines.
+machines that will fail tend to fail early while those machines don't fail early
+will tend to survive for very long times.  Industrial burn-in is the process of
+running new machines for some set amount of time to identify and reject those
+early failing machines, leaving an "equilibrium" of functional machines.
 
 A user taking this analogy too far might consider running an ensemble of Markov
 chains and then throwing out those that manifest any odd behavior, keeping only
@@ -2482,9 +2609,8 @@ If we assume a Markov chain Monte Carlo central limit theorem then
 _theoretical warmup_ is the process of running long enough for the
 initialization bias to become negligible and the central limit theorem to become
 a reasonable approximation.  More geometrically we can think of theoretical
-warmup as the time it takes for our Markov chains to find and then explore the
-stationary typical set sufficiently well that they become approximately
-stationary.
+warmup as the time it takes for our Markov chains to find the stationary typical
+set and make its first sojourn through it.
 
 Contrary to common folklore, this process is relatively quick if the Markov
 transition is well-behaved.  If the Markov chains eventually equilibrate and
@@ -2498,7 +2624,7 @@ of Markov transition distributions using feedback from the Markov chains
 themselves.  For example Random Walk Metropolis transition distributions are
 defined by the covariance of the proposal density function, and various
 heuristics have been developed for setting the optimal covariance based on
-expectation values with respect to the target distribution. 
+expectation values with respect to the target distribution.
 
 Although we won't know these expectation values in practice we can estimate them
 using the early history of the Markov chains provided that they have
@@ -2529,50 +2655,49 @@ waiting for for a theoretical warmup before starting to tune the Markov
 transition.  This not only helps to suppresses any bias from the initialization
 but also gives us the most flexibility when designing adaption strategies.
 
-### Empirical Warmup
+### Heuristic Warmup
 
-Most importantly _empirical warmup_ is how long we run our Markov chains before
-we enter the main sampling phase and start using points to inform our final
-Markov chain Monte Carlo estimators.  The _hope_ is that our empirical warmup is
-long enough that our Markov chains have achieved theoretical warmup, as well as
-adaptive warmup if we're tuning our Markov transition configuration.
+Most importantly _heuristic warmup_ is for how many fixed iterations we run our
+Markov chains before we enter the main sampling phase and start using points to
+inform our final Markov chain Monte Carlo estimators.  The _hope_ is that our
+empirical warmup is long enough that our Markov chains have achieved theoretical
+warmup, as well as adaptive warmup if we're tuning our Markov transition
+configuration.
 
-In practice, however, we have no guarantee that any empirical warmup we define
+In practice, however, we have no guarantee that any heuristic warmup we define
 before running our Markov chains will be long enough to ensure equilibrated
 Markov chains and a reasonably effective Markov transition configuration going
-forwards.  Specifically we can very rarely estimate the necessary warmup from
-theoretical considerations or the behavior from other Markov chains targeting
-other probability distributions.  The most common question in Markov chain Monte
-Carlo is exactly how long one should set the empirical warmup, but ultimately
-_there is no generic answer_. 
+forwards.  Specifically we can very rarely estimate the necessary warmup times
+from theoretical considerations or the behavior from other Markov chains
+targeting other probability distributions.  The most common question in Markov
+chain Monte Carlo is exactly how long one should set the empirical warmup, but
+ultimately _there is no generic answer_.
 
-The best way we can manage the risk of an overly hurried empirical warmup is to
-carefully inspect the subsequent evolution of our Markov chains for any sign of
-transient behavior or poor adaptation.  If we start with a default empirical
-warmup and find evidence of problems in our Markov chains after that empirical
-warmup has concluded then we can go back and run longer before assuming
-equilibrium.  At the same time if longer empirical warmups do not help, or if
-we find indications that the Markov transition might not admit a sufficiently
-nice equilibrium at all, then we may have to stop and consider other Markov
-transitions entirely.
+The best way we can manage the risk of heuristic warmup is to carefully inspect
+the subsequent evolution of our Markov chains for any sign of transient behavior
+or poor adaptation.  If we start with a default heuristic warmup and find
+evidence of problems in our Markov chains after that empirical warmup has
+concluded then we can go back and run longer before assuming equilibrium.  At
+the same time if longer empirical warmups do not help, or if we find indications
+that the Markov transition might not admit a sufficiently nice equilibrium at
+all, then we may have to stop and consider other Markov transitions entirely.
 
 ## Supply Chain
 
 After empirical warmup we sit back and watch our Markov chains explore what is
-_hopefully_ the extent of the stationary typical set.  In this main sampling
-phase we save each point generated in our Markov chains for diagnostic and
-analysis to follow.
+_hopefully_ the extent of the stationary typical set.  In this collection phase
+we save each point generated in our Markov chains for diagnostic and analysis to
+follow.
 
 ## Chain of Custody
 
-When are Markov chains have reached a set number of iterations we collect
-everything produced after warmup and scrutinize the output for any signs of
-worry.  It is here that we evaluate and check all of our diagnostics for any
-signs of transient behavior.
+When our Markov chains have reached the fixed number of iterations we scrutinize
+everything produced after warmup for any signs of worry.  It is here that we
+evaluate and check all of our diagnostics for any signs of transient behavior.
 
 For general Markov transitions we can look through trace plots and check the
-split $\hat{R}[f]$ statistics for all functions of interest, and if there are no
-hints of problems then hope and prey that we didn't miss anything.  When we have
+split $\hat{R}[f]$ statistics for all functions of interest and, if there are no
+hints of problems, then hope and prey that we didn't miss anything.  When we have
 diagnostics specific to a particular Markov transition distribution then we
 check those as well, following up on any information they provide that might
 identify the existence of obstructions to equilibrium or, even better, the
@@ -2594,15 +2719,15 @@ failure.
 If we don't see any indications that we have not yet reached equilibrium then
 we can assume that we have and move onto the the evaluation of Markov chain
 Monte Carlo estimators of interest.  In addition to any bespoke functions of
-interest in a given application, we typically also look at the projections that
-map each point in the ambient space onto component axes.
+interest in a given application, we typically also look at each component
+projection function if the ambient space is a product space.
 
 For each function of interest we first want to check for any signs that the
-function might not be cube integrable with respect to the target probability
-distribution.  One way to verify cube integrability is to look at the
-$\hat{k}[f]$ statistic which fits a power law to the tail of the function values
-encountered in our Markov chains as can be done importance sampling
-[@VehtariEtAl:2015a].
+square of the function might not be square integrable with respect to the target 
+probability distribution.  One way to verify this integrability condition is to
+look at the $\hat{k}[f]$ statistic which fits a power law to the tail of the
+function values encountered in our Markov chains as can be done importance
+sampling [@VehtariEtAl:2015a].
 
 Confident that a Markov chain Monte Carlo estimator is well-defined we can then
 proceed to evaluate the estimator and everything needed to evaluate its
@@ -2617,9 +2742,10 @@ At this point we can evaluate an effective sample size estimator using the
 estimated autocorrelations and check to see if the incremental effective sample
 size is sufficiently large for the estimate to be trustworthy.  We should also
 make sure that we have at least ten effective samples for each function of
-interest to ensure that stationarity is a sufficiently good approximation.
+interest to ensure that the central limit theorem is a sufficiently good
+approximation.
 
-Finally we can put all of these estimates together to form the Markov chain
+Finally we can put all of these estimates together to form the final Markov chain
 Monte Carlo standard errors, our mathematical Voltrons, for each Markov chain
 Monte Carlo estimator.
 
@@ -2631,13 +2757,87 @@ coming across.  If we don't do the work, however, then we have no sense of how
 faithful the Markov chain Monte Carlo estimators might be.
 
 We can always evaluate a Markov chain Monte Carlo estimator, effective sample
-size, and standard error for a given function, but if that function isn't cube
-integrable, if a Markov chain Monte Carlo central limit theorem doesn't exist,
-or if the estimator is too biased by the initialization then those estimated
-values won't corresponding to anything meaningful.  Just because we can run
-Markov chain Monte Carlo without our computer crashing doesn't mean that the
-algorithm is producing useful results.  Only with careful validation does it
-become productive.
+size, and standard error for a given function, but if that function isn't
+sufficiently integrable, if a Markov chain Monte Carlo central limit theorem 
+doesn't exist, or if the estimator is too biased by the initialization then 
+those estimated values won't corresponding to anything meaningful.  Just because
+we can run Markov chain Monte Carlo without our computer crashing doesn't mean
+that the algorithm is producing useful results.  Only with careful validation
+does it become productive.
+
+## Example Workflows
+
+As with most complex tasks organizing each of the necessary steps into coherent
+workflows can facilitate the robust application of Markov chain Monte Carlo in
+practice.  The exact form of a useful workflow, however, depends on just how
+much theory is at our disposal.
+
+In general the application of Markov chain Monte Carlo can be grouped into four
+sequential phases.  In the _preparatory phase_ we engineer a Markov transition
+that preserves our target distribution and configure the resulting Markov
+chains.  This is followed by the _warmup phase_ where we hopefully give our
+Markov chains time to settle in before the _collection phase_ where we start
+farming iterations for Markov chain Monte Carlo estimators.  Finally in the
+_analysis phase_ we evaluate and diagnose the desired estimators.
+
+### Markov Chain Monte Carlo In Theory
+
+In a more perfect world we would be able to fully analyze an engineered Markov
+transition before generating any chains.  We would verify a central limit
+theorem and work out relaxation times before having to configure our Markov
+chains.
+
+This knowledge would then allow us configure the warmup phase to run for a fixed
+number of relaxation times to give the Markov chains adequate time to
+equilibrate before running through more relaxation times to adapt any degrees
+of freedom in the Markov transition as needed.
+
+Because we would have already verified ideal conditions we wouldn't have any
+doubts once we reached the analysis phase.  We would compute Markov chain
+Monte Carlo estimators and celebrate knowing that the estimators will be
+well-behaved.
+
+The only detour from this workflow would occur if our estimators weren't
+sufficiently precise, in which case we could return to the collection phase and
+extend the existing Markov chains.
+
+<center>
+<br>
+```{r, out.width = "50%", echo=FALSE}
+knitr::include_graphics("figures/workflow/theory/theory.png")
+```
+<br><br>
+</center>
+
+### Markov Chain Monte Carlo In Practice
+
+Sadly we live in the real world, not the more perfect world of where
+probabilistic computation is actually pleasant.  In practice we cannot verify
+a central limit theorem and work our relaxation times initially.  Consequently
+we have to configure our Markov chains in the preparatory phase _heuristically_
+and empirically check for any problems.
+
+Because we don't know the relaxation time a priori we have to run the warmup
+phase and collection phases for a fixed number of iterations and hope that each
+phase is long enough.
+
+The analysis phase now becomes much more demanding, requiring us to diagnose
+failures of a Markov chain Monte Carlo central limit theorem or inadequate
+warmup before constructing Markov chain Monte Carlo estimators.  If we identify
+any problems then we have to reconfigure our Markov chains and run again.  In
+the worst case we might have to consider more robust Markov transitions
+entirely.
+
+Only once we've empirically verified no signs of transient behavior can be we
+celebrate a computation well done.
+
+<center>
+<br>
+```{r, out.width = "50%", echo=FALSE}
+knitr::include_graphics("figures/workflow/practice/practice.png")
+```
+<br><br>
+</center>
 
 # Putting It All Into Practice
 
@@ -2645,8 +2845,8 @@ Having developed a comprehensive foundation of Markov chain Monte Carlo -- what
 is being estimated, how the error in that estimation can potentially be
 quantified, and the best way to manage the risk that we will not get useful
 error quantification -- we can now demonstrate these concepts with explicit
-examples.  Here we will consider two low-dimensional circumstances, one in
-which a Random Walk Metropolis transition does well and one where it does not,
+examples.  Here we will consider three low-dimensional circumstances, one in
+which a Random Walk Metropolis transition does well and two where it does not,
 before studying how the ideal behavior of this particular Markov transition
 scales with the dimension of the target distribution.
 
@@ -2657,13 +2857,13 @@ let's consider a very simple, two-dimensional target distribution specified by
 two independent Gaussian probability density functions,
 $$
 \pi(q) =
-\mathcal{N}(\varpi_{1}(q) ; 1, 1)
+\text{normal}(\varpi_{1}(q) ; 1, 1)
 \cdot
-\mathcal{N}(\varpi_{1}(q) ; -1, 1).
+\text{normal}(\varpi_{1}(q) ; -1, 1).
 $$
 One advantage of this example is that the component means and variances are
 given immediately by the locations and scales, which allows us to compare Markov
-chain Monte Carlo estimates to a known ground truth.
+chain Monte Carlo estimates to exact values.
 
 In `R` we implement this target distribution by specifying the _log_ target
 probability density function to maximize numerical stability.
@@ -2799,7 +2999,7 @@ fast_monitor <- function(sims, warmup, names=NULL) {
 ```
 
 We can now compute our diagnostics and Markov chain Monte Carlo estimators after
-leaving out the first 100 samples as the empirical warmup.
+leaving out the first 100 samples as the heuristic warmup.
 
 ```{r}
 parameter_names <- c("varpi_1", "varpi_2", "accept_prob")
@@ -2875,7 +3075,7 @@ theorem can actually be explicitly proven.
 
 ## Dysfunctional Estimators
 
-Unfortuantely Markov chain Monte Carlo doesn't alwasy behave so well in
+Unfortunately Markov chain Monte Carlo doesn't always behave so well in
 practice.  In this section we'll consider two examples that demonstrate just how
 wildly Markov chain Monte Carlo can fail, and why we have to adopt to a robust
 workflow to maximize our diagnostic sensitivity and manage the risk of these
@@ -2995,13 +3195,13 @@ mcmc_stats <- fast_monitor(array(mcmc_samples[,c(1, 2, 13)],
 mcmc_stats
 ```
 
-The effective sample sizes have decreased, especially for the scale, but
-otherwise nothing seems to indicate a pathology.  That is, however, until we
-compare the Markov chain Monte Carlo estimators to their exact values.  One
-benefit of this funnel example is that the expected location and log scale are
-both zero.  Here the expected location is consistent with zero, but the expected
-log scale is being drastically overestimated given the small Markov chain Monte
-Carlo standard error.
+The estimated effective sample sizes are extremely small, especially for the
+scale, but otherwise nothing seems to indicate a pathology.  That is, however,
+until we compare the Markov chain Monte Carlo estimators to their exact values.
+One benefit of this funnel example is that the expected location and log scale
+are both zero.  Here the expected location is consistent with zero, but the
+expected log scale is being drastically overestimated given the small estimated
+Markov chain Monte Carlo standard error.
 
 Indeed if we plot the convergence of these estimators we see that only the
 estimator for the expected location converges to the exact value.  The estimator
@@ -3057,10 +3257,10 @@ which we know is a distinct possibility.  The question now is whether or not
 there are indications of this failure that would have suggested the failure even
 if we didn't already know the exact expected values.
 
-We can firstly look at the estimated means of the individual parameters, which
-certainly exhibit some unpleasant behavior.  We see even lower effective sample
-sizes but, more importantly, we see large split $\hat{R}$ which suggests
-transient behavior manifesting in the output of those functions.
+We can firstly look at the estimated component means, which certainly exhibit
+some unpleasant behavior.  We see even lower effective sample sizes but, more
+importantly, we see large split $\hat{R}$ which suggests transient behavior
+manifesting in the output of those functions.
 
 ```{r}
 parameter_names <- c("mu", "log tau",
@@ -3122,12 +3322,12 @@ mcmc_stats
 ```
 
 Not only do many of the split $\hat{R}$ diagnostics remain high, but the
-effective sample sizes also don't seem to have changed despite the twenty fold
-increase in iterations!  The fact that the effective samples sizes are not
-scaling with the number of iterations means that either we weren't estimating
-the autocorrelations accurately before or a Markov chain Monte Carlo central
-limit theorem doesn't hold and the effective sample size estimators are not
-particularly meaningful.
+estimated effective sample sizes also don't seem to have changed despite the
+twenty fold increase in iterations!  The fact that the estimated effective
+samples sizes are not scaling with the number of iterations means that either
+we weren't estimating the autocorrelations accurately before or a Markov chain
+Monte Carlo central limit theorem doesn't hold and the effective sample size
+estimators are not particularly meaningful.
 
 Bringing up the longer trace plot for the log scale demonstrates the horrors a
 little more clearly.  After some initial, seemingly pleasant behavior the Markov
@@ -3204,12 +3404,12 @@ as a _mixture_ of Gaussian probability density functions,
 $$
 \pi(q) =
 \theta \,
-\mathcal{N} (\varpi_{1}(q) \mid 4, 1) \,
-\mathcal{N} (\varpi_{2}(q) \mid 8, 2)
+\text{normal} (\varpi_{1}(q) \mid 4, 1) \,
+\text{normal} (\varpi_{2}(q) \mid 8, 2)
 +
 (1 - \theta) \,
-\mathcal{N} (\varpi_{1}(q) \mid -8, 2) \,
-\mathcal{N} (\varpi_{2}(q) \mid -4, 1)
+\text{normal} (\varpi_{1}(q) \mid -8, 2) \,
+\text{normal} (\varpi_{2}(q) \mid -4, 1)
 $$
 with the mixture probability
 $$
@@ -3310,10 +3510,10 @@ for (n in 1:n_transitions) {
 }
 ```
 
-We discard the first 100 iterations as warmup and compute our diagnostics and
-estimators.  Both split $\hat{R}$ and the effective sample sizes looks good.
-Even the average Metropolis acceptance probability is reasonable, indicating a
-solid tuning of the proposal distribution.
+We discard the first 100 iterations as heuristic warmup and compute our
+diagnostics and estimators.  Both split $\hat{R}$ and the effective sample sizes
+looks good.  Even the average Metropolis acceptance probability is reasonable,
+indicating a solid tuning of the proposal distribution.
 
 ```{r}
 parameter_names <- c("varpi_1", "varpi_2", "accept_prob")
@@ -3434,8 +3634,8 @@ Even after running 200000 iterations we've accumulated only one transition
 between the metastabilities and only about a single effective sample.  In order
 to equilibrate to where a Markov chain Monte Carlo central limit theorem is
 approximately valid, let alone to achieve reasonably precise Markov chain Monte
-Carlo estimators, we would have to run at least ten to one hundred times more
-iterations, which quickly becomes impractical.
+Carlo estimators, we would have to run at least ten times more iterations, which
+quickly becomes impractical.
 
 While a longer Markov chain still isn't enough for precise estimation, it at
 least provides some diagnostic power to the metastable nature of the initial
@@ -3478,7 +3678,7 @@ mcmc_stats
 ```
 
 Taking a quick look at the trace plots we can see that this diagnostic
-sensitivity comes from the fact that each Markov chain initially explores a
+sensitivity comes from the fact that the each Markov chain initially explores a
 different metastability making it easy to see their inconsistencies.
 
 ```{r}
@@ -3513,15 +3713,16 @@ even those good behaviors can be insufficient in practice. Let's consider, for
 example, what happens to Random Walk Metropolis as the dimensionality of the
 target distribution increases.
 
-Beyond a few dimensions the best abstraction of our target distribution is its
-typical set.  If we want to prepare to journey into higher dimensional problems
-then we need to adopt this perspective as soon as possible.
+Beyond a few dimensions the most efficient compression of our target
+distribution is its typical set.  If we want to prepare to journey into higher
+dimensional problems then our exploration needs to be compatible with this
+geometry.
 
 In high dimensions the proposal distribution is strongly influenced by the
 increasing volume towards infinity.  The Gaussian proposal density functions of
 Random Walk Metropolis are skewed away from the mode and, if the scale is too
 large, out of the typical set entirely.  Consequently we shouldn't think of this
-proposal distribution as a fuzzy sphere but rather an fuzzy _spade_ that
+proposal distribution as a fuzzy sphere but rather an fuzzy _teardrop_ that
 asymmetrically jumps away from the interior of the typical set rather than
 towards it.
 
@@ -3535,9 +3736,9 @@ knitr::include_graphics("figures/random_walk_metro/big_jump/big_jump.png")
 
 Those who really want to maintain the abstraction that a product of independent
 Gaussian probability density functions should be isotropic have to warp their
-concept of the typical set.  Locally we can maintain a sense of isotropy if we
-think about the typical set being wrapped around the current point, just like
-string wrapped around a finger.
+concept of the typical set a little bit.  Locally we can maintain a sense of
+isotropy if we think about the typical set being wrapped around the current
+point, just like string wrapped around a finger.
 
 <center>
 <br>
@@ -3548,17 +3749,17 @@ knitr::include_graphics("figures/random_walk_metro/big_jump_alt/big_jump_alt.png
 </center>
 
 This perspective ensures that more proposals fall outside of the typical set
-than inside, but only at the expense of making sense only around a particular
-point.  If we move to another point then we have to warp the typical set around
-that point to properly move this perspective.  As always, high-dimensional
-spaces are weird and visualizing them for our low-dimensionally trained brains
-is hard.
+than inside, but only at the expense of making sense only in the neighborhood of
+a particular point.  If we move to another point then we have to warp the
+typical set around that point to properly move this perspective.  As always,
+high-dimensional spaces are weird and visualizing them for our low-dimensionally
+trained brains is hard.
 
 It doesn't matter how we strain our minds to intuit this high-dimensional
 behavior so long as we recognize that the random walk proposal distributions
 strongly prefer new points that lie outside of the typical set.  Proposals
 outside of the typical set are then rejected by the acceptance procedure
-because the of how quickly the target probability density decays as we jump away
+because of how quickly the target probability density decays as we move away
 from the mode at the center of the typical set.
 
 In other words the proposal distribution suggests points in neighborhoods of
@@ -3569,10 +3770,10 @@ probability density, which are exactly those points in the stationary typical
 set.
 
 Ultimately Metropolis-Hastings algorithms explore through trial and error.  Each
-proposal guesses where the typical set continues beyond our current point with
-the acceptance procedure checks those guesses, rejecting any that have chosen
-poorly.  The problem is that as we consider higher and higher dimensions, and
-the typical set becomes narrower and narrower, good guesses become rarer and
+proposal guesses where the typical set continues beyond the current point with
+the acceptance procedure checking those guesses and rejecting any that have
+chosen poorly.  The problem is that as we consider higher and higher dimensions,
+and the typical set becomes narrower and narrower, good guesses become rarer and
 rarer.
 
 Unfortunately the inefficiency of the random walk trial and error persists no
@@ -3593,7 +3794,7 @@ knitr::include_graphics("figures/random_walk_metro/small_jump/small_jump.png")
 
 This high-dimensional behavior can also be derived theoretically, at least for
 target distributions specified by a sufficiently large product of independent
-and identical probability density functions.   [@RobertsEtAl:1997] showed that
+and identical probability density functions.  [@RobertsEtAl:1997] showed that
 in this case the performance of Markov chain Monte Carlo estimators decreases
 inversely with dimension _no matter how the random walk proposal distribution is
 tuned_.  They also worked out that the scales that achieve optimal performance
@@ -3601,10 +3802,10 @@ asymptotically decrease with the square root of dimension, and that those
 optimal scales achieve the same average acceptance probability of about $0.234$.
 
 We can verify these results with simulation, defining our target probability
-density function as a product of unit Gaussian probability density functions,
+density function as a product of unit normal probability density functions,
 allowing us to quickly scale to an arbitrary number of dimensions,
 $$
-\pi(q) = \prod_{i = 1}^{I} \mathcal{N}( \varpi_{i}(q) \mid 0, 1).
+\pi(q) = \prod_{i = 1}^{I} \text{normal}( \varpi_{i}(q) \mid 0, 1).
 $$
 
 ```{r}
@@ -3622,7 +3823,7 @@ sigma <- 1.4
 
 In particular let's track the average acceptance probability and average
 effective sample size for all of the components as we increase from one
-dimension to ten dimensions.
+dimension to ten.
 
 ```{r, cache=TRUE}
 n_transitions <- 10000
@@ -3710,10 +3911,11 @@ lines(plot_Ds, pad_eff / n_transitions, col=c_dark, lwd=2)
 That said, there's no reason why a proposal distribution that works well in one
 dimension should work well in ten dimensions.  How much can we fight against
 the increasing dimension by tuning the proposal distribution?  To determine this
-I empirically worked out the optimal scales for each dimension by running large
-ensembles of Markov chains while scanning across possible scales to see where
-the effective sample sizes peaked.  Interestingly this purely empirical tuning
-closely matches the square root of dimension decrease expected from theory.
+I empirically worked out the optimal proposal scales for each dimension by
+running large ensembles of Markov chains while scanning across possible scales
+to see where the effective sample sizes peaked.  Interestingly this purely
+empirical tuning closely matches the square root of dimension decrease expected
+from theory.
 
 ```{r}
 opt_sigmas <- c(2.5, 1.75, 1.5, 1.2, 1.15, 1.0, 0.95, 0.85, 0.8, 0.75)
@@ -3724,7 +3926,7 @@ plot(Ds, opt_sigmas, main="", col=c_dark, pch=16, cex=1,
 lines(seq(1, 10.5, 0.1), 2.4 / sqrt(seq(1, 10.5, 0.1)), col=c_light, lwd=2)
 ```
 
-We can now try again using this optimal scales and see if we do any better.
+We can now try again using these optimal scales and see if we do any better.
 
 ```{r, cache=TRUE}
 for (D in Ds) {
@@ -3768,9 +3970,9 @@ for (D in Ds) {
 Using the optimal scales definitely improved performance.  Decreasing the jump
 distance with dimension stabilizes the average acceptance probability near the
 theoretical optimum.  At the same time the average incremental effective sample
-sizes increase a little bit.  Unfortunately, we're fighting a losing battle.
-While the effective samples sizes are larger they still decay rapidly with
-increasing dimension.
+sizes increase a little bit relative to the fixed tuning.  Unfortunately, we're
+fighting a losing battle.  While the effective samples sizes are larger they
+still decay rapidly with increasing dimension.
 
 ```{r}
 par(mfrow=c(1, 2))
@@ -3813,30 +4015,6 @@ Markov transitions, that exploit more information about the target distribution.
 Hamiltonian Monte Carlo is a particularly useful approach in this regard, but
 that will have to wait for its own case study.
 
-# Non-Equilibrium Perspectives
-
-In this case study I have focused on understanding and identifying the
-equilibrium of well-behaved Markov chain Monte Carlo estimators that gives rise
-to a central limit theorem and quantifiable errors.  This is one of the most
-studied perspectives on Markov chain Monte Carlo, but it is not the only
-perspective.
-
-Over the last decade or two there has been a considerable amount of work trying
-to quantify the error of Markov chain Monte Carlo estimators outside of a
-stationary equilibrium; see for example [@JoulinEtAl:2010].  Developments in
-this direction could drastically improve the robustness of Markov chain Monte
-Carlo but the current results rely on assumptions about the structure of the
-Markov transition distribution that are too strong to be relevant in practice.
-
-For example _Stein methods_, such as [@GorhamEtAl:2017], consider a family of
-certain nice functions with known expectation values.  Identifying
-_adversarial functions_ amongst this family whose Markov chain Monte Carlo
-estimators are converging to the exact values the slowest can, in some
-circumstances, bound the convergence of other nice functions, even those outside
-of the family.  In addition to the bounds, these adversarial functions might
-also be useful for identifying transient behaviors that obstruct the more
-traditional Markov chain Monte Carlo central limit theorem error quantification.
-
 # Conclusions
 
 Principled probabilistic computation with quantifiable errors is both necessary
@@ -3845,7 +4023,7 @@ Markov chain Monte Carlo offers a relatively general approach to this problem
 that, while not always successful, offers enough diagnostic information to give
 us a decent chance of identifying its failures when we take the time to look
 closely enough.  By implementing Markov chain Monte Carlo through a proper
-workflow we can force ourselves to take that time and optimize our ability to
+workflow we can force ourselves to take that time and increase our ability to
 manage the risk.
 
 In other words if we treat Markov chain Monte Carlo as a delicate tool that
@@ -3860,7 +4038,7 @@ To truly realize the power of Markov chain Monte Carlo we need to combine a
 robust workflow with Markov transitions that use as much information about the
 target distribution to ensure as possible to maximize both performance and
 diagnostic power.  That is where modern algorithms like Hamiltonian Monte Carlo
-shine.
+really shine.
 
 # Appendix: Convergent Vocabulary
 
@@ -3881,17 +4059,18 @@ the limiting value exactly,
 $$
 \lim_{N \rightarrow \infty} \theta_{N} = \theta^{*}.
 $$
-Technically _nothing_ ever converges after only a finite amount of time.  That
-said, after enough time, $N_{c}$, the objects in the sequence might get so close
-to the limiting value that the difference doesn't matter in practice,
+Technically _nothing_ ever converges after only a finite amount of iterations.
+That said, after enough iteations, $N_{\epsilon}$, the objects in the sequence
+will get arbitrarily close to limiting value
 $$
-| \theta_{n} - \theta_{\infty} | \approx 0, \, \forall n > N_{c}.
+| \theta_{n} - \theta_{\infty} | \lt \epsilon, \, \forall n > N_{\epsilon}
 $$
-Without an explicit threshold defining when the difference no longer matters
-this _preasymptotic convergence_ isn't well-defined, but it is often used when
-building intuition about _how_ sequences converge.  If we want to be careful
-then we have to separate out formal convergence and more casual concepts like
-preasymptotic convergence.
+and the difference doesn't matter in practice.  Without an explicit threshold
+defining when the differences no longer matter, this kind of approximate
+convergence isn't well-defined but it is often used when building intuition
+about _how_ sequences converge.  If we want to be careful then we have to
+separate out formal convergence and more casual concepts like effective
+convergence.
 
 The second important contribution to the notational confusion is exactly what
 objects are converging.  For example, we could consider the last point in a
@@ -3899,13 +4078,12 @@ growing Markov chain.  Under the sufficiently nice conditions the two ends of an
 infintely long Markov chain become uncorrelated and the last point will
 asymptotically converge to an exact sample from the target distribution.  When
 the correlation between the two ends of the Markov chain is vanishingly small we
-might say that the end point has preasymptotically converged to an approximately
-exact sample.
+might say that the end point has effectively converged to an exact sample.
 
 Instead of considering a single realization of a Markov chain we can also
 consider the $N$-step distributions that quantify the scope of possible
-realizations of the Markov chain marginally at each iteration.  Under the
-necessary conditions the $N$-step distribution will asymptotically converge to
+realizations of the Markov chain marginally at each iteration.  Under some
+technical conditions the $N$-step distribution will asymptotically converge to
 the stationary distribution of the Markov transition,
 $$
 \lim_{N \rightarrow \infty} T^{N} \rho = \pi.
@@ -3920,20 +4098,16 @@ $$
 While the end of a Markov chain converges, the entire Markov chain itself
 doesn't really converge to anything.  Even in the asymptotic limit, for example,
 the Markov chain can't converge to an ensemble of exact samples because the
-earlier states will always retain their initial behavior.  _Expectations over
-the history of a Markov chain_, however, do have well-defined asymptotic
-behaviors.
+earlier states will always contain residue of the initialization.
+_Expectations over the history of a Markov chain_, however, do have well-defined
+asymptotic behaviors.
 
 The immediate example is the Markov chain Monte Carlo estimator of any
 integrable function which converges to the corresponding expectation value with
-respect to the stationary probability distribution,
-$$
-\lim_{N \rightarrow \infty} \frac{1}{N + 1} \sum_{n = 0}^{N} f(q_{n}) =
-\mathbb{E}_{\pi} [ f ].
-$$
-for any Markov chain realization.  Because this holds for any realized Markov
-chain, it also implies that the average of the $N$-step expectation values
-converge to the stationary expectation value,
+respect to the stationary probability distribution for almost every Markov chain
+realization.  Because this holds for almost every realized Markov chain, it also
+implies that the average of the $N$-step expectation values converge to the
+stationary expectation value,
 $$
 \lim_{N \rightarrow \infty} \frac{1}{N + 1} \sum_{n = 0}^{N}
 \mathbb{E}_{T^{N} \rho}[f] = \mathbb{E}_{\pi},
@@ -3952,8 +4126,9 @@ and hence what should be our conceptual priority.
 
 # Acknowledgements {-}
 
-I am also indebted for the feedback from those who have attended my courses and
-talks.
+I thank Sam Livingstone, Charles Margossian, and Siddhant Wahal for helpful
+comments.  I am also indebted for the feedback from those who have attended my
+courses and talks.
 
 A very special thanks to everyone supporting me on Patreon: Abhinav Katoch,
 Abhishek Vasu,Adam Slez,Aki Vehtari,Alan O'Donnell,Alex Gao,Alexander Bartik,

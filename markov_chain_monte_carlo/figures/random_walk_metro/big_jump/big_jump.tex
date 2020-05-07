@@ -36,20 +36,21 @@
     }  
   \end{scope}
   
-  \pgfmathsetmacro{\x}{10.5}
+  \pgfmathsetmacro{\x}{10.8}
   \pgfmathsetmacro{\y}{1}
-  \pgfmathsetmacro{\delta}{2}
+  \pgfmathsetmacro{\delta}{0.25}
+  
   \foreach \i in {0, 0.02,..., 1} {
-    \fill[color=green, opacity={exp(-5 * \i)}]
-      ({\x - \delta * \i}, \y) 
-      .. controls ({\x - 0.5 * \delta * \i}, \y) 
-        and ({\x - 0.25 * \delta * \i}, {\y - 0.25 * \delta * \i}) 
-      .. ({\x + 0.25 * \delta * \i}, {\y - 0.75 * \delta * \i})
-      .. controls ({\x + \delta * \i}, {\y - 0.5 * \delta * \i}) 
-         and ({\x + \delta * \i}, {\y + 0.5 * \delta * \i}) 
-       .. ({\x + 0.25 * \delta * \i}, {\y + 0.75 * \delta * \i})
-       .. controls ({\x - 0.25 * \delta * \i}, {\y + 0.25 * \delta * \i}) 
-         and ({\x - 0.5 * \delta * \i}, \y) .. ({\x - \delta * \i}, \y);
+    \draw[color=green, line width={3 * \i}, opacity={exp(-5 * \i)}]
+      (-5 * \delta + \x, 0 + \y) 
+        .. controls (-2  * \delta + \x, 0 + \y) and (-1  * \delta + \x, 2  * \delta + \y) .. 
+      (-0.5 * \delta + \x, 2 * \delta + \y) 
+        .. controls (0 + \x, 2 * \delta + \y) and (0.5 * \delta + \x, 0.75 * \delta + \y) .. 
+      (0.5 * \delta + \x, 0 + \y) 
+        .. controls (0.5 * \delta + \x, -0.75 * \delta + \y) and (0 + \x, -2 * \delta + \y) .. 
+      (-0.5 * \delta + \x, -2 * \delta + \y) 
+        .. controls (-1 * \delta + \x, -2 * \delta + \y) and (-2 * \delta + \x, 0 + \y) ..  
+      (-5 * \delta + \x, 0 + \y);
   }
 \end{tikzpicture}
 
