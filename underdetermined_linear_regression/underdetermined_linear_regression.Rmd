@@ -2,6 +2,9 @@
 title: "Underdetermined Linear Regression"
 author: "Michael Betancourt"
 date: "December 2018"
+csl: institute-of-mathematical-statistics.csl
+link-citations: yes
+linkcolor: blue
 output:
   html_document:
     fig_caption: yes
@@ -35,7 +38,7 @@ happens when we try to fit a linear regression with many fewer observations.
 First we simulate data using $M = 200$ slopes and only $N = 100$ observations.
 
 ```{r}
-writeLines(readLines("generate_data.stan"))
+writeLines(readLines("stan_programs/generate_data.stan"))
 ```
 
 ```{r}
@@ -57,7 +60,7 @@ options(mc.cores = parallel::detectCores())
 util <- new.env()
 source('stan_utility.R', local=util)
 
-fit <- stan(file='generate_data.stan', iter=1,
+fit <- stan(file='stan_programs/generate_data.stan', iter=1,
             chains=1, seed=194838, algorithm="Fixed_param")
 
 X <- extract(fit)$X[1,,]
@@ -72,12 +75,13 @@ We then proceed to fit the simulated data using weakly informative priors on
 all of the parameters to ensure a well-defined posterior distribution.
 
 ```{r}
-writeLines(readLines("linear_regression.stan"))
+writeLines(readLines("stan_programs/linear_regression.stan"))
 ```
 
 ```{r, cache=TRUE}
 input_data <- read_rdump("linear_regression.data.R")
-fit <- stan(file='linear_regression.stan', data=input_data, seed=4938483)
+fit <- stan(file='stan_programs/linear_regression.stan', data=input_data, 
+            seed=4938483, refresh=0)
 
 util$check_all_diagnostics(fit)
 ```
@@ -153,15 +157,15 @@ parallel components of the distance from each sampled configuration and the
 underdetermined hyperplane.
 
 ```{r}
-writeLines(readLines("linear_regression_w_proj.stan"))
+writeLines(readLines("stan_programs/linear_regression_w_proj.stan"))
 ```
 
 This time we also make sure to give our trajectories the room they need by
 expanding the maximum treedepth.
 
 ```{r, cache=TRUE}
-fit <- stan(file='linear_regression_w_proj.stan', data=input_data, seed=4938483,
-            control=list(max_treedepth=15))
+fit <- stan(file='stan_programs/linear_regression_w_proj.stan', data=input_data, 
+            seed=4938483, control=list(max_treedepth=15), refresh=0)
 
 util$check_n_eff(fit)
 util$check_rhat(fit)
@@ -238,6 +242,8 @@ areas of research!
 
 # Acknowledgements
 
+I thank Frank Weber for helpful comments.
+
 A very special thanks to everyone supporting me on Patreon: Aki Vehtari, 
 Alan O'Donnell, Andre Zapico, Andrew Rouillard, Austin Rochford, Avraham Adler, 
 Bo Schwartz Madsen, Bryan Yu, Cat Shark, Charles Naylor, Christopher Howlin, 
@@ -253,12 +259,27 @@ Robin Taylor, Sam Petulla, Sam Zorowitz, Seo-young Kim, Seth Axen,
 Sharan Banagiri, Simon Duane, Stephen Oates, Stijn, Vladislavs Dovgalecs, 
 and yolha.
 
-# Original Computing Environment
+# License {-}
+
+A repository containing the material used in this case study is available on
+[GitHub](https://github.com/betanalpha/knitr_case_studies/tree/master/underdetermined_linear_regression).
+
+The code in this case study is copyrighted by Michael Betancourt and licensed
+under the new BSD (3-clause) license:
+
+https://opensource.org/licenses/BSD-3-Clause
+
+The text and figures in this case study are copyrighted by Michael Betancourt
+and licensed under the CC BY-NC 4.0 license:
+
+https://creativecommons.org/licenses/by-nc/4.0/
+
+# Original Computing Environment {-}
 
 ```{r, comment=NA}
 writeLines(readLines(file.path(Sys.getenv("HOME"), ".R/Makevars")))
 ```
 
 ```{r, comment=NA}
-devtools::session_info("rstan")
+sessionInfo()
 ```

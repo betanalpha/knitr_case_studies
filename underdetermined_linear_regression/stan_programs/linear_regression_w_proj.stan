@@ -47,7 +47,7 @@ generated quantities {
   {
     vector[N] z = Pnorm * X_buff * (append_row(beta, alpha) - R);
     gamma_perp = Z \ (X_buff' * z);
-    gamma_par = append_row(beta, alpha) - gamma_perp;
+    gamma_par = (append_row(beta, alpha) - R) - gamma_perp;
     delta = sqrt(dot_self(gamma_perp));
   }
 }
