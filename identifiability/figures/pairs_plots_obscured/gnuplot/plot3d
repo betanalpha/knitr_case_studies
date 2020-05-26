@@ -1,0 +1,133 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "xyz.eps"
+
+set border 3
+
+set hidden3d
+
+set title ""
+
+set xtics nomirror scale 0
+set format x ''
+set xlabel ''
+set xrange [-5:5]
+
+set ytics nomirror scale 0
+set format y ''
+set ylabel ''
+set yrange [-5:5]
+
+set ztics nomirror scale 0
+set format z ''
+set zlabel ''
+set zrange [-5:5]
+
+unset colorbox
+set cbrange [-5:5]
+
+set palette model RGB rgbformulae 8, 9, 9
+
+set view 70, 60, 1, 1
+
+splot \
+"samples.dat" using 4:5:6 w p pt 7 ps 0.75 lc "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "xy.eps"
+
+set border 0
+
+set title ""
+
+set xtics nomirror scale 0
+set format x ''
+set xlabel ''
+set xrange [-5:5]
+
+set ytics nomirror scale 0
+set format y ''
+set ylabel ''
+set yrange [-5:5]
+
+set ztics nomirror scale 0
+set format z ''
+set zlabel ''
+set zrange [-5:5]
+
+plot \
+"samples.dat" using 4:5 w p pt 7 ps 2 lc "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "yz.eps"
+
+set border 0
+
+set title ""
+
+set xtics nomirror scale 0
+set format x ''
+set xlabel ''
+set xrange [-5:5]
+
+set ytics nomirror scale 0
+set format y ''
+set ylabel ''
+set yrange [-5:5]
+
+set ztics nomirror scale 0
+set format z ''
+set zlabel ''
+set zrange [-5:5]
+
+plot \
+"samples.dat" using 5:6 w p pt 7 ps 2 lc "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "xz.eps"
+
+set border 0
+
+set title ""
+
+set xtics nomirror scale 0
+set format x ''
+set xlabel ''
+set xrange [-5:5]
+
+set ytics nomirror scale 0
+set format y ''
+set ylabel ''
+set yrange [-5:5]
+
+set ztics nomirror scale 0
+set format z ''
+set zlabel ''
+set zrange [-5:5]
+
+plot \
+"samples.dat" using 4:6 w p pt 7 ps 2 lc "$dark" notitle
+
+END

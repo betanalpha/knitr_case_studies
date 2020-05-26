@@ -1,0 +1,79 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray60}{gray}{0.95}
+
+\newcommand{\mcpoint}[2]{  
+  \fill[color=dark] (#1, #2) circle (3pt); 
+  \fill[color=light] (#1, #2) circle (2pt);
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.35, thick]
+
+  \pgfmathsetmacro{\dx}{0}
+  \draw[white] (-7 + \dx, -9) rectangle (7 + \dx, 6);
+    
+  \begin{scope}
+    \clip (-7 + \dx, -9) rectangle (7 + \dx, 6);
+    \node at (0 + \dx, 0) {\includegraphics[width=3.5cm]{gnuplot/density.eps}};
+  \end{scope}
+  
+  \draw [->, >=stealth, line width=1] (-5.05 + \dx, -5) -- +(10, 0);
+  \draw [->, >=stealth, line width=1] (-5 + \dx, -5) -- +(0, 10);
+  \node[] at (4 + \dx, -6) { $\theta_{1}$ };
+  \node[] at (-6 + \dx, 4) { $\theta_{2}$ };
+ 
+  \node[] at (0 + \dx, -8) { Target Density Function };
+ 
+  \pgfmathsetmacro{\dx}{18}
+  \draw[white] (-7 + \dx, -9) rectangle (7 + \dx, 6);
+ 
+  \begin{scope}
+    \clip (-7 + \dx, -9) rectangle (7 + \dx, 6);
+    \node at (0 + \dx, 0) {\includegraphics[width=3.5cm]{gnuplot/crude_samples.eps}};
+  \end{scope}
+  
+  \draw [->, >=stealth, line width=1] (-5.05 + \dx, -5) -- +(10, 0);
+  \draw [->, >=stealth, line width=1] (-5 + \dx, -5) -- +(0, 10);
+  \node[] at (4 + \dx, -6) { $\theta_{1}$ };
+  \node[] at (-6 + \dx, 4) { $\theta_{2}$ };
+  
+  \node[] at (0 + \dx, -8) { Nominal Step Size Adaptation };
+
+  \pgfmathsetmacro{\dx}{36}
+  \draw[white] (-7 + \dx, -9) rectangle (7 + \dx, 6);
+ 
+  \begin{scope}
+    \clip (-7 + \dx, -9) rectangle (7 + \dx, 6);
+    \node at (0 + \dx, 0) {\includegraphics[width=3.5cm]{gnuplot/refined_samples.eps}};
+  \end{scope}
+  
+  \draw [->, >=stealth, line width=1] (-5.05 + \dx, -5) -- +(10, 0);
+  \draw [->, >=stealth, line width=1] (-5 + \dx, -5) -- +(0, 10);
+  \node[] at (4 + \dx, -6) { $\theta_{1}$ };
+  \node[] at (-6 + \dx, 4) { $\theta_{2}$ };
+  
+  \node[] at (0 + \dx, -8) { Refined Step Size Adaptation };
+
+\end{tikzpicture}
+
+\end{document}  

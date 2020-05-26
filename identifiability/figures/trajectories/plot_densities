@@ -1,0 +1,179 @@
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "nominal.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-7:7]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:7]
+
+set zlabel ''
+set zrange[-7:0]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 400
+set isosamples 400
+
+splot \
+- 0.5 * ( (x - 0.25 * y**3 + y**2 - 2) / 0.25)**2 \
+- 0.5 * (x / 2)**2 - 0.5 * (y / 2)**2 notitle, \
+'trajectory.dat' u 2:3:(0) every :::0::0 w l ls 1 lw 2 lc rgb "black" notitle, \
+'trajectory.dat' u 2:3:(0) every :::0::0 w l ls 1 lw 1.5 lc rgb "white" notitle, \
+'trajectory.dat' u 2:3:(0) every :::0::0 w p pt 7 ps 1.0 lc rgb "black" notitle, \
+'trajectory.dat' u 2:3:(0) every :::0::0 w p pt 7 ps 0.75 lc rgb "white" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "nominal_zoom.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-1:3]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-1.5:3]
+
+set zlabel ''
+set zrange[-7:0]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 300
+set isosamples 300
+
+splot \
+- 0.5 * ( (x - 0.25 * y**3 + y**2 - 2) / 0.25)**2 \
+- 0.5 * (x / 2)**2 - 0.5 * (y / 2)**2 notitle, \
+'trajectory.dat' u 2:3:(0) every :::0::0 w l ls 1 lw 4 lc rgb "black" notitle, \
+'trajectory.dat' u 2:3:(0) every :::0::0 w l ls 1 lw 3 lc rgb "white" notitle, \
+'trajectory.dat' u 2:3:(0) every :::0::0 w p pt 7 ps 2 lc rgb "black" notitle, \
+'trajectory.dat' u 2:3:(0) every :::0::0 w p pt 7 ps 1.5 lc rgb "white" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "divergent.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-7:7]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:7]
+
+set zlabel ''
+set zrange[-7:0]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 300
+set isosamples 300
+
+splot \
+- 0.5 * ( (x - 0.25 * y**3 + y**2 - 2) / 0.25)**2 \
+- 0.5 * (x / 2)**2 - 0.5 * (y / 2)**2 notitle, \
+'divergent2.dat' u 2:3:(0) every :::1::1 w l ls 1 lw 2 lc rgb "black" notitle, \
+'divergent2.dat' u 2:3:(0) every :::1::1 w l ls 1 lw 1.5 lc rgb "white" notitle, \
+'divergent2.dat' u 2:3:(0) every :::1::1 w p pt 7 ps 1.0 lc rgb "black" notitle, \
+'divergent2.dat' u 2:3:(0) every :::1::1 w p pt 7 ps 0.75 lc rgb "white" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "divergent_zoom.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-2:3]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-2:5]
+
+set zlabel ''
+set zrange[-7:0]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 300
+set isosamples 300
+
+splot \
+- 0.5 * ( (x - 0.25 * y**3 + y**2 - 2) / 0.25)**2 \
+- 0.5 * (x / 2)**2 - 0.5 * (y / 2)**2 notitle, \
+'divergent2.dat' u 2:3:(0) every :::1::1 w l ls 1 lw 4 lc rgb "black" notitle, \
+'divergent2.dat' u 2:3:(0) every :::1::1 w l ls 1 lw 3 lc rgb "white" notitle, \
+'divergent2.dat' u 2:3:(0) every :::1::1 w p pt 7 ps 2.0 lc rgb "black" notitle, \
+'divergent2.dat' u 2:3:(0) every :::1::1 w p pt 7 ps 1.5 lc rgb "white" notitle
+
+END
