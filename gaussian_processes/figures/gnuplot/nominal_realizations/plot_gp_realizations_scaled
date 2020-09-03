@@ -1,0 +1,47 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'gp_scaled.eps'
+
+set border 0
+
+set lmargin screen 0
+set bmargin screen 0
+set rmargin screen 1
+set tmargin screen 1
+
+set title ""
+
+set xlabel 'x'
+set format x ''
+set xtics nomirror in (-5.5, 0, 5.5)
+set xrange[-11:11]
+
+set ytics nomirror in (-3, 0, 3)
+set format y ''
+set ylabel 'y'
+set yrange[-10:10]
+
+set zlabel ''
+set cbrange[-10:50]
+unset cbtics
+unset colorbox
+
+set palette model RGB rgbformulae 8, 9, 9 negative
+
+set datafile separator ','
+
+plot \
+for [i=1:50] "< sed -n ".i."p gp.clean.csv | tr ',' '\n'" \
+u (22.0 * \$0 / 550 - 11):1:(i) w l lt 1 lw 3 lc palette notitle
+
+END

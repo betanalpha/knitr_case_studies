@@ -1,0 +1,82 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'gp_low_rho.eps'
+
+set border 0
+
+set lmargin 0
+set bmargin 0
+set rmargin 1
+set tmargin 1
+
+set title ""
+
+set xtics nomirror scale 0
+set xlabel ''
+set format x ''
+set xrange[-1:5]
+
+set ytics nomirror scale 0
+set ylabel 'y'
+set format y ''
+set yrange[-10:10]
+
+set zlabel ''
+set cbrange[-10:50]
+unset cbtics
+unset colorbox
+
+set palette model RGB rgbformulae 8, 9, 9 negative
+
+plot \
+for [i=1:50] \
+"< sed -n ".i."p gp_low_rho.clean.csv | awk -F, '{for(n=3; n < 504; ++n) print \$n}'" \
+u (20.0 * \$0 / 500 - 10):1:(i) w l lt 1 lw 3 lc palette notitle
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'gp_high_rho.eps'
+
+set border 0
+
+set lmargin 0
+set bmargin 0
+set rmargin 1
+set tmargin 1
+
+set title ""
+
+set xtics nomirror scale 0
+set xlabel ''
+set format x ''
+set xrange[-1:5]
+
+set ytics nomirror scale 0
+set ylabel ''
+set format y ''
+set yrange[-10:10]
+
+set zlabel ''
+set cbrange[-10:50]
+unset cbtics
+unset colorbox
+
+set palette model RGB rgbformulae 8, 9, 9 negative
+
+plot \
+for [i=1:50] \
+"< sed -n ".i."p gp_high_rho.clean.csv | awk -F, '{for(n=3; n < 504; ++n) print \$n}'" \
+u (20.0 * \$0 / 500 - 10):1:(i) w l lt 1 lw 3 lc palette notitle
+END

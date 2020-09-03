@@ -1,0 +1,154 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'gp_low_rho.eps'
+
+set border 0
+
+set lmargin 0
+set bmargin 0
+set rmargin 1
+set tmargin 1
+
+set title ""
+
+set xtics nomirror scale 0
+set xlabel 'x'
+set xtics nomirror scale 0
+set xrange[-11:11]
+
+set ytics nomirror scale 0
+set ylabel 'y'
+set yrange[-10:10]
+
+set zlabel ''
+set cbrange[-10:10]
+unset cbtics
+unset colorbox
+
+set palette model RGB rgbformulae 8, 9, 9 negative
+
+plot \
+for [i=1:10] \
+"< sed -n ".i."p gp_low_rho.clean.csv | tr ',' '\n'" \
+u (22.0 * \$0 / 551 - 11):1:(i) w l lt 1 lw 3 lc palette notitle
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'gp_high_rho.eps'
+
+set border 0
+
+set lmargin 0
+set bmargin 0
+set rmargin 1
+set tmargin 1
+
+set title ""
+
+set xtics nomirror scale 0
+set xlabel 'x'
+set xtics nomirror scale 0
+set xrange[-11:11]
+
+set ytics nomirror scale 0
+set ylabel 'y'
+set yrange[-10:10]
+
+set zlabel ''
+set cbrange[-10:10]
+unset cbtics
+unset colorbox
+
+set palette model RGB rgbformulae 8, 9, 9 negative
+
+plot \
+for [i=1:10] \
+"< sed -n ".i."p gp_high_rho.clean.csv | tr ',' '\n'" \
+u (22.0 * \$0 / 551 - 11):1:(i) w l lt 1 lw 3 lc palette notitle
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'gp_low_alpha.eps'
+
+set border 0
+
+set lmargin 0
+set bmargin 0
+set rmargin 1
+set tmargin 1
+
+set title ""
+
+set xtics nomirror scale 0
+set xlabel 'x'
+set xtics nomirror scale 0
+set xrange[-11:11]
+
+set ytics nomirror scale 0
+set ylabel 'y'
+set yrange[-25:25]
+
+set zlabel ''
+set cbrange[-10:10]
+unset cbtics
+unset colorbox
+
+set palette model RGB rgbformulae 8, 9, 9 negative
+
+plot \
+for [i=1:10] \
+"< sed -n ".i."p gp_low_alpha.clean.csv | tr ',' '\n'" \
+u (22.0 * \$0 / 551 - 11):1:(i) w l lt 1 lw 3 lc palette notitle
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'gp_high_alpha.eps'
+
+set border 0
+
+set lmargin 0
+set bmargin 0
+set rmargin 1
+set tmargin 1
+
+set title ""
+
+set xtics nomirror scale 0
+set xlabel 'x'
+set xtics nomirror scale 0
+set xrange[-11:11]
+
+set ytics nomirror scale 0
+set ylabel 'y'
+set yrange[-25:25]
+
+set zlabel ''
+set cbrange[-10:10]
+unset cbtics
+unset colorbox
+
+set palette model RGB rgbformulae 8, 9, 9 negative
+
+plot \
+for [i=1:10] \
+"< sed -n ".i."p gp_high_alpha.clean.csv | tr ',' '\n'" \
+u (22.0 * \$0 / 551 - 11):1:(i) w l lt 1 lw 3 lc palette notitle
+END
+
+

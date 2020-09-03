@@ -1,0 +1,152 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray60}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.5]
+
+\node[] at (-23.7, 12) {
+$
+\boldsymbol{\mu} = 
+\begin{pmatrix}
+\mu(x^{\mathrm{obs}}_{1}) \\
+\vdots \\
+\mu(x^{\mathrm{obs}}_{N_{\mathrm{obs}}}) \vspace{4mm} \\
+\mu(x^{\mathrm{pred}}_{1}) \\
+\vdots \\
+\mu(x^{\mathrm{pred}}_{N_{\mathrm{pred}}}) \\
+\end{pmatrix} 
+$
+};
+
+\node[] at (-23, 0) {
+$
+\begin{pmatrix}
+\mu(x^{\mathrm{obs}}_{1}) \\
+\vdots \\
+\mu(x^{\mathrm{obs}}_{N_{\mathrm{obs}}}) \vspace{4mm} \\
+\mu(x^{\mathrm{pred}}_{1}) \\
+\vdots \\
+\mu(x^{\mathrm{pred}}_{N_{\mathrm{pred}}}) \\
+\end{pmatrix} 
+$
+};
+
+\draw[light, line width=1.5, rounded corners=5] (-20, 0.1) rectangle (-28, 4);
+\node[light] at (-26.75, 3) { $\boldsymbol{\mu}_{\mathrm{obs}}$ };
+
+\draw[dark, line width=1.5, rounded corners=5] (-26, -0.1) rectangle (-18, -4);
+\node[dark] at (-19.25, -3) { $\boldsymbol{\mu}_{\mathrm{pred}}$ };
+
+\node[] at (-0.8, 12) {
+$
+\mathbf{K} = 
+\begin{pmatrix}
+k(x^{\mathrm{obs}}_{1}, x^{\mathrm{obs}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{obs}}_{1}, x^{\mathrm{obs}}_{N_{\mathrm{obs}}}) 
+& k(x^{\mathrm{obs}}_{1}, x^{\mathrm{pred}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{obs}}_{1}, x^{\mathrm{pred}}_{N_{\mathrm{pred}}}) 
+\\
+\vdots & \ddots & \vdots & \vdots & \ddots & \vdots 
+\\
+k(x^{\mathrm{obs}}_{N_{\mathrm{obs}}}, x^{\mathrm{obs}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{obs}}_{N_{\mathrm{obs}}}, x^{\mathrm{obs}}_{N_{\mathrm{obs}}})
+& k(x^{\mathrm{obs}}_{N_{\mathrm{obs}}}, x^{\mathrm{obs}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{obs}}_{N_{\mathrm{obs}}}, x^{\mathrm{obs}}_{N_{\mathrm{pred}}}) 
+\vspace{3mm} 
+\\
+k(x^{\mathrm{pred}}_{1}, x^{\mathrm{obs}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{pred}}_{1}, x^{\mathrm{obs}}_{N_{\mathrm{obs}}}) 
+& k(x^{\mathrm{pred}}_{1}, x^{\mathrm{pred}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{pred}}_{1}, x^{\mathrm{pred}}_{N_{\mathrm{pred}}}) 
+\\
+\vdots & \ddots & \vdots & \vdots & \ddots & \vdots 
+\\
+k(x^{\mathrm{pred}}_{N_{\mathrm{pred}}}, x^{\mathrm{obs}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{pred}}_{N_{\mathrm{pred}}}, x^{\mathrm{obs}}_{N_{\mathrm{obs}}})
+& k(x^{\mathrm{pred}}_{N_{\mathrm{pred}}}, x^{\mathrm{pred}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{pred}}_{N_{\mathrm{pred}}}, x^{\mathrm{pred}}_{N_{\mathrm{pred}}})
+\end{pmatrix} 
+$
+};
+
+\node[] at (0, 0) {
+$
+\begin{pmatrix}
+k(x^{\mathrm{obs}}_{1}, x^{\mathrm{obs}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{obs}}_{1}, x^{\mathrm{obs}}_{N_{\mathrm{obs}}}) 
+& k(x^{\mathrm{obs}}_{1}, x^{\mathrm{pred}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{obs}}_{1}, x^{\mathrm{pred}}_{N_{\mathrm{pred}}}) 
+\\
+\vdots & \ddots & \vdots & \vdots & \ddots & \vdots 
+\\
+k(x^{\mathrm{obs}}_{N_{\mathrm{obs}}}, x^{\mathrm{obs}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{obs}}_{N_{\mathrm{obs}}}, x^{\mathrm{obs}}_{N_{\mathrm{obs}}})
+& k(x^{\mathrm{obs}}_{N_{\mathrm{obs}}}, x^{\mathrm{obs}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{obs}}_{N_{\mathrm{obs}}}, x^{\mathrm{obs}}_{N_{\mathrm{pred}}}) 
+\vspace{3mm} 
+\\
+k(x^{\mathrm{pred}}_{1}, x^{\mathrm{obs}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{pred}}_{1}, x^{\mathrm{obs}}_{N_{\mathrm{obs}}}) 
+& k(x^{\mathrm{pred}}_{1}, x^{\mathrm{pred}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{pred}}_{1}, x^{\mathrm{pred}}_{N_{\mathrm{pred}}}) 
+\\
+\vdots & \ddots & \vdots & \vdots & \ddots & \vdots 
+\\
+k(x^{\mathrm{pred}}_{N_{\mathrm{pred}}}, x^{\mathrm{obs}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{pred}}_{N_{\mathrm{pred}}}, x^{\mathrm{obs}}_{N_{\mathrm{obs}}})
+& k(x^{\mathrm{pred}}_{N_{\mathrm{pred}}}, x^{\mathrm{pred}}_{1}) 
+& \cdots 
+& k(x^{\mathrm{pred}}_{N_{\mathrm{pred}}}, x^{\mathrm{pred}}_{N_{\mathrm{pred}}})
+\end{pmatrix} 
+$
+};
+
+\draw[light, line width=1.5, rounded corners=5] (-0.3, 0.1) rectangle (-15, 4);
+\node[light] at (-13.75, 3) { $\mathbf{K}_{\mathrm{obs}}$ };
+
+\draw[mid, line width=1.5, rounded corners=5] (-0.1, 0.1) rectangle (13, 6);
+\node[mid] at (11.5, 5) { $\mathbf{K}_{\mathrm{mix}}$ };
+
+\draw[mid, line width=1.5, rounded corners=5] (-0.3, -0.1) rectangle (-13, -6);
+\node[mid] at (-11.5, -5) { $\mathbf{K}_{\mathrm{mix}}^{T}$ };
+
+\draw[dark, line width=1.5, rounded corners=5] (-0.1, -0.1) rectangle (15, -4);
+\node[dark] at (13.75, -3) { $\mathbf{K}_{\mathrm{pred}}$ };
+
+\end{tikzpicture}
+
+\end{document}  

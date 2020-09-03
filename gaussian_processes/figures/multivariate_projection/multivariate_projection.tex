@@ -1,0 +1,98 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, fadings}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray60}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3]
+  \tikzfading[name=fade left, left color=transparent!100, right color=transparent!20]
+  \tikzfading[name=fade right, left color=transparent!20, right color=transparent!100]
+
+  \pgfmathsetmacro{\dx}{0}
+  
+  \draw[white] (-17 + \dx, -12) rectangle (17 + \dx, 12);
+
+  \begin{scope}
+    \clip (-13 + \dx, -8) rectangle (13 + \dx, 8);
+    \node at (0 + \dx, 0) {\includegraphics[width=7.8cm]{gp.eps}};
+  \end{scope}
+
+  \node[] at (0 + \dx, 9.5) { $ \pi(f) = \mathcal{GP}(\mu, k)$ };
+  
+  \draw [->, >=stealth, line width=1] (-13 + \dx, -8) -- +(26, 0);
+  \draw [->, >=stealth, line width=1] (-13 + \dx, -8.058) -- +(0, 16);
+  \node[] at (0 + \dx, -10) { $x$ };
+  \node[] at (-15 + \dx, 0) { $f(x)$ };
+  
+  \pgfmathsetmacro{\dx}{36}
+  
+  \draw[white] (-17 + \dx, -12) rectangle (17 + \dx, 12);
+
+  \draw[dashed, color=gray70, line width=1] (-8.275 + \dx, -8) -- +(0, 16);
+  \node[] at (-8.275 + \dx, -9) { $x_{1}$ };
+  
+  \draw[dashed, color=gray70, line width=1] (-2.37 + \dx, -8) -- +(0, 16);
+  \node[] at (-2.37 + \dx, -9) { $x_{2}$ };
+  
+  \draw[dashed, color=gray70, line width=1] (4.725 + \dx, -8) -- +(0, 16);
+  \node[] at (4.725 + \dx, -9) { $x_{3}$ };
+  
+  \draw[dashed, color=gray70, line width=1] (9.45 + \dx, -8) -- +(0, 16);
+  \node[] at (9.45 + \dx, -9) { $x_{4}$ };
+
+  \begin{scope}
+    \clip (-13 + \dx, -8) rectangle (13 + \dx, 8);
+    \node at (0 + \dx, 0) {\includegraphics[width=7.8cm]{gp_multi_proj.eps}};
+      
+    \fill[white, opacity=0.8] (-13 + \dx, -8) rectangle (-8.275 - 0.5 + \dx, 8);
+    
+    \fill[white, path fading=fade right] (-8.275 - 0.5 + \dx, -8) rectangle (-8.275 + \dx, 8);
+    \fill[white, path fading=fade left] (-8.275 + \dx, -8) rectangle (-8.275 + 0.5 + \dx, 8);
+    
+    \fill[white, opacity=0.8] (-8.275 + 0.5 + \dx, -8) rectangle (-2.37 - 0.5 + \dx, 8);
+    
+    \fill[white, path fading=fade right] (-2.37 - 0.5 + \dx, -8) rectangle (-2.37 + \dx, 8);
+    \fill[white, path fading=fade left] (-2.37 + \dx, -8) rectangle (-2.37 + 0.5 + \dx, 8);
+    
+    \fill[white, opacity=0.8] (-2.37 + 0.5 + \dx, -8) rectangle (4.725 - 0.5 + \dx, 8);
+
+    \fill[white, path fading=fade right] (4.725 - 0.5 + \dx, -8) rectangle (4.725 + \dx, 8);
+    \fill[white, path fading=fade left] (4.725 + \dx, -8) rectangle (4.725 + 0.5 + \dx, 8);
+    
+    \fill[white, opacity=0.8] (4.725 + 0.5 + \dx, -8) rectangle (9.45 - 0.5 + \dx, 8); 
+    
+    \fill[white, path fading=fade right] (9.45 - 0.5 + \dx, -8) rectangle (9.45 + \dx, 8);
+    \fill[white, path fading=fade left] (9.45 + \dx, -8) rectangle (9.45 + 0.5 + \dx, 8);
+    
+    \fill[white, opacity=0.8] (9.45 + 0.5 + \dx, -8) rectangle (13 + \dx, 8);
+  \end{scope}
+  
+  \node[] at (0 + \dx, 11) { $ \pi(\mathbf{f}) = \text{multi-normal}(\boldsymbol{\mu}, \boldsymbol{\Sigma}) $ };
+  \node[] at (0 + \dx, 9) { $ f_{i} = f(x_{i}), \mu_{i} = \mu(x_{i}), \Sigma_{ij} = k(x_{i}, x_{j}) $ };
+  
+  \draw [->, >=stealth, line width=1] (-13 + \dx, -8) -- +(26, 0);
+  \draw [->, >=stealth, line width=1] (-13 + \dx, -8.058) -- +(0, 16);
+  \node[] at (0 + \dx, -10) { $x$ };
+  \node[] at (-15 + \dx, 0) { $f(x)$ };
+ 
+\end{tikzpicture}
+
+\end{document}  
