@@ -1,7 +1,7 @@
 ---
 title: "Identity Crisis"
 author: "Michael Betancourt"
-date: "May 2020"
+date: "June 2020"
 bibliography: identifiability.bib
 csl: institute-of-mathematical-statistics.csl
 link-citations: yes
@@ -23,32 +23,65 @@ knitr::opts_chunk$set(comment=NA)
 ```
 
 Under ideal conditions only a small neighborhood of model configurations will be
-consistent with both the observed data and our domain expertise, resulting in a
-strongly concentrating posterior distribution that yield precise inferences and
-accurate estimation of those inferences.  Under more realistic conditions,
-however, our measurements and domain expertise can be much less informative,
-allowing our posterior distribution to stretch across more expansive
-neighborhoods of the model configuration space.  These intricate uncertainties
-complicate not only the utility of our inferences but also our ability to
-quantify those inferences computationally.
+consistent with both the observed data and the domain expertise we encode in
+our prior model, resulting in a posterior distribution that strongly
+concentrates along each parameter.  This not only yields precise inferences and
+but also facilitates accurate estimation of those inferences.  Under more
+realistic conditions, however, our measurements and domain expertise can be much
+less informative, allowing our posterior distribution to stretch across more
+expansive, complex neighborhoods of the model configuration space.  These
+intricate uncertainties complicate not only the utility of our inferences but
+also our ability to quantify those inferences computationally.
 
-In this case study we will explore the concept of identifiability, beginning
-with the formal definitions in the theoretical statistics literature before
-considering a more geometric definition that generalizes to applied statistical
-practice.  We will also discuss the principled ways in which we can compensate
-for poorly-identified inferences and then demonstrate these ideas in a series of
-pedagogical examples.
+In this case study we will explore the theoretical concept of _identifiability_
+and its more geometric counterpart _degeneracy_ that better generalizes to
+applied statistical practice.  We will also discuss the principled ways in which
+we can identify and then compensate for degenerate inferences before
+demonstrating these strategies in a series of pedagogical examples.
 
-# Asymptotic Identifiability
+# Identifiability
 
-In the statistics literature identifiability is an _asymptotic_ concept that
-considers whether or not infinitely large observations are able to recover the
-true data generating process.
+An observational model $\pi_{\mathcal{S}}(y ; \theta)$ with observations
+$y \in Y$ and model configurations $\theta \in \Theta$ is _identified_ when all
+of the data generating processes are unique
+[@CasellaEtAl:2002, @BernardoEtAl:2009].  In other words any two distinct model
+configurations $\theta_{1} \ne \theta_{2}$ specify different probability
+distribution over the observational space, or equivalently different probability
+density functions,
+$$
+\pi_{\mathcal{S}}(y ; \theta_{1}) \ne \pi_{\mathcal{S}}(y ; \theta_{2}).
+$$
 
-To define an asymptotic limit we consider first an initial observational model,
-$\pi_{\mathcal{S}}(y ; \theta)$, with the component observation $y \in Y$ and
-the model configurations $\theta \in \Theta$.  We then consider the product
-model that results from repeated, independent measurements,
+For example consider the observational model specified by normal probability
+density functions whose location parameter is the sum of two model parameters,
+$$
+\pi_{\mathcal{S}}(y ; \alpha, \beta, \sigma)
+=
+\text{normal}(y ; \alpha + \beta, \sigma).
+$$
+In this case the infinite number of model configurations that fall on the line
+$\alpha + \beta = \mu$ for any real number $\mu \in \mathbb{R}$ all specify
+_exactly_ the same data generating process.
+
+Formal identifiability, however, does not always imply such extreme degeneracy.
+The sets of equivalent model configurations, for example, might be _compact_, or
+bounded within a finite volume, unlike the lines that stretch all the way to
+infinity in the previous example.  At the same time the sets of equivalent model
+configurations might contain only a finite number of elements, indicating that
+only a few model configurations specify exactly the same data generating
+process, with the bulk of the observational model identified.
+
+That said, just because the data generating processes in the observational model
+are different doesn't mean that realized likelihood functions or realized
+posterior density functions from this model will be.  Identifiability offers no
+guarantee that the differences between the different data generating processes
+will be large enough to distinguish them after only a finite number of
+observations.  An infinite number of observations, however, should be enough to
+resolve what could be minuscule differences between the different data
+generating processes.
+
+To be more precise let's define a product observational model
+that results from repeated, independent measurements,
 $\{ y_{1}, \ldots, y_{N} \} \in Y^{N}$,
 $$
 \pi_{\mathcal{S}_{N}}(y_{1}, \ldots, y_{N}; \theta)
@@ -56,14 +89,20 @@ $$
 \prod_{n = 1}^{N}
 \pi_{\mathcal{S}}(y_{n} ; \theta).
 $$
-At this point we can then ask how the inferences informed by these repeated
-observations behave as $N$ approaches infinity.
+As $N$ approaches infinity the inferences informed by this product observational
+model will be well-behaved only if the component observational model is
+identified.  The exact meaning of well-behaved depends on the nature of our
+inferences, in particular whether they are derived from a frequentist or a
+Bayesian perspective.
 
-## Frequentist Identifiability
+## Frequentist Asymptotics
 
-Evaluating the observational probability density function on a realized
-observation, $\{ \tilde{y}_{1}, \ldots, \tilde{y}_{N} \}$, defines a _likelihood
-function_ from the model configuration space into the real numbers,
+While there many frequentist estimators here we will consider only the
+maximum likelihood estimator.
+
+Recall that evaluating the product observational probability density function on
+a realized observation, $\{ \tilde{y}_{1}, \ldots, \tilde{y}_{N} \}$, defines a
+_likelihood function_ from the model configuration space into the real numbers,
 $$
 \mathcal{L}_{\tilde{y}_{1}, \ldots, \tilde{y}_{N}}(\theta)
 =
@@ -71,101 +110,125 @@ $$
 $$
 The higher the output likelihood relative to the outputs from other model
 configurations the more consistent that model configuration is with the realized
-observation compared to the others.
+observation relative to the other model configurations.  In particular the model
+configuration with the highest output likelihood is the most consistent relative
+to the others.
 
-In the frequentist setting an observational model is _identified_ only when the
-likelihood function concentrates on the true model configuration for almost all
-infinitely large observations,
+This model configuration with the largest likelihood output is exactly the
+definition of the _maximum likelihood estimator_,
 $$
-\lim_{N \rightarrow \infty}
-\mathcal{L}_{\tilde{y}_{1}, \ldots, \tilde{y}_{N}}(\theta)
-= \delta(\theta - \theta^{*}),
+\hat{\theta}_{\text{ML}}(\tilde{y}_{1}, \ldots, \tilde{y}_{N})
+=
+\underset{\theta \in \Theta}{\text{argmax}}
+\mathcal{L}_{\tilde{y}_{1}, \ldots, \tilde{y}_{N}}(\theta).
 $$
-where
+Ultimately the utility of this estimator is determined by how close the data
+generating process specified by the maximum likelihood estimator,
 $$
-\tilde{y}_{n} \sim \pi_{\mathcal{S}}(y_{n} ; \theta^{*}).
+\pi_{\mathcal{S}}(y; \hat{\theta}_{\text{ML}}(\tilde{y}_{1}, \ldots, \tilde{y}_{N}))
 $$
-In other words if our observational model is identified then we would almost
-always be able to exactly recover the truth given enough data, at least within
-the context of that model.
+is to the true data generating process.
 
-Critically this formal definition of identifiability is defined only in the
-$\mathcal{M}$-closed context.  Even when an observational model is identified we
-have no constraints on how the likelihood functions realized from _external
+Identifiability is a critical requirement for utility of the maximum likelihood
+estimator even under ideal circumstances [@vanderVaart:2000, CasellaEtAl:2002].
+More formally let's assume an $\mathcal{M}$-closed context such that the
+observed data are drawn from a data generating process within the observational
+model,
+$$
+y_{n} \sim \pi(y_{n} ; \theta^{*}), \, \theta^{*} \in \Theta.
+$$
+In the asymptotic $N \rightarrow \infty$ limit the maximum likelihood estimator
+will converge to the true model configuration for almost all observations only
+if the component observational model is identified.  In other words if our
+observational model is identified then we will almost always be able to exactly
+recover the truth given enough data, at least within the context of that model.
+
+Subject to some regularity conditions -- such as the true model configuration
+being in the interior of the model configuration space and not on a boundary,
+the likelihood functions being sufficiently smooth, etc -- the asymptotic
+consistency of the maximum likelihood estimator also implies that the likelihood
+function realized from almost every product observation itself converges to a
+delta function around the true model configuration.  With some even stronger
+regularity conditions asymptotic consistency implies that the likelihood
+functions contract to this delta function uniformly in all directions.
+Consequently given these regularity conditions identifiability implies that the
+_geometry_ of the likelihood function is well-defined asymptotically.
+
+Critically these consequences of identifiability are well-defined only in the
+$\mathcal{M}$-closed context.  Even when an observational model is identified
+are no guarantees regarding how the likelihood functions realized from _external
 observations_, that is observations generated from data generating processes
 outside of the observational model, might behave in the asymptotic limit.
 
-Although confirmation of frequentist identifiability has limited utility in
-practice, where we have neither infinitely large observations or an
-$\mathcal{M}$-closed context, the _failure_ of frequentist identifiability can
-be a useful diagnostic tool.  Observational models that don't work well in the
-idealized $\mathcal{M}$-closed, infinite limit are unlikely to provide
-well-behaved inferences in $\mathcal{M}$-open, finite data circumstances either.
+Although confirmation of identifiability has limited utility in practice, where
+we have neither infinitely large observations or an $\mathcal{M}$-closed
+context, the _failure_ of frequentist identifiability can be a useful diagnostic
+tool.  Observational models that don't work well in the idealized
+$\mathcal{M}$-closed, infinite limit are unlikely to provide well-behaved
+inferences in $\mathcal{M}$-open, finite data circumstances either.
 Consequently while frequentist identifiability is not a sufficient condition for
 useful models it is typically a necessary one, and checking it can help us to
 find pathological model behavior.
 
 If our observational model depends on auxiliary data, for example geographical
-locations where measurements are being performed, then the asymptotic limit,
-not to mention concepts like identifiability that are defined in that limit,
-becomes a bit more complicated.  More formally let's define the data, $y$, that
+locations where measurements are being performed, concepts like identifiability
+become a bit more complicated.  More formally let's define the data, $y$, that
 results from the measurement as a _variate_ and data, $x$, that defines the
 context of a measurement as a _covariate_.  In this case our observational model
 takes the conditional form
 $$
 \pi_{\mathcal{S}}(y | x ; \theta).
 $$
-In order to formally define an asymptotic limit we have to explicitly define how
-the covariates change from measurement to measurement with a probabilistic
-model, $\pi_{S}(x)$
+In this case we can define identifiability _conditionally_ on a given covariate
+value or we can define it _marginally_ given an explicit model for the
+covariates, $\pi_{S}(x)$.
 
-For example we could take a Dirac distribution around some nominal covariates
-which allows us to ask if our model is identified _conditioned on those nominal
-covariate values_.  We get a much more informative picture, however, when we
-consider a covariate model that spans an entire range of possible covariate
-values, giving us sensitivity to possible pathologies in between the nominal
-values.  In the statistics literature this limit is known as
-_infill asymptotics_.
+The asymptotic limit, and the consequences of these different forms of
+identifiability, also become more complicated in the presence of covariates.
+For example we can consider the asymptotic limit given a fixed covariate value,
+in which case identifiability conditioned on that value is necessary for good
+asymptotic behavior.  We get a much more informative picture, however, when we
+consider the asymptotic limit with the covariates values spanning the entire
+range of possible covariate values, giving us sensitivity to possible
+pathologies near the nominal values.  In the statistics literature this limit is
+known as _infill asymptotics_.
 
-## Bayesian Identifiability
+## Bayesian Asymptotics
 
-Frequentist identifiability also has a natural Bayesian equivalent.  If the
-likelihood functions all concentrate on the true model configuration then the
-posterior density functions all will as well, at least provided that the prior
-density functions don't obstruct the convergence.  This intuition is formalized
-in the _Bernstein-von Mises theorem_ which defines the conditions under which
-the the realized posterior density functions converge to the true model
-configuration within a particular parameterization of the model configuration
-space.
+The asymptotic behavior of the maximum likelihood estimator and the likelihood
+function itself also has a natural Bayesian equivalent.  If the observational
+model is identified and the realized likelihood functions all concentrate around
+the true model configuration then the realized posterior density functions
+should as well, at least provided that the prior density functions don't obstruct
+the convergence.  This intuition is formalized in the
+_Bernstein-von Mises theorem_ [@vanderVaart:2000] which defines the conditions
+under which realized posterior point estimates, such as the posterior mean,
+median, and mode converge to the true model configuration while the realized
+posterior density functions contract around the true model configuration.
 
-As with frequentist identifiability, the practical utility of formal Bayesian
-identifiability is diagnosing the particularly nasty pathologies in the
-observational model or the prior model that persist to the asymptotic limit and
+As with frequentist asymptotics, the practical utility of formal Bayesian
+asymptotics is diagnosing any particularly nasty pathologies in the
+observational model or the prior model that persist to the asymptotic limit but
 are likely to corrupt preasymptotic inferences as well.
 
-# Preasymptotic Identifiability
+# Degeneracy
 
-Of course we will never have perfect models or infinitely many repeated
-observations.  What really matters in practice is the _preasymptotic_ behavior
-of our inferences.  Without the benefits of the asymptotic limit, however,
-defining a consistent notion of identifiability is significantly messier.
+We will never have perfect models or infinitely many repeated observations.
+What really matters in practice is the _preasymptotic_ behavior of our
+inferences when our model, especially when the model only approximates the true
+data generating process.  While the specific results considered above hold only
+in the asymptotic limit, the _geometric_ considerations are far more general and
+are perfectly well-defined not only preasymptotically but also in the
+$\mathcal{M}$-open context.  In particular we can always investigate how
+_uniformly_ a realized likelihood function or posterior density function
+concentrates around any single point in the model configuration space.
 
-Although identifiability is defined in only the asymptotic limit, its
-_geometric_ implications suggest a more general definition of identifiability
-that makes sense not only preasymptotically but also in the $\mathcal{M}$-open
-context.  Asymptotic identifiability often implies that likelihood functions and
-posterior density functions realized from infinitely many repeated observations
-will collapse onto a single point in the model configuration space.  Although
-realizations from finitely many observations won't, in general, achieve
-complete collapse they might _uniformly concentrate_ around a single point in
-the model configuration space.
-
-In other words we can define _preasymptotic identifiability_ as a description of
-how strongly and how uniformly a realized likelihood function or posterior
+Following that intuition let's define _degeneracy_ as a qualitative description
+of how strongly and how uniformly a realized likelihood function or posterior
 density function concentrates around a single point in the model configuration
-space.  Our inferences are strongly preasymptotically identified if they appear
-to concentrate around a single point rather than some extended, degenerate
-surface.
+space.  Our inferences are strongly non-degenerate, or weakly degenerate, if
+they appear to concentrate around a single point rather than some extended,
+degenerate surface.
 
 <center>
 <br>
@@ -176,13 +239,17 @@ knitr::include_graphics("figures/pre_id/pre_id.png")
 </center>
 
 The stronger and more uniformly a realized likelihood function or posterior
-density function concentrates around a single point the more informed our
-inferences will be.  In particular preasymptotic identifiability is not binary
-characterization like asymptotic identifiability but rather a continuous one.
-Exactly _how_ preasymptotically identified our inferences need to be before they
-become problematic depends on the details of a given analysis.
+density function concentrates around a single point the more informed inferences
+about the given parameters will be.  In particular degeneracy is not binary
+qualification like asymptotic consistency but rather a continuous one.  Exactly
+_how_ degenerate our inferences can be before they become problematic depends
+on the details of a given analysis.
 
-## Consequences of Poor Preasymptotic Identifiability
+Note that nonidentified models will, by definition, by degenerate both
+asymptotically and preasymptotically.  Consequently degeneracy expands upon
+the former identifiability.
+
+## Consequences of Degeneracy
 
 A realized likelihood function or posterior density function becomes problematic
 when the resulting inferences don't have enough information to achieve the
@@ -191,52 +258,50 @@ accurate computation of those inferences in the first place.
 
 Whether or not we can expect to accumulate enough information to achieve our
 inferential goals from typical measurement outcomes is a question of
-_experimental design_.  poorly-identified inferences suggests a mismatch between
+_experimental design_.  Degenerate inferences suggests a mismatch between
 the experimental design and those goals -- either our design doesn't probe the
 desired phenomena well enough or our goals are simply too ambitious for the
 available experimental technology.
 
-Regardless of our particular inferential goals, weak preasymptotic
-identifiability can have critical computational consequences.  The more
-degenerate a realized likelihood function or posterior density function the more
-expensive it will be to algorithmically quantify the full extent of the model
-configurations consistent with the observed data, if it is possible at all.  For
-example deterministic approximations based on point estimates, such as maximum
-likelihood confidence intervals and Laplace approximations, become less accurate
-the less uniformly the likelihood function concentrates.  At the same time
-stochastic approximations like Markov chain Monte Carlo will typically be more
-expensive, rendering them less accurate for a fixed computational cost.
+Regardless of our particular inferential goals, degeneracy can have critical
+computational consequences.  The more degenerate a realized likelihood function
+or posterior density function, the more expensive it will be to algorithmically
+quantify the full extent of the model configurations consistent with the
+observed data, if it is possible at all.  For example deterministic
+approximations based on point estimates, such as maximum likelihood confidence
+intervals and Laplace approximations, become less accurate the less uniformly
+the likelihood function concentrates.  At the same time stochastic
+approximations like Markov chain Monte Carlo will typically be more expensive,
+rendering them less accurate for a fixed computational cost.
 
-If weak preasymptotic identifiability prevents us from being able to fully
-quantify a realized likelihood function or posterior density function, and
-hence their resulting inferences, then we can't accurately judge the utility
-of those inferences at all.  In practice we need our inferences to be
-sufficiently well-identified so that our computational tools have a reasonable
-opportunity to succeed and we have a reasonable opportunity to understand how
-our model responds to a given observations.
+If degeneracy prevents us from being able to fully quantify a realized
+likelihood function or posterior density function, and hence the inferences they
+encode, then we won't be able to accurately judge the utility of those
+inferences at all.  In practice we need our inferences to be sufficiently
+well-identified so that our computational tools have a reasonable opportunity to
+succeed, and we have a reasonable opportunity to understand how our model
+responds to a given observations.
 
-## Subtleties of Preasymptotic Identifiability
+## Subtleties of Degeneracy
 
-Although this geometric perspective of preasymptotic identifiability was
-motivated by the typical point geometry of asymptotic identifiability, there are
-some subtle but critically important differences between the asymptotic and
-preasymptotic perspectives.
+Although this geometric perspective of degeneracy is motivated by ideal
+asymptotic behavior, there are some subtle but critically important differences
+between the asymptotic and preasymptotic perspectives.
 
 ### A Million Ways To Be Cruel
 
 While the realized likelihood functions and posterior density functions from
-well-identified models all look similar, the realizations from less
-well-behaving models can each be poorly-identified in their own unique way.  In
-particular the exact consequences of poor preasymptotic identifiability will
-depend on the shape and orientation of the specific surface on which the
-realizations appear to concentrate.  I will refer to the particular geometry of
-a poorly-identified likelihood function or posterior density function as a
-_degeneracy_.
+non-degenerate models all look similar, the realizations from less well-behaving
+models can each be degenerate in their own unique way.  In particular the exact
+consequences of strong degeneracies will depend on the shape and orientation of
+the specific surface on which the realizations appear to concentrate.  I will
+refer to the particular geometry of a degenerate likelihood function or
+posterior density function as a _degeneracy_.
 
-Perhaps the most important classification of poor preasymptotic identifiability
-is between _continuous degeneracies_ and _discontinuous degeneracies_.  A
-continuous degeneracy is characterized by model configurations consistent with
-the observed data organized into a single connected, fuzzy surface.
+Perhaps the most important classification of these geometries is between
+_continuous degeneracies_ and _discontinuous degeneracies_.  A continuous
+degeneracy is characterized by model configurations consistent with the observed
+data organizing into a single connected, fuzzy surface.
 
 <center>
 <br>
@@ -245,6 +310,11 @@ knitr::include_graphics("figures/cont_degen/cont_degen.png")
 ```
 <br><br>
 </center>
+
+We can further classify continuous degeneracies that concentrate within any
+finite volume, such as the right two degeneracies above, as _compact_, and
+those that extend all the way to infinity in more or more directions, such
+as the left degeneracy above, as _non-compact_.
 
 On the other hand discontinuous degeneracies are characterized by the model
 configurations consistent with the observed data clustering into _modes_
@@ -261,7 +331,7 @@ knitr::include_graphics("figures/disc_strong_degen/disc_strong_degen.png")
 A realized likelihood function or posterior density function can suffer from one
 or both of these degeneracies at the same time.  While they might decompose into
 a number of discontinuous degeneracies where each individual mode is itself
-locally well-identified as above, a particularly pathological realization might
+locally non-degenerate as above, a particularly pathological realization might
 be comprised of a collection of continuously degenerate modes.
 
 <center>
@@ -274,10 +344,10 @@ knitr::include_graphics("figures/disc_weak_degen/disc_weak_degen.png")
 
 ### The Most Capricious of Insects
 
-Asymptotic identifiability requires the collapse of the likelihood functions
-realized from almost every infinitely large observation.  In other words it does
-not depend the details of any particular observation and hence characterizes the
-entire observational model.
+Asymptotic non-degeneracy requires the collapse of the likelihood functions
+realized from almost every infinitely large observation.  In particular it does
+not depend on the details of any particular observation, and hence it
+characterizes the entire observational model.
 
 The shape of the likelihood functions and posterior density functions realized
 from finite observations, however, will in general depend on those particular
@@ -291,19 +361,19 @@ knitr::include_graphics("figures/posterior_variation/posterior_variation.png")
 <br><br>
 </center>
 
-Consequently preasymptotic identifiability will also depend on the particular
+Consequently preasymptotic degeneracies will also depend on the particular
 observation considered.  The realized likelihood functions and posterior density
-functions might be reasonably well-identified for some particularly informative
+functions might be only weakly degenerate for some particularly informative
 observations, but manifest strong degeneracies for others.  Indeed the more
 complex the measurement process and higher dimensional the observational space,
 the more opportunities there will be for fluctuations to conspire to obscure the
 latent phenomena of interest.
 
 In other words we can't talk about an entire model being preasymptotically
-identified unless we can verify that every realization of a likelihood function
-or posterior density function is strongly and uniformly concentrated.  At the
-same time we can't talk about the robustness of a model, and how prone it might
-be to contorting itself to accommodate misfit, unless we can quantify the
+non-degenerate unless we can verify that every realization of a likelihood
+function or posterior density function is strongly and uniformly concentrated.
+At the same time we can't talk about the robustness of a model, and how prone it
+might be to contorting itself to accommodate misfit, unless we can quantify the
 behavior of realizations from data generated outside of the model.  Such
 _inferential calibrations_ require either careful theoretical work or expansive
 simulation studies.
@@ -312,9 +382,8 @@ simulation studies.
 
 Because the particular geometry of a realized likelihood function or posterior
 density function depends on a chosen parameterization of the model configuration
-space so too will this definition of preasymptotic identifiability.  A
-realization that appears degenerate in one parameterization might appear much
-less degenerate in another!
+space so too will our defintion of degeneracy.  A realization that appears
+degenerate in one parameterization might appear much less degenerate in another!
 
 <center>
 <br>
@@ -325,39 +394,37 @@ knitr::include_graphics("figures/reparam/reparam.png")
 </center>
 
 This parameterization dependence, however, also provides an opportunity for
-moderating preasymptotic identifiability problems.  Strong preasymptotic
-identification implies that _every_ parameter is strongly informed independently
-of the others.  If some parameters are strongly coupled then we might be able to
-find a reparameterization that transforms them into parameters that are less
-coupled, and hence better identified.  At the same time if some parameters are
-particularly weakly-informed then we might be able to remove them from the model
-entirely.
+moderating degeneracy problems.  Weak degeneracy implies that _every_ parameter
+is strongly informed independently of the others.  If some parameters are
+strongly coupled then we might be able to find a reparameterization that
+transforms them into parameters that are less coupled, and hence better
+identified.  At the same time if some parameters are particularly
+weakly-informed then we might be able to remove them from the model entirely.
 
-# Managing Poor Preasymptotic Identifiability {#sec:management}
+# Managing Degeneracies {#sec:management}
 
-Preasymptotic identifiability is ultimately a question of information, in
-particular how much information we have about the chosen parameters that
-coordinate the model configuration space.  If a realized likelihood function or
-posterior density function is poorly preasymptotically identified then we need
-to incorporate more information into our inferences, change the parameters that
-we're trying to identify, or weaken our inferential goals so that what little
-information we have is sufficient.
+Degeracy is ultimately a question of information, in particular how much
+information we have about the chosen parameters that coordinate the model
+configuration space.  If a realized likelihood function or posterior density
+function is degenerate then we need to incorporate more information into our
+inferences, change the parameters that we're trying to identify, or weaken our
+inferential goals so that what little information we have is sufficient.
 
 ## More Information
 
-The most direct way to improve the preasymptotic identifiability of our
-inferences is to add more information.  In turn the most direct way to add more
-information is to repeat the measurement process multiple times and aggregate
-the resulting observations together into one larger, more informative
-observation.  In practice, however, repeating the measurement process exactly is
-often prohibitively expensive if not outright impossible.  Moreover there is no
-guarantee that degeneracies won't persist through repeated measurements.
+The most direct way to reduce degenerate behavior in our inferences is to add
+more information.  In turn the most direct way to add more information is to
+repeat the measurement process multiple times and aggregate the resulting
+observations together into one larger, more informative observation.  In
+practice, however, repeating the measurement process _exactly_ is often
+prohibitively expensive if not outright impossible.  Moreover there is no
+guarantee that some degeneracies won't persist through repeated measurements.
 
 A powerful alternative to repeating the initial measurement process is to
-_complement_ it with additional processes that are sensitive to only some
-phenomenological, environmental, or experimental parameters.  This complementary
-data can then break degeneracies in the likelihood function, allowing the
-original data to inform the rest of the parameters.
+_complement_ it with additional measurement processes that are sensitive to only
+some phenomenological, environmental, or experimental parameters.  This
+complementary data can then break degeneracies in the likelihood function,
+allowing the original data to inform the rest of the parameters.
 
 Consider, for example, a measurement of some phenomenon, quantified by the
 parameter $\lambda_{S}$, that is corrupted by some irreducible background,
@@ -373,9 +440,9 @@ knitr::include_graphics("figures/dgm_nominal/dgm_nominal.png")
 <br><br>
 </center>
 
-Adding additional data where the phenomenon has been removed, however, informs
-only the background contribution and allows the _excess_ observed in the
-original data to inform the latent phenomenon.
+Incorporating data from additional measurements where the phenomenon has been
+removed, however, informs only the background contribution, allowing the
+_excess_ observed in the original data to inform the latent phenomenon.
 
 <center>
 <br>
@@ -389,7 +456,7 @@ Bayesian analyses also benefit from the opportunity to add information through
 the prior model.  For example principled domain expertise can suppress extreme
 model configurations and _contain_ the posterior density function into a
 reasonably small neighborhood even when the realized likelihood function is
-poorly preasymptotically identified.
+degenerate.
 
 <center>
 <br>
@@ -419,48 +486,49 @@ to the poor generalizability zone.
 
 ## Reparameterizations
 
-The parameters in the initial parameterization being poorly preasymptotically
-identified doesn't mean that parameters in _other_ parameterizations suffer the
-same fate.  In some instances we can reparameterize the model configuration
-space and replace poorly-identified parameters with new parameters are that
-better suited to the measurement process.  Some times we can find alternative
-parameterizations where all of the parameters are well-identified, and even if
-we can't we might be able to find parameterizations that isolate degeneracies
-into just a few parameters which are then easier to manage.
+The parameters in the initial parameterization being poorly informed doesn't
+mean that parameters in _other_ parameterizations suffer the same fate.  In some
+instances we can reparameterize the model configuration space and replace
+poorly-identified parameters with new parameters are that better suited to the
+measurement process.  Some times we can find alternative parameterizations where
+all of the parameters are strongly informed, and even if we can't we might be
+able to find parameterizations that isolate degeneracies into just a few
+parameters which are then easier to manage.
 
 For example consider the observational model that depends on the parameters only
 through a function $f : \Theta \rightarrow \mathbb{R}$,
 $$
 \pi_{S}(y; f(\theta_{1}, \ldots, \theta_{N})).
 $$
-If the function $f$ is many-to-one then the no amount of data will be able to
-identify the parameters $\{\theta_{1}, \ldots, \theta_{N} \}$ individually.  On
-the other hand if we can find a new parameterization with a parameter
+If the function $f$ is many-to-one then the observational model will be
+nonidentified and no amount of data will be able to inform the parameters
+$\{\theta_{1}, \ldots, \theta_{N} \}$ individually.  On the other hand if we can
+find a new parameterization with a parameter
 $$
 \phi_{1} = f(\theta_{1}, \ldots, \theta_{N})
 $$
 then the data will be able to inform $\phi_{1}$ and we can resort to the prior
 model to inform the remaining $\{ \phi_{2}, \ldots, \phi_{N} \}$.
 
-Reparameterizations are especially important when weak preasymptotic
-identifiability is limits how well a computational algorithm is able to survey
-the entirety of a realized likelihood function or posterior density function.
-Careful reparameterizations can reorganize the model configurations consistent
-with the data into geometries that better match the capabilities of the
-algorithm and actually facilitate accurate computation.
+Reparameterizations are especially important when strong degeneracies limits how
+well a computational algorithm is able to survey the entirety of a realized
+likelihood function or posterior density function.  Careful reparameterizations
+can reorganize the model configurations consistent with the data into geometries
+that better match the capabilities of the algorithm and actually facilitate
+accurate computation.
 
 Many modeling techniques have natural parameterizations that are optimal in
 different circumstances.  In order to use these techniques as responsibly as
 possible we need to familiarize ourselves with not only the basic structure of
-the technique but also these parameterizations and their consequences for
-preasymptotic identifiability.
+the technique but also the natural parameterizations and how they might
+interact with observed data to yield degenerate behavior.
 
 ## Lowered Expectations
 
-Sometimes degeneracies are inescapable, with the poor preasymptotic
-identifiability of a realized likelihood function or posterior density function
-communicating that we have neither the data nor the domain expertise to learn
-enough about the latent phenomena of interest.
+Sometimes the degeneracies of a realized likelihood function or posterior
+density function are inescapable, communicating that we have neither the data
+nor the domain expertise to learn enough about our model of the latent data
+generating process.
 
 If our computational tools are able to accurately quantify the degenerate
 likelihood function or posterior density function then we might have to just
@@ -474,12 +542,11 @@ function we won't be able to report faithful inferences at all.  In that case we
 might have to set aside the analysis until we can equip better algorithms that
 allow us to better understand our inferences and their limitations.
 
-# Diagnosing Poor Preasymptotic Identifiability
+# Diagnosing Degeneracies
 
 If we know that a realized likelihood function or posterior density function is
-only weakly preasymptotically identified then we can manage that poor
-identifiability with the strategies discussed in [Section 3](#sec:management).
-But how exactly can we work out how well preasymptotically identified a
+degenerate then we can manage the degeneracies with the strategies discussed in
+[Section 3](#sec:management).  But how exactly can we work out how degenerate a
 realization is in practice, especially when our model is sophisticated and the
 model configuration space is high-dimensional?
 
@@ -488,21 +555,18 @@ model configuration space is high-dimensional?
 One approach is to utilize computational methods that explore the entirety of
 the realized likelihood function or posterior density function and examine
 projections of that exploration onto lower-dimensional surfaces that we can
-visualize.  In particular we can't study preasymptotic identifiability with
-methods that return only point estimates and assume certain behaviors of the
-realized likelihood function or posterior density function in the surrounding
-neighborhood.
+visualize.  In particular we can't study degeneracy with methods that return
+only point estimates.
 
-In a Bayesian analysis Markov chain Monte Carlo has especially notable
-diagnostic power.  Effective Markov chains will expand into the most relevant
-neighborhoods of the model configuration space, probing any potential degenerate
-behavior in the process.  Moreover the individual states of the resulting Markov
-chains can be immediately projected onto any subspace allowing for immediate
-visualization.
+In Bayesian analyses Markov chain Monte Carlo has especially notable diagnostic
+power.  Effective Markov chains will expand into the most relevant neighborhoods
+of the model configuration space, probing any potential degenerate behavior in
+the process.  Moreover the individual states of the resulting Markov chains can
+be immediately projected onto any subspace allowing for immediate visualization.
 
 A common diagnostic strategy is to consider _pairs plots_, or scatter plots of
 the realized Markov chain states projected onto each pair of functions of
-interest, usually including the parameter functions.
+interest, for example the parameter functions.
 
 <center>
 <br>
@@ -512,19 +576,20 @@ knitr::include_graphics("figures/pairs_plot/pairs_plot.png")
 <br><br>
 </center>
 
-Because we're looking for geometries in the posterior density function that
-frustrate algorithmic exploration we want to focus on the posterior density
-function encountered by our chosen algorithm.  In tools like Stan that means
-looking at the parameter functions on the _unconstrained_ model configuration
-space and not the nominal constrained model configuration space that appears in
-a Stan program itself.  Exploring the unconstrained space is made easier by using
-the `diagnostic_file` option in the Stan interfaces which writes the
-unconstrained state at each iteration of the Markov chain to a text file.
+Because we are looking for degenerate behavior in the posterior density function
+that might frustrate algorithmic exploration we want to focus on the posterior
+density function actually encountered by our chosen algorithm.  In tools like
+Stan that means looking at the parameter functions on the _unconstrained_ model
+configuration space and not the nominal constrained model configuration space
+that appears in a Stan program itself.  Exploring the unconstrained space is
+made easier by using the `diagnostic_file` option in the Stan interfaces which
+writes the unconstrained state at each iteration of the Markov chain to a text
+file.
 
 These plots can be useful in identifying degeneracies that manifest in only two
 parameters, but they are not necessarily revealing of degeneracies that manifest
-on higher-dimensional surfaces.  In this case the scatter plots collapse too
-many samples onto the projected surface, obstructing the underlying degeneracy.
+on higher-dimensional surfaces.  In this case the scatter plots collapse the
+projected surface and obstruct the underlying degeneracy.
 
 <center>
 <br>
@@ -546,31 +611,31 @@ knitr::include_graphics("figures/pairs_plots_obscured/pairs_plots_obscured.png")
 </center>
 
 To avoid this projection collapse we would have to _slice_ the samples into
-bands of some of the remaining parameters.  Beyond a few dimensions, however,
-this would generate an infeasibly large number of sparsely populated scatter
-plots.
+bands of the remaining parameters.  Beyond a few dimensions, however, slicing
+generates an impractical number of plots, each of which is only sparsely
+populated and hence conveys little information on their own.
 
 Even without slicing the number of possible pairs plots is the biggest
 limitation to this approach.  Without domain expertise to motivate potential
 degenerate surfaces we would have to force ourselves through at least
-$D \cdot (D + 1) / 2$ scatter plots.  Even for moderate dimensions this quickly
-expands to hundreds if not thousands of plots that might not even reveal
-problematic degeneracies at all.
+$D \cdot (D + 1) / 2$ scatter plots, where $D$ is the number of parameters in
+our model.  Even for moderate dimensions this quickly expands to hundreds if not
+thousands of plots that might not even reveal problematic degeneracies at all.
 
 Exploring high-dimensional spaces through visualizations is hard and it's all
-the more challenging when we don't know for what we're looking.
+the more challenging when we don't know for what we're looking!
 
 ## My Engine Makes This Strange Sound
 
 Visualizations of Markov chains are only as good as the ability of those Markov
 chains to capture the full extent of the posterior distribution.  In particular
-slow or ineffectual Markov chains provide only a partial view of the full
-posterior distribution and hence lead to misleading pairs plots diagnostics.
+slow or ineffectual Markov chains provide only an incomplete view of the full
+posterior distribution and hence can lead to misleading pairs plots diagnostics.
 
 Consider, for example, a Markov chain that slowly wanders around its
 initialization, exploring only a very small part of the posterior distribution
 that concentrates on a curved surface.  In this case the pairs plots would show
-no signs of degeneracy.
+no signs of serious degeneracy.
 
 <center>
 <br>
@@ -580,7 +645,7 @@ knitr::include_graphics("figures/pairs_plot_bad1/pairs_plot_bad1.png")
 <br><br>
 </center>
 
-Even if we ran multiple Markov chains then we would visualize only multiple
+If we ran multiple Markov chains then we would visualize only multiple
 incomplete explorations.  This could then easily mislead us into thinking that
 we're dealing with the wrong kind of degeneracy, for example a discrete one
 instead of a continuous one.
@@ -593,52 +658,53 @@ knitr::include_graphics("figures/pairs_plot_bad2/pairs_plot_bad2.png")
 <br><br>
 </center>
 
-This behavior is particularly troubling when degenerate posterior density
-functions are a key obstacle that prevents Markov chains from effectively
-exploring the full posterior distribution in the first place.
+This behavior is particularly troubling when degenerate behavior in a realized
+posterior density function prevents Markov chains from effectively exploring
+the full posterior distribution in the first place.  Our diagnostics will fail
+exactly when we need them!
 
-Fortunately not all Markov chain Monte Carlo algorithms fail silently.  Some
+Fortunately not all Markov chain Monte Carlo algorithms fail so silently.  Some
 algorithms, namely Hamiltonian Monte Carlo, actually complain quite loudly when
-they struggle to work with degenerate posterior density functions.  At least,
-that is, if you listen to them.  Although these complaints are certainly an
-annoyance they are often our _only_ hint at the underlying pathologies.
+they struggle with degenerate posterior density functions.  At least, that is,
+if you listen to them.  Although these complaints are certainly an annoyance
+they are often our _only_ hint at the underlying pathologies.
 
-Consequently our most powerful diagnostic strategy is a _postmortem_ one where
-we first try to run a Markov chain Monte Carlo algorithm and then carefully
-scrutinizing where and how an algorithm struggles or outright fails in order to
-track down the underlying pathologies.  The louder our algorithm, the more
-information we will have to guide us to degenerate behavior.
+Consequently our most powerful diagnostic strategy is a
+_postmortem investigation_ where we carefully scrutinize how a Markov chain
+Monte Carlo algorithm struggles or outright fails in order track down the
+underlying pathologies and motivate hypotheses for their origins.  The louder
+our algorithm, the more information we will have to guide us to degenerate
+behavior.
 
-Exactly how poorly preasymptotically identified a posterior density function
-has to be before a Markov chain Monte Carlo algorithm starts to struggle or
-first breaks depends on the detailed interactions between the algorithm, the
-configuration of that algorithm, and the posterior density function.  Some
-algorithms are fragile, breaking with only small degeneracies while some are
-more robust, only slowly bending until the degeneracies become strong enough.
-In order to maximize our diagnostic power we need to be familiar how a given
-algorithm responds to different degeneracies.
+Exactly how degenerate a posterior density function has to be before a Markov
+chain Monte Carlo algorithm starts to struggle, or breaks outright, depends on
+the detailed interactions between the algorithm, the configuration of that
+algorithm, and the posterior density function.  Some algorithms are fragile,
+breaking with only small degeneracies while some are more robust, only slowly
+bending before the degeneracies become strong enough.  In order to maximize our
+diagnostic power we need to be familiar how a given algorithm responds to
+different degeneracies.
 
 For example by comparing multiple Markov chains initialized at different places
 in the model configuration space, perhaps with summary statistics like the
-potential scale reduction factor $\hat{R}$, we can detect discrete degeneracies.
-The more Markov chains we run the better we will be able resolve the full extent
-of the degeneracy, even if each individual Markov chain explores only a local
-mode.
+potential scale reduction factor $\hat{R}$, we might be able to detect discrete
+degeneracies.  The more Markov chains we run the better we will be able resolve
+the full extent of the degeneracy, even if each individual Markov chain explores
+only a local mode.
 
 ## Sonic Boom
 
-Hamiltonian Monte Carlo has a reputation for being fast but that is only part of
-its success.  Yes, for well preasymptotically identified posterior density
-functions Hamiltonian Monte Carlo rapidly explores the posterior distribution
-even in high-dimensional model configuration spaces.  Yes, Hamiltonian Monte
-Carlo can manage relatively poorly preasymptotically identified posterior
-density functions by consuming more computational resources.  What makes
-Hamiltonian Monte Carlo so really in practice, however, is that when it
-struggles or outright fails to fully quantify a poorly-identified posterior
-density function it does so _loudly_.
+Hamiltonian Monte Carlo has a reputation for being fast, but that is only one
+part of its success.  Yes, for non-degenerate posterior density functions
+Hamiltonian Monte Carlo rapidly explores the posterior distribution even in
+high-dimensional model configuration spaces.  Yes, Hamiltonian Monte Carlo can
+manage moderately degerate posterior density functions by consuming more
+computational resources.  What makes Hamiltonian Monte Carlo so powerful in
+practice, however, is that when it struggles or outright fails to fully quantify
+a degerate posterior density function it does so _loudly_.
 
 Hamiltonian Monte Carlo [@Betancourt:2018b] exploits _Hamiltonian dynamics_
-which generates trajectories that rapidly and coherently explore the posterior
+which generate trajectories that rapidly and coherently explore the posterior
 distribution.  In practice we can't generate these trajectories exactly so
 instead we approximate them with discrete, numerical trajectories.  The smaller
 the discretization time, or _step size_, the more accurate but also more
@@ -664,9 +730,9 @@ of the realized posterior density function as much as possible.
 Unfortunately there is a limit to this adaptive feedback.  When the posterior
 density function changes too quickly the numerical integration can become
 unstable, resulting in numerical trajectories that rocket towards infinity
-instead of exploring the delicate features.  In other words these _divergent
-trajectories_ indicate when Hamiltonian Monte Carlo is unable to fully resolve
-the details of the target posterior distribution.
+instead of exploring the delicate features.  On the other hand these _divergent
+trajectories_ also provide a clear indication of when Hamiltonian Monte Carlo is
+unable to fully resolve the details of the target posterior distribution.
 
 <center>
 <br>
@@ -678,13 +744,12 @@ knitr::include_graphics("figures/hmc_div_transition/hmc_div_transition.png")
 
 Markov chain iterations sampled from divergent trajectories are marked as
 _divergent iterations_ in Stan.  Because the states in divergent trajectories
-are spatially correlated with the neighborhoods of strong curvature that induce
-the instabilities we can use these divergent iterations to approximately locate
-these neighborhoods that appear pathological to Hamiltonian Monte Carlo.  We can
-verify any suspicious behavior by rerunning with a less aggressive, more
-refined, step size adaptation that should result in a smaller step size, and
-more accurate trajectories that can better penetrate the problematic
-neighborhood.
+are spatially correlated with the neighborhoods of high curvature that induce
+instabilities, we can use these divergent iterations to approximately locate
+these neighborhoods.  We can verify any suspicious behavior by rerunning with a
+less aggressive, more refined, step size adaptation that should result in a
+smaller step size, and more accurate trajectories that can better penetrate the
+problematic neighborhood.
 
 <center>
 <br>
@@ -695,12 +760,11 @@ knitr::include_graphics("figures/div_hunting/div_hunting.png")
 </center>
 
 The details of the numerical Hamiltonian dynamics that drive Hamiltonian Monte
-Carlo serve as a powerful probe of degenerate behavior characteristic of poor
-preasymptotic identifiability.  For example the less uniformly the posterior
-density function concentrates the smaller the step size will have to be to
-resolve the directions of stronger concentration while the longer the overall
-trajectories will have to be to fully explore the directions of smaller
-concentration.
+Carlo serve as a powerful probe of degenerate behavior.  For example the less
+uniformly the posterior density function concentrates the smaller the step size
+will have to be to resolve the directions of stronger concentration, while the
+longer the overall trajectories will have to be to fully explore the directions
+of smaller concentration.
 
 <center>
 <br>
@@ -711,25 +775,24 @@ knitr::include_graphics("figures/hmc_scales/hmc_scales.png")
 </center>
 
 In other words the more continuously degenerate the posterior density function
-the more integrator iterations, or _leapfrog steps_, we will need to simulate
-the latent Hamiltonian dynamics.  The number of leapfrog steps needed for each
-iteration then helps identify problematic geometries.
+the more integrator steps, or _leapfrog steps_, we will need to simulate the
+latent Hamiltonian dynamics.  The number of leapfrog steps needed for each
+iteration can then help to identify problematic geometries.
 
-Particularly extreme degeneracies often "pinch" at the boundary of the
-degenerate surface, manifesting in neighborhoods where the curvature rapidly
-increases and renders numerical trajectories unstable.  Consequently the
-appearance and structure of divergent iterations provide a sensitive diagnostic
-of these problematic boundaries.  Because divergent iterations are sampled from
-divergent trajectories they will concentrate towards the problematic
-neighborhoods, literally pointing the way to the pathology.  Overlaying
-divergent iterations and non-divergent iterations in a pairs plot is
-particularly informative, especially when the functions being compared are
-well-chosen.
+Particularly extreme degeneracies often "pinch" at their boundaries, manifesting
+in neighborhoods where the curvature rapidly increases and renders numerical
+trajectories unstable.  Consequently the appearance and structure of divergent
+iterations provide a sensitive diagnostic of these problematic boundaries.
+Because divergent iterations are sampled from divergent trajectories they will
+concentrate towards the problematic neighborhoods, literally pointing the way to
+the pathology.  Overlaying divergent iterations and non-divergent iterations in
+a pairs plot is particularly informative, especially when the functions being
+compared are well-chosen.
 
 Sometimes the geometry of the posterior density function is so adversarial that
 even exact Hamiltonian trajectories don't go very far and Hamiltonian Monte
-Carlo devolves into very incoherent, _diffusive_ exploration.  Although this is
-a relatively rare pathology it can detected with another diagnostic bespoke to
+Carlo devolves into incoherent, _diffusive_ exploration.  Although this is a
+relatively rare pathology it can detected with another diagnostic bespoke to
 Hamiltonian Monte Carlo -- the energy fraction of missing information, or
 _E-FMI_ [@Betancourt:2016b].  Because these pathologies are somewhat rare, and
 often buried under other more pressing pathologies, we don't yet have a full
@@ -737,13 +800,13 @@ understanding of the offending degeneracies and hence how to resolve them.
 
 # Don't Do Me Like That
 
-Because the diversity of degenerate behavior is so expansive, finding and
-learning about the signs of poor preasymptotically identifiability, not to
-mention reacting effectively, is an overwhelming challenge.  To reduce the
-difficulty we need to build experience, and experience building is facilitated
-by compartmentalizing the possibilities.  Limiting ourselves to a single
-degeneracy at a time presents a much more manageable task, especially when those
-degeneracies are typical of a new modeling technique that we're learning.
+Because the diversity of degenerate behavior is so expansive, identifying and
+and investigating it, not to mention reacting effectively, can be an an
+overwhelming challenge.  To reduce the difficulty we need to build experience,
+and experience building is facilitated by compartmentalizing the possibilities.
+Limiting ourselves to a single degeneracy at a time presents a much more
+manageable lesson, especially when those degeneracies are typical of a new
+modeling technique that we're learning.
 
 In case studies where I introduce new modeling techniques I take the opportunity
 to also discuss the degeneracies to which the technique might be vulnerable and
@@ -753,7 +816,7 @@ simple degeneracies and their consequences.
 
 Although these examples are artificial let's assume that in the initial
 parameterizations our domain expertise would constrain the parameters to values
-around or smaller than one.  Consequently ones defines the scale that separates
+around or smaller than one.  Consequently $1$ defines the scale that separates
 "weakly informative" from "strongly informative".
 
 As always, however, we have to start by setting up our local `R` environment.
@@ -783,8 +846,9 @@ c_green_trans <- c("#00FF0080")
 ## Extraneous Parameters
 
 The simplest degeneracy is having an extraneous parameter.  Here there are no
-problematic interactions between the parameters, just one parameter that's not
-informed by the likelihood function at all.
+problematic interactions between the parameters, just one parameter that doesn't
+influence the likelihood function at all.  Technically the extraneous parameter
+makes this observational model fully non-identified.
 
 To see the problem let's simulate an observation from an arbitrary model
 configuration.
@@ -805,8 +869,8 @@ sigma <- extract(simu)$sigma[1]
 input_data <- list("N" = N, "y" = y, "sigma" = sigma)
 ```
 
-Let's first consider a Bayesian model with a uniform prior density function that
-allows the fully pathology of the degenerate likelihood function propagate to
+We will first consider a Bayesian model with a uniform prior density function
+that allows any degeneracies in the likelihood function to fully propagate to
 the posterior density function.
 
 ```{r}
@@ -820,18 +884,18 @@ fit <- stan(file='stan_programs/fit_extra_flat.stan', data=input_data,
 
 Unfortunately diagnostic checks indicate that Stan's Hamiltonian Monte Carlo
 sampler is complaining.  Not only is $\hat{R}$ for $b$ indicating mixing
-problems the numerical trajectories are hitting the default upper bound of 1024
-leapfrog steps indicating that the sampler is working extraordinarily hard to
-generate each transition.
+problems, but also the numerical trajectories are hitting the default upper
+bound of 1024 leapfrog steps indicating that the sampler is working
+extraordinarily hard to generate each transition.
 
 ```{r}
 util$check_all_diagnostics(fit)
 ```
 
 The pairs plot of the two parameters shows the Markov chains struggling to
-explore the full breadth of the degenerate posterior density function that
-stretches all the way to infinity along the extraneous dimension.  Note the
-scale of the vertical axis!
+explore the non-compact degeneracy that stretches all the way to positive and
+negative infinity along the extraneous dimension.  Note the scale of the
+vertical axis!
 
 ```{r}
 samples <- extract(fit)
@@ -877,9 +941,9 @@ points(unpermuted_samples[,4,1], unpermuted_samples[,4,2],
        col=c_dark_trans, pch=16, cex=0.8)
 ```
 
-To suppress the infinite degeneracy we can incorporate domain expertise in our
+To suppress the infinite degeneracy we can incorporate domain expertise into our
 prior model that disfavors infinite values.  Let's start with weak prior with
-old mild suppression relative to the natural scales of the system.
+relatively mild suppression relative to the natural scales of the system.
 
 ```{r}
 writeLines(readLines("stan_programs/fit_extra_weak.stan"))
@@ -898,7 +962,7 @@ util$check_all_diagnostics(fit)
 ```
 
 Although our computation is now accurate, the posterior density function is
-still only weakly identified along the extraneous direction.
+still only weakly informed along the extraneous direction.
 
 ```{r}
 samples <- extract(fit)
@@ -913,7 +977,7 @@ lines(300 * cos(seq(0, 2 * pi, 2 * pi / 250)),
       col=c_mid)
 ```
 
-We can improve the identifiability by incorporating stronger prior information.
+We can reduce the degeneracy by incorporating stronger prior information.
 
 ```{r}
 writeLines(readLines("stan_programs/fit_extra_strong.stan"))
@@ -969,6 +1033,7 @@ hist(samples$a, breaks=seq(0.5, 1.3, 0.05), main="",
 
 A slightly more sophisticated, and more interesting, example is an additive
 degeneracy where measurements are informed by only the sum of two parameters.
+Once again this observational model is formally nonidentified.
 
 ```{r}
 writeLines(readLines("stan_programs/simu_add.stan"))
@@ -987,8 +1052,8 @@ input_data <- list("N" = N, "y" = y, "sigma" = sigma)
 ```
 
 An improper prior model specified by a uniform prior density function will carry
-the full extent of this degeneracy from the likelihood function to the posterior
-density function.
+the full extent of the non-compact degeneracy from the likelihood function to
+the posterior density function.
 
 ```{r}
 writeLines(readLines("stan_programs/fit_add_flat.stan"))
@@ -1006,7 +1071,11 @@ util$check_all_diagnostics(fit)
 ```
 
 As in the extraneous case we see the Markov chains trying to explore all the
-way out towards infinity, only this time along the line $b = y - a$.
+way out towards infinity, only this time along the line
+$b = \left< y \right> - a$, where
+$$
+\left< y \right> = \frac{1}{N} \sum_{n = 1}^{N} y_{n}.
+$$
 
 ```{r}
 samples <- extract(fit)
@@ -1070,16 +1139,16 @@ fit <- stan(file='stan_programs/fit_add_weak_a.stan', data=input_data,
             seed=4938483, refresh=0)
 ```
 
-This resolves the most serious diagnostic issues, but the tree depth warning
+This moderates the most serious diagnostic issues, but the tree depth warning
 indicates that the sample is still working extraordinarily hard.
 
 ```{r}
 util$check_all_diagnostics(fit)
 ```
 
-Indeed he weak prior model is able to contain the likelihood function to a
-finite neighborhood that gives the sampler a decent chance of fully quantifying
-the posterior distribution.
+Indeed the weakly informative prior model is able to contain the likelihood
+function to a finite neighborhood that gives the sampler a decent chance of
+fully quantifying the posterior distribution.
 
 ```{r}
 samples <- extract(fit)
@@ -1152,9 +1221,9 @@ lines(300 * cos(seq(0, 2 * pi, 2 * pi / 250)),
       col=c_mid)
 ```
 
-Even with the prior model taming the full extent of the degeneracy our posterior
-distribution remains relatively poorly-identified.  In particular, we don't
-learn much about about each parameter marginally.
+Even through the prior model tames the initial non-compact degeneracy to a
+compact one, the realized posterior distribution is still quite degenerate.  In
+particular, we don't learn much about about each parameter marginally.
 
 ```{r}
 a_prior_samples <- rnorm(4000, 0, 100)
@@ -1175,7 +1244,7 @@ hist(samples$b, breaks=seq(-250, 250, 10), prob=T,
      col=c_dark, border=c_dark_highlight, add=T)
 ```
 
-What do the measurements inform?  If we rotate the model configuration space
+What _do_ the measurements inform?  If we rotate the model configuration space
 we can see that the observation informs only the transformed parameter `a + b`
 while providing no information about the orthogonal direction `a - b`.
 
@@ -1196,13 +1265,13 @@ hist(samples$a + samples$b, breaks=seq(-250, 250, 10), prob=T,
 ```
 
 While the prior model provides a powerful tool for suppressing the degenerate
-behavior of poorly preasymptotically identified likelihood functions it's
-not our only tool if we are able to incorporate additional data.
+behavior of generate likelihood functions it's not our only tool if we are able
+to incorporate additional data.
 
 For example measurements that inform either of the parameters independently of
-the other allow the initial data to inform the other.  Here let's consider an
-auxiliary measurement that directly informs `a` to complement what we learn from
-the initial data.
+the other allow the initial data to inform the remaining parameter.  Here let's
+consider an auxiliary measurement that directly informs `a` to complement what
+we learn from the initial data.
 
 ```{r}
 writeLines(readLines("stan_programs/fit_add_weak_aux.stan"))
@@ -1228,7 +1297,8 @@ util$check_all_diagnostics(fit)
 ```
 
 The efficient computation is no surprise given how informed the posterior
-density function is with the combined power of both measurements.
+density function is in all directions with the combined power of both
+measurements.
 
 ```{r}
 aux_samples <- extract(fit)
@@ -1286,18 +1356,20 @@ fit_reparam <- stan(file='stan_programs/fit_add_reparam.stan', data=input_data,
                     seed=4938483, refresh=0)
 ```
 
-The reparameterized and excised model is able to utilize a much larger step size
-which should result in cheaper numerical trajectories.
+The reparameterized and excised model is able to utilize a much larger step
+sizes which should result in cheaper numerical trajectories.
 
 ```{r}
-stepsizes <- list(
-  "Extra"  = get_sampler_params(fit_weak, inc_warmup=FALSE)[[1]][,'stepsize__'][1],
-  "Reparmeterized" = get_sampler_params(fit_reparam, inc_warmup=FALSE)[[1]][,'stepsize__'][1])
+extra_stepsizes <- sapply(1:4, function(c) get_sampler_params(fit_weak, inc_warmup=FALSE)[[c]][,'stepsize__'][1])
+reparam_stepsizes <- sapply(1:4, function(c) get_sampler_params(fit_reparam, inc_warmup=FALSE)[[c]][,'stepsize__'][1])
+
+xs <- rep(1:2, 4)
+ys <- c(rbind(extra_stepsizes, reparam_stepsizes))
 
 par(mfrow=c(1, 1))
 
-plot(1:2, stepsizes, col=c_dark, type="l", log="y",
-     xlab="N", xaxt='n', ylab="Adapted Step Size")
+plot(xs, ys, col=c_dark, type="p", pch=16, cex=0.8, log="y",
+     xlab="", xaxt='n', ylab="Adapted Step Size")
 axis(1, at=1:2, labels=c("Weak", "Reparameterized"))
 ```
 
@@ -1306,18 +1378,15 @@ number of trajectories in the weakly identified model having to expand out to
 the default upper limit.
 
 ```{r}
-steps1 <- do.call(rbind, get_sampler_params(fit_weak, inc_warmup=FALSE))[,'n_leapfrog__']
-steps2 <- do.call(rbind, get_sampler_params(fit_reparam, inc_warmup=FALSE))[,'n_leapfrog__']
+steps1 <- do.call(rbind,
+                  get_sampler_params(fit_weak, inc_warmup=FALSE))[,'n_leapfrog__']
+table(steps1)
+```
 
-par(mfrow=c(1, 2))
-
-hist(steps1, breaks=1:1024-0.5, main="Weak",
-     col=c_dark, border=c_dark_highlight,
-     xlab="Number of Leapfrog Steps", yaxt='n', ylab="")
-
-hist(steps2, breaks=1:1024-0.5, main="Reparameterized",
-     col=c_dark, border=c_dark_highlight,
-     xlab="Number of Leapfrog Steps", yaxt='n', ylab="")
+```{r}
+steps2 <- do.call(rbind,
+                  get_sampler_params(fit_reparam, inc_warmup=FALSE))[,'n_leapfrog__']
+table(steps2)
 ```
 
 Ultimately the reparameterized and excised model is able to take advantage
@@ -1325,12 +1394,12 @@ of much longer trajectories that explore the posterior distribution more
 efficiently.
 
 ```{r}
-int_times1 <- stepsizes[[1]] * steps1
-int_times2 <- stepsizes[[2]] * steps2
+int_times1 <- unlist(lapply(1:4, function(c) extra_stepsizes[c] * steps1[(1000 * (c - 1) + 1): (1000 * c)]))
+int_times2 <- unlist(lapply(1:4, function(c) reparam_stepsizes[c] * steps2[(1000 * (c - 1) + 1): (1000 * c)]))
 
 par(mfrow=c(1, 2))
 
-int_time_breaks <- seq(-0.5, 50.5, 1)
+int_time_breaks <- seq(0, 10, 0.1)
 
 hist(int_times1, breaks=int_time_breaks, main="Weak",
      col=c_dark, border=c_dark_highlight,
@@ -1359,7 +1428,7 @@ axis(1, at=1:2, labels=c("Weak", "Reparameterized"))
 ```
 
 The increased effective sample size and decreased cost of each Hamiltonian
-transition results in a _four orders of magnitude_ increase in the statisical
+transition results in a _four orders of magnitude_ increase in the statistical
 efficiency of the reparameterized and excised model.
 
 ```{r}
@@ -1374,8 +1443,8 @@ plot(1:2, a_ess_per / a_ess_per[1], col=c_dark, type="l", log="y",
 axis(1, at=1:2, labels=c("Weak", "Reparmeterized"))
 ```
 
-It's expensive to work with poorly preasymptotically identified models, although
-when working with complex data generating processes it's often unavoidable.
+It's expensive to work with degenerate models, although when working with
+complex data generating processes it's often unavoidable.
 
 ### Scaling with Observation Size
 
@@ -1489,24 +1558,23 @@ lines(3 * cos(seq(0, 2 * pi, 2 * pi / 250)),
 Because the measurement will only ever identify `a + b` the additional
 data only concentrates the likelihood function around the degenerate line even
 more.  In other words the concentration of the posterior density function
-becomes _less uniform_, and more poorly preasymptotically identified, with more
-data.
+becomes _less uniform_, and more degenerate, with more data.
 
-We can see the consequences of this weakening identifiability by looking at the
+We can see the consequences of this increasing degeneracy by looking at the
 behavior of the Hamiltonian Monte Carlo sampler.
 
 The sampler needs to decrease the step size to resolve the increasingly stronger
 degeneracy.
 
 ```{r}
-stepsizes <- list(
-  "N = 1"   =   get_sampler_params(fit1, inc_warmup=FALSE)[[1]][,'stepsize__'][1],
-  "N = 100" =   get_sampler_params(fit2, inc_warmup=FALSE)[[1]][,'stepsize__'][1],
-  "N = 10000" = get_sampler_params(fit3, inc_warmup=FALSE)[[1]][,'stepsize__'][1])
+stepsizes1 <- sapply(1:4, function(c) get_sampler_params(fit1, inc_warmup=FALSE)[[c]][,'stepsize__'][1])
+stepsizes2 <- sapply(1:4, function(c) get_sampler_params(fit2, inc_warmup=FALSE)[[c]][,'stepsize__'][1])
+stepsizes3 <- sapply(1:4, function(c) get_sampler_params(fit3, inc_warmup=FALSE)[[c]][,'stepsize__'][1])
 
-par(mfrow=c(1, 1))
+xs <- rep(1:3, 4)
+ys <- c(rbind(stepsizes1, stepsizes2, stepsizes3))
 
-plot(1:3, stepsizes, col=c_dark, type="l", log="y",
+plot(xs, ys, col=c_dark, type="p", pch=16, cex=0.8, log="y",
      xlab="N", xaxt='n', ylab="Adapted Step Size")
 axis(1, at=1:3, labels=c("1", "100", "10000"))
 ```
@@ -1516,22 +1584,17 @@ increases.
 
 ```{r}
 steps1 <- do.call(rbind, get_sampler_params(fit1, inc_warmup=FALSE))[,'n_leapfrog__']
+table(steps1)
+```
+
+```{r}
 steps2 <- do.call(rbind, get_sampler_params(fit2, inc_warmup=FALSE))[,'n_leapfrog__']
+table(steps2)
+```
+
+```{r}
 steps3 <- do.call(rbind, get_sampler_params(fit3, inc_warmup=FALSE))[,'n_leapfrog__']
-
-par(mfrow=c(1, 3))
-
-hist(steps1, breaks=0:700-0.5, main="N = 1",
-     col=c_dark, border=c_dark_highlight,
-     xlab="Number of Leapfrog Steps", yaxt='n', ylab="")
-
-hist(steps2, breaks=0:700-0.5, main="N = 100",
-     col=c_dark, border=c_dark_highlight,
-     xlab="Number of Leapfrog Steps", yaxt='n', ylab="")
-
-hist(steps3, breaks=0:700-0.5, main="N = 10000",
-     col=c_dark, border=c_dark_highlight,
-     xlab="Number of Leapfrog Steps", yaxt='n', ylab="")
+table(steps3)
 ```
 
 The optimal integration time should be set by the longest length scale, which
@@ -1543,13 +1606,13 @@ dynamic integration time in Stan is doing a reasonable job of maintaining
 optimal integration times even as the degeneracy increases.
 
 ```{r}
-int_times1 <- stepsizes[[1]] * steps1
-int_times2 <- stepsizes[[2]] * steps2
-int_times3 <- stepsizes[[3]] * steps3
+int_times1 <- unlist(lapply(1:4, function(c) stepsizes1[c] * steps1[(1000 * (c - 1) + 1): (1000 * c)]))
+int_times2 <- unlist(lapply(1:4, function(c) stepsizes2[c] * steps2[(1000 * (c - 1) + 1): (1000 * c)]))
+int_times3 <- unlist(lapply(1:4, function(c) stepsizes3[c] * steps3[(1000 * (c - 1) + 1): (1000 * c)]))
 
 par(mfrow=c(1, 3))
 
-int_time_breaks <- seq(-0.1, 12.1, 0.1)
+int_time_breaks <- seq(-0.1, 8.1, 0.1)
 
 hist(int_times1, breaks=int_time_breaks, main="N = 1",
      col=c_dark, border=c_dark_highlight,
@@ -1592,8 +1655,8 @@ axis(1, at=1:3, labels=c("1", "100", "10000"))
 
 Similarly the effective sample size per leapfrog step, which quantifies a
 measure of computational efficiency, decreases with the number of observations.
-Accounting for the increasing cost of each leapfrog step the effective sample
-size per computational cost would plummet even faster.
+Accounting for the increasing cost of each leapfrog step, the effective sample
+size per computational cost plummets even faster.
 
 ```{r}
 a_ess_per <- c(summary1[,'n_eff'][1] / sum(steps1),
@@ -1638,8 +1701,8 @@ writeLines(readLines("stan_programs/fit_add_meas_var.stan"))
 ```
 
 Although the model with a fixed measurement variability encountered no problems
-fitting this data this model where we have to infer the measurement variability
-enjoys a good number of divergent iterations.
+fitting this data, the new model where we have to infer the measurement
+variability enjoys a good number of divergent iterations.
 
 ```{r, warning=FALSE}
 fit_mv <- stan(file='stan_programs/fit_add_meas_var.stan', data=input_data.1,
@@ -1676,14 +1739,16 @@ Interestingly the step size for the measurement variability fit also becomes
 much smaller.
 
 ```{r}
-stepsizes <- list(
-  "Fixed"  =  get_sampler_params(fit, inc_warmup=FALSE)[[1]][,'stepsize__'][1],
-  "Fitted" =  get_sampler_params(fit_mv, inc_warmup=FALSE)[[1]][,'stepsize__'][1]
-)
+fixed_stepsizes <- sapply(1:4, function(c) get_sampler_params(fit, inc_warmup=FALSE)[[c]][,'stepsize__'][1])
+fitted_stepsizes <- sapply(1:4, function(c) get_sampler_params(fit_mv, inc_warmup=FALSE)[[c]][,'stepsize__'][1])
+
+xs <- rep(1:2, 4)
+ys <- c(rbind(fixed_stepsizes, fitted_stepsizes))
 
 par(mfrow=c(1, 1))
 
-plot(1:2, stepsizes, col=c_dark, type="l", xlab="", xaxt='n', ylab="Adapted Step Size")
+plot(xs, ys, col=c_dark, type="p", pch=16, cex=0.8, log="y",
+     xlab="", xaxt='n', ylab="Adapted Step Size")
 axis(1, at=1:2, labels=c("Fixed", "Fitted"))
 ```
 
@@ -1691,35 +1756,30 @@ Likewise the number of leapfrog steps increases indicating that the sampler is
 working much harder to cover as much of the posterior distribution as it can.
 
 ```{r}
-steps <- do.call(rbind, get_sampler_params(fit, inc_warmup=FALSE))[,'n_leapfrog__']
-steps_mv <- do.call(rbind, get_sampler_params(fit_mv, inc_warmup=FALSE))[,'n_leapfrog__']
+fixed_steps <- do.call(rbind, get_sampler_params(fit, inc_warmup=FALSE))[,'n_leapfrog__']
+table(fixed_steps)
+```
 
-par(mfrow=c(1, 2))
-
-hist(steps, breaks=0:150-0.5, main="Fixed",
-     col=c_dark, border=c_dark_highlight,
-     xlab="Number of Leapfrog Steps", yaxt='n', ylab="")
-
-hist(steps_mv, breaks=0:150-0.5, main="Fitted",
-     col=c_dark, border=c_dark_highlight,
-     xlab="Number of Leapfrog Steps", yaxt='n', ylab="")
+```{r}
+fitted_steps <- do.call(rbind, get_sampler_params(fit_mv, inc_warmup=FALSE))[,'n_leapfrog__']
+table(fitted_steps)
 ```
 
 Even the integration times are a little bit longer.
 
 ```{r}
-int_times <- stepsizes[[1]] * steps
-int_times_mv <- stepsizes[[2]] * steps_mv
+int_times_fixed <- unlist(lapply(1:4, function(c) fixed_stepsizes[c] * fixed_steps[(1000 * (c - 1) + 1): (1000 * c)]))
+int_times_fitted <- unlist(lapply(1:4, function(c) fitted_stepsizes[c] * fitted_steps[(1000 * (c - 1) + 1): (1000 * c)]))
 
 par(mfrow=c(1, 2))
 
-int_time_breaks <- seq(-0.1, 80, 0.1)
+int_time_breaks <- seq(0, 15, 0.1)
 
-hist(int_times, breaks=int_time_breaks, main="Fixed",
+hist(int_times_fixed, breaks=int_time_breaks, main="Fixed",
      col=c_dark, border=c_dark_highlight,
      xlab="Integration Time", yaxt='n', ylab="")
 
-hist(int_times_mv, breaks=int_time_breaks, main="Fitted",
+hist(int_times_fitted, breaks=int_time_breaks, main="Fitted",
      col=c_dark, border=c_dark_highlight,
      xlab="Integration Time", yaxt='n', ylab="")
 ```
@@ -1728,9 +1788,10 @@ Let's follow good practice, however, and not get too far ahead of ourselves
 before we investigate the degenerate behavior.  In particular let's go hunting
 for divergences.
 
-Note that because $\sigma$ is constrained to be positive in our Stan program we
- want to look at the unconstrained parameter function $\log(\sigma)$ in the
- postmortem analysis.
+Because $\sigma$ is constrained to be positive in our Stan program we want to
+look at the unconstrained parameter function in the postmortem analysis.  If we
+know that Stan ensures positivity by fitting $\log(\sigma)$ instead of $\sigma$
+then we can just apply the transformation ourselves.
 
 ```{r}
 partition <- util$partition_div(fit_mv)
@@ -1758,39 +1819,81 @@ points(div_samples$b, log(div_samples$sigma),
        col="green", pch=16, cex=0.8)
 ```
 
+Alternatively we can run with a diagnostic file which saves the unconstrained
+values directly.  Because the unconstrained parameter names in the diagnostic
+fit are the same as the constrained parameter names in the nominal fit care is
+needed to avoid confusion!
+
+```{r, warning=FALSE}
+stan(file='stan_programs/fit_add_meas_var.stan', data=input_data.1,
+     seed=4938483, refresh=0, diagnostic_file = "output/hmc_diag.csv")
+   
+   
+diag_files <- sapply(1:4, function (c) paste("output/hmc_diag_", c, ".csv", sep=""))
+unconstrained_fit <- rstan::read_stan_csv(diag_files)
+
+partition <- util$partition_div(unconstrained_fit)
+div_samples <- partition[[1]]
+nondiv_samples <- partition[[2]]
+
+par(mfrow=c(1, 3))
+
+plot(nondiv_samples$a, nondiv_samples$b,
+     col=c_dark_trans, pch=16, cex=0.8,
+     xlab="a", ylab="b")
+points(div_samples$a, div_samples$b,
+       col="green", pch=16, cex=0.8)
+
+plot(nondiv_samples$a, nondiv_samples$sigma,
+     col=c_dark_trans, pch=16, cex=0.8,
+     xlab="a", ylab="log(sigma)")
+points(div_samples$a, div_samples$sigma,
+       col="green", pch=16, cex=0.8)
+
+plot(nondiv_samples$b, nondiv_samples$sigma,
+     col=c_dark_trans, pch=16, cex=0.8,
+     xlab="b", ylab="log(sigma)")
+points(div_samples$b, div_samples$sigma,
+       col="green", pch=16, cex=0.8)
+```
+
 The divergent iterations slightly concentrate towards smaller values of
-$\sigma$ as well as a line $b = \text{const} - a$ but there's no smoking gun in
-the naive pairs plots.  Perhaps the degenerate surface is no longer aligned with
-the parameters?
+$\sigma$, as well as a line $b = \text{const} - a$, but there's no smoking gun
+in the naive pairs plots.  Perhaps the degenerate surface is no longer aligned
+with the parameters?
 
 Hunting for complex degeneracies is greatly facilitated by considering the
 structure of the model.  In this case we know that for given any value of
 $\sigma$ the conditional posterior density function will concentrate around the
-line $b = -a + y$.  That then suggests that we look at the pairs plot between
-the measurement variability and the distance from this surface, $\delta$.
+line $b = -a + \left<y \right>$.  That then suggests that we look at the pairs
+plot between the measurement variability and the distance from this surface,
+$\delta$.
 
-```{r}
+Remember that `div_samples` and `nondiv_samples` still contain the unconstrained
+values so `$sigma` here actually returns the unconstrained values `log(sigma)`.
+
+```{r, warning=FALSE}
 par(mfrow=c(1, 1))
 
 nondiv_delta = nondiv_samples$a + nondiv_samples$b - input_data.1$y
 div_delta = div_samples$a + div_samples$b - input_data.1$y
 
-plot(nondiv_delta, log(nondiv_samples$sigma),
+plot(nondiv_delta, nondiv_samples$sigma,
      col=c_dark_trans, pch=16, cex=0.8,
      xlab="delta", ylab="log(sigma)")
-points(div_delta, log(div_samples$sigma),
+points(div_delta, div_samples$sigma,
        col="green", pch=16, cex=0.8)
 ```
 
 There it is!  The divergent iterations concentrate at small values of $\sigma$
 where the parameters $a$ and $b$ start to collapse onto the degenerate surface
-$b = -a + y$.  This suggest that the sampler is not able to fully resolve the
-posterior density function at small values of $\sigma$.
+$b = -a + \left<y \right>$.  This suggest that the sampler is not able to fully
+resolve the posterior density function close to the degenerate line.
 
 To confirm let's run again but with less aggressive step size adaptation.  In
 Stan the step size adaptation is controlled by a configuration parameter called
 `delta` or `adapt_delta` depending on the interface.  When there are no
-divergences the optimal value is $\delta = 0.8$ but increasing $\delta$ towards
+divergences the optimal value is $\delta = 0.8$, but increasing $\delta$ towards
 1 results in smaller step sizes that can better resolve any problematic
 behavior.
 
@@ -1800,8 +1903,8 @@ fit_mv99 <- stan(file='stan_programs/fit_add_meas_var.stan',
                  control=list(adapt_delta=0.99), refresh=0)
 ```
 
-Increasing `adapt_delta`, and decreasing the step size, does seem to reduce the
-number of divergent iterations, although it doesn't remove them entirely.
+Increasing `adapt_delta`, and decreasing the step size, does reduce the number
+of divergent iterations, although it doesn't remove them entirely.
 
 ```{r}
 util$check_all_diagnostics(fit_mv99)
@@ -1830,6 +1933,9 @@ by interactions with the environmental parameters, making them more problematic
 and harder to diagnose.  If it's challenging to characterize the system being
 studied when the experimental conditions are known perfectly then it's going to
 be even harder when one has to characterize the experiment using the same data.
+Moreover these pathologies are fundamentally preasymptotic and hence don't
+show up in classical asymptotic analyses where the infinite data informs
+parameters like the measurement variability completely.
 
 The strategies for tempering this worsened degeneracy are the same as before.
 In particular we desperately need more information.
@@ -1886,9 +1992,10 @@ dangerous feedback effects that mislead our inferences away from anything
 principled.
 
 If we're not confident in our domain expertise then we can always consider new
-measurements to compliment our initial data.  Here's let's consider some
-_calibration data_ that constrains $\sigma$ and hopefully prevents the worst of
-the new degeneracy from propagating to the posterior density function.
+measurements to compliment our initial data.  Here's let's consider some data
+from a _calibration experiment_ that constrains $\sigma$ and hopefully prevents
+the worst of the new degeneracy from propagating to the posterior density
+function.
 
 ```{r}
 calib_data <- list("N_calib" = 10, "y_calib" = rnorm(10, 0, 0.75))
@@ -1927,56 +2034,48 @@ generating process.  We know that repeated measurements won't improve the
 degeneracy between $a$ and $b$, but they might inform $\sigma$ independently
 of those two parameters.
 
-```{r}
-aux_data <- list("N_aux" = 10, "y_aux" = rnorm(10, 1, 0.5))
-total_data <- c(input_data.100, aux_data)
-```
-
-```{r}
-writeLines(readLines("stan_programs/fit_add_meas_var_aux.stan"))
-```
-
 ```{r, warning=FALSE}
-fit <- stan(file='stan_programs/fit_add_meas_var_aux.stan',
-            data=total_data, seed=4938483, refresh=0)
+fit100 <- stan(file='stan_programs/fit_add_meas_var.stan',
+               data=input_data.100, seed=4938483, refresh=0)
 ```
 
 Again the lack of diagnostic warnings bodes well.
 
 ```{r}
-util$check_all_diagnostics(fit)
+util$check_all_diagnostics(fit100)
 ```
 
 As does the much better informed measurement variability.
 
 ```{r}
-samples <- extract(fit)
+samples100 <- extract(fit100)
+delta = samples$a + samples$b - rep(mean(input_data.1$y), 4000)
+delta100 = samples100$a + samples100$b - rep(mean(input_data.100$y), 4000)
 
-par(mfrow=c(1, 1))
-
-plot(samples$a, samples$b,
-     col=c_dark_trans, pch=16, cex=0.8, main="N = 100",
-     xlab="a", xlim=c(-3, 3), ylab="b", ylim=c(-4, 4))
-lines(3 * cos(seq(0, 2 * pi, 2 * pi / 250)),
-      3 * sin(seq(0, 2 * pi, 2 * pi / 250)),
-      col=c_mid)
+plot(delta, log(samples$sigma),
+     col=c_dark_trans, pch=16, cex=0.8,
+     xlab="delta", ylab="log(sigma)")
+points(delta100, log(samples100$sigma),
+       col=c_light_trans, pch=16, cex=0.8)
 ```
 
 This model demonstrates some of the critical differences between asymptotic and
-preasymptotic identifiability.  The parameters $a$ and $b$ are asymptotically
-nonidentified and will remain degenerate even as we collect an infinite number
-of repeated observations.  In fact the likelihood function will concentrate
-around the degenerate line and make it even harder to resolve algorithmically.
-$\sigma$, however, is conflated with $a$ and $b$ only when the number of
-observation size is small and so is inherently a preasymptotic consideration.
+preasymptotic degeneracies.  The parameters $a$ and $b$ are nonidentified and
+will remain degenerate even as we collect an infinite number of repeated
+observations.  In fact the realized likelihood functions will concentrate around
+the degenerate line and make it even harder to resolve the posterior density
+function algorithmically.  $\sigma$, however, is conflated with $a$ and $b$ only
+when the number of observations is small, and so is inherently a preasymptotic
+consideration.
 
 ## Multiplicative Degeneracy
 
 Let's now consider a similar problem -- a model where the data informs only the
-_product_ of two parameters.
+_product_ of two parameters.  Once again this defines a properly nonidentified
+observational model.
 
 First we need to simulate some data from an arbitrary model configuration with
-parameter values around 1.
+parameter values around our nominal scale 1.
 
 ```{r}
 writeLines(readLines("stan_programs/simu_multi.stan"))
@@ -1995,8 +2094,8 @@ input_data <- list("N" = N, "y" = y, "sigma" = sigma)
 ```
 
 We'll then begin the fitting with an improper prior model specified by a
-uniform prior density that really wants infinity to be part of the posterior
-density function.
+uniform prior density that really wants a lot of posterior probablity around
+infinity.
 
 ```{r}
 writeLines(readLines("stan_programs/fit_multi_flat.stan"))
@@ -2015,8 +2114,8 @@ util$check_all_diagnostics(fit)
 
 Plotting the pairs plot with highlighted divergences quickly reveals the
 problem.  We are dealing not only with a continuous _multiplicative_ degeneracy
-but also a discrete degeneracy corresponding to the absolute signs of the two
-parameters.
+but also a discrete degeneracy corresponding to the relative signs between the
+two parameters.
 
 ```{r}
 par(mfrow=c(1, 1))
@@ -2033,17 +2132,17 @@ points(div_samples$a, div_samples$b,
 ```
 
 First things first, let's manage the discrete degeneracy by fixing the sign of
-one of $a$ to be positive.  By doing this we admit that the absolute signs of
-$a$ and $b$ don't have any real meaning -- it's only the relative signs that
-matter for the data generating process.  In other words we're choosing a single,
-arbitrary convention instead of forcing our sampler to explore all of the
-possible conventions.
+$a$ to be positive.  By doing this we admit that the absolute signs of $a$ and
+$b$ don't have any real meaning -- it's only the relative signs that matter for
+the data generating process.  In other words we're choosing a single, arbitrary
+convention instead of forcing our sampler to explore all of the possible
+conventions.  The subsequent model is valid only if these assumptions are!
 
 ```{r}
 writeLines(readLines("stan_programs/fit_multi_flat_pos.stan"))
 ```
 
-```{r}, warning=FALSE}
+```{r, warning=FALSE}
 fit <- stan(file='stan_programs/fit_multi_flat_pos.stan',
                  data=input_data, seed=4938483, refresh=0)
 ```
@@ -2098,7 +2197,6 @@ too much for the sampler to accurately resolve.  The Markov chains don't even
 reach the containment that it supposed to be enforced by the more informative
 prior model!
 
-
 ```{r}
 par(mfrow=c(1, 1))
 
@@ -2120,8 +2218,7 @@ lines(c(xs, rev(xs)), c(ys, -rev(ys)), col=c_mid)
 
 To confirm we run again with `adapt_delta` larger than the default 0.8 but
 smaller than the maximum value of 1.  If our hypothesis about the narrowing
-ends is true then we should see this more refined fit expand further out
-further.
+ends is true then we should see this more refined fit expand out further.
 
 ```{r, warning=FALSE}
 fit <- stan(file='stan_programs/fit_multi_weak.stan',
@@ -2131,7 +2228,7 @@ fit <- stan(file='stan_programs/fit_multi_weak.stan',
 util$check_all_diagnostics(fit)
 ```
 
-Conveniently this is exactly was we see.
+Conveniently this is exactly what we see.
 
 ```{r}
 par(mfrow=c(1, 1))
@@ -2193,7 +2290,8 @@ ys <- c(0, ys, 0)
 lines(c(xs, rev(xs)), c(ys, -rev(ys)), col=c_mid)
 ```
 
-We confirm by running again with less aggressive step size adaptation.
+We can confirm this hypothesis by running again with less aggressive step size
+adaptation.
 
 ```{r, warning=FALSE}
 fit <- stan(file='stan_programs/fit_multi_strong_b.stan',
@@ -2226,11 +2324,10 @@ ys <- c(0, ys, 0)
 lines(c(xs, rev(xs)), c(ys, -rev(ys)), col=c_mid)
 ```
 
-To ensure reasonable preasymptotic identifiability we need a stronger domain
-expertise influencing both parameters.  Assuming that it is consistent with a
-more careful reflection of our domain expertise  we might consider the
-relatively strongly informative prior model encoded in the following Stan
-program.
+To reduce the degeneracy we need a stronger domain expertise influencing both
+parameters.  Assuming that it is consistent with a more careful reflection of
+our domain expertise we might consider the relatively strongly informative prior
+model encoded in the following Stan program.
 
 ```{r}
 writeLines(readLines("stan_programs/fit_multi_strong_ab.stan"))
@@ -2241,7 +2338,7 @@ fit <- stan(file='stan_programs/fit_multi_strong_ab.stan',
             data=input_data, seed=4938483, refresh=0)
 ```
 
-Stan isn't complain quite as furiously but divergent iterations remain.
+Stan doesn't complain quite as furiously but divergent iterations remain.
 
 ```{r}
 util$check_all_diagnostics(fit)
@@ -2307,17 +2404,18 @@ lines(c(xs, rev(xs)), c(ys, -rev(ys)), col=c_mid)
 
 ## Discrete Degeneracy
 
-Finally let's consider a notoriously poorly preasymptotically identified model
--- the exchangeable mixture model.  A mixture model considers multiple
-component observational models that are sampled with different weights; an
-exchangeable mixture model considers component observational models that all
-fall in the same parametric family of probability density functions.  Because
-the exchangeable components all have exactly the same functionality any
-permutation of the components won't affect the possible data generating
-processes.
+Finally let's consider a notoriously degenerate model -- the exchangeable
+mixture model.  A mixture model considers multiple component observational
+models that contribute to the overall data generating process in different,
+unknown proportions; an exchangeable mixture model considers component
+observational models that all fall in the same parametric family of probability
+density functions.  Because the exchangeable components all have exactly the
+same functionality any permutation of the components won't affect the composite
+data generating processes.  In other words the exchangeable mixture model is
+nonidentified by construction.
 
-First let's simulate a relatively large observation that would ensure strong
-preasymptotic identifiability for many low-dimensional models.
+First let's simulate a relatively large observation that would ensure very
+weak degeneracies for most low-dimensional models.
 
 ```{r}
 writeLines(readLines("stan_programs/simu_mix.stan"))
@@ -2334,8 +2432,8 @@ y <- array(extract(simu)$y[1,])
 input_data <- list("N" = N, "y" = y)
 ```
 
-Attempting to fit the exchangeable mixture model suggests that the preasymptotic
-identifiability leaves much to be desired.
+An attempt to fit the exchangeable mixture model greets us with a flurry of
+diagnostic warnings.
 
 ```{r}
 writeLines(readLines("stan_programs/fit_mix.stan"))
@@ -2350,8 +2448,8 @@ fit <- stan(file='stan_programs/fit_mix.stan', data=input_data,
 util$check_all_diagnostics(fit)
 ```
 
-This is backed up by the pairs plot which exhibits both continuous and discrete
-degeneracies!
+These warnings are backed up by the pairs plot which exhibits both continuous
+and discrete degeneracies!
 
 ```{r}
 samples <- extract(fit)
@@ -2363,12 +2461,8 @@ plot(samples$mu[,1], samples$mu[,2],
      xlab="mu[1]", ylab="mu[2]")
 ```
 
-Each Markov chain is confined to one of the discrete modes in the posterior
-density function.  Even though we can't construct accurate Markov chain Monte
-Carlo estimators from the ensemble it does provide us with the diagnostic power
-to identify the discrete degeneracy.  This reinforces why running multiple
-Markov chains is so critical to finding and then analyzing potential degenerate
-behavior.
+To gain deeper insight into the split $\hat{R}$ warnings lets plot the samples
+from each chain separately.
 
 ```{r}
 unpermuted_samples <- extract(fit, permute=FALSE)
@@ -2400,10 +2494,16 @@ points(unpermuted_samples[,4,1], unpermuted_samples[,4,2],
        col=c_dark_trans, pch=16, cex=0.8)
 ```
 
+Each Markov chain is confined to one of the discrete modes in the posterior
+density function.  Even though we can't construct accurate Markov chain Monte
+Carlo estimators from this ensemble of Markov chains it does provide us with the
+diagnostic power to identify the discrete degeneracy.  This reinforces why
+running multiple Markov chains is so critical to finding and then analyzing
+potential degenerate behavior.
+
 One immediate source of the discrete degenerate behavior is the exchangeability
-of the components.  If we permute the components then they'll just be
-reconfigured in the posterior distribution to achieve the same fit, resulting in
-a _label switching_ degeneracy.
+of the components.  If we permute the components then they'll just reconfigure
+to achieve the same fit, resulting in a _label switching_ degeneracy.
 
 To break this degeneracy we need a prior model that distinguishes between the
 mixture components, making each component responsible for behaviors that overlap
@@ -2426,7 +2526,7 @@ util$check_all_diagnostics(fit)
 ```
 
 The pairs plot clearly indicates why -- despite the prior model strongly
-disfavoring label switching the posterior density function includes it anyway.
+disfavoring label switching the posterior density function includes it anyway!
 
 ```{r}
 samples <- extract(fit)
@@ -2440,7 +2540,9 @@ plot(samples$mu[,1], samples$mu[,2],
 
 To break exchangeability we'll have to be even more aggressive.  Introducing an
 _ordering_ to the component parameters ensures that there is exactly zero
-overlap in behaviors that they can explain.
+overlap in behaviors that they can explain.  If we interpret the ordering as
+part of the observational model then this theoretically makes the model
+identifiable.
 
 ```{r}
 writeLines(readLines("stan_programs/fit_mix_ordered.stan"))
@@ -2453,8 +2555,7 @@ fit <- stan(file='stan_programs/fit_mix_ordered.stan', data=input_data,
 util$check_all_diagnostics(fit)
 ```
 
-Without any overlap the posterior density function is reasonably
-well-identified!
+Without any overlap the posterior density function shows no signs of degeneracy!
 
 ```{r}
 samples <- extract(fit)
@@ -2466,8 +2567,8 @@ plot(samples$mu[,1], samples$mu[,2],
      xlab="mu[1]", ylab="mu[2]")
 ```
 
-To make things really interesting let's consider what happens when we try to
-infer not only the ordered component parameters but also the measurement
+To make things really interesting, however, let's consider what happens when we
+try to infer not only the ordered component parameters but also the measurement
 variabilities, $\sigma_{1}$ and $\sigma_{2}$.
 
 ```{r}
@@ -2485,11 +2586,11 @@ The Stan diagnostics are not mad at us, they're just disappointed.
 util$check_all_diagnostics(fit)
 ```
 
-Looking at the partially recovered demonstrates why.  When the measurement
-variabilities are not known exactly the mixture components are able to
-continuously rearrange themselves without affecting the overall fit to even
-large observations.  This results in strong degeneracies that persist even as
-we aggregate relatively large data sets.
+Looking at the partially recovered posterior distribution demonstrates why.
+When the measurement variabilities are not known exactly the mixture components
+are able to continuously rearrange themselves without affecting the overall fit
+to even large observations.  This results in strong degeneracies that persist
+even as we aggregate relatively large data sets.
 
 ```{r}
 samples <- extract(fit)
@@ -2515,18 +2616,18 @@ plot(log(samples$sigma[,1]), log(samples$sigma[,1]),
 
 This example just barely opens the Pandora's box that is exchangeable mixture
 models.  The potential preasymptotic degeneracies become even nastier when we
-don't know the number of components exactly and consider mixtures over
+don't know the number of components exactly or when we consider mixtures over
 higher-dimensional spaces.  When dealing with exchangeable mixture models
 addressing one degeneracy just seems to reveals another degeneracy laying in
 wait.
 
 # Conclusion
 
-With only finite observations the precision with which we can make Bayesian
-inferences, and our ability to accurate quantify those inferences
+With only a finite number of observations the precision with which we can make
+Bayesian inferences, and our ability to accurate quantify those inferences
 algorithmically, is limited by the geometry of the posterior density function.
 The less uniformly the posterior density function concentrates the more our
-algorithms will have to work and the lower the chances that they will be able
+algorithms will have to work, and the lower the chances that they will be able
 to provide faithful characterizations of the posterior density function at all.
 
 As unfortunate as these consequences are, they don't leave us entirely helpless.
