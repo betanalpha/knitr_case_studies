@@ -352,17 +352,17 @@ resources -- both in terms of instruction processing and memory -- we'll never
 be able to manipulate an entire sampled function.
 
 Fortunately the practical implementation of a Gaussian process becomes
-infinitely easier -- literally -- if we consider not all function values but
-rather only those at a finite number of covariate values.  I will refer to the
-finite number of covariate values of interest as a _grid_.  In this case the
-function values over the grid follow a distribution specified by a multivariate
-normal density function completely determined by the Gaussian process.
+infinitely easier -- literally -- if we consider not _all_ function values but
+rather only those at a _finite_ number of covariate values which I will denote
+as a _grid_.  In this case the function values over the grid follow a
+distribution specified by a multivariate normal density function completely
+determined by the Gaussian process.
 
 First consider the behavior of a single function value at the covariate point
 $x_{1}$,
 $$
 f_{1} = f(x_{1}).
-$$.
+$$
 Each sampled function reduces to single value of that function evaluated at
 $x_{1}$, and the variation of those function values is completely specified by a
 normal density function with location parameter given by evaluating the mean
@@ -460,20 +460,26 @@ and
 $$
 \mathbf{K} =
 \begin{pmatrix}
-\mathbf{K}_{\text{obs}} & \mathbf{K}_{\text{pred}} \\
-( \mathbf{K}_{\text{pred}} )^{T} & \mathbf{K}_{\text{pred}}
+\mathbf{K}_{\text{obs}} & \mathbf{K}_{\text{mix}} \\
+( \mathbf{K}_{\text{mix}} )^{T} & \mathbf{K}_{\text{pred}}
 \end{pmatrix}.
 $$
 
 The conditional probability density function for the unobserved function values
-given the observed function values $f_{n} = f(x^{\text{obs}}_{n})$ is then given
-by the location parameters
+$(f_{\text{pred}})_{n} = f(x^{\text{pred}}_{n})$ given the observed function 
+values $(f_{\text{obs}})_{n} = f(x^{\text{obs}}_{n})$ falls into the 
+multivariate normal family,
+$$
+\pi(\mathbf{f}_{\text{pred}} \mid \mathbf{f}_{\text{obs}}) =
+\text{multi-normal} (\boldsymbol{\mu}, \boldsymbol{\Sigma})
+$$
+with the location parameters
 $$
 \boldsymbol{\mu}
 =
 \mathbf{m}_{\text{pred}}
 + ( \mathbf{K}_{\text{mix}} )^{T} \cdot ( \mathbf{K}_{\text{obs}} )^{-1}
-+ \cdot (\mathbf{f} - \mathbf{m}_{\text{obs}})
+\cdot (\mathbf{f}_{\text{obs}} - \mathbf{m}_{\text{obs}})
 $$
 and the covariance matrix parameters
 $$
@@ -503,15 +509,23 @@ function we introduced in [Section 1.1.3](#sec:modeling).  Calculating the
 conditional location parameters in this way is also known as _kriging_,
 especially in the geological literature.
 
-Now that we've worked out how to implement Gaussian processes in practice we can
-also start to see their practical limitations.
+By working directly with a finite-dimensional projection of a Gaussian process
+we avoid all of the impracticalities of infinite-dimensional spaces.  At the
+same time because we never actually realize the latent infinite-dimensional
+function space I hesitate calling Gaussian processes "infinite-dimensional" or
+"non-parametric".  In practice a Gaussian process model will always manifest
+in a finite number of parameters!
 
-For example because the projection of a Gaussian process results in a
-multivariate normal density function that correlates _all_ of the function
-values at the grid points with each other we cannot add new grid points without
+Working with finite-dimensional projections, however, is not without its
+limitations.  Once we've projected a Gaussian process onto a finite grid we
+cannot investigate functional behavior elsewhere; contrast this for example
+with a polynomial model that allows the possible functional behavior to be
+evaluated at _any_ input point.  In order to investigate functional behavior at
+new covariate points we have to create a larger grid and project again,
 constructing an entirely new multivariate normal density function and repeating
-all of the subsequent linear algebra.  In other words Gaussian processes are
-awkward when we can't specify the relevant covariate values ahead of time.
+all of the subsequent linear algebra.  Unfortunately Gaussian processes are
+awkward when we can't specify all of the relevant covariate values ahead of
+time.
 
 Moreover while the manipulations of a projected Gaussian process are technically
 possible, they are definitely not cheap.  The cost of all of these operations
@@ -537,7 +551,7 @@ k(x_{1}, x_{2}) = k_{\alpha}(x_{1}, x_{2}) + k_{\beta}(x_{1}, x_{2})
 $$
 and point-wise multiplication,
 $$
-k(x_{1}, x_{2}) = k_{\alpha}(x_{1}, x_{2}) * k_{\beta}(x_{1}, x_{2}).
+k(x_{1}, x_{2}) = k_{\alpha}(x_{1}, x_{2}) \cdot k_{\beta}(x_{1}, x_{2}).
 $$
 
 At the same time that breadth can be overwhelming, especially when first
@@ -551,7 +565,7 @@ decaying exponentially fast with the squared distance between the covariates
 being compared,
 $$
 k(x_{1}, x_{2}) = \alpha^{2}
-\exp \left( - \left( \frac{ |x_{1} - x_{2} |}{\rho} \right)^{2} \right).
+\exp \left( - \frac{1}{2} \left( \frac{ |x_{1} - x_{2} |}{\rho} \right)^{2} \right).
 $$
 
 <center>
@@ -579,10 +593,10 @@ $$
 \begin{align*}
 k(x_{1}, x_{1})
 &= \alpha^{2}
-\exp \left( - \left( \frac{ |x_{1} - x_{1} |}{\rho} \right)^{2} \right)
+\exp \left( - \frac{1}{2} \left( \frac{ |x_{1} - x_{1} |}{\rho} \right)^{2} \right)
 \\
 &= \alpha^{2}
-\exp \left( - \left( \frac{0}{\rho} \right)^{2} \right)
+\exp \left( - \frac{1}{2} \left( \frac{0}{\rho} \right)^{2} \right)
 \\
 &= \alpha^{2}
 \exp \left( - 0 \right)
@@ -609,14 +623,14 @@ $$
 \frac{ k(x_{1}, x_{2}) }{ \sqrt{ k(x_{1}, x_{1}) \cdot k(x_{2}, x_{2})} }
 &=
 \frac{ \alpha^{2}
-\exp \left( - \left( \frac{ |x_{1} - x_{2} |}{\rho} \right)^{2} \right) }
+\exp \left( - \frac{1}{2} \left( \frac{ |x_{1} - x_{2} |}{\rho} \right)^{2} \right) }
 { \sqrt{ \alpha^{2} \cdot \alpha^{2} }}
 \\
 &= \frac{ \alpha^{2} }{ \alpha^{2} }
-\exp \left( - \left( \frac{ |x_{1} - x_{2} |}{\rho} \right)^{2} \right)
+\exp \left( - \frac{1}{2} \left( \frac{ |x_{1} - x_{2} |}{\rho} \right)^{2} \right)
 \\
 &=
-\exp \left( - \left( \frac{ |x_{1} - x_{2} |}{\rho} \right)^{2} \right).
+\exp \left( - \frac{1}{2} \left( \frac{ |x_{1} - x_{2} |}{\rho} \right)^{2} \right).
 \end{align*}
 $$
 When $\rho$ is small the correlations between function values at even close
@@ -634,7 +648,8 @@ knitr::include_graphics("figures/rho_comp/rho_comp.png")
 
 To build intuition for how these parameters interact with each other it helps to
 examine the behavior of the Gaussian processes as both $\alpha$ and $\rho$ are
-varied from small to large values.
+varied from small to large values.  Translation into an alignment chart is left
+as an exercise for the reader.
 
 <center>
 <br>
@@ -1936,7 +1951,7 @@ util$plot_gp_post_realizations(pred_opt_fit, data, truth,
 ```{r}
 util$plot_gp_post_quantiles(fit, data, truth,
                             "Posterior Marginal Quantiles (Bayes)")
-                        
+                      
 util$plot_gp_post_quantiles(pred_opt_fit, data, truth,
                             "Posterior Marginal Quantiles (MML)")
 ```
@@ -1944,7 +1959,7 @@ util$plot_gp_post_quantiles(pred_opt_fit, data, truth,
 ```{r}
 util$plot_gp_post_pred_quantiles(fit, data, truth,
                                  "Posterior Predictive (Bayes)")
-                             
+                           
 util$plot_gp_post_pred_quantiles(pred_opt_fit, data, truth,
                                  "Posterior Predictive (MML)")
 ```
@@ -2127,9 +2142,9 @@ perform best when used generatively rather than as a black box!
 
 Inferring functional behavior with Gaussian process priors can be considered a
 form of _interpolation_.  The observational model constrains the functional
-behavior _at_ the observed covariate values while the structure of the covariance
-function constrains how that behavior propagates _between_ the observed
-covariate values.
+behavior _at_ the observed covariate values while the structure of the
+covariance function constrains how that behavior propagates _between_ the
+observed covariate values.
 
 The less distance between the observed covariates the less work the Gaussian
 process prior has to do and, generally, the more precise the inferred
@@ -2156,7 +2171,13 @@ between the observed covariates just waiting to be exploited.
 These challenges are not unique to Gaussian processes but are instead inherent
 to any probabilistic interpolation method.  Interpolation of functional behavior
 between observed points simply becomes a poorly-posed problem beyond a few
-dimensions.
+dimensions.  Ultimately interpolation methods like Gaussian processes are just
+mechanisms to convert domain expertise into prior models for functional
+behavior.  If we don't provide enough useful domain expertise then the resulting
+prior models will be poorly informed no matter the details of that mechanism.
+Unfortunately we rarely have much domain expertise about the behavior of
+high-dimensional functions.
+
 
 This has critical implications for _emulation_ methods that try to model the
 behavior of expensive functions from a few costly evaluations.  In low
@@ -2217,52 +2238,53 @@ of well-behaved functional behaviors.
 
 # Acknowledgements
 
-I thank Dan Simpson, Aki Vehtari, and Rob Trangucci for helpful comments.
+I thank Dan Simpson, Aki Vehtari, Rob Trangucci, and Maggie Lieu for helpful
+comments.
 
-A very special thanks to everyone supporting me on Patreon: Aapeli Nevala, 
-abcnap, Abhinav Katoch, Abhishek Vasu, Adam Bartonicek, Al King, Alan O'Donnell, 
-Alex ANDORRA, Alexander Bartik, Alexander Noll, Allison M. Campbell, 
-Anders Valind, Andrea Serafino, Andrew Rouillard, Annie Chen, Anthony Wuersch, 
-Antoine Soubret, Arya, asif zubair, Austin Rochford, Austin Rochford, 
-Avraham Adler, Bao Tin Hoang, Ben Matthews, Ben Swallow, Benjamin Phillabaum, 
-Benoit Essiambre, Bo Schwartz Madsen, Brian Callander, Brian Hartley, Bryan Yu, 
-Cameron Smith, Canaan Breiss, Cat Shark, Chad Scherrer, Charles Naylor, 
-Chase Dwelle, Chibuikem Nwizu, Chris Zawora, Christopher Mehrvarzi, 
-Cole Monnahan, Colin Carroll, Colin McAuliffe, D, Damien Mannion, dan mackinlay, 
-Dan W Joyce, Daniel Hocking, Daniel Rowe, Darshan Pandit, David Burdelski, 
-David Humeau, David Pascall, Derek G Miller, Diogo Melo, Doug Rivers, Ed Berry, 
-Ed Cashin, Elizaveta Semenova, Erik Banek, Ero Carrera, Ethan Goan, Evan Russek, 
-Fabio Zottele, Federico Carrone, Felipe González, Fergus Chadwick, Filipe Dias, 
-Finn Lindgren, Florian Wellmann, Francesco Corona, Garrett Mooney, Gene K, 
-Geoff Rollins, George Ho, Georgia S, Granville Matheson, Guido Biele, 
-Guilherme Marthe, Hamed Bastan-Hagh, Hany Abdulsamad, Haonan Zhu, Ian , 
-Ilaria Prosdocimi, Isaac S, J Michael Burgess, Jair Andrade Ortiz, 
-James McInerney, James Wade, JamesU, Janek Berger, Jeff Dotson, Jeff Helzner, 
-Jeffrey Arnold, Jeffrey Burnett, Jessica Graves, Joel Kronander, John Flournoy, 
-John Zito, Jonathan Sedar, Jonathan St-onge, Jonathon Vallejo, Jose Pereira, 
-Josh Weinstock, Joshua Mayer, Josué Mendoza, jsdenain , Justin Bois, 
-Juuso Parkkinen, Karim Naguib, Karim Osman, Kazuki Yoshida, Kejia Shi, 
-Kádár András, Lars Barquist, Leo Burgy, lizzie , Luiz Carvalho, 
-Lukas Neugebauer, Marc Dotson, Marc Trunjer Kusk Nielsen, Mark Donoghoe, 
-Markus P., Martin Modrák, Martin Rosecky, Matt Wescott, Matthew Kay, 
-Matthew Quick, Matthew T Stern, Maurits van der Meer, Maxim Kesin, 
-Michael Colaresi, Michael DeWitt, Michael Dillon, Michael Griffiths, 
-Michael Grosskopf, Michael Redman, Michael Tracy, Mikael Elhouar, Mike Lawrence, 
-Mikhail Popov, mikko heikkilä, MisterMentat , Márton Vaitkus, N Sanders, 
-Nathan Rutenbeck, Nerf-Shepherd , Nicholas Cowie, Nicholas Erskine, 
-Nicholas Knoblauch, Nicholas Ursa, Nick S, Nicolas Frisby, Noah Guzman, Okada, 
-Ole Rogeberg, Oliver Clark, Oliver Crook, Olivier Ma, Omri Har Shemesh, 
-Pablo León Villagrá, Patrick Boehnke, Pau Pereira Batlle, Paul Oreto, 
-Peter Smits, Pieter van den Berg , Pintaius Pedilici, Ravin Kumar, Reed Harder, 
-Riccardo Fusaroli, Richard Jiang, Richard Price, Robert Frost, Robert Goldman, 
-Robert kohn, Robin Taylor, Roofwalker, Scott Block, Sean Talts, Seth Axen, 
-Shira, sid phani, Simon Dirmeier, Simon Duane, Simon Lilburn, Srivatsa Srinath, 
-Stephanie Fitzgerald, Stephen Lienhard, Stephen Oates, Steve Bertolani, Stijn, 
-Stone Chen, Sue Marquez, Sus, Susan Holmes, Suyog Chandramouli, Sören Berg, 
-Teddy Groves, Teresa Ortiz, Thomas Littrell, Thomas Siegert, Thomas Vladeck, 
-Tiago Cabaço, Tim Howes, Tim Radtke, Tom McEwen, Tommy Naugle, Trey Spiller, 
+A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
+abcnap, Abhinav Katoch, Abhishek Vasu, Adam Bartonicek, Al King, Alan O'Donnell,
+Alex ANDORRA, Alexander Bartik, Alexander Noll, Allison M. Campbell,
+Anders Valind, Andrea Serafino, Andrew Rouillard, Annie Chen, Anthony Wuersch,
+Antoine Soubret, Arya, asif zubair, Austin Rochford, Austin Rochford,
+Avraham Adler, Bao Tin Hoang, Ben Matthews, Ben Swallow, Benjamin Phillabaum,
+Benoit Essiambre, Bo Schwartz Madsen, Brian Callander, Brian Hartley, Bryan Yu,
+Cameron Smith, Canaan Breiss, Cat Shark, Chad Scherrer, Charles Naylor,
+Chase Dwelle, Chibuikem Nwizu, Chris Zawora, Christopher Mehrvarzi,
+Cole Monnahan, Colin Carroll, Colin McAuliffe, D, Damien Mannion, dan mackinlay,
+Dan W Joyce, Daniel Hocking, Daniel Rowe, Darshan Pandit, David Burdelski,
+David Humeau, David Pascall, Derek G Miller, Diogo Melo, Doug Rivers, Ed Berry,
+Ed Cashin, Elizaveta Semenova, Erik Banek, Ero Carrera, Ethan Goan, Evan Russek,
+Fabio Zottele, Federico Carrone, Felipe González, Fergus Chadwick, Filipe Dias,
+Finn Lindgren, Florian Wellmann, Francesco Corona, Garrett Mooney, Gene K,
+Geoff Rollins, George Ho, Georgia S, Granville Matheson, Guido Biele,
+Guilherme Marthe, Hamed Bastan-Hagh, Hany Abdulsamad, Haonan Zhu, Ian ,
+Ilaria Prosdocimi, Isaac S, J Michael Burgess, Jair Andrade Ortiz,
+James McInerney, James Wade, JamesU, Janek Berger, Jeff Dotson, Jeff Helzner,
+Jeffrey Arnold, Jeffrey Burnett, Jessica Graves, Joel Kronander, John Flournoy,
+John Zito, Jonathan Sedar, Jonathan St-onge, Jonathon Vallejo, Jose Pereira,
+Josh Weinstock, Joshua Mayer, Josué Mendoza, jsdenain , Justin Bois,
+Juuso Parkkinen, Karim Naguib, Karim Osman, Kazuki Yoshida, Kejia Shi,
+Kádár András, Lars Barquist, Leo Burgy, lizzie , Luiz Carvalho,
+Lukas Neugebauer, Marc Dotson, Marc Trunjer Kusk Nielsen, Mark Donoghoe,
+Markus P., Martin Modrák, Martin Rosecky, Matt Wescott, Matthew Kay,
+Matthew Quick, Matthew T Stern, Maurits van der Meer, Maxim Kesin,
+Michael Colaresi, Michael DeWitt, Michael Dillon, Michael Griffiths,
+Michael Grosskopf, Michael Redman, Michael Tracy, Mikael Elhouar, Mike Lawrence,
+Mikhail Popov, mikko heikkilä, MisterMentat , Márton Vaitkus, N Sanders,
+Nathan Rutenbeck, Nerf-Shepherd , Nicholas Cowie, Nicholas Erskine,
+Nicholas Knoblauch, Nicholas Ursa, Nick S, Nicolas Frisby, Noah Guzman, Okada,
+Ole Rogeberg, Oliver Clark, Oliver Crook, Olivier Ma, Omri Har Shemesh,
+Pablo León Villagrá, Patrick Boehnke, Pau Pereira Batlle, Paul Oreto,
+Peter Smits, Pieter van den Berg , Pintaius Pedilici, Ravin Kumar, Reed Harder,
+Riccardo Fusaroli, Richard Jiang, Richard Price, Robert Frost, Robert Goldman,
+Robert kohn, Robin Taylor, Roofwalker, Scott Block, Sean Talts, Seth Axen,
+Shira, sid phani, Simon Dirmeier, Simon Duane, Simon Lilburn, Srivatsa Srinath,
+Stephanie Fitzgerald, Stephen Lienhard, Stephen Oates, Steve Bertolani, Stijn,
+Stone Chen, Sue Marquez, Sus, Susan Holmes, Suyog Chandramouli, Sören Berg,
+Teddy Groves, Teresa Ortiz, Thomas Littrell, Thomas Siegert, Thomas Vladeck,
+Tiago Cabaço, Tim Howes, Tim Radtke, Tom McEwen, Tommy Naugle, Trey Spiller,
 Tuan Nguyen Anh, Tyrel Stokes, Vanda Inacio de Carvalho, Vince, Virginia Webber,
-vittorio trotta, Will Dearden, Will Farr, William Grosso, yolhaj , yureq , Z, 
+vittorio trotta, Will Dearden, Will Farr, William Grosso, yolhaj , yureq , Z,
 and ZAKH.
 
 # References {-}
