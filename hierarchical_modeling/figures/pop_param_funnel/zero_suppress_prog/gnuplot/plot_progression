@@ -1,0 +1,135 @@
+#!/bin/bash
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "prior.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-5:5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:5]
+
+set zlabel ''
+set zrange[-20:7]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9
+
+set samples 400
+set isosamples 400
+
+splot  0.5 * x**2 \
+     + 0.5 * ((y - 5) / 1)**2 \
+     + log(0.0752) + log(0.02005) + 7.42881917762 notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "likelihood.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-5:5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:5]
+
+set zlabel ''
+set zrange[-20:7]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9
+
+set samples 400
+set isosamples 400
+
+splot  0.5 * ( (x  - 2.474708) / exp(y) )**2 \
+     + 0.5 * ( (x  - 2.075384) / exp(y) )**2 \
+     + 0.5 * ( (x  - 1.847598) / exp(y) )**2 \
+     + 7.42370349156 - 7.42881917762 notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "posterior.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-5:5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:5]
+
+set zlabel ''
+set zrange[-20:7]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9
+
+set samples 400
+set isosamples 400
+
+sigma=0.25
+y_obs = 1.30321992
+
+N_margin = 9.0
+y_ave = -1.107945
+y2_ave = 3.989815
+
+splot  0.5 * x**2 \
+     + 0.5 * ((y - 5) / 1)**2 \
+     + 0.5 * ( (x  - 2.474708) / exp(y) )**2 \
+     + 0.5 * ( (x  - 2.075384) / exp(y) )**2 \
+     + 0.5 * ( (x  - 1.847598) / exp(y) )**2 \
+     + log(0.075) + log(0.02) + 7.42370349156 notitle
+
+END

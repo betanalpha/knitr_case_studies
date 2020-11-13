@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# log(0.075) + log(0.02) + 5.48572742264
+# log(0.075) + log(0.02) + 10.6989510706
+# log(0.075) + log(0.02) - 1.47600656449
+
+gnuplot << END
+set xrange[-15:15]
+set yrange[-5:5]
+set format z "%.5f"
+
+set samples 400
+set isosamples 400
+
+set table "prior_ulpdf.dat"
+splot - (  0.5 * x**2 \
+         + 0.5 * (exp(y) / 0.15)**2 - y)
+
+unset table
+END
+
+grep -v '^#' prior_ulpdf.dat | awk '{print $3}' | grep -v ^$ > prior_ulpdf_flat.dat
+
+python -c 'import functools; import math; \
+           f = open("prior_ulpdf_flat.dat"); vals = map(float, f.read().splitlines()); \
+           print functools.reduce( \
+             lambda a, b: a + math.log(1 + math.exp(b - a)) if a > b else b + math.log(1 + math.exp(a - b)), vals)'
+
+gnuplot << END
+set xrange[-15:15]
+set yrange[-5:5]
+set format z "%.5f"
+
+set samples 400
+set isosamples 400
+
+set table "post_indiv_ulpdf.dat"
+splot - (  0.5 * ( (x  - 2.474708) / exp(y) )**2 \
+         + 0.5 * ( (x  - 2.075384) / exp(y) )**2 \
+         + 0.5 * ( (x  - 1.847598) / exp(y) )**2)
+
+END
+
+grep -v '^#' post_indiv_ulpdf.dat | awk '{print $3}' | grep -v ^$ > post_indiv_ulpdf_flat.dat
+
+python -c 'import functools; import math; \
+           f = open("post_indiv_ulpdf_flat.dat"); vals = map(float, f.read().splitlines()); \
+           print functools.reduce( \
+             lambda a, b: a + math.log(1 + math.exp(b - a)) if a > b else b + math.log(1 + math.exp(a - b)), vals)'
+
+gnuplot << END
+set xrange[-15:15]
+set yrange[-5:5]
+set format z "%.5f"
+
+set samples 400
+set isosamples 400
+
+set table "post_margin_ulpdf.dat"
+splot - (  0.5 * x**2 \
+         + 0.5 * (exp(y) / 0.15)**2 - y \
+         + 0.5 * ( (x  - 2.474708) / exp(y) )**2 \
+         + 0.5 * ( (x  - 2.075384) / exp(y) )**2 \
+         + 0.5 * ( (x  - 1.847598) / exp(y) )**2 )
+
+END
+
+grep -v '^#' post_margin_ulpdf.dat | awk '{print $3}' | grep -v ^$ > post_margin_ulpdf_flat.dat
+
+python -c 'import functools; import math; \
+           f = open("post_margin_ulpdf_flat.dat"); vals = map(float, f.read().splitlines()); \
+           print functools.reduce( \
+             lambda a, b: a + math.log(1 + math.exp(b - a)) if a > b else b + math.log(1 + math.exp(a - b)), vals)'

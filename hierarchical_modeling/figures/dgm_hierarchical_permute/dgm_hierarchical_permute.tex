@@ -1,0 +1,129 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\newcommand*{\offset}{0.025}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3, thick]
+
+\pgfmathsetmacro{\r}{2}
+
+\pgfmathsetmacro{\dx}{0}
+\pgfmathsetmacro{\dy}{0}
+
+\draw[white] (-15 + \dx, -6 + \dy) rectangle (15 + \dx, 8 + \dy);
+
+\filldraw[fill=white, draw=dark, line width=1.5] (-12 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\theta_{1}$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5] (-6 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\ldots$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5] (0 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\theta_{k}$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5] (6 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\ldots$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5] (12 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\theta_{K}$ };
+
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (-12 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (-6 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (0 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (6 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (12 + \dx, 3 - \r + \dy);
+
+\filldraw[fill=white, draw=dark, line width=1.5] (0 + \dx, -3 + \dy) circle (\r)
+node[color=black] { $\phi$ };
+
+\pgfmathsetmacro{\dx}{34}
+\pgfmathsetmacro{\dy}{0}
+
+\draw[white] (-15 + \dx, -6 + \dy) rectangle (15 + \dx, 8 + \dy);
+
+\draw[->, >=stealth, line width=1.5, dark] 
+  (1.5 + \dx, 4.75) .. controls (2.5 + \dx, 5.5) and (4 + \dx, 6) .. 
+  (6 + \dx, 6) .. controls (8 + \dx, 6) and (9.5 + \dx, 5.5) .. (10.5 + \dx, 4.75);
+
+\draw[<-, >=stealth, line width=1.5, dark] 
+  (1 + \dx, 5) .. controls (2 + \dx, 6) and (4 + \dx, 6.5) .. 
+  (6 + \dx, 6.5) .. controls (8 + \dx, 6.5) and (10 + \dx, 6) .. (11 + \dx, 5);
+
+\filldraw[fill=white, draw=dark, line width=1.5, opacity=0.25] (-12 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\theta_{1}$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5, opacity=0.25] (-6 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\ldots$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5] (0 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\theta_{K}$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5, opacity=0.25] (6 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\ldots$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5] (12 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\theta_{k}$ };
+
+\draw[->, >=stealth, color=mid, line width=1.5, opacity=0.25] (0 + \dx, -3 + \r + \dy) -- (-12 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5, opacity=0.25] (0 + \dx, -3 + \r + \dy) -- (-6 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (0 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5, opacity=0.25] (0 + \dx, -3 + \r + \dy) -- (6 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (12 + \dx, 3 - \r + \dy);
+
+\filldraw[fill=white, draw=dark, line width=1.5] (0 + \dx, -3 + \dy) circle (\r)
+node[color=black] { $\phi$ };
+
+\pgfmathsetmacro{\dx}{68}
+\pgfmathsetmacro{\dy}{0}
+
+\draw[white] (-15 + \dx, -6 + \dy) rectangle (15 + \dx, 8 + \dy);
+
+\filldraw[fill=white, draw=dark, line width=1.5] (-12 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\theta_{1}$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5] (-6 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\ldots$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5] (0 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\theta_{K}$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5] (6 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\ldots$ };
+
+\filldraw[fill=white, draw=dark, line width=1.5] (12 + \dx, 3 + \dy) circle (\r)
+node[color=black] { $\theta_{k}$ };
+
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (-12 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (-6 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (0 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (6 + \dx, 3 - \r + \dy);
+\draw[->, >=stealth, color=mid, line width=1.5] (0 + \dx, -3 + \r + \dy) -- (12 + \dx, 3 - \r + \dy);
+
+\filldraw[fill=white, draw=dark, line width=1.5] (0 + \dx, -3 + \dy) circle (\r)
+node[color=black] { $\phi$ };
+
+\end{tikzpicture}
+
+\end{document}  

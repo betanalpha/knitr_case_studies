@@ -1,0 +1,118 @@
+#!/bin/bash
+
+# log(0.075) + log(0.02) + 8.73885035992
+# log(0.075) + log(0.02) + 8.61512726601
+# log(0.075) + log(0.02) - 9.70089214372
+# log(0.075) + log(0.02) - 3.43233580095
+
+gnuplot << END
+set xrange[-15:15]
+set yrange[-5:3]
+set format z "%.5f"
+
+set samples 400
+set isosamples 400
+
+set table "prior_ulpdf.dat"
+splot - (0.5 * x**2 \
+     + 0.5 * (exp(y) / 3)**2 - y) notitle
+
+unset table
+END
+
+grep -v '^#' prior_ulpdf.dat | awk '{print $3}' | grep -v ^$ > prior_ulpdf_flat.dat
+
+python -c 'import functools; import math; \
+           f = open("prior_ulpdf_flat.dat"); vals = map(float, f.read().splitlines()); \
+           print functools.reduce( \
+             lambda a, b: a + math.log(1 + math.exp(b - a)) if a > b else b + math.log(1 + math.exp(a - b)), vals)'
+
+gnuplot << END
+set xrange[-15:15]
+set yrange[-5:3]
+set format z "%.5f"
+
+set samples 400
+set isosamples 400
+
+sigma_indiv = 5
+y_indiv = -0.48906449
+
+set table "post_indiv_ulpdf.dat"
+splot - (0.5 * x**2 \
+     + 0.5 * (exp(y) / 3)**2 - y \
+     + 0.5 * ( (x * exp(y) - y_indiv) / sigma_indiv )**2) notitle
+
+END
+
+grep -v '^#' post_indiv_ulpdf.dat | awk '{print $3}' | grep -v ^$ > post_indiv_ulpdf_flat.dat
+
+python -c 'import functools; import math; \
+           f = open("post_indiv_ulpdf_flat.dat"); vals = map(float, f.read().splitlines()); \
+           print functools.reduce( \
+             lambda a, b: a + math.log(1 + math.exp(b - a)) if a > b else b + math.log(1 + math.exp(a - b)), vals)'
+
+gnuplot << END
+set xrange[-15:15]
+set yrange[-5:3]
+set format z "%.5f"
+
+set samples 400
+set isosamples 400
+
+sigma_indiv = 5
+y_indiv = -0.48906449
+
+sigma_margin = 5
+N_margin = 9.0
+y_ave = -1.677848
+y2_ave = 19.78904
+
+set table "post_weak_margin_ulpdf.dat"
+splot -( 0.5 * x**2 \
+     + 0.5 * (exp(y) / 3)**2 - y \
+     + 0.5 * ( (x * exp(y) - y_indiv) / sigma_indiv )**2 \
+     + 0.5 * N_margin * log(sigma_margin**2 + exp(2 * y)) \
+     + 0.5 * N_margin * y2_ave / (sigma_margin**2 + exp(2 * y))) notitle
+
+END
+
+grep -v '^#' post_weak_margin_ulpdf.dat | awk '{print $3}' | grep -v ^$ > post_weak_margin_ulpdf_flat.dat
+
+python -c 'import functools; import math; \
+           f = open("post_weak_margin_ulpdf_flat.dat"); vals = map(float, f.read().splitlines()); \
+           print functools.reduce( \
+             lambda a, b: a + math.log(1 + math.exp(b - a)) if a > b else b + math.log(1 + math.exp(a - b)), vals)'
+
+
+gnuplot << END
+set xrange[-15:15]
+set yrange[-5:3]
+set format z "%.5f"
+
+set samples 400
+set isosamples 400
+
+sigma_indiv = 5
+y_indiv = -0.48906449
+
+sigma_margin = 0.25
+N_margin = 9
+y_ave = -1.107945
+y2_ave = 3.989815
+
+set table "post_strong_margin_ulpdf.dat"
+splot -( 0.5 * x**2 \
+     + 0.5 * (exp(y) / 3)**2 - y \
+     + 0.5 * ( (x * exp(y) - y_indiv) / sigma_indiv )**2 \
+     + 0.5 * N_margin * log(sigma_margin**2 + exp(2 * y)) \
+     + 0.5 * N_margin * y2_ave / (sigma_margin**2 + exp(2 * y))) notitle
+
+END
+
+grep -v '^#' post_strong_margin_ulpdf.dat | awk '{print $3}' | grep -v ^$ > post_strong_margin_ulpdf_flat.dat
+
+python -c 'import functools; import math; \
+           f = open("post_strong_margin_ulpdf_flat.dat"); vals = map(float, f.read().splitlines()); \
+           print functools.reduce( \
+             lambda a, b: a + math.log(1 + math.exp(b - a)) if a > b else b + math.log(1 + math.exp(a - b)), vals)'
