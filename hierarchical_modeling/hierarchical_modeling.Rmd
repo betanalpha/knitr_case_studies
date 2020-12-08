@@ -65,7 +65,7 @@ $$
 Note that $\theta$ might be one-dimensional but could also be multi-dimensional
 depending on how sophisticatedly we model each context context.
 
-In a _homogeneous_ or _no pooling_ model we ignore the potential variation
+In a _homogeneous_ or _complete pooling_ model we ignore the potential variation
 entirely and assume that the behavior in each individual context is captured by
 the nominal parameters.  Because every context is modeled with the same,
 monolithic parameters all of the observations across those contexts _pool_
@@ -312,6 +312,14 @@ $$
 By modeling both jointly we have the flexibility to focus our inferences on just
 the individual contexts we've observed or the entire latent population,
 depending on which might be more appropriate in any given application.
+
+Critically the latent population implied by de Finetti's theorem is simply a
+latent population _consistent_ with the particular contexts observed, and it
+need not correspond to any real population.  For example if the observed
+contexts are influenced by selection effects then the latent population will
+model only those contexts influenced by those specific selection effects; that
+latent population will not generalize to contexts chosen under different
+selection effects.
 
 The latent parameters $\phi$ are commonly referred to as _hyperparameters_ and
 $\pi(\phi)$ as the _hyperprior_.  While "hyper" is admittedly fun to say in my
@@ -644,7 +652,7 @@ $$
 \sim \text{normal}(\mu, \tau).
 \end{align*}
 $$
-When $\lambda_{n} = 0$ the $k$th individual is modeled with a non-centered
+When $\lambda_{k} = 0$ the $k$th individual is modeled with a non-centered
 parameterization, when $\lambda_{k} = 1$ reduces to a centered parameterization,
 and intermediate values interpolate between the two.
 
@@ -689,11 +697,11 @@ In general this integration cannot be performed analytically, but to build some
 conceptual intuition let's consider the limit where the data are infinitely
 informative and we can approximate the likelihood functions with Dirac delta
 functions that are non-zero only at a single point
-$\hat{\theta}_{n}(\tilde{y}_{k})$,
+$\hat{\theta}_{k}(\tilde{y}_{k})$,
 $$
 \pi(\tilde{y}_{k} \mid \theta_{k})
 \approx
-\delta \left( \theta_{k} - \hat{\theta}_{n}(\tilde{y}_{k}) \right).
+\delta \left( \theta_{k} - \hat{\theta}_{k}(\tilde{y}_{k}) \right).
 $$
 Within this limit the integration becomes trivial -- we just evaluate the
 integrand at this point,
@@ -709,12 +717,12 @@ $$
 &\propto
 \left[ \prod_{k = 1}^{K}
 \int \mathrm{d} \theta_{k} \,
-\delta \left( \theta_{k} - \hat{\theta}_{n}(\tilde{y}_{k}) \right)
+\delta \left( \theta_{k} - \hat{\theta}_{k}(\tilde{y}_{k}) \right)
 \cdot \text{normal}(\theta_{k} \mid \mu, \tau) \right]
 \pi(\mu, \tau)
 \\
 &\propto
-\left[ \prod_{k = 1}^{K} \text{normal} \left( \hat{\theta}_{n}(\tilde{y}_{k}) \mid \mu, \tau \right) \right]
+\left[ \prod_{k = 1}^{K} \text{normal} \left( \hat{\theta}_{k}(\tilde{y}_{k}) \mid \mu, \tau \right) \right]
 \pi(\mu, \tau).
 \end{align*}
 $$
@@ -727,7 +735,7 @@ $$
 \begin{align*}
 \pi(\tilde{y} \mid \mu, \tau)
 &=
-\prod_{k = 1}^{K} \text{normal} \left( \hat{\theta}_{n}(\tilde{y}_{k}) \mid \mu, \tau \right)
+\prod_{k = 1}^{K} \text{normal} \left( \hat{\theta}_{k}(\tilde{y}_{k}) \mid \mu, \tau \right)
 \\
 &\propto \quad
 \text{normal} \left( \mu \mid \hat{\mu}(\tilde{y}), \frac{\tau}{\sqrt{K}} \right)
@@ -800,7 +808,7 @@ $$
 \pi(\mu, \tau) = \pi(\mu) \cdot \pi(\tau)
 $$
 to isolate just one regime of the funnel and enable effective computation.  For
-example upper bounds on how much heterogeneity is reasonably can inform
+example upper bounds on how much heterogeneity is reasonable can inform
 infinity-suppressing priors that cut off the top of the funnel.
 
 <center>
@@ -830,7 +838,7 @@ hierarchical model!
 
 ## Learning the Individual Parameters
 
-Now we can consider the degeneracies inherit to the individual parameters, in
+Now we can consider the degeneracies inherent to the individual parameters, in
 particular under what circumstances degeneracies arise in both the centered and
 non-centered parameterizations.
 
@@ -978,9 +986,9 @@ directly but rather the relative deviations of those parameters from the latent
 population,
 $$
 \begin{align*}
-\eta_{n} &\sim \text{normal}(0, 1)
+\eta_{k} &\sim \text{normal}(0, 1)
 \\
-\theta_{k} &= \mu + \tau \cdot \eta_{n}.
+\theta_{k} &= \mu + \tau \cdot \eta_{k}.
 \end{align*}
 $$
 
@@ -1016,12 +1024,12 @@ The coupling of the individual parameters and the population parameters is
 instead isolated to the deterministic transformation from the relative
 parameters back to the absolute parameters,
 $$
-\theta_{k} = \mu + \tau \cdot \eta_{n}.
+\theta_{k} = \mu + \tau \cdot \eta_{k}.
 $$
 Information that constrains the individual parameters manifests in an awkward
 geometry for the relative parameters.  If the $\theta_{k}$ are fixed then an
 increase in $\tau$ must be accompanied by either an increase in $\mu$ or a
-decrease in $\tilde{\theta}_{n}$, resulting in an _inverted funnel degeneracy_
+decrease in $\eta_{k}$, resulting in an _inverted funnel degeneracy_
 in the individual likelihood functions that becomes more pathological the more
 strongly informed the likelihood functions!
 
@@ -1240,11 +1248,11 @@ knitr::include_graphics("figures/funnel/typical_set/typical_set.png")
 <br><br>
 </center>
 
-In order accurately quantify a target distribution a probabilistic computational
-algorithm must be able to quantify both extremes of the funnel, from the flat
-expanses at the top to the narrow valley at the bottom, _at the same_.  For
-Markov chain Monte Carlo algorithms this requires many transitions from the top
-of the funnel to the bottom and back again.
+In order to accurately quantify a target distribution a probabilistic
+computational algorithm must be able to quantify both extremes of the funnel,
+from the flat expanses at the top to the narrow valley at the bottom, _at the
+same time_.  For Markov chain Monte Carlo algorithms this requires many
+transitions from the top of the funnel to the bottom and back again.
 
 For most Markov transitions this exploration up and down the funnel is limited
 by the shape of the concentrating typical set.  At any point there is more
@@ -1295,7 +1303,7 @@ funnel degeneracies within relatively short Markov chains.
 For example the extreme curvature deep in the neck of the funnel causes
 instabilities in the numerical Hamiltonian trajectories that generate each
 transition, resulting in _divergent transitions_ that can then be used to
-diagnose the unfortunately geometry.
+diagnose the unfortunate geometry.
 
 <center>
 <br>
@@ -1375,7 +1383,7 @@ to exactly this stunted exploration.  Even without divergences the E-FMI
 diagnostic can readily identify the consequences of a latent funnel degeneracy.
 
 Hamiltonian Monte Carlo is especially well-suited for working with the funnel
-degeneracies inherit to hierarchical models.  The sensitive diagnostics inform
+degeneracies inherent to hierarchical models.  The sensitive diagnostics inform
 not only when the funnels have become too strong but also _where_ in parameter
 space the degeneracy is most problematic.  That in turn guides the most
 effective resolution, whether it be refined prior models or reparameterization
@@ -1389,7 +1397,7 @@ and further details on Hamiltonian Monte Carlo and hierarchical models see
 
 # Empirical Investigations
 
-To explore how the degenerate behavior inherit to hierarchical models manifests
+To explore how the degenerate behavior inherent to hierarchical models manifests
 in practice let's get our hands dirty with some coding experiments.  In this
 section we'll investigate various aspects of these degeneracies with targeted
 examples before considering a more realistic modeling problem.
@@ -1599,8 +1607,8 @@ util$check_all_diagnostics(fit)
 ```
 
 Looking at the trace plots we see the Markov chains 3 and 4 explore the deepest
-part of the funnel only slowly while Markov chains 1 and 2 do venture into the
-depths at all.  This incomplete exploration is why those two chains don't
+part of the funnel only slowly while Markov chains 1 and 2 don't venture into 
+the depths at all.  This incomplete exploration is why those two chains don't
 trigger E-FMI warnings!
 
 ```{r}
@@ -1707,7 +1715,7 @@ sigma <- 10
 fit <- stan(file='stan_programs/generate_data.stan',
             data=c("N", "K", "indiv_idx", "sigma"), iter=1, chains=1,
             seed=194838, algorithm="Fixed_param")
-        
+
 y <- extract(fit)$y[1,]
 
 data <- list("N" = N, "y" = y, "K" = K, "indiv_idx" = indiv_idx, "sigma" = sigma)
@@ -2050,6 +2058,8 @@ The narrow likelihood functions strongly inform each individual parameter which
 in turn informs the population location parameter, $\mu$.
 
 ```{r}
+cp_samples <- extract(cp_fit)
+
 M <- data$K + 1
 idx <- rep(1:M, each=2)
 x <- sapply(1:length(idx), function(m) if(m %% 2 == 0) idx[m] + 0.5 else idx[m] - 0.5)
@@ -2082,8 +2092,6 @@ Because we have a reasonable number of contexts we also learn the population
 scale reasonably well.
 
 ```{r}
-cp_samples <- extract(cp_fit)
-
 hist(abs(rnorm(40000, 0, 5)), breaks=seq(0, 25, 0.25),
      col=c_light, border=c_light_highlight, main="",
      xlim=c(0, 20), xlab="tau", yaxt='n', ylim=c(0, 5000), ylab="")
@@ -3070,13 +3078,13 @@ idx <- rep(1:M, each=2)
 x <- sapply(1:length(idx), function(m) if(m %% 2 == 0) idx[m] + 0.5 else idx[m] - 0.5)
 
 probs <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
-cred <- sapply(1:data$N_exp, function(n) quantile(exp(samples$log_psi[,n]), probs=probs))
+cred <- sapply(1:data$N_exp, function(n) quantile(samples$log_psi[,n], probs=probs))
 pad_cred <- do.call(cbind, lapply(idx, function(m) cred[1:9,m]))
 
 plot(1, type="n", main="",
      xlim=c(0.5, M + 0.5), xlab="", xaxt="n",
      ylim=c(min(pad_cred[1,]), max(pad_cred[9,])),
-     ylab="Marginal psi0 Posteriors")
+     ylab="Marginal log psi0 Posteriors")
 
 polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
         col = c_light, border = NA)
@@ -3126,7 +3134,7 @@ pad_cred <- do.call(cbind, lapply(idx, function(m) reordered_cred[1:9,m]))
 plot(1, type="n", main="",
      xlim=c(0.5, M + 0.5), xlab="", xaxt="n",
      ylim=c(min(pad_cred[1,]), max(pad_cred[9,])),
-     ylab="Marginal psi Posteriors")
+     ylab="Marginal log psi 0 Posteriors")
 
 polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
         col = c_light, border = NA)
@@ -3142,7 +3150,7 @@ axis(1, at=1:M, labels=temp_idx)
 ```
 
 The inferred calibration coefficients appear to be reasonably well correlated
-with temperature, breaking the exchangeability inherit to our hierarchical
+with temperature, breaking the exchangeability inherent to our hierarchical
 model.  With the temperature data at hand, however, we can do better.
 
 ### Attempt Three
@@ -3299,7 +3307,7 @@ We can now take a look a closer look at our inferences.  We learn a bit more
 about the temperature scaling than just what was provided by the informative
 prior model.
 
-```{r}   
+```{r}
 hist(abs(rnorm(4000, 1.25, 0.25)), breaks=seq(0, 5, 0.025),
      col=c_light, border=c_light_highlight, main="",
      xlim=c(0, 2), xlab="gamma", yaxt='n', ylim=c(0, 300), ylab="")
@@ -3317,6 +3325,66 @@ plot(samples$mu_log_psi0, samples$tau_log_psi0,
      xlab="mu_log_psi0", xlim=c(-1, 1),
      ylab="tau_log_psi0", ylim=c(0, 1.5))
 ```
+
+```{r}
+M <- data$N_exp
+idx <- rep(1:M, each=2)
+x <- sapply(1:length(idx), function(m) if(m %% 2 == 0) idx[m] + 0.5 else idx[m] - 0.5)
+
+probs <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+cred <- sapply(1:data$N_exp, function(n) quantile(samples$log_psi0[,n], probs=probs))
+pad_cred <- do.call(cbind, lapply(idx, function(m) cred[1:9,m]))
+
+plot(1, type="n", main="",
+     xlim=c(0.5, M + 0.5), xlab="", xaxt="n",
+     ylim=c(min(pad_cred[1,]), max(pad_cred[9,])),
+     ylab="Marginal log psi0 Posteriors")
+
+polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
+        col = c_light, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
+        col = c_light_highlight, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
+        col = c_mid, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
+        col = c_mid_highlight, border = NA)
+lines(x, pad_cred[5,], col=c_dark, lwd=2)
+
+axis(1, at=1:M, labels=1:M)
+```
+
+One possible source of this excess heterogeneity might be an insufficient
+temperature model.  If the temperature dependence were more complicated,
+however, then we would expect to see the heterogeneity continue to correlate
+with the recorded temperatures.  To check we can reorder the experiments again.
+
+```{r}
+reordered_cred <- cred[,temp_idx]
+pad_cred <- do.call(cbind, lapply(idx, function(m) reordered_cred[1:9,m]))
+
+plot(1, type="n", main="",
+     xlim=c(0.5, M + 0.5), xlab="", xaxt="n",
+     ylim=c(min(pad_cred[1,]), max(pad_cred[9,])),
+     ylab="Marginal log psi0 Posteriors")
+
+polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
+        col = c_light, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
+        col = c_light_highlight, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
+        col = c_mid, border = NA)
+polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
+        col = c_mid_highlight, border = NA)
+lines(x, pad_cred[5,], col=c_dark, lwd=2)
+
+axis(1, at=1:M, labels=temp_idx)
+```
+
+Reordering the experiments no longer reveals systematic structure, however,
+suggesting that the heterogeneity is a consequence of some other process.
+
+Confident in our modeling assumptions we can now plot the posteriors for the
+more directly interpretable constrained calibration coefficient, $\psi_{0}$.
 
 ```{r}
 M <- data$N_exp
@@ -3345,44 +3413,14 @@ lines(x, pad_cred[5,], col=c_dark, lwd=2)
 axis(1, at=1:M, labels=1:M)
 ```
 
-One possible source of this excess heterogeneity might be an insufficient
-temperature model.  If the temperature dependence were more complicated,
-however, then we would expect to see the heterogeneity continue to correlate
-with the recorded temperatures.  To check we can reorder the experiments again.
-
-```{r}
-reordered_cred <- cred[,temp_idx]
-pad_cred <- do.call(cbind, lapply(idx, function(m) reordered_cred[1:9,m]))
-
-plot(1, type="n", main="",
-     xlim=c(0.5, M + 0.5), xlab="", xaxt="n",
-     ylim=c(min(pad_cred[1,]), max(pad_cred[9,])),
-     ylab="Marginal psi0 Posteriors")
-
-polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
-        col = c_light, border = NA)
-polygon(c(x, rev(x)), c(pad_cred[2,], rev(pad_cred[8,])),
-        col = c_light_highlight, border = NA)
-polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
-        col = c_mid, border = NA)
-polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
-        col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
-
-axis(1, at=1:M, labels=temp_idx)
-```
-
-Reordering the experiments no longer reveals systematic structure, however,
-suggesting that the heterogeneity is a consequence of some other process.
-
-Content with our model we can now consider how to communicate our inferences to
-anyone who might be using a similar analog-to-digital converter.  If others will
-be using the _exact same devices_ in the _exact same experimental_ conditions
-then it's natural to report the individual calibration coefficients,
-$\log \psi_{0}$, directly.  On the other hand if the experiments only sampled
-the devices and conditions then the latent population parameters
-$\mu_{\log \psi_{0}}$ and $\tau_{\log \psi_{0}}$ better capture the range of
-behaviors that others will encounter.
+Finally we can consider how to communicate our inferences to anyone who might be
+using a similar analog-to-digital converter.  If others will be using the _exact
+same devices_ in the _exact same experimental_ conditions then it's natural to
+report the individual calibration coefficients, $\log \psi_{0}$, directly.  On
+the other hand if the experiments only sampled the devices and conditions then
+the latent population parameters $\mu_{\log \psi_{0}}$ and
+$\tau_{\log \psi_{0}}$ will better capture the range of behaviors that others
+will encounter.
 
 # Multivariate Normal Hierarchical Models {#sec:multi_hier}
 
@@ -3437,14 +3475,17 @@ Prior modeling of the correlation matrix is more subtle.  A common choice is the
 Lewandowski-Kurowicka-Joe, or LKJ, probability density function over the space
 of correlation matrices inspired by [@LewandowskiEtAl:2009],
 $$
-\pi(\boldsymbol{\Psi}) = \text{LKJ}(\zeta).
+\pi(\boldsymbol{\Psi}) = \text{LKJ}(\zeta) = \left| \boldsymbol{\Psi} \right|^{\eta}.
 $$
 The positive parameter $\zeta \in \mathbb{R}^{+}$ controls the concentration of
 the probability density function -- if $\zeta > 1$ then the probability density
 function concentrates around the identity matrix, if $\zeta = 1$ then the
 probability density function is uniform over the space of correlation matrices,
 and if $\zeta < 1$ then the probability density function concentrates on the
-boundaries of the space.
+boundaries of the space.  Incidentally, because the LKJ density function depends
+only on the absolute value of a matrix determinant it is invariant to
+permutations of the rows and columns of $\boldsymbol{\Psi}$; consequently it
+defines a finitely-exchangeable model!
 
 Because an identity correlation matrix corresponds to vanishing correlations
 between the parameters, $\zeta > 1$ is a natural choice when expanding around
@@ -4030,7 +4071,7 @@ Fortunately the sensitive failure diagnostics of Hamiltonian Monte Carlo are
 particularly well-suited for this challenge, allowing us to identify and
 investigate any degeneracies and guide principled responses.
 
-Aside from computational considerations we also have to be recognize the
+Aside from computational considerations we also have to recognize the
 limitations of the exchangeability assumption implied by hierarchical models.
 _Any_ information that might characterize the varying behavior between the
 individual contexts can provide the basis of much more informative model.  From
@@ -4040,51 +4081,53 @@ heterogeneity.
 
 # Acknowledgements {-}
 
-A very special thanks to everyone supporting me on Patreon: Aapeli Nevala, 
-abcnap, Abhinav Katoch, Abhishek Vasu, Adam Bartonicek, Alan O'Donnell, 
-Alex ANDORRA, Alexander Bartik, Alexander Noll, Alfredo Garbuno Iñigo, 
-Allison M. Campbell, Anders Valind, Andrea Serafino, Andrew Rouillard, 
-Annie Chen, Anthony Wuersch, Antoine Soubret, Arya, asif zubair, Austin Carter, 
-Austin Rochford, Austin Rochford, Avraham Adler, Bao Tin Hoang, Ben Matthews, 
-Ben Swallow, Benjamin Phillabaum, Benoit Essiambre, Bo Schwartz Madsen, 
-Brian Hartley, Bryan Yu, Brynjolfur Gauti Jónsson, Cameron Smith, Canaan Breiss, 
-Cat Shark, Chad Scherrer, Charles Naylor, Chase Dwelle, Chris Jones, 
-Chris Zawora, Christopher Mehrvarzi, Chuck Carlson, Cole Monnahan, 
-Colin Carroll, Colin McAuliffe, D, Damien Mannion, dan mackinlay, Dan W Joyce, 
-Daniel Hocking, Daniel Rowe, Darshan Pandit, David Burdelski, David Christle, 
-David Humeau, David Pascall, Derek G Miller, Diogo Melo, Doug Rivers, Ed Berry, 
-Ed Cashin, Elizaveta Semenova, Eric Novik, Erik Banek, Ero Carrera, Ethan Goan, 
-Evan Cater, Fabio Zottele, Federico Carrone, Felipe González, Fergus Chadwick, 
-Filipe Dias, Finn Lindgren, Florian Wellmann, Francesco Corona, Geoff Rollins, 
-George Ho, Georgia S, Gerardo Salazar, Granville Matheson, Guido Biele, 
-Guilherme Marthe, Hamed Bastan-Hagh, Hany Abdulsamad, Haonan Zhu, Hugo Botha, 
-Hyunji Moon, Ian, Ilaria Prosdocimi, Isaac S, J Michael Burgess, 
-Jair Andrade Ortiz, James McInerney, James Wade, JamesU, Janek Berger, 
-Jeff Dotson, Jeff Helzner, Jeffrey Arnold, Jeffrey Burnett, Jessica Graves, 
-Joel Kronander, John Flournoy, John Zito, Jon, Jonathan Sedar, Jonathan St-onge, 
-Jonathon Vallejo, Jose Pereira, Josh Weinstock, Joshua Duncan, Joshua Griffith, 
-Joshua Mayer, Josué Mendoza, Justin Bois, Karim Naguib, Karim Osman, 
-Kazuki Yoshida, Kejia Shi, Kádár András, Leo Grinsztajn, lizzie, Luiz Carvalho, 
-Lukas Neugebauer, Marc Dotson, Marc Trunjer Kusk Nielsen, Mark Donoghoe, 
-Markus P., Martin Modrák, Matt Wescott, Matthew Kay, Matthew Quick, 
-Matthew T Stern, Maurits van der Meer, Maxim Kesin, Michael Colaresi, 
-Michael DeWitt, Michael Dillon, Michael Griffiths, Michael Redman, 
-Michael Tracy, Mick Cooney, Mike Lawrence, Mikhail Popov, MisterMentat, 
-Mohammed Charrout, Márton Vaitkus, Nathan Rutenbeck, Nerf-Shepherd, Nicholas 
-Cowie, Nicholas Erskine, Nicholas Knoblauch, Nicholas Ursa, Nick S, 
-Nicolas Frisby, Noah Guzman, Ole Rogeberg, Oliver Crook, Olivier Ma, 
-Omri Har Shemesh, Pablo León Villagrá, Patrick Boehnke, Pau Pereira Batlle, 
-Paul Oreto, Peter Smits, Pieter van den Berg, Pintaius Pedilici, Ravin Kumar, 
-Reed Harder, Riccardo Fusaroli, Richard Jiang, Richard Price, Robert Frost, 
-Robert Goldman, Robert J Neal, Robert kohn, Robert Mitchell V, Robin Taylor, 
-Rong Lu, Roofwalker, Rémi, Scott Block, Sean Talts, Seth Axen, Shira, sid phani, 
-Simon Dirmeier, Simon Duane, Simon Lilburn, Srivatsa Srinath, 
-Stephanie Fitzgerald, Stephen Lienhard, Stephen Oates, Steve Bertolani, Stijn, 
-Stone Chen, Sue Marquez, Sus, Susan Holmes, Suyog Chandramouli, Sören Berg, 
-Teddy Groves, Teresa Ortiz, Thomas Littrell, Thomas Vladeck, Théo Galy-Fajou, 
-Tiago Cabaço, Tim Howes, Tim Radtke, Tom Knowles, Tom McEwen, Tommy Naugle, 
-Tuan Nguyen Anh, Tyrel Stokes, Vanda Inacio de Carvalho, Vince, Virginia Webber, 
-vittorio trotta, Will Dearden, Will Farr, William Grosso, yolhaj, yureq, Z, 
+I warmly thank Susannah Tysor and Rob Trangucci for helpful comments.
+
+A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
+abcnap, Abhinav Katoch, Abhishek Vasu, Adam Bartonicek, Alan O'Donnell,
+Alex ANDORRA, Alexander Bartik, Alexander Noll, Alfredo Garbuno Iñigo,
+Allison M. Campbell, Anders Valind, Andrea Serafino, Andrew Rouillard,
+Annie Chen, Anthony Wuersch, Antoine Soubret, Arya, asif zubair, Austin Carter,
+Austin Rochford, Austin Rochford, Avraham Adler, Bao Tin Hoang, Ben Matthews,
+Ben Swallow, Benjamin Phillabaum, Benoit Essiambre, Bo Schwartz Madsen,
+Brian Hartley, Bryan Yu, Brynjolfur Gauti Jónsson, Cameron Smith, Canaan Breiss,
+Cat Shark, Chad Scherrer, Charles Naylor, Chase Dwelle, Chris Jones,
+Chris Zawora, Christopher Mehrvarzi, Chuck Carlson, Cole Monnahan,
+Colin Carroll, Colin McAuliffe, D, Damien Mannion, dan mackinlay, Dan W Joyce,
+Daniel Hocking, Daniel Rowe, Darshan Pandit, David Burdelski, David Christle,
+David Humeau, David Pascall, Derek G Miller, Diogo Melo, Doug Rivers, Ed Berry,
+Ed Cashin, Elizaveta Semenova, Eric Novik, Erik Banek, Ero Carrera, Ethan Goan,
+Evan Cater, Fabio Zottele, Federico Carrone, Felipe González, Fergus Chadwick,
+Filipe Dias, Finn Lindgren, Florian Wellmann, Francesco Corona, Geoff Rollins,
+George Ho, Georgia S, Gerardo Salazar, Granville Matheson, Guido Biele,
+Guilherme Marthe, Hamed Bastan-Hagh, Hany Abdulsamad, Haonan Zhu, Hugo Botha,
+Hyunji Moon, Ian, Ilaria Prosdocimi, Isaac S, J Michael Burgess,
+Jair Andrade Ortiz, James McInerney, James Wade, JamesU, Janek Berger,
+Jeff Dotson, Jeff Helzner, Jeffrey Arnold, Jeffrey Burnett, Jessica Graves,
+Joel Kronander, John Flournoy, John Zito, Jon, Jonathan Sedar, Jonathan St-onge,
+Jonathon Vallejo, Jose Pereira, Josh Weinstock, Joshua Duncan, Joshua Griffith,
+Joshua Mayer, Josué Mendoza, Justin Bois, Karim Naguib, Karim Osman,
+Kazuki Yoshida, Kejia Shi, Kádár András, Leo Grinsztajn, lizzie, Luiz Carvalho,
+Lukas Neugebauer, Marc Dotson, Marc Trunjer Kusk Nielsen, Mark Donoghoe,
+Markus P., Martin Modrák, Matt Wescott, Matthew Kay, Matthew Quick,
+Matthew T Stern, Maurits van der Meer, Maxim Kesin, Michael Colaresi,
+Michael DeWitt, Michael Dillon, Michael Griffiths, Michael Redman,
+Michael Tracy, Mick Cooney, Mike Lawrence, Mikhail Popov, MisterMentat,
+Mohammed Charrout, Márton Vaitkus, Nathan Rutenbeck, Nerf-Shepherd, Nicholas
+Cowie, Nicholas Erskine, Nicholas Knoblauch, Nicholas Ursa, Nick S,
+Nicolas Frisby, Noah Guzman, Ole Rogeberg, Oliver Crook, Olivier Ma,
+Omri Har Shemesh, Pablo León Villagrá, Patrick Boehnke, Pau Pereira Batlle,
+Paul Oreto, Peter Smits, Pieter van den Berg, Pintaius Pedilici, Ravin Kumar,
+Reed Harder, Riccardo Fusaroli, Richard Jiang, Richard Price, Robert Frost,
+Robert Goldman, Robert J Neal, Robert kohn, Robert Mitchell V, Robin Taylor,
+Rong Lu, Roofwalker, Rémi, Scott Block, Sean Talts, Seth Axen, Shira, sid phani,
+Simon Dirmeier, Simon Duane, Simon Lilburn, Srivatsa Srinath,
+Stephanie Fitzgerald, Stephen Lienhard, Stephen Oates, Steve Bertolani, Stijn,
+Stone Chen, Sue Marquez, Sus, Susan Holmes, Suyog Chandramouli, Sören Berg,
+Teddy Groves, Teresa Ortiz, Thomas Littrell, Thomas Vladeck, Théo Galy-Fajou,
+Tiago Cabaço, Tim Howes, Tim Radtke, Tom Knowles, Tom McEwen, Tommy Naugle,
+Tuan Nguyen Anh, Tyrel Stokes, Vanda Inacio de Carvalho, Vince, Virginia Webber,
+vittorio trotta, Will Dearden, Will Farr, William Grosso, yolhaj, yureq, Z,
 and ZAKH.
 
 # References {-}
