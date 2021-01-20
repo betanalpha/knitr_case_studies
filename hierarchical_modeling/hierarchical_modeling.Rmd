@@ -69,7 +69,7 @@ In a _homogeneous_ or _complete pooling_ model we ignore the potential variation
 entirely and assume that the behavior in each individual context is captured by
 the nominal parameters.  Because every context is modeled with the same,
 monolithic parameters all of the observations across those contexts _pool_
-together to inform those parameters, ensuring relatively precise inferences.  If
+together to inform those parameters, ensuring strongly informed inferences.  If
 the actual variations are large, however, then these strong inferences come at
 the cost of substantial model misfit.
 
@@ -120,14 +120,14 @@ $$
 The flexibility afforded by this independence assumption allows the model to
 capture any context-to-context variation.  It also implies that only
 observations within each context inform the individual parameters, resulting in
-less precise inferences relative to the homogeneous model.
+less informed inferences relative to the homogeneous model.
 
 Including latent interactions between the individual parameters implements a
 _partial pooling_ model.  Here the interactions allow observations to
 potentially inform other contexts without assuming full homogeneity.  If the
 interaction model is a reasonable approximation to the heterogeneity in the true
-data generating process then our inferences would enjoy more precision than the
-no pooling model but less misfit than the complete pooling model.
+data generating process then our inferences would be more strongly informed than
+in the no pooling model but suffer less misfit than the complete pooling model.
 
 This raises the question, however, of exactly how we might model those
 interactions between the individual parameters.
@@ -313,14 +313,6 @@ By modeling both jointly we have the flexibility to focus our inferences on just
 the individual contexts we've observed or the entire latent population,
 depending on which might be more appropriate in any given application.
 
-Critically the latent population implied by de Finetti's theorem is simply a
-latent population _consistent_ with the particular contexts observed, and it
-need not correspond to any real population.  For example if the observed
-contexts are influenced by selection effects then the latent population will
-model only those contexts influenced by those specific selection effects; that
-latent population will not generalize to contexts chosen under different
-selection effects.
-
 The latent parameters $\phi$ are commonly referred to as _hyperparameters_ and
 $\pi(\phi)$ as the _hyperprior_.  While "hyper" is admittedly fun to say in my
 opinion this terminology confuses the underlying assumptions and so I prefer to
@@ -362,7 +354,7 @@ the commutativity of multiplication -- the product of conditional probability
 density functions is the same regardless of the order of the individual factors.
 $$
 \begin{align*}
-\pi(\theta_{1}, \ldots, \theta_{k}, \ldots, \theta_{K})
+\pi(\theta_{1}, \ldots, \theta_{k}, \ldots, \theta_{K}, \phi)
 &=
 \pi(\theta_{1} \mid \phi) \cdot \ldots
 \cdot \pi(\theta_{k} \mid \phi) \cdot \ldots
@@ -397,7 +389,7 @@ individual we can just multiply another factor of the population density
 function without disturbing the initial model,
 $$
 \begin{align*}
-\pi(\theta_{1}, \ldots, \theta_{K + 1})
+\pi(\theta_{1}, \ldots, \theta_{K + 1}, \phi)
 &=
 \prod_{n = 1}^{K + 1} \pi(\theta_{k} \mid \phi) \cdot \pi(\phi)
 \\
@@ -405,7 +397,7 @@ $$
 \pi(\theta_{K + 1} \mid \phi) \cdot \prod_{k = 1}^{K} \pi(\theta_{k} \mid \phi) \cdot \pi(\phi)
 \\
 &=
-\pi(\theta_{K + 1} \mid \phi) \cdot \pi(\theta_{1}, \ldots, \theta_{K}).
+\pi(\theta_{K + 1} \mid \phi) \cdot \pi(\theta_{1}, \ldots, \theta_{K}, \phi).
 \end{align*}
 $$
 
@@ -480,6 +472,103 @@ parameters jointly with the individual parameters we can _dynamically_ learn the
 shape of the population model and hence the amount of pooling consistent with
 the observed data.
 
+## Interpreting Hierarchical Models
+
+Mathematically hierarchical models are incredibly versatile and fit naturally
+into many modeling applications.  The _interpretation_ of the hierarchy in each
+of those applications, however, can vary considerably.  Defining that
+interpretation is critical in understanding not only how the resulting
+inferences can be used but also how they should be communicated.
+
+The latent population implied by de Finetti's theorem, for example, is just a
+latent population _consistent_ with the particular contexts observed and the
+exchangeable heterogeneity that manifests in those contexts.  It need not
+correspond to any _real_ population, and we have to be careful to extrapolate
+the hierarchical model to other contexts only when appropriate.
+
+Hierarchical models capture _how_ behaviors vary across exchangeable contexts,
+not _why_ they vary.  Without some understanding for what causes those
+variations we cannot determine how meaningful the hierarchical population is
+beyond the current analysis.  If new contexts are influenced by different
+phenomena then the hierarchical model will poorly generalize to those contexts.
+At the same time if the underlying cause of the heterogeneity is not static then
+the hierarchical model might not even generalize to future interactions with the
+observed contexts!
+
+For example if the observed contexts are influenced by unmodeled selection
+effects then the latent population will accurately capture only the behavior
+within contexts governed by _those exact_ selection effects.  The latent
+population will not be applicable to contexts chosen under different selection
+effects or under no selection effects at all.
+
+When the interpretation of the latent population generalizes, for example when
+modeling individual objects drawn from a real, persistent population, then
+inferences about both the individual parameters and population parameters are
+relevant.  Which is most relevant, however, depends on the details of the
+observed contexts.
+
+If the contexts encountered in the analysis fully exhaust some finite set of
+possible contexts _and_ the contexts can be intentionally selected or prepared
+in future circumstances, then inferences of the individual parameters are
+sufficient for understanding future interactions with those contexts.  For
+example we can generate predictions within any of the observed contexts by
+sampling from those marginal posteriors distributions,
+$$
+\begin{align*}
+\tilde{\theta}_{k} &\sim \pi(\theta_{k} \mid \tilde{y} )
+\\
+y &\sim \pi(y \mid \tilde{\theta}_{k}).
+\end{align*}
+$$
+Consequently when sharing the results of these analyses it's natural to include
+only inferences of the individual parameters.
+
+One the other hand if the contexts encountered in an analysis are incidental or
+uncontrollable _and_ if the observed contexts are only a small sample of the
+possible contexts that might encounter, then inferences about the population
+parameters are necessary.  In this case predictions require sampling new
+contexts from the population model,
+$$
+\begin{align*}
+\tilde{\phi} &\sim \pi(\phi)
+\\
+\tilde{\theta} &\sim \pi(\theta \mid \tilde{\phi})
+\\
+y &\sim \pi(y \mid \tilde{\theta}),
+\end{align*}
+$$
+Now the marginal posterior of the population parameters captures the
+relevant information and is most natural in analysis summaries.
+
+The interpretation of the latent population, however, does not always
+generalize. For example if heterogeneity between the observed contexts arises
+from some complex, poorly-understood side effect unique to a particular
+experiment, then any hierarchical model of that heterogeneity will not
+generalize beyond the scope of that experiment.  In this case the hierarchical
+model is best interpreted as a means of absorbing these systematic variations
+in order to isolate some hidden phenomenological behavior that _does_ generalize
+beyond the experiment.
+
+Consider an experiment designed to study some baseline behavior
+$\theta_{\text{baseline}}$; this behavior might for example be captured by
+parameters or by the output of some complex mechanistic model.  If that baseline
+behavior is corrupted during the measurement, however, then we might model the
+behavior in each observed context as
+$$
+\theta_{k} = \theta_{\text{baseline}} + \delta_{k},
+$$
+where the residuals $\delta_{k}$ model the corruption of the baseline behavior
+that manifests in each observed context.  Because these residuals model the
+corruption unique to one particular realization of an experiment, they have no
+useful meaning outside of analyses of that measurement.  By modeling them
+jointly with the baseline behavior, however, we can account for that particular
+corruption, filtering out the noise and recovering the desired signal.
+
+In this case inferences about both the individual residuals and the latent
+population model for the residuals would be incidental, and of limited interest
+when summarizing an analysis.  Instead the relevant inferences would be captured
+in the marginal posterior distribution for $\theta_{\text{baseline}}$.
+
 ## Normal Hierarchical Models
 
 In order to completely specify a hierarchical model we need to specify the
@@ -544,56 +633,9 @@ precluding that the heterogeneity might be negligible, then a more appropriate
 choice is a prior model that concentrates towards $\tau = 0$, such as that
 specified by half-normal prior density function.
 
-### Inferring Individuals Verses The Latent Population
-
-Often statistical analyses are expected to report a single summary that
-characterizes the behavior of a system.  When that behavior is heterogeneous,
-however, no single summary fully captures the behavior.  To ensure meaningful
-communication of our inferences we have to be careful to understand how are
-colleagues might interpret any summary we produce.
-
-If the particular contexts encountered in the analysis fully exhaust the
-contexts that one might encounter in the future then it's natural to focus our
-inferences on the posterior summaries of the individual parameters.  For example
-we might report the posterior pushforward distribution of the parameter average,
-$$
-\frac{1}{K} \sum_{k = 1}^{K} \theta_{k},
-$$
-or any other estimator of centrality.
-
-One the other hand if the observed contexts are only a small sample of the
-potential contexts that might encounter in the future then it's more natural to
-focus on posterior summaries of the population parameters.  For example we might
-report the population location as a general baseline behavior.
-
-The subtle difference between these two perspectives clarifies a bit when we
-consider hypothetical predictions.  If we've fully exhausted the finite set of
-possible contexts then predictions would be generated from the existing
-individual parameters,
-$$
-y \sim \pi(y \mid \theta_{k});
-$$
-in this case inferences of the individual parameters are sufficient to
-generalize.  Conversely if we've only seen a selection of possible contexts then
-predictions might need to generate new individual parameters,
-$$
-\begin{align*}
-\theta &\sim \text{normal}(\mu, \tau)
-\\
-y &\sim \pi(y \mid \theta),
-\end{align*}
-$$
-in which case the population parameters quantify the generalized behavior.
-
-Which perspective is most appropriate depends not only on the particular
-application but also on the local community and how that community will consume
-reported inferences.  As always there is no universal answer and instead we have
-to consider what might be best in every new analysis.
-
-### Equivalent Parameterizations
-
-Conveniently there are multiple ways to specify a normal hierarchical model.
-We can always reparameterize the individual parameters,
+Normal density functions can be parameterized in many different ways and,
+consequently, so too can normal hierarchical models.  We can always
+reparameterize the individual parameters,
 $$
 \eta_{k} = f(\theta_{k})
 $$
@@ -891,7 +933,7 @@ knitr::include_graphics("figures/centered_progressions/indiv_likelihood/indiv_li
 </center>
 
 Observations within the other contexts, however, inform the populations scale
-and complement what we learn from $\tilde{y}_{k}$ alone.
+$\tau$ and complement what we learn from $\tilde{y}_{k}$ alone.
 
 <center>
 <br>
@@ -952,7 +994,9 @@ The individual likelihood functions, however, are not the only data that
 constrain the individual parameters.  As long as $\tau < \infty$ information
 in the other likelihood functions will inform $\mu$ and $\tau$ as well.  Even
 if an individual likelihood function is diffuse this partial pooling can
-suppress the worst of the funnel degeneracy.
+suppress the worst of the funnel degeneracy.  The larger the heterogeneity the
+more the marginal likelihood function will concentrate away from $\tau = 0$
+and suppress the worst of the funnel behavior.
 
 <center>
 <br>
@@ -1214,7 +1258,7 @@ Funnel degeneracies show up all over the place in hierarchical models, and
 unfortunately those degeneracies are especially problematic to accurate
 probabilisitic computation.  To understand why let's take a closer look at a
 probability density function that manifests a funnel degeneracy and the
-probability distribution is represents.
+probability distribution it represents.
 
 As we saw above a probability density function with a funnel degeneracy is
 characterized by a single parameter that controls the concentration of
@@ -1607,7 +1651,7 @@ util$check_all_diagnostics(fit)
 ```
 
 Looking at the trace plots we see the Markov chains 3 and 4 explore the deepest
-part of the funnel only slowly while Markov chains 1 and 2 don't venture into 
+part of the funnel only slowly while Markov chains 1 and 2 don't venture into
 the depths at all.  This incomplete exploration is why those two chains don't
 trigger E-FMI warnings!
 
@@ -1773,10 +1817,12 @@ divergence warnings that we were expecting.
 util$check_all_diagnostics(cp_fit)
 ```
 
-Markov chains 1, 3, and 4 exhibit the characteristic funnel behavior in the
-trace plots for the population scale.  Markov chain 2 doesn't even bother to
-dip its toes into the funnel.  Note also that only Markov chain 4, which spends
-the most time deep in the funnel, triggers the E-FMI warning.
+If we look only at the first 1000 iterations that would have been run with the
+default Stan configuration we wee that Markov chains 1, 3, and 4 exhibit the
+characteristic funnel behavior in the trace plots for the population scale.
+Markov chain 2 doesn't even bother to dip its toes into the funnel.  Note also
+that only Markov chain 4, which spends the most time deep in the funnel,
+triggers the E-FMI warning.
 
 ```{r}
 unpermuted_samples <- extract(cp_fit, permute=FALSE)
@@ -1801,8 +1847,39 @@ plot(1:10000, log(unpermuted_samples[,4,2]), type="l", lwd=1, col=c_dark,
      ylab="log(tau)", ylim=c(-8, 3))
 ```
 
-To really confirm, however, we have to investigate the scatter plots.  Indeed
-we see funnels in each of the centered parameters.
+Looking at all 10000 iterations we can see the funnel pathologies manifest more
+often but still not often enough to necessarily be a clear problem.  We have to
+always keep in mind that empirical Markov chain Monte Carlo diagnostics are only
+as useful as the information they can extract from the Markov chains, and the
+slower the Markov chains explore the less information that can possibly be
+extracted!
+
+```{r}
+unpermuted_samples <- extract(cp_fit, permute=FALSE)
+
+par(mfrow=c(2, 2))
+
+plot(1:10000, log(unpermuted_samples[,1,2]), type="l", lwd=1, col=c_dark,
+     main="Chain 1",
+     xlab="Iteration", xlim=c(1, 10000),
+     ylab="log(tau)", ylim=c(-8, 3))
+plot(1:10000, log(unpermuted_samples[,2,2]), type="l", lwd=1, col=c_dark,
+     main="Chain 2",
+     xlab="Iteration", xlim=c(1, 1000),
+     ylab="log(tau)", ylim=c(-8, 3))
+plot(1:10000, log(unpermuted_samples[,3,2]), type="l", lwd=1, col=c_dark,
+     main="Chain 3",
+     xlab="Iteration", xlim=c(1, 10000),
+     ylab="log(tau)", ylim=c(-8, 3))
+plot(1:10000, log(unpermuted_samples[,4,2]), type="l", lwd=1, col=c_dark,
+     main="Chain 4",
+     xlab="Iteration", xlim=c(1, 10000),
+     ylab="log(tau)", ylim=c(-8, 3))
+```
+
+To really confirm the presence of a funnel, however, we have to investigate the
+more sensitive divergence diagnostics with scatter plots.  Indeed we see funnels
+in each of the centered parameters.
 
 ```{r}
 partition <- util$partition_div(cp_fit)
@@ -1957,7 +2034,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 axis(1, at=1:M, labels=c("th1", "th2", "th3", "th4", "th5",
                          "th6", "th7", "th8", "th9", "mu"))
@@ -2009,7 +2087,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 pad_obs <- do.call(cbind, lapply(idx, function(k) data$y[k]))
 
@@ -2082,7 +2161,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 axis(1, at=1:M, labels=c("th1", "th2", "th3", "th4", "th5",
                          "th6", "th7", "th8", "th9", "mu"))
@@ -2123,7 +2203,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 pad_obs <- do.call(cbind, lapply(idx, function(k) data$y[k]))
 
@@ -2862,12 +2943,20 @@ heterogeneity?  It looks like the observed normalized averages vary much more
 strongly across experiments than the posterior retrodictive values.
 
 ```{r}
-par(mar=c(4, 1, 1, 1))
+par(mar=c(5, 1, 2, 1))
 
-par(mfrow=c(7, 3))
-for (n in 1:21) {
+par(mfrow=c(3, 3))
+for (n in 1:9) {
   hist(samples$norm_ave[,n], breaks=seq(0, 10, 0.25),
-       col=c_dark, border=c_dark_highlight, main="",
+       col=c_dark, border=c_dark_highlight, main=paste("Experiment", n),
+       xlab="Normalized Average", xlim=c(0, 10), yaxt='n', ylab="")
+  abline(v=obs_norm_ave[n], col="black", lty=1, lw=2)
+}
+
+par(mfrow=c(4, 3))
+for (n in 10:21) {
+  hist(samples$norm_ave[,n], breaks=seq(0, 10, 0.25),
+       col=c_dark, border=c_dark_highlight, main=paste("Experiment", n),
        xlab="Normalized Average", xlim=c(0, 10), yaxt='n', ylab="")
   abline(v=obs_norm_ave[n], col="black", lty=1, lw=2)
 }
@@ -3032,12 +3121,20 @@ Similarly the model is now able to capture the empirical normalized averages
 observed in each experiment.
 
 ```{r}
-par(mar=c(4, 1, 1, 1))
+par(mar=c(5, 1, 2, 1))
 
-par(mfrow=c(7, 3))
-for (n in 1:21) {
+par(mfrow=c(3, 3))
+for (n in 1:9) {
   hist(samples$norm_ave[,n], breaks=seq(0, 25, 0.25),
-       col=c_dark, border=c_dark_highlight, main="",
+       col=c_dark, border=c_dark_highlight, main=paste("Experiment", n),
+       xlab="Normalized Average", xlim=c(0, 20), yaxt='n', ylab="")
+  abline(v=obs_norm_ave[n], col="black", lty=1, lw=2)
+}
+
+par(mfrow=c(4, 3))
+for (n in 10:21) {
+  hist(samples$norm_ave[,n], breaks=seq(0, 25, 0.25),
+       col=c_dark, border=c_dark_highlight, main=paste("Experiment", n),
        xlab="Normalized Average", xlim=c(0, 20), yaxt='n', ylab="")
   abline(v=obs_norm_ave[n], col="black", lty=1, lw=2)
 }
@@ -3094,7 +3191,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 axis(1, at=1:M, labels=1:M)
 ```
@@ -3144,7 +3242,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 axis(1, at=1:M, labels=temp_idx)
 ```
@@ -3283,13 +3382,21 @@ lines(x, pad_obs - pad_cred[5,], col="black", lty=1, lw=2)
 ```
 
 ```{r}
-par(mar=c(4, 1, 1, 1))
+par(mar=c(5, 1, 2, 1))
 
-par(mfrow=c(7, 3))
-for (n in 1:21) {
+par(mfrow=c(3, 3))
+for (n in 1:9) {
   hist(samples$norm_ave[,n], breaks=seq(0, 25, 0.25),
-       col=c_dark, border=c_dark_highlight, main="",
-       xlab="Normalized Averge", xlim=c(0, 20), yaxt='n', ylab="")
+       col=c_dark, border=c_dark_highlight, main=paste("Experiment", n),
+       xlab="Normalized Average", xlim=c(0, 20), yaxt='n', ylab="")
+  abline(v=obs_norm_ave[n], col="black", lty=1, lw=2)
+}
+
+par(mfrow=c(4, 3))
+for (n in 10:21) {
+  hist(samples$norm_ave[,n], breaks=seq(0, 25, 0.25),
+       col=c_dark, border=c_dark_highlight, main=paste("Experiment", n),
+       xlab="Normalized Average", xlim=c(0, 20), yaxt='n', ylab="")
   abline(v=obs_norm_ave[n], col="black", lty=1, lw=2)
 }
 
@@ -3348,7 +3455,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 axis(1, at=1:M, labels=1:M)
 ```
@@ -3375,7 +3483,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 axis(1, at=1:M, labels=temp_idx)
 ```
@@ -3408,7 +3517,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 axis(1, at=1:M, labels=1:M)
 ```
@@ -3475,7 +3585,7 @@ Prior modeling of the correlation matrix is more subtle.  A common choice is the
 Lewandowski-Kurowicka-Joe, or LKJ, probability density function over the space
 of correlation matrices inspired by [@LewandowskiEtAl:2009],
 $$
-\pi(\boldsymbol{\Psi}) = \text{LKJ}(\zeta) = \left| \boldsymbol{\Psi} \right|^{\eta}.
+\pi(\boldsymbol{\Psi}) = \text{LKJ}(\zeta) = \left| \boldsymbol{\Psi} \right|^{\zeta}.
 $$
 The positive parameter $\zeta \in \mathbb{R}^{+}$ controls the concentration of
 the probability density function -- if $\zeta > 1$ then the probability density
@@ -3715,7 +3825,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 axis(1, at=1:M, labels=c("th1", "th2", "th3", "th4", "th5",
                          "th6", "th7", "th8", "th9", "mu"))
@@ -3774,7 +3885,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 pad_obs <- do.call(cbind, lapply(idx, function(m) data$y[m,1]))
 
@@ -3853,7 +3965,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
        col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
        col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 axis(1, at=1:M, labels=c("th1", "th2", "th3", "th4", "th5",
                          "th6", "th7", "th8", "th9", "mu"))
@@ -3912,7 +4025,8 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-lines(x, pad_cred[5,], col=c_dark, lwd=2)
+for (m in 1:M)
+  lines(x[(2 * m - 1):(2 * m)], pad_cred[5,(2 * m - 1):(2 * m)], col=c_dark, lwd=2)
 
 pad_obs <- do.call(cbind, lapply(idx, function(m) data$y[m,1]))
 
@@ -4081,7 +4195,8 @@ heterogeneity.
 
 # Acknowledgements {-}
 
-I warmly thank Susannah Tysor and Rob Trangucci for helpful comments.
+I warmly thank Susannah Tysor, Rob Trangucci, Charles Margossian, and
+Alex Andorra for helpful comments.
 
 A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
 abcnap, Abhinav Katoch, Abhishek Vasu, Adam Bartonicek, Alan O'Donnell,
