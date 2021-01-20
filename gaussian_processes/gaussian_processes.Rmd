@@ -269,13 +269,13 @@ $$
 \Delta x = | x_{1} - x_{2} |.
 $$
 In this case we can visualize the marginal and correlation structure of the
-covariance function by plotting its values verses distance in a _variogram_,
+covariance function by plotting its values verses distance in a _covariogram_,
 or its normalized values verse distance in a _correlogram_.
 
 <center>
 <br>
 ```{r, out.width = "100%", echo=FALSE}
-knitr::include_graphics("figures/variogram_general/variogram_general.png")
+knitr::include_graphics("figures/covariogram_general/covariogram_general.png")
 ```
 <br><br>
 </center>
@@ -571,7 +571,7 @@ $$
 <center>
 <br>
 ```{r, out.width = "75%", echo=FALSE}
-knitr::include_graphics("figures/variogram_exp_quad/variogram_exp_quad.png")
+knitr::include_graphics("figures/covariogram_exp_quad/covariogram_exp_quad.png")
 ```
 <br><br>
 </center>
@@ -1339,7 +1339,7 @@ confirm this hypothesis we sample from the functional posterior as before.
 
 ```{r}
 pred_data <- list(alpha=alpha, rho=rho, sigma=sigma,
-                  N_obs=data$N_obs, x=data$x_obs, y_obs=data$y_obs,
+                  N_obs=data$N_obs, x_obs=data$x_obs, y_obs=data$y_obs,
                   N_predict=data$N_predict, x_predict=data$x_predict)
 pred_opt_fit <- stan(file='stan_programs/fit_normal_anal.stan', data=pred_data,
                      iter=1000, warmup=0, chains=1, seed=5838298, refresh=1000,
@@ -2238,8 +2238,8 @@ of well-behaved functional behaviors.
 
 # Acknowledgements
 
-I thank Dan Simpson, Aki Vehtari, Rob Trangucci, and Maggie Lieu for helpful
-comments.
+I thank Dan Simpson, Aki Vehtari, Rob Trangucci, Maggie Lieu, Finn Lindgren,
+and Jeremy Silver for helpful comments.
 
 A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
 abcnap, Abhinav Katoch, Abhishek Vasu, Adam Bartonicek, Al King, Alan O'Donnell,
