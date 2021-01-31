@@ -1,0 +1,174 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\newcommand*{\offset}{0.025}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3, thick]
+
+\pgfmathsetmacro{\r}{2}
+
+\pgfmathsetmacro{\dx}{0}
+\pgfmathsetmacro{\dy}{0}
+
+\draw[dark] (-18, -9) rectangle (18, 7);
+
+\pgfmathsetmacro{\R}{40}
+\pgfmathsetmacro{\dtheta}{5}
+\pgfmathsetmacro{\dphi}{3.5}
+
+\pgfmathsetmacro{\cx}{2}
+\pgfmathsetmacro{\cy}{3}
+
+\pgfmathsetmacro{\n}{4}
+\pgfmathsetmacro{\x}{\R * cos(90 + \n * \dtheta)}
+\pgfmathsetmacro{\y}{\R * sin(90 + \n * \dtheta) - \R}
+\begin{scope}[shift={(\x, \y)}, rotate={\dphi * \n}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+
+  \begin{scope}[shift={(0, -0.5 * \cy)}]
+    \fill[dark] (0, 0) circle ({0.25 * \cx});    
+  \end{scope}
+  \begin{scope}[shift={(0, 0.0 * \cy)}]
+    \fill[dark] (0, 0) circle ({0.25 * \cx});       
+  \end{scope} 
+  \begin{scope}[shift={(0, 0.5 * \cy)}]
+    \fill[dark] (0, 0) circle ({0.25 * \cx});      
+  \end{scope}  
+\end{scope}
+
+\pgfmathsetmacro{\n}{3}
+\pgfmathsetmacro{\x}{\R * cos(90 + \n * \dtheta)}
+\pgfmathsetmacro{\y}{\R * sin(90 + \n * \dtheta) - \R}
+\begin{scope}[shift={(\x, \y)}, rotate={\dphi * \n}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+    
+  \fill[dark]    (-0.33 * \cx, 0 * \cy - 0.25 * \cx) -- (0.33 * \cx, 0 * \cy - 0.25 * \cx) 
+              -- (0, 0 * \cy + 0.25 * \cx) -- cycle;   
+                
+\end{scope}
+
+
+\pgfmathsetmacro{\n}{2}
+\pgfmathsetmacro{\x}{\R * cos(90 + \n * \dtheta)}
+\pgfmathsetmacro{\y}{\R * sin(90 + \n * \dtheta) - \R}
+\begin{scope}[shift={(\x, \y)}, rotate={\dphi * \n}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);   
+  
+  \begin{scope}[shift={(0, -0.5 * \cy)}]
+    \fill[dark] (-0.25 * \cx, -0.25 * \cx) rectangle (0.25 * \cx, +0.25 * \cx); 
+  \end{scope}
+  \begin{scope}[shift={(0, 0.0 * \cy)}]
+    \fill[dark] (-0.25 * \cx, -0.25 * \cx) rectangle (0.25 * \cx, +0.25 * \cx); 
+  \end{scope} 
+  \begin{scope}[shift={(0, 0.5 * \cy)}]
+    \fill[dark] (-0.25 * \cx, -0.25 * \cx) rectangle (0.25 * \cx, +0.25 * \cx); 
+  \end{scope} 
+\end{scope}
+
+
+\pgfmathsetmacro{\n}{1}
+\pgfmathsetmacro{\x}{\R * cos(90 + \n * \dtheta)}
+\pgfmathsetmacro{\y}{\R * sin(90 + \n * \dtheta) - \R}
+\begin{scope}[shift={(\x, \y)}, rotate={\dphi * \n}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+    
+  \begin{scope}[shift={(0, -0.33 * \cy)}]
+    \fill[dark] (-0.33 * \cx, -0.25 * \cx) -- (0.33 * \cx, -0.25 * \cx) -- (0, +0.25 * \cx) -- cycle;   
+  \end{scope}
+  \begin{scope}[shift={(0, +0.33 * \cy)}]
+    \fill[dark] (-0.33 * \cx, -0.25 * \cx) -- (0.33 * \cx, -0.25 * \cx) -- (0, +0.25 * \cx) -- cycle;    
+  \end{scope} 
+\end{scope}
+
+
+\pgfmathsetmacro{\n}{0}
+\pgfmathsetmacro{\x}{\R * cos(90 + \n * \dtheta)}
+\pgfmathsetmacro{\y}{\R * sin(90 + \n * \dtheta) - \R}
+\begin{scope}[shift={(\x, \y)}, rotate={\dphi * \n}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  
+   \begin{scope}[shift={(0, -0.5 * \cy)}]
+    \fill[dark] (-0.33 * \cx, -0.25 * \cx) -- (0.33 * \cx, -0.25 * \cx) -- (0, +0.25 * \cx) -- cycle;   
+  \end{scope}
+  \begin{scope}[shift={(0, 0.0 * \cy)}]
+    \fill[dark] (-0.33 * \cx, -0.25 * \cx) -- (0.33 * \cx, -0.25 * \cx) -- (0, +0.25 * \cx) -- cycle;   
+  \end{scope} 
+  \begin{scope}[shift={(0, 0.5 * \cy)}]
+    \fill[dark] (-0.33 * \cx, -0.25 * \cx) -- (0.33 * \cx, -0.25 * \cx) -- (0, +0.25 * \cx) -- cycle;   
+  \end{scope}  
+\end{scope}
+
+
+\pgfmathsetmacro{\n}{-1}
+\pgfmathsetmacro{\x}{\R * cos(90 + \n * \dtheta)}
+\pgfmathsetmacro{\y}{\R * sin(90 + \n * \dtheta) - \R}
+\begin{scope}[shift={(\x, \y)}, rotate={\dphi * \n}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+
+  \begin{scope}[shift={(0, -0.33 * \cy)}]
+    \fill[dark] (-0.25 * \cx, -0.25 * \cx) rectangle (0.25 * \cx, +0.25 * \cx); 
+  \end{scope}
+  \begin{scope}[shift={(0, 0.33 * \cy)}]
+    \fill[dark] (-0.25 * \cx, -0.25 * \cx) rectangle (0.25 * \cx, +0.25 * \cx); 
+  \end{scope}
+\end{scope}
+
+
+\pgfmathsetmacro{\n}{-2}
+\pgfmathsetmacro{\x}{\R * cos(90 + \n * \dtheta)}
+\pgfmathsetmacro{\y}{\R * sin(90 + \n * \dtheta) - \R}
+\begin{scope}[shift={(\x, \y)}, rotate={\dphi * \n}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy); 
+  
+  \begin{scope}[shift={(0, -0.33 * \cy)}]
+    \fill[dark] (0, 0) circle ({0.25 * \cx});      
+  \end{scope}
+  \begin{scope}[shift={(0, +0.33 * \cy)}]
+    \fill[dark] (0, 0) circle ({0.25 * \cx});       
+  \end{scope} 
+\end{scope}
+
+
+\pgfmathsetmacro{\n}{-3}
+\pgfmathsetmacro{\x}{\R * cos(90 + \n * \dtheta)}
+\pgfmathsetmacro{\y}{\R * sin(90 + \n * \dtheta) - \R}
+\begin{scope}[shift={(\x, \y)}, rotate={\dphi * \n}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  
+  \fill[dark] (0, 0) circle ({0.25 * \cx});   
+\end{scope}
+
+\pgfmathsetmacro{\n}{-4}
+\pgfmathsetmacro{\x}{\R * cos(90 + \n * \dtheta)}
+\pgfmathsetmacro{\y}{\R * sin(90 + \n * \dtheta) - \R}
+\begin{scope}[shift={(\x, \y)}, rotate={\dphi * \n}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \fill[dark] (-0.25 * \cx, 0 * \cy - 0.25 * \cx) rectangle (0.25 * \cx, 0 * \cy + 0.25 * \cx);  
+\end{scope}
+
+
+\end{tikzpicture}
+
+\end{document}  

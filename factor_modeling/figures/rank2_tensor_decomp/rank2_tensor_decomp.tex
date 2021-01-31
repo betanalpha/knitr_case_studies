@@ -1,0 +1,259 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function x(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %  
+    return \xb;
+  };
+  function y(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %   
+    return \yb;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.10, thick]
+  
+\pgfmathsetmacro{\theta}{45}
+\pgfmathsetmacro{\phi}{25}
+  
+
+\node at (11, -1) { $=$ };
+
+\node at (15, -30) { $\oplus$ };
+\node at (45.5, -30) { $\oplus$ };
+
+\node at (15, -60) { $\oplus$ };
+
+\node at (100, 0) { Rank 0 Contribution };
+\node at (100, -30) { Rank 1 Contributions };
+\node at (100, -60) { Rank 2 Contribution };
+
+\draw[white] (-20, -80) rectangle (120, 15);
+
+
+\node[] at (-5, -0.5) { $( \mathbf{1} \oplus \mathbf{a} \oplus \mathbf{b} )^{2}$ };
+
+
+\begin{scope}[shift={(46.5, 0)}]
+ 
+  \draw[white] (-13, -13) rectangle (11, 11);
+  \node[] at (-1, -15) { $ \mathbf{1} \otimes \mathbf{1} $ };
+ 
+  % Top Face
+  \pgfmathsetmacro{\y}{-2}
+  
+  \foreach \x in {6, 10} {
+    \draw[line width=0.3]   ({x(\x, \y, -6, \theta, \phi)}, {y(\x, \y, -6, \theta, \phi)})
+                         -- ({x(\x, \y, -2, \theta, \phi)}, {y(\x, \y, -2, \theta, \phi)});
+  }
+
+  \foreach \z in {-6, -2} {
+    \draw[line width=0.3]   ({x(6, \y, \z, \theta, \phi)}, {y(6, \y, \z, \theta, \phi)})
+                         -- ({x(10, \y, \z, \theta, \phi)}, {y(10, \y, \z, \theta, \phi)});
+  }
+ 
+  % Side Face
+  \pgfmathsetmacro{\x}{10}
+
+  \foreach \y in {-6, -2} {
+    \draw[line width=0.3]   ({x(\x, \y, -6, \theta, \phi)}, {y(\x, \y, -6, \theta, \phi)})
+                         -- ({x(\x, \y, -2, \theta, \phi)}, {y(\x, \y, -2, \theta, \phi)});
+  }
+  
+  \foreach \z in {-6, -2} {
+    \draw[line width=0.3]   ({x(\x, -6, \z, \theta, \phi)}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, -2, \z, \theta, \phi)}, {y(\x, -2, \z, \theta, \phi)});
+  }
+  
+  % Front Face
+  \pgfmathsetmacro{\z}{-6}
+  
+  \foreach \x in {6, 10} {
+    \draw[line width=0.3]   ({x(\x, -6, \z, \theta, \phi)}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, -2, \z, \theta, \phi)}, {y(\x, -2, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, -2} {
+    \draw[line width=0.3]   ({x(6, \y, \z, \theta, \phi)}, {y(6, \y, \z, \theta, \phi)})
+                         -- ({x(+10, \y, \z, \theta, \phi)}, {y(+10, \y, \z, \theta, \phi)});
+  }
+  
+\end{scope}
+
+\begin{scope}[shift={(31, -30)}]
+ 
+  \draw[white] (-13, -13) rectangle (11, 11);
+  \node[] at (-1, -15) { $ \mathbf{a} \otimes \mathbf{1} $ };
+ 
+  % Top Face
+  \pgfmathsetmacro{\y}{-2}
+  
+  \foreach \x in {-6, -2, 2, 6, 10} {
+    \draw[line width=0.3]   ({x(\x, \y, -6, \theta, \phi)}, {y(\x, \y, -6, \theta, \phi)})
+                         -- ({x(\x, \y, -2, \theta, \phi)}, {y(\x, \y, -2, \theta, \phi)});
+  }
+
+  \foreach \z in {-6, -2} {
+    \draw[line width=0.3]   ({x(-6, \y, \z, \theta, \phi)}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(10, \y, \z, \theta, \phi)}, {y(10, \y, \z, \theta, \phi)});
+  }
+ 
+  % Side Face
+  \pgfmathsetmacro{\x}{10}
+
+  \foreach \y in {-6, -2} {
+    \draw[line width=0.3]   ({x(\x, \y, -6, \theta, \phi)}, {y(\x, \y, -6, \theta, \phi)})
+                         -- ({x(\x, \y, -2, \theta, \phi)}, {y(\x, \y, -2, \theta, \phi)});
+  }
+  
+  \foreach \z in {-6, -2} {
+    \draw[line width=0.3]   ({x(\x, -6, \z, \theta, \phi)}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, -2, \z, \theta, \phi)}, {y(\x, -2, \z, \theta, \phi)});
+  }
+  
+  % Front Face
+  \pgfmathsetmacro{\z}{-6}
+  
+  \foreach \x in {-6, -2, 2, 6, 10} {
+    \draw[line width=0.3]   ({x(\x, -6, \z, \theta, \phi)}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, -2, \z, \theta, \phi)}, {y(\x, -2, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, -2} {
+    \draw[line width=0.3]   ({x(-6, \y, \z, \theta, \phi)}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+10, \y, \z, \theta, \phi)}, {y(+10, \y, \z, \theta, \phi)});
+  }
+  
+\end{scope}
+
+\begin{scope}[shift={(62, -30)}]
+ 
+  \draw[white] (-13, -13) rectangle (11, 11);
+  \node[] at (-1, -15) { $ \mathbf{1} \otimes \mathbf{b} $ };
+ 
+  % Top Face
+  \pgfmathsetmacro{\y}{6}
+  
+  \foreach \x in {6, 10} {
+    \draw[line width=0.3]   ({x(\x, \y, -6, \theta, \phi)}, {y(\x, \y, -6, \theta, \phi)})
+                         -- ({x(\x, \y, -2, \theta, \phi)}, {y(\x, \y, -2, \theta, \phi)});
+  }
+
+  \foreach \z in {-6, -2} {
+    \draw[line width=0.3]   ({x(6, \y, \z, \theta, \phi)}, {y(6, \y, \z, \theta, \phi)})
+                         -- ({x(10, \y, \z, \theta, \phi)}, {y(10, \y, \z, \theta, \phi)});
+  }
+ 
+  % Side Face
+  \pgfmathsetmacro{\x}{10}
+
+  \foreach \y in {-6, -2, 2, 6} {
+    \draw[line width=0.3]   ({x(\x, \y, -6, \theta, \phi)}, {y(\x, \y, -6, \theta, \phi)})
+                         -- ({x(\x, \y, -2, \theta, \phi)}, {y(\x, \y, -2, \theta, \phi)});
+  }
+  
+  \foreach \z in {-6, -2} {
+    \draw[line width=0.3]   ({x(\x, -6, \z, \theta, \phi)}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi)}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  % Front Face
+  \pgfmathsetmacro{\z}{-6}
+  
+  \foreach \x in {6, 10} {
+    \draw[line width=0.3]   ({x(\x, -6, \z, \theta, \phi)}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi)}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, -2, 2, 6} {
+    \draw[line width=0.3]   ({x(6, \y, \z, \theta, \phi)}, {y(6, \y, \z, \theta, \phi)})
+                         -- ({x(+10, \y, \z, \theta, \phi)}, {y(+10, \y, \z, \theta, \phi)});
+  }
+  
+\end{scope}
+
+\begin{scope}[shift={(46.5, -60)}]
+ 
+  \draw[white] (-13, -13) rectangle (11, 11);
+  \node[] at (-1, -15) { $ \mathbf{a} \otimes \mathbf{b} $ };
+ 
+  % Top Face
+  \pgfmathsetmacro{\y}{6}
+  
+  \foreach \x in {-6, -2, 2, 6, 10} {
+    \draw[line width=0.3]   ({x(\x, \y, -6, \theta, \phi)}, {y(\x, \y, -6, \theta, \phi)})
+                         -- ({x(\x, \y, -2, \theta, \phi)}, {y(\x, \y, -2, \theta, \phi)});
+  }
+
+  \foreach \z in {-2} {
+    \draw[line width=0.3]   ({x(-6, \y, \z, \theta, \phi)}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(10, \y, \z, \theta, \phi)}, {y(10, \y, \z, \theta, \phi)});
+  }
+ 
+  % Side Face
+  \pgfmathsetmacro{\x}{10}
+
+  \foreach \y in {-6, -2, 2, 6} {
+    \draw[line width=0.3]   ({x(\x, \y, -6, \theta, \phi)}, {y(\x, \y, -6, \theta, \phi)})
+                         -- ({x(\x, \y, -2, \theta, \phi)}, {y(\x, \y, -2, \theta, \phi)});
+  }
+  
+  \foreach \z in {-2} {
+    \draw[line width=0.3]   ({x(\x, -6, \z, \theta, \phi)}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi)}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  % Front Face
+  \pgfmathsetmacro{\z}{-6}
+  
+  \foreach \x in {-6, -2, 2, 6, 10} {
+    \draw[line width=0.3]   ({x(\x, -6, \z, \theta, \phi)}, {y(\x, -6, \z, \theta, \phi)})
+                         -- ({x(\x, +6, \z, \theta, \phi)}, {y(\x, +6, \z, \theta, \phi)});
+  }
+  
+  \foreach \y in {-6, -2, 2, 6} {
+    \draw[line width=0.3]   ({x(-6, \y, \z, \theta, \phi)}, {y(-6, \y, \z, \theta, \phi)})
+                         -- ({x(+10, \y, \z, \theta, \phi)}, {y(+10, \y, \z, \theta, \phi)});
+  }
+  
+\end{scope}
+  
+\end{tikzpicture}
+
+\end{document}  

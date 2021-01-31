@@ -1,0 +1,191 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+\usepackage{wasysym}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\newcommand*{\offset}{0.025}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3, thick]
+
+\pgfmathsetmacro{\cx}{2}
+\pgfmathsetmacro{\cy}{3}
+
+\draw[white] (-32, -17) rectangle (32, 17);
+
+\node[dark, rotate=90] at (30, 0) { \huge Color Levels };
+
+\draw[light, rounded corners=5, line width=2] (-27.5, 11 - 5) rectangle (27.5, 11 + 5);
+\draw[mid, rounded corners=5, line width=2] (-27.5, 0 - 5) rectangle (27.5, 0 + 5);
+\draw[dark, rounded corners=5, line width=2] (-27.5, -11 - 5) rectangle (27.5, -11 + 5);
+
+% Row One
+\pgfmathsetmacro{\phi}{-58}
+\pgfmathsetmacro{\x}{-10}
+\pgfmathsetmacro{\y}{11}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=light, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[light, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+\pgfmathsetmacro{\phi}{39}
+\pgfmathsetmacro{\x}{0}
+\pgfmathsetmacro{\y}{11}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=light, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[light, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+\pgfmathsetmacro{\phi}{-5}
+\pgfmathsetmacro{\x}{10}
+\pgfmathsetmacro{\y}{11}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=light, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[light, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+% Row Two
+\pgfmathsetmacro{\phi}{47}
+\pgfmathsetmacro{\x}{-15}
+\pgfmathsetmacro{\y}{0}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=mid, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[mid, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+\pgfmathsetmacro{\phi}{-65}
+\pgfmathsetmacro{\x}{-5}
+\pgfmathsetmacro{\y}{0}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=mid, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[mid, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+\pgfmathsetmacro{\phi}{-48}
+\pgfmathsetmacro{\x}{5}
+\pgfmathsetmacro{\y}{0}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=mid, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[mid, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+\pgfmathsetmacro{\phi}{23}
+\pgfmathsetmacro{\x}{15}
+\pgfmathsetmacro{\y}{0}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=mid, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[mid, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+% Row Three
+\pgfmathsetmacro{\phi}{-33}
+\pgfmathsetmacro{\x}{-20}
+\pgfmathsetmacro{\y}{-11}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[dark, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+\pgfmathsetmacro{\phi}{-16}
+\pgfmathsetmacro{\x}{-10}
+\pgfmathsetmacro{\y}{-11}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[dark, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+\pgfmathsetmacro{\phi}{57}
+\pgfmathsetmacro{\x}{0}
+\pgfmathsetmacro{\y}{-11}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[dark, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+\pgfmathsetmacro{\phi}{32}
+\pgfmathsetmacro{\x}{10}
+\pgfmathsetmacro{\y}{-11}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[dark, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+\pgfmathsetmacro{\phi}{-60}
+\pgfmathsetmacro{\x}{20}
+\pgfmathsetmacro{\y}{-11}
+\begin{scope}[shift={(\x, \y)}, rotate={\phi}]
+  \filldraw[fill=white, draw=dark, rounded corners=2] (0 - \cx, 0 - \cy) rectangle (0 + \cx, 0 + \cy);
+  \node[dark, rotate={\phi}] at (0.17, 0) { $\Huge \neptune$ }; 
+\end{scope}
+
+
+\draw[white] (-32 + 66, -17) rectangle (32 + 66, 17);
+
+\pgfmathsetmacro{\r}{1.5}
+
+
+\filldraw[fill=white, draw=light, line width=2] (38, 11) circle (\r);
+\filldraw[fill=white, draw=light, line width=2] (42, 11) circle (\r);
+\filldraw[fill=white, draw=light, line width=2] (46, 11) circle (\r);
+
+\draw[->, >=stealth, color=light, line width=2] (42, 0 + \r) -- (38, 11 - \r);
+\draw[->, >=stealth, color=light, line width=2] (42, 0 + \r) -- (42, 11 - \r);
+\draw[->, >=stealth, color=light, line width=2] (42, 0 + \r) -- (46, 11 - \r);
+
+\filldraw[fill=white, draw=light, line width=2] (42, 0) circle (\r);
+
+\filldraw[fill=white, draw=mid, line width=2] (56, 11) circle (\r);
+\filldraw[fill=white, draw=mid, line width=2] (60, 11) circle (\r);
+\filldraw[fill=white, draw=mid, line width=2] (64, 11) circle (\r);
+\filldraw[fill=white, draw=mid, line width=2] (68, 11) circle (\r);
+
+\draw[->, >=stealth, color=mid, line width=2] (62, 0 + \r) -- (56, 11 - \r);
+\draw[->, >=stealth, color=mid, line width=2] (62, 0 + \r) -- (60, 11 - \r);
+\draw[->, >=stealth, color=mid, line width=2] (62, 0 + \r) -- (64, 11 - \r);
+\draw[->, >=stealth, color=mid, line width=2] (62, 0 + \r) -- (68, 11 - \r);
+
+\filldraw[fill=white, draw=mid, line width=2] (62, 0) circle (\r);
+
+\filldraw[fill=white, draw=dark, line width=2] (78, 11) circle (\r);
+\filldraw[fill=white, draw=dark, line width=2] (82, 11) circle (\r);
+\filldraw[fill=white, draw=dark, line width=2] (86, 11) circle (\r);
+\filldraw[fill=white, draw=dark, line width=2] (90, 11) circle (\r);
+\filldraw[fill=white, draw=dark, line width=2] (94, 11) circle (\r);
+
+\draw[->, >=stealth, color=dark, line width=2] (86, 0 + \r) -- (78, 11 - \r);
+\draw[->, >=stealth, color=dark, line width=2] (86, 0 + \r) -- (82, 11 - \r);
+\draw[->, >=stealth, color=dark, line width=2] (86, 0 + \r) -- (86, 11 - \r);
+\draw[->, >=stealth, color=dark, line width=2] (86, 0 + \r) -- (90, 11 - \r);
+\draw[->, >=stealth, color=dark, line width=2] (86, 0 + \r) -- (94, 11 - \r);
+
+\filldraw[fill=white, draw=dark, line width=2] (86, 0) circle (\r);
+
+\draw[->, >=stealth, color=black, line width=2] (66, -11 + \r) -- (42, 0 - \r);
+\draw[->, >=stealth, color=black, line width=2] (66, -11 + \r) -- (62, 0 - \r);
+\draw[->, >=stealth, color=black, line width=2] (66, -11 + \r) -- (86, 0 - \r);
+
+\filldraw[fill=white, draw=black, line width=2] (66, -11) circle (\r);
+
+\end{tikzpicture}
+
+\end{document}  
