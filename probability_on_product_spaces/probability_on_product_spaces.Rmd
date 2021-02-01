@@ -659,8 +659,8 @@ defines the conditional probability density function
 $$
 \pi(x_{2} \mid \tilde{x}_{1})
 =
-\frac{ \pi(x_{2} \mid \tilde{x}_{1}) }
-{ \int \mathrm{d} x_{1} \, \pi(x_{2} \mid \tilde{x}_{1}) \, \pi(x_{2}) }
+\frac{ \pi(\tilde{x}_{1} \mid x_{2}) }
+{ \int \mathrm{d} x_{2} \, \pi(\tilde{x}_{1} \mid x_{2}) \, \pi(x_{2}) }
 \cdot \pi(x_{2}).
 $$
 If, however, we only need an unnormalized conditional density function, which
@@ -669,12 +669,12 @@ $$
 \begin{align*}
 \pi(x_{2} \mid \tilde{x}_{1})
 &=
-\frac{ \pi(x_{2} \mid \tilde{x}_{1}) }
-{ \int \mathrm{d} x_{2} \, \pi(x_{2} \mid \tilde{x}_{1}) \, \pi(x_{2}) }
+\frac{ \pi(\tilde{x}_{1} \mid x_{2}) }
+{ \int \mathrm{d} x_{2} \, \pi(\tilde{x}_{1} \mid x_{2}) \, \pi(x_{2}) }
 \cdot \pi(x_{2})
 \\
 &\propto
-\pi(x_{2} \mid \tilde{x}_{1}) \cdot \pi(x_{2})
+\pi(\tilde{x}_{1} \mid x_{2}) \cdot \pi(x_{2})
 \\
 &\propto
 \pi(\tilde{x}_{1}, x_{2}),
@@ -1170,8 +1170,7 @@ from there.
 
 # Acknowledgements {-}
 
-I am indebted for the feedback from those who have attended my courses and
-talks.
+I thank Edward A. Roualdes and Prashin Jethwa for helpful comments.
 
 A very special thanks to everyone supporting me on Patreon: Abhishek Vasu, 
 Adam Slez, Aki Vehtari, Alan O'Donnell, Alex Gao, Alexander Bartik, 
