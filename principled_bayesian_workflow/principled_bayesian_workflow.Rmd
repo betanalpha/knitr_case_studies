@@ -774,8 +774,9 @@ knitr::include_graphics("figures/sbc/sbc_good.png")
 One of the massive advantages of this approach is that common computational
 problems manifest in _systematic_ deviations that are easy to spot.  For example
 if our computational method generates samples that are underdispersed then the
-prior rank will be biased low and high, resulting in a SBC histogram
-concentrated at both boundaries.
+posterior samples will cluster, concentrating above or below the prior sample
+more strongly than they should.  This tend results in prior ranks that are
+biased away from the middle and a SBC histogram concentrated at both boundaries.
 
 <center>
 <br>
@@ -785,8 +786,10 @@ knitr::include_graphics("figures/sbc/sbc_underdispersed.png")
 <br><br>
 </center>
 
-Similarly if the estimated posterior is biased low then the prior ranks will be
-biased high and the SBC histogram will concentrate at the right boundary.
+Similarly if the estimated posterior is biased high then the posterior samples 
+will concentrate above the prior sample more strongly than they should,
+resulting in larger prior ranks and a SBC histogram that concentrates at the
+right boundary.
 
 <center>
 <br>
@@ -801,7 +804,8 @@ prior ranks are defined as
 $$
 \rho = \sharp \left\{ \tilde{\theta} > \tilde{\theta}'_{r} \right\}
 $$
-then a low bias in the posterior fit will manifest in a SBC histogram that
+then a high bias in the posterior fit will manifest in fewer posterior samples
+smaller than the prior sample, lower prior ranks, and a SBC histogram that
 concentrates at the _left_ boundary.  The rank convention is arbitrary so we
 just have to make sure that we use one of them consistently.
 
@@ -962,10 +966,11 @@ configuration space,
 $$
 z[f \mid \tilde{y}, \theta^{\dagger}] =
 \frac{ \mathbb{E}_{\mathrm{post}}[f \mid \tilde{y}] - f(\theta^{\dagger}) }
-{ \mathbb{E}_{\mathrm{post}}[f \mid \tilde{y} ] },
+{ \mathbb{s}_{\mathrm{post}}[f \mid \tilde{y} ] },
 $$
 where $\theta^{\dagger}$ is the parameter corresponding to the true data
-generating process.  The posterior $z$-score quantifies how accurately the
+generating process and $\mathbb{s}_{\mathrm{post}}$ the standard deviation of
+the function $f$.  The posterior $z$-score quantifies how accurately the
 posterior recovers the true model configuration along this coordinate.  Smaller
 values indicate a posterior that more strongly concentrates around the true
 value while larger values indicate a posterior that concentrates elsewhere.
@@ -992,7 +997,7 @@ contraction is being forced away from the true value by the observed data and
 overfitting, at least if the prior model contains the true value.  Likewise a
 posterior distribution with a small posterior $z$-score and a small posterior
 contraction is only poorly informed by the observations.  On the other hand a
-posterior distribution with both a small posterior $z$-score and a small
+posterior distribution with both a small posterior $z$-score and a large
 posterior contraction indicates ideal learning behavior.  A posterior
 distribution with a large posterior $z$-score and a small posterior contraction
 indicates that the prior model conflicts with the true value.
@@ -3606,38 +3611,22 @@ $\theta$.  To investigate further let's look at the simulated observations that
 frustrated our computation.
 
 ```{r}
-par(mfrow=c(3, 3))
+par(mfrow=c(2, 2))
 
-hist(simu_ys[50,], breaks=(0:10 - 0.5),
-     main="", xlab="y[50]", yaxt='n', ylab="",
+hist(simu_ys[690,], breaks=(0:150 - 0.5),
+     main="", xlab="y[690]", xlim=c(0, 8), yaxt='n', ylab="",
      col=c_dark, border=c_dark_highlight)
 
-hist(simu_ys[113,], breaks=(0:10 - 0.5),
-     main="", xlab="y[113]", yaxt='n', ylab="",
+hist(simu_ys[703,], breaks=(0:150 - 0.5),
+     main="", xlab="y[703]", xlim=c(0, 8), yaxt='n', ylab="",
      col=c_dark, border=c_dark_highlight)
 
-hist(simu_ys[130,], breaks=(0:10 - 0.5),
-     main="", xlab="y[130]", yaxt='n', ylab="",
+hist(simu_ys[846,], breaks=(0:150 - 0.5),
+     main="", xlab="y[846]", xlim=c(0, 8), yaxt='n', ylab="",
      col=c_dark, border=c_dark_highlight)
 
-hist(simu_ys[161,], breaks=(0:10 - 0.5),
-     main="", xlab="y[161]", yaxt='n', ylab="",
-     col=c_dark, border=c_dark_highlight)
-
-hist(simu_ys[380,], breaks=(0:10 - 0.5),
-     main="", xlab="y[380]", yaxt='n', ylab="",
-     col=c_dark, border=c_dark_highlight)
-
-hist(simu_ys[627,], breaks=(0:10 - 0.5),
-     main="", xlab="y[627]", yaxt='n', ylab="",
-     col=c_dark, border=c_dark_highlight)
-
-hist(simu_ys[837,], breaks=(0:10 - 0.5),
-     main="", xlab="y[837]", yaxt='n', ylab="",
-     col=c_dark, border=c_dark_highlight)
-
-hist(simu_ys[50,], breaks=(0:10 - 0.5),
-     main="", xlab="y[50]", yaxt='n', ylab="",
+hist(simu_ys[931,], breaks=(0:150 - 0.5),
+     main="", xlab="y[931]", xlim=c(0, 8), yaxt='n', ylab="",
      col=c_dark, border=c_dark_highlight)
 ```
 
@@ -3647,13 +3636,13 @@ see why these zero count observations impede accurate computation let's look at
 the fit in more detail.
 
 ```{r}
-input_data <- list("N" = N, "y" = simu_ys[50,])
+input_data <- list("N" = N, "y" = simu_ys[690,])
 fit <- stan(file='stan_programs/fit_data2.stan', data=input_data, 
             seed=4938483, refresh=2000)
 util$check_all_diagnostics(fit)
 ```
 
-With only one divergence the failure of our computation here is relatively 
+With only three divergences the failure of our computation here is relatively 
 mild, although not ignorable.
 
 Because we have only two parameters we can examine the entire fitted posterior 
@@ -3675,15 +3664,15 @@ points(log(div_params$lambda),
        col=c_green_trans, pch=16, cex=0.8)
 ```
 
-When we have only zero counts our model is extremely _poorly identified_, with 
-the observation unable to distinguish between a very low Poisson source strength 
+When we have only zero counts our model is extremely _degenerate_, with the
+observation unable to distinguish between a very low Poisson source strength 
 and the failure of all of the detectors at once.
 
 To be thorough let's also investigate one of the simulated observations with 
 small but not entirely zero counts in each detector.
 
 ```{r}
-input_data <- list("N" = N, "y" = simu_ys[113,])
+input_data <- list("N" = N, "y" = simu_ys[931,])
 fit <- stan(file='stan_programs/fit_data2.stan', data=input_data, 
             seed=4938483, refresh=2000)
 
@@ -3702,7 +3691,7 @@ points(log(div_params$lambda),
        col=c_green_trans, pch=16, cex=0.8)
 ```
 
-In this case the small number of divergent transitions leads us to a more subtle
+In this case the lone divergent transitions leads us to a more subtle
 identifiability issue.  When the failure probability $\theta$ is small the model
 places the responsibility for the observations almost entirely on the Poisson 
 component.  Consequently the observations strongly inform the Poisson source 
@@ -4655,8 +4644,9 @@ possible.
 
 I thank Sean Talts, Marc Dotson, Tomi Peltola, David Tait, Ludger Sandig,
 Desislava Petkova, arabidopsis, Shira Mitchell, Ero Carrera, Aki Vehtari, Adam
-Fleischhacker, and yureq for helpful comments as well as the feedback from those 
-who have attended my courses and talks.
+Fleischhacker, yureq, Allison Campbell, JS Denain, and Frank Weber for helpful
+comments as well as the feedback from those who have attended my courses and
+talks.
 
 A very special thanks to everyone supporting me on Patreon:
 Abhishek Vasu, Adam Slez, Aki Vehtari, Alan O'Donnell, Alexander Bartik, 
