@@ -55,7 +55,7 @@ allow us to understand when we can trust the corrupted answers that we receive.
 
 In this case study I introduce the basics of probabilistic computation, with a
 focus on the challenges that arise as we attempt to scale to problems in more 
-than a few dimenions.  I discuss a variety of popular probabilistic 
+than a few dimensions.  I discuss a variety of popular probabilistic 
 computational algorithms in the context of these challenges and set the stage 
 for a more thorough discussion of Markov chain Monte Carlo and Hamiltonian Monte
 Carlo that will follow in future case studies.
@@ -114,7 +114,7 @@ $$
 
 For example in one-dimension a quadrature method might define a grid of $N + 1$
 evenly spaced points $\{q_{0}, \ldots, q_{N}\}$, with the volume elements
-defined as $(\Delta_{q})_{n} = q_{n} - q_{n - 1}$, and the integrand values 
+defined as $(\Delta q)_{n} = q_{n} - q_{n - 1}$, and the integrand values 
 assumed to be the value at the right end of each volume element.
 
 <center>
@@ -576,7 +576,7 @@ for (D in Ds) {
   prob_ses[D] <- s[2]
 }
 
-# Plot probabilities verses dimension
+# Plot probabilities versus dimension
 c_light <- c("#DCBCBC")
 c_light_highlight <- c("#C79999")
 c_mid <- c("#B97C7C")
@@ -706,7 +706,7 @@ for (D in Ds) {
   prob_outer_ses[D] <- s2[2]
 }
 
-# Plot probabilities verses dimension
+# Plot probabilities versus dimension
 pad_inner_means <- do.call(cbind, lapply(idx, function(n) prob_inner_means[n]))
 pad_inner_ses <- do.call(cbind, lapply(idx, function(n) prob_inner_ses[n]))
 
@@ -737,12 +737,12 @@ in the corners manifests as a wave that propagates from small radii to larger
 radii as the dimensionality of the space increases!
 
 We can compare the volumes of the inner and outer shells directly by plotting 
-the ratio of probabilities verses dimension.
+the ratio of probabilities versus dimension.
 
 ```{r}
 plot(1, type="n", main="",
 xlim=c(head(Ds, 1) - 0.5, tail(Ds, 1) + 0.5), xlab="Dimension",
-ylim=c(0, 10), ylab="Ratio of Outer verses Inner Probability")
+ylim=c(0, 10), ylab="Ratio of Outer versus Inner Probability")
 
 lines(plot_Ds, pad_outer_means / pad_inner_means, col=c_dark_highlight, lwd=2)
 ```
@@ -1144,7 +1144,7 @@ for (D in Ds) {
   prob_ses[D] <- s[2]
 }
 
-# Plot inclusion probability verses dimension
+# Plot inclusion probability versus dimension
 pad_means <- do.call(cbind, lapply(idx, function(n) prob_means[n]))
 pad_ses <- do.call(cbind, lapply(idx, function(n) prob_ses[n]))
 
@@ -1195,7 +1195,7 @@ for (D in Ds) {
   r_quantiles[D,] <- quantile(r_samples, probs=quant_probs)
 }
 
-# Plot average distance from mode verses dimension
+# Plot average distance from mode versus dimension
 pad_r_means <- do.call(cbind, lapply(idx, function(n) r_means[n]))
 pad_r_ses <- do.call(cbind, lapply(idx, function(n) r_ses[n]))
 
@@ -1214,7 +1214,7 @@ increasing dimension because of the overwhelming influence of the growing volume
 around infinity.  We can visualize the entire distribution using quantiles.
 
 ```{r}
-# Plot distance quantiles verses dimension
+# Plot distance quantiles versus dimension
 pad_r_quantiles <- do.call(cbind, lapply(idx, function(n) r_quantiles[n, 1:9]))
 
 plot(1, type="n", main="",
@@ -1374,7 +1374,7 @@ measure is how we interpret and interact with _populations_.  The more
 characteristics we consider for each individual in the population, and hence
 the higher the dimension of the probability distribution we will need to 
 quantify that population, the better the population will be described by the 
-typical set and only the typical set.  There will always a most common, modal 
+typical set and only the typical set.  There will always be a most common, modal 
 individual in a large enough population but the _typicality_ of that individual 
 decreases as we involve more characteristics.
 
@@ -1567,7 +1567,7 @@ $$
 \frac{ \partial^{2} \pi}
 { \partial q_{i} \partial q_{j} } (q = \hat{q})
 $$
-Expectation values can then estimated with Gaussian integrals,
+Expectation values can then be estimated with Gaussian integrals,
 $$
 \mathbb{E}_{\pi} \! \left[ f \right]
 \approx 
@@ -2037,7 +2037,7 @@ rapidly disperses.  In the best case this will only inflate the estimation error
 but in the worst case it can render $w(q) \, f(q)$ no longer square integrable 
 and invalidating the importance sampling estimator entirely!
 
-In low-dimensional problems typical sets are board.  Constructing a good 
+In low-dimensional problems typical sets are broad.  Constructing a good 
 auxiliary probability distribution whose typical set strongly overlaps the 
 typical set of the target distribution isn't trivial but it is often feasible.
 
