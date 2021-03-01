@@ -30,14 +30,15 @@ knitr::opts_knit$set(global.par = TRUE)
 <!-- fear factor -->
 
 Hierarchical models are a natural way to model heterogeneity across exchangeable
-contexts, but they become less appropriate when the contexts are not completely
-exchangeable.  In particular any labels that categorize individual contexts into
-groups immediately break exchangeability, and modeling heterogeneity
-consistently with these groupings becomes much more subtle. When the contexts
-are subject to multiple, overlapping categorizations the challenge becomes even
-more difficult.  In this case study we investigate how to generalize
-exchangeability in the presence of _factors_ that categorize individual contexts
-and then develop modeling techniques compatible with this generalization.
+contexts, but they become less appropriate when additional information
+discriminates those contexts.  In particular any labels that categorize
+individual contexts into groups immediately obstructs the full exchangeability,
+and modeling heterogeneity consistently with these groupings becomes much more
+subtle. When the contexts are subject to multiple, overlapping categorizations
+the challenge becomes even more difficult.  In this case study we investigate
+how to generalize exchangeability in the presence of _factors_ that categorize
+individual contexts and then develop modeling techniques compatible with this
+generalization.
 
 We begin by discussing how to consistently model heterogeneity in the presence
 of a single factor before considering multiple factors, in particular multiple
@@ -81,14 +82,14 @@ knitr::include_graphics("figures/one_factor_pickup/one_factor_pickup.png")
 <br><br>
 </center>
 
-We will denote this discriminating information with traditional statistics
-terminology.  A _factor_ is a variable that endows each context with one of a
-finite number of discrete, unordered values, or _levels_.  When there is minimal
-risk of confusion, I will also use "level" to refer to all of the individual
-contexts grouped with the same level value.  In our card example the immediate
-factor is color, with the three levels corresponding to light red, red, and dark
-red values.  The "dark red level" would then correspond to all cards with dark
-red coloring.
+We will denote such discriminating information with traditional statistics
+terminology.  A _factor_ is a categorical variable that endows each context with
+one of a finite number of discrete, unordered values, or _levels_.  When there
+is minimal risk of confusion I will also use "level" to refer to all of the
+individual contexts grouped with the same level value.  In our card example the
+immediate factor is color, with the three levels corresponding to light red,
+red, and dark red values.  The "dark red level" would then correspond to all
+cards with dark red coloring.
 
 Factors can capture any abstract categorization or labeling.  For example if the
 contexts are defined by facilities where a certain product is manufactured then
@@ -112,10 +113,11 @@ knitr::include_graphics("figures/one_factor_pickup_permute/one_factor_pickup_per
 <br><br>
 </center>
 
-The residual exchangeability that persists after a factor has been introduced
-becomes more clear if we group the individual contexts by their level
-assignments.  Because our domain expertise is invariant to permutations of the
-contexts within each level we retain a _conditional exchangeability_.
+Grouping the individual contexts by their level assignments makes it easier to
+identify, and classify, the permutations that persist after a factor has been
+introduced.  For example the permutations that modify only contexts within a
+single level are unaffected by the introduction of the factor and they define a
+ _conditional exchangeability_.
 
 <center>
 <br>
@@ -125,9 +127,9 @@ knitr::include_graphics("figures/one_factor_sorted/one_factor_sorted.png")
 <br><br>
 </center>
 
-This conditional exchangeability suggests that the heterogeneity of the
-individual contexts is compatible with independent hierarchical models within
-each level.
+These conditional exchangeabilities then suggests that the heterogeneity of the
+individual contexts should be modeled with independent hierarchical models
+within each level.
 
 <center>
 <br>
@@ -137,20 +139,21 @@ knitr::include_graphics("figures/one_factor_sorted_hier_conditional/one_factor_s
 <br><br>
 </center>
 
-At the same time the level values themselves are also arbitrary labels, and any
-model of behavior common to each level will be invariant to permutations of
-these labels.  Consequently we also have a _marginal exchangeability_.
+Because the level values themselves are also arbitrary labels, any permutation
+that swaps _all_ of the contexts within different levels is also compatible with
+the given factor.  These permutations then define a corresponding
+_marginal exchangeability_.
 
 <center>
 <br>
-```{r, out.width = "50%", echo=FALSE}
+```{r, out.width = "100%", echo=FALSE}
 knitr::include_graphics("figures/one_factor_marginal/one_factor_marginal.png")
 ```
 <br><br>
 </center>
 
-Consequently any parameters modeling that common behavior are naturally amenable
-to a hierarchical model _across_ the levels.
+Consequently any behavior common to each level is naturally modeled with a
+hierarchical model _across_ the levels.
 
 <center>
 <br>
@@ -160,11 +163,12 @@ knitr::include_graphics("figures/one_factor_sorted_hier_marginal/one_factor_sort
 <br><br>
 </center>
 
-## Factor Compatible Hierarchical Models
+## Factor Compatible Hierarchical Models {#sec:single_factor_model}
 
 Conditional exchangeability motivates independent hierarchical models within
 each of the factor levels, while marginal exchangeability motivates a
-hierarchical model across the factor levels.  These hierarchies can also be
+hierarchical model across the factor levels.  These residual exchangeabilities,
+however, are compatible with each other.  Consequently the hierarchies can be
 combined into a _deeper_ hierarchical model with multiple layers, the top level
 capturing the conditional heterogeneity and the bottom layer capturing the
 marginal heterogeneity across levels.
@@ -181,20 +185,20 @@ This architecture gives the most general family of hierarchical models
 compatible with a given factor.  In order to specify a particular hierarchical
 model we first need to specify the population models within each level,
 $$
-\theta_{kl} \sim \pi(\phi_{l}),
+\theta_{k} \sim \pi(\phi_{l(k)}),
 $$
-where $l \in \{1, \ldots, L\}$ indexes each level and
-$k \in \{1, \ldots, K_{l} \}$ indexes the individual contexts within those
-levels; the occupancy of each level, $K_{l}$, will not in general be uniform.
-The full model specification is then completed with a population model across
-the level-specific population parameters,
+where $k \in \{1, \ldots, K_{l} \}$ indexes the individual contexts,
+$l \in \{1, \ldots, L\}$ indexes each factor level, and $l(k)$ maps each context
+into its associated factor level.  The full model specification is then
+completed with a population model across the level-specific population
+parameters,
 $$
 \phi_{l} \sim \pi(\phi).
 $$
 
 For example within each level we might consider a normal population model,
 $$
-\theta_{kl} \sim \text{normal}(\theta_{l}, \tau_{l}).
+\theta_{k} \sim \text{normal}(\theta_{l(k)}, \tau_{l(k)}).
 $$
 In general we can pool the population parameters $(\theta_{l}$, $\tau_{l})$
 jointly with a two-dimensional population model, but we might also pool just the
@@ -209,18 +213,18 @@ Together these assumptions specify a basic, but effective, factor compatible
 hierarchical model,
 $$
 \begin{align*}
-\theta_{l} &\sim \text{normal}(\mu, \tau)
+\theta_{k} &\sim \text{normal}(\theta_{l(k)}, \tau_{l(k)})
 \\
-\theta_{kl} &\sim \text{normal}(\theta_{l}, \tau_{l}).
+\theta_{l} &\sim \text{normal}(\mu, \tau).
 \end{align*}
 $$
 
 That said, this specific hierarchical model doesn't actually appear much in the
 statistics literature.  Most commonly the conditional heterogeneity within the
 levels is implicitly ignored, or occasionally explicitly assumed to be zero.  In
-either case all of the individual contexts collapse into a single _level context_
-for each factor level, and the remaining marginal heterogeneity across those
-level contexts is captured by a single hierarchical model,
+either case all of the individual contexts collapse into a set of
+_level contexts_, and the remaining marginal heterogeneity across those level
+contexts is captured by a single hierarchical model,
 $$
 \theta_{l} \sim \pi(\phi).
 $$
@@ -250,13 +254,13 @@ practice.
 
 One particular reparameterization, however, also offers a useful
 interpretability that can facilitate model building.  If we non-center the level
-parameters _relative to the location parameter_ then the hierarchical model
+parameters _with respect to the location parameter_ then the hierarchical model
 takes on a particularly compelling form:
 $$
 \begin{align*}
-\delta_{l} &\sim \text{normal}(0, \tau)
+\theta_{l} &= \theta + \delta_{l}
 \\
-\theta_{l} &= \theta + \delta_{l}.
+\delta_{l} &\sim \text{normal}(0, \tau).
 \end{align*}
 $$
 The behavior within each level decomposes into _additive_ contribution from a
@@ -292,9 +296,9 @@ Assuming that each set of residual parameters are exchangeable motivates another
 hierarchical model,
 $$
 \begin{align*}
-\delta_{l} &\sim \pi(\phi)
+\theta_{l} &= \delta_{l} + \theta
 \\
-\theta_{l} &=\delta_{l} + \theta.
+\delta_{l} &\sim \pi(\phi).
 \end{align*}
 $$
 Taking normal population models exactly recovers the normal hierarchical model
@@ -312,18 +316,25 @@ $\theta_{l}$, we have to incorporate both $\theta$ and $\delta_{l}$ together.
 
 That said the residual parameters are often implicitly given an interpretation
 based on _counterfactual_ circumstances.  For example the baseline $\theta$
-might be presented as the behavior in the _hypothetical_ circumstance where the
-heterogeneity vanishes.  Although we might not observe this circumstance, and
-indeed it might be impossible to observe this circumstance at all, it provides
-_an_ interpretation for $\theta$ independent of the other parameters.  Similarly
-the factor level residuals might be interpreted as the behavior within each
-level in the hypothetical circumstance where the baseline contribution vanishes.
+might be presented as the behavior of a _hypothetical_ level with
+$delta_{l} = 0$,
+$$
+\theta_{l} = \theta + 0.
+$$
+Although we might not observe this circumstance, and indeed it might be
+impossible to observe this circumstance at all, it provides _an_ interpretation
+for $\theta$ independent of the other parameters.  Similarly the factor level
+residuals might be interpreted as the behavior within each level in the
+hypothetical circumstance where the baseline contribution vanishes,
+$$
+\theta_{l} = 0 + \delta_{l}.
+$$
 
 Personally I find these counterfactual interpretations confusing if not outright
-misleading when they are made implicitly.  I recommend instead always using
-_explicit_ configurations to interpret the residual parameters.  That
-configuration might be _actual_, corresponding to levels observed in the data,
-or _hypothetical_, corresponding to hypothetical levels with hypothetical
+misleading, especially when they are made implicitly.  I recommend instead
+always using _explicit_ configurations to interpret the residual parameters.
+That configuration might be _actual_, corresponding to levels observed in the
+data, or _hypothetical_, corresponding to hypothetical levels with hypothetical
 behavior.  By making these assumptions explicit we avoid any ambiguity in
 statements about the parameters, and hence any confusion in how those statements
 might apply in other circumstances.  In particular writing out the full
@@ -358,7 +369,7 @@ knitr::include_graphics("figures/two_factor_nested_pickup/two_factor_nested_pick
 </center>
 
 As before the color factor groups the individual contexts into color levels,
-separating the full exchangeability into marginal exchangeability across the
+reducing the full exchangeability into marginal exchangeability across the
 color levels and conditional exchangeability within the color levels.  As above
 we will assume that there is no heterogeneity within the levels so that the
 structure of the factor compatible hierarchical model is determined entirely by
@@ -373,8 +384,8 @@ knitr::include_graphics("figures/two_factor_nested_color/two_factor_nested_color
 </center>
 
 The new symbol factor also groups the individual contexts, but this time into
-symbol levels.  These symbol levels then motive their own own factor compatible
-hierarchical models.
+symbol levels.  These symbol levels then motivate their own own factor
+compatible hierarchical models.
 
 <center>
 <br>
@@ -409,23 +420,35 @@ the individual contexts collapse into one context for each symbol.  This holds
 more generally -- the relevant contexts in a nested multifactor model are always
 the levels of the _shallowest_ factor with the most refined levels.
 
-For example consider an initial factor that separates the individual contexts
-into $I$ levels, and then a second factor that separates the contexts in the
-$i$th level into $J_{i}$ sub-levels.  This nesting suggests a deeper hierarchy
-that models heterogeneity across the $I$ levels and the marginal/conditional
-heterogeneity across the $J_{i}$ sub-levels.  We will ignore any residual
-conditional heterogeneity of the $K_{ij}$ contexts within each of those
-sub-levels for now.
-
+For example consider an initial factor $f_{1}$ that separates the individual
+contexts into the levels $l_{1} \in \{1, \ldots, L_{f_{1}}\}$, and then a second
+factor $f_{2}$ that separates the contexts into the levels
+$l_{2} \in \{1, \ldots, L_{f_{2}} \}$ that nest into the $f_{1}$ levels with the
+many-to-one map $l_{1}(l_{2})$.  The most general family of hierarchical models
+compatible with these two nested factors is given by
+$$
+\begin{align*}
+\theta^{f_{2}}_{l_{2}} &\sim \pi( \theta^{f_{1}}_{l_{1}(l_{2})} )
+\\
+\theta^{f_{1}}_{l_{1}} &\sim \pi(\phi).
+\end{align*}
+$$
 If we assume that the heterogeneity manifests _only_ in the location of a normal
 population model then we arrive at a nested normal hierarchical model,
 $$
 \begin{align*}
-\theta_{i} &\sim \text{normal}(\theta, \tau)
+\theta^{f_{2}}_{l_{2}} &\sim
+\text{normal}( \theta^{f_{1}}_{l_{1}(l_{2})}, \tau^{f_{1}}_{l_{1}(l_{2})} )
 \\
-\theta_{ij} &\sim \text{normal}(\theta_{i}, \tau_{i}).
+\theta^{f_{1}}_{l_{1}} &\sim \text{normal}(\theta, \tau).
 \end{align*}
 $$
+
+One of the more frustrating but also critical aspects of multifactor models is
+their organization.  Through this case study I try to communicate that
+organization as clearly as possible with a careful, explicit notation.  That
+notation, however, also introduces a mess of indices that can be a bit
+overwhelming at first.  Hopefully the clarity is worth it!
 
 ## Conditional Exchangeability and Trivial Factors
 
@@ -441,7 +464,7 @@ knitr::include_graphics("figures/two_factor_nested_residual/two_factor_nested_re
 </center>
 
 Those individual contexts, however, always defines a natural factor: the
-_trivial factor_ that maps each context into its own level.
+_trivial factor_ that assigns each context to its own level.
 
 <center>
 <br>
@@ -453,9 +476,8 @@ knitr::include_graphics("figures/two_factor_nested_indiv/two_factor_nested_indiv
 
 Because it completely separates the contexts, the trivial factor is always
 compatible with other factors no matter how refined their levels might be.
-Consequently we can always add another hierarchy, one modeling the heterogeneity
-compatible with the marginal exchangeability of the trivial levels, on top of
-any nested hierarchical model.
+Consequently we can always add another hierarchy to modeling the heterogeneity
+across the trivial levels on top of any nested hierarchical model.
 
 <center>
 <br>
@@ -470,11 +492,11 @@ arose when we included the conditional heterogeneity of the most refined
 level!  Consequently even if we generally ignore the conditional heterogeneity
 within the individual factor levels we can always incorporated it back into the
 final nested multifactor model by including an additional trivial factor.  In
-particular once we have programs capable of specifying any nested multifactor
-model it's straightforward to add the residual heterogeneity within the more
-refined level by adding an explicit trivial factor.  This is one reason why
-conditional heterogeneity is often ignored entirely in many references on
-multifactor models.
+particular once we have programs capable of automatically building multifactor
+model for any set of nested factors it's straightforward to add the residual
+heterogeneity within the more refined level by adding an explicit trivial
+factor.  This is perhaps one reason why conditional heterogeneity is often
+ignored entirely in many references on multifactor models.
 
 ## Nested Residuals
 
@@ -482,20 +504,21 @@ As is often the case we specified the nested normal hierarchical model in a
 monolithically centered parameterization,
 $$
 \begin{align*}
-\theta_{i} &\sim \text{normal}(\theta, \tau)
+\theta^{f_{2}}_{l_{2}} &\sim
+\text{normal}( \theta^{f_{1}}_{l_{1}(l_{2})}, \tau^{f_{1}}_{l_{1}(l_{2})} )
 \\
-\theta_{ij} &\sim \text{normal}(\theta_{i}, \tau_{i}).
+\theta^{f_{1}}_{l_{1}} &\sim \text{normal}(\theta, \tau).
 \end{align*}
 $$
 Equivalently we can also non-center each hierarchical parameter relative to the
 corresponding location parameter to give a residual model,
 $$
 \begin{align*}
-\delta_{i} &\sim \text{normal}(0, \tau)
+\theta^{f_{2}}_{l_{2}} &= \theta + \delta^{f_{1}}_{l_{1}(l_{2})} + \delta^{f_{2}}_{l_{2}}
 \\
-\delta_{ij} &\sim \text{normal}(0, \tau_{i})
+\delta^{f_{2}}_{l_{2}} &\sim \text{normal}(0, \tau^{f_{1}}_{l_{1}(l_{2})} )
 \\
-\theta_{ij} &= \theta + \delta_{i} + \delta_{ij}.
+\delta^{f_{1}}_{l_{1}} &\sim \text{normal}(0, \tau).
 \end{align*}
 $$
 
@@ -504,32 +527,39 @@ generally if all of the hierarchical parameters are unconstrained.  We begin by
 adding and subtracting a variable corresponding the levels of the first factor,
 $$
 \begin{align*}
-\theta_{lk}
+\theta^{f_{2}}_{l_{2}}
 &=
-\theta_{lk} + 0
+\theta^{f_{2}}_{l_{2}} + 0
 \\
 &=
-\theta_{lk} + (-\theta_{l} + \theta_{l})
+\theta^{f_{2}}_{l_{2}} +
+\big( -\theta^{f_{1}}_{l_{1}(l_{2})} + \theta^{f_{1}}_{l_{1}(l_{2})} \big)
 \\
 &=
-(\theta_{lk} - \theta_{l}) + \theta_{l}.
+\big( \theta^{f_{2}}_{l_{2}} - \theta^{f_{1}}_{l_{1}(l_{2})} \big)
++ \theta^{f_{1}}_{l_{1}(l_{2})}.
 \end{align*}
 $$
 Then we add and subtract a term common to all levels,
 $$
 \begin{align*}
-\theta_{lk}
+\theta^{f_{2}}_{l_{2}}
 &=
-(\theta_{lk} - \theta_{l}) + \theta_{l} + 0,
+\big(\theta^{f_{2}}_{l_{2}} - \theta^{f_{1}}_{l_{1}(l_{2})}\big)
++ \theta^{f_{1}}_{l_{1}(l_{2})} + 0
 \\
 &=
-(\theta_{lk} - \theta_{l}) + \theta_{l} + (-\theta + \theta),
+\big(\theta^{f_{2}}_{l_{2}} - \theta^{f_{1}}_{l_{1}(l_{2})}\big)
++ \theta^{f_{1}}_{l_{1}(l_{2})} + \big( -\theta + \theta \big)
 \\
 &=
-(\theta_{lk} - \theta_{l}) + (\theta_{l} - \theta) + \theta
+\big( \theta^{f_{2}}_{l_{2}} - \theta^{f_{1}}_{l_{1}(l_{2})} \big)
++ \big( \theta^{f_{1}}_{l_{1}(l_{2})} - \theta \big) + \theta
 \\
 &=
-\delta_{lk} + \delta_{l} + \theta.
+\hspace{1mm} \delta^{f_{2}}_{l_{2}}
+\hspace{18.1mm} + \delta^{f_{1}}_{l_{1}(l_{2})}
+\hspace{11.4mm} + \theta.
 \end{align*}
 $$
 We can then build a hierarchical model compatible with the two nested factors by
@@ -541,25 +571,57 @@ application.
 
 The residual parameters here suffer the same interpretational difficulties that
 we encountered in [Section 1.4](#sec:single_residual).  In order to reconstruct
-the behavior in any observed context, $\theta_{ij}$, we have to incorporate
-_all_ of the contributions, including the baseline $\theta$, the first level
-residuals $\delta_{i}$, the second level residuals $\delta_{ij}$, and so on.
-Consequently none of these parameters have any interpretation independent of the
-others.
+the behavior in any observed context, $\theta^{f_{2}}_{l_{2}}$, we have to
+incorporate _all_ of the contributions, including the baseline $\theta$, the
+first factor residuals $\delta^{f_{1}}_{l_{1}(l_{2})}$, and the second factor
+residuals, $\delta^{f_{2}}_{l_{2}}$.  Consequently none of these parameters have
+any interpretation independent of the others.
 
 We can continue to avoid confusion by always interpreting model inferences in
-terms of explicit contexts, and the contributions from all of the factors levels
-within which that context is nested.  Again those contexts can be actual, for
-example constructed from observed levels and their inferred behavior, or
-hypothetical, for example imagined levels where heterogeneity vanishes.  By
-communicating all of the relevant details we avoid any interpretational
+terms of an explicit context, and the contributions from all of the factors
+levels to which that context belongs.  As before those contexts can be actual,
+constructed from observed levels and their inferred behavior, or hypothetical,
+imagined levels where heterogeneity vanishes.  For example in order to isolate
+the baseline we have to consider hypothetical residuals levels with zero
+contribution,
+$$
+\begin{align*}
+\delta^{f_{1}}_{l_{1}(l_{2})} &= \delta^{f_{2}}_{l_{2}} = 0
+\\
+\theta^{f_{2}}_{l_{2}} &= \theta + 0 + 0 = \theta,
+\end{align*}
+$$
+while isolating the first factor contributions require hypothetically
+vanishing contributions from the baseline and second factor,
+$$
+\begin{align*}
+\theta &= \delta^{f_{2}}_{l_{2}} = 0,
+\\
+\theta^{f_{2}}_{l_{2}}
+&= 0 + \delta^{f_{1}}_{l_{1}(l_{2})} + 0
+= \delta^{f_{1}}_{l_{1}(l_{2})}.
+\end{align*}
+$$
+Finally to isolate only the second factor contributions we have to imagine that
+the contributions from both the baseline and first factor vanish,
+$$
+\begin{align*}
+\theta &= \delta^{f_{1}}_{l_{1}(l_{2})} = 0,
+\\
+\theta^{f_{2}}_{l_{2}}
+&= 0 + 0 + \delta^{f_{2}}_{l_{2}}
+= \delta^{f_{2}}_{l_{2}}.
+\end{align*}
+$$
+
+By communicating _all_ of the relevant assumptions we avoid any interpretational
 ambiguity.
 
 # Overlapping Multifactor Models
 
 When the levels of multiple factors don't nest, and instead overlap with each
 other, building models compatible with all of the factors at the same time
-becomes especially challenging.  In fact in this case we often appeal to models
+becomes especially challenging.  In this case we often have to appeal to models
 that are only _approximately_ compatible with all of the factors.
 
 ## Intersecting Exchangeability
@@ -578,8 +640,9 @@ knitr::include_graphics("figures/two_factor_pickup/two_factor_pickup.png")
 
 If we consider only the color factor then our model proceeds as in
 [Section 1](#sec:single_factor).  We can freely permute the cards within each
-color level, defining marginal and conditional exchangeabilities and motivating
-a compatible hierarchical model.
+color level, defining conditional exchangeabilities, and all of the cards across
+levels, defining marginal exchangeability, and motivating a compatible
+hierarchical model.
 
 <center>
 <br>
@@ -601,8 +664,8 @@ knitr::include_graphics("figures/two_factor_sorted_symbol/two_factor_sorted_symb
 </center>
 
 Because the factor levels overlap, however, these notions of exchangeability are
-not consistent with each other.  Permutations that are valid within the color
-levels, for example, are obstructed by the symbol level categorization.
+not consistent with each other.  Many permutations that are compatible the color
+factor, for example, are not compatible with the symbol factor categorizations.
 
 <center>
 <br>
@@ -612,8 +675,8 @@ knitr::include_graphics("figures/two_factor_sorted_both/two_factor_sorted_both.p
 <br><br>
 </center>
 
-The only permutations that avoid crossing levels from both factors are those
-restricted to the the same _intersection level_.
+The only permutations that are compatible with _both_ factors at the same time
+are those confined to the same _intersection level_.
 
 <center>
 <br>
@@ -683,8 +746,8 @@ problems quickly arise.
 
 Most immediately the number of intersection levels tends to be large.  As we
 consider more factors, and more levels within each factor, the total number
-of intersections explodes multiplicatively.  Even if each factor seems
-reasonable on its own the intersection factor can easily have hundreds if not
+of intersections explodes multiplicatively.  Even if each factor features only
+a few levels on its own, the intersection factor can easily have hundreds if not
 thousands of levels.  As the number of intersection levels grows the occupancy
 of the levels also becomes more sparse for any fixed number of observations;
 many of the intersection levels might not be observed at all.  At best this
@@ -694,82 +757,95 @@ degenerate enough to obstruct accurate computation.
 The intersection levels also manifest strong correlations.  Any behavior common
 to a level in one of the factors will propagate to _all_ of the intersection
 levels that correspond to that level; the more significant the common behavior
-the more strongly those intersection parameters will be coupled together.  The
-common behavior in all of the individual factor levels results in a tangled web
-of complex interactions that can frustrate not only computation but also the
+the more strongly those intersection parameters will be coupled together.  For
+example any behavior common to the second color level will induce correlations
+between all four of the corresponding interaction levels, and any behavior
+common to the second symbol level will induce correlations between all three
+of the corresponding interaction levels.
+
+<center>
+<br>
+```{r, out.width = "100%", echo=FALSE}
+knitr::include_graphics("figures/two_factor_inter_corr/two_factor_inter_corr.png")
+```
+<br><br>
+</center>
+
+The common behavior in all of the individual factor levels results in a tangled
+web of complex interactions that can frustrate not only computation but also the
 interpretation of the parameters.
 
 Taking inspiration from the residual perspective we considered above, however,
 we can expand the intersection parameters into a sequence of residual
-parameters.  For example consider the case of two factors, the first with levels
-indexed by $l_{1} \in \{1, \ldots, L_{1}\}$, the second with levels indexed
-$l_{2} \in \{1, \ldots, L_{2}\}$, and the corresponding intersection levels
-indexed by the ordered pair $(l_{1}, l_{2})$.
-
-One of the more frustrating but also critical aspects of these models is their
-organization.  Here I'm trying to communicate that organization as clearly as
-possible with a careful, explicit notation.  That notation, however, also
-introduces a overwhelming mess of indices.  Hopefully the clarity is worth it!
+parameters that may be better behaved.  For example consider the case of two
+factors, the first with levels indexed by $l_{1} \in \{1, \ldots, L_{1}\}$, the
+second with levels indexed $l_{2} \in \{1, \ldots, L_{2}\}$, and the
+corresponding intersection levels indexed by the ordered pair $(l_{1}, l_{2})$.
 
 Notational complaints aside, we can isolate the behavior common to the
 individual factor levels by adding and subtracting parameters for each,
 $$
 \begin{align*}
-\theta^{1,2}_{l_{1}, l_{2}}
+\theta^{f_{1}, f_{2}}_{l_{1}, l_{2}}
 &=
-\theta^{1,2}_{l_{1}, l_{2}} + 0 + 0
+\theta^{f_{1}, f_{2}}_{l_{1}, l_{2}} + 0 + 0
 \\
 &=
-\theta^{1,2}_{l_{1}, l_{2}}
-+ (-\theta^{1}_{l_{1}} + \theta^{2}_{l_{2}})
-+ (-\theta^{1}_{j} + \theta^{2}_{l_{2}})
+\theta^{f_{1}, f_{2}}_{l_{1}, l_{2}}
++ \big(-\theta^{f_{1}}_{l_{1}} + \theta^{f_{2}}_{l_{2}} \big)
++ \big(-\theta^{f_{1}}_{j} + \theta^{f_{2}}_{l_{2}} \big)
 \\
 &=
-(\theta^{1,2}_{l_{1}, l_{2}} - \theta^{1}_{l_{1}} - \theta^{2}_{l_{2}})
-+ \theta^{1}_{l_{1}} + \theta^{2}_{l_{2}}.
+\big(\theta^{f_{1}, f_{2}}_{l_{1}, l_{2}} - \theta^{f_{1}}_{l_{1}} - \theta^{f_{2}}_{l_{2}}\big)
++ \theta^{f_{1}}_{l_{1}} + \theta^{f_{2}}_{l_{2}}.
 \end{align*}
 $$
 We can then isolate the behavior common to all levels by adding and subtracting
 a baseline parameter,
 $$
 \begin{align*}
-\theta^{1,2}_{l_{1}, l_{2}}
+\theta^{f_{1}, f_{2}}_{l_{1}, l_{2}}
 &=
-(\theta^{1,2}_{l_{1}, l_{2}} - \theta^{1}_{l_{1}} - \theta^{2}_{l_{2}})
-+ \theta^{1}_{l_{1}} + \theta^{2}_{l_{2}}
+\big(\theta^{f_{1}, f_{2}}_{l_{1}, l_{2}} - \theta^{f_{1}}_{l_{1}} - \theta^{f_{2}}_{l_{2}}\big)
++ \theta^{f_{1}}_{l_{1}} + \theta^{f_{2}}_{l_{2}}
 + 2 \cdot 0
 \\
 &=
-(\theta^{1,2}_{l_{1}, l_{2}} - \theta^{1}_{l_{1}} - \theta^{2}_{l_{2}})
-+ \theta^{1}_{l_{1}} + \theta^{2}_{l_{2}}
+\big(\theta^{f_{1}, f_{2}}_{l_{1}, l_{2}} - \theta^{f_{1}}_{l_{1}} - \theta^{f_{2}}_{l_{2}}\big)
++ \theta^{f_{1}}_{l_{1}} + \theta^{f_{2}}_{l_{2}}
 + 2 \cdot (-\theta + \theta)
 \\
 &=
-(\theta^{12}_{l_{1}, l_{2}} - \theta^{1}_{l_{1}} - \theta^{2}_{l_{2}} + \theta)
-+ (\theta^{1}_{l_{1}} - \theta)
-+ (\theta^{2}_{l_{2}} - \theta)
+\big(\theta^{12}_{l_{1}, l_{2}} - \theta^{f_{1}}_{l_{1}} - \theta^{f_{2}}_{l_{2}} + \theta\big)
++ \big(\theta^{f_{1}}_{l_{1}} - \theta\big)
++ \big(\theta^{f_{2}}_{l_{2}} - \theta\big)
 + \theta
 \\
-&= \delta^{1,2}_{l_{1}, l_{2}} + \delta^{1}_{l_{1}} + \delta^{2}_{l_{2}} + \theta.
+&= 
+\hspace{1mm} \delta^{f_{1}, f_{2}}_{l_{1}, l_{2}}
+\hspace{31.25mm} + \delta^{f_{1}}_{l_{1}}
+\hspace{12.25mm} + \delta^{f_{2}}_{l_{2}}
+\hspace{12.5mm} + \theta
 \end{align*}
 $$
 
 The baseline factor $\theta$ captures the behavior common to all contexts
-while the residual factors $\delta^{1}_{l_{1}}$ and $\delta^{2}_{l_{2}}$ capture
-the behavior common to the contexts within each individual factor level.  This
-leaves the residual interaction factor, $\delta^{1, 2}_{l_{1}, l_{2}}$, which
-captures any excess heterogeneity unique to the _overlap_ of the factors.
+while the residual factors $\delta^{f_{1}}_{l_{1}}$ and $\delta^{f_{2}}_{l_{2}}$
+capture the behavior common to the contexts within each individual factor level.
+This leaves the residual interaction factor,
+$\delta^{f_{1}, f_{2}}_{l_{1}, l_{2}}$, which captures any excess heterogeneity
+unique to the _overlap_ of the factor levels.
 
-When these common behaviors are significant these residual parameters should be
-less strongly coupled then the original intersection parameters.  Moreover even
-if the intersection levels are sparsely populated the baseline and factor
+If these common behaviors are significant then these residual parameters should
+be less strongly coupled then the original intersection parameters.  Moreover
+even if the intersection levels are sparsely populated the baseline and factor
 residuals will tend to be more densely populated and hence easier to infer.
 
 In general we can decompose the intersection of $N_{F}$ factors into a single
 baseline, main contributions from each factor, first-order interactions between
 each pair of factors, second-order interactions between each triplet of factors,
 and so on.  To break the notational asymmetry between the first two
-contributions and the various intersections I will also refer to all of these 
+contributions and the various intersections I will also refer to all of these
 contributions by their _order_, starting with the zeroth-order contribution from
 the baseline.  This ordering will also be consistent with the more formal
 treatment in [Section 3.4](#sec:tensor).
@@ -828,8 +904,19 @@ influence from color on the behavior of the cards.  There are no cards, however,
 that are characterized by _only_ color.  The contributions from the color and
 symbol levels always accompany each other, not to mention the corresponding
 intersections.  In order to isolate an independent color contribution we'd have
-to consider an artificial circumstance where the main symbol contributions and
-all of the intersection contributions vanish.  If the artificiality of this
+to consider an artificial circumstance where baseline contribution, the main
+symbol contributions, and all of the intersection contributions vanish,
+$$
+\begin{align*}
+\theta &= \delta^{f_{2}}_{l_{2}} = \delta^{f_{1}, f_{2}}_{l_{1}, l_{2}} = 0
+\\
+\theta^{f_{1}, f_{2}}_{l_{1}, l_{2}}
+&= 0 + \delta^{f_{1}}_{l_{1}} + 0 + 0
+= \delta^{f_{1}}_{l_{1}}.
+\end{align*}
+$$
+
+If the artificiality of this
 construction is taken for granted then it can lead to far more misunderstanding
 than insight.
 
@@ -837,9 +924,25 @@ than insight.
 
 Once we've decomposed the full interaction factor into a residual sequence
 we can build a multifactor compatible hierarchical model by assigning
-independent hierarchies to each contributing factor.  The advantage of this
-construction over building a hierarchy over the main interaction factor levels
-directly is that we have much more flexibility in the prior modeling.
+independent hierarchies to each contributing factor,
+$$
+\begin{align*}
+\theta^{f_{1}, f_{2}}_{l_{1}, l_{2}}
+&= \theta
++ \delta^{f_{1}}_{l_{1}} + \delta^{f_{2}}_{l_{2}}
++ \delta^{f_{1}, f_{2}}_{l_{1}, l_{2}}
+\\
+\delta^{f_{1}, f_{2}}_{l_{1}, l_{2}} &\sim \pi( \phi^{f_{1}, f_{2}} )
+\\
+\delta^{f_{1}}_{l_{1}} &\sim \pi( \phi^{f_{1}} )
+\\
+\delta^{f_{2}}_{l_{2}} &\sim \pi( \phi^{f_{2}} ).
+\end{align*}
+$$
+
+The advantage of this construction over building a hierarchy over the main
+interaction factor levels directly is that we have much more flexibility in the
+prior modeling.
 
 In particular if the higher-order interactions grow weaker, and the behavior of
 each context is dominated by the leading-order contributions, then we can use
@@ -853,7 +956,8 @@ then at some point the higher-order contributions can be neglected without
 really affecting the quality of our inferences.  Although dropping higher-order
 contributions technically results in hierarchical models that are not _exactly_
 compatible with the overlapping exchangeability of the individual factors, we
-may not be able to resolve those incompatibilities without massive data sets.
+may not be able to resolve those incompatibilities without the very precise
+inferences afforded by massive data sets.
 
 In fact the residual construction provides a natural scaffolding for expanding
 our hierarchical models with a sequence of _truncated_ models that capture more
@@ -864,13 +968,13 @@ $$
 $$
 Once we fit this initial model we can look for indications of heterogeneity
 across the factor levels with carefully designed posterior retrodictive checks.
-If these checks indicate that excess heterogeneity is important then we can add
-the first-order residuals,
+If these checks indicate that excess heterogeneity is important then we might
+add the first-order residuals,
 $$
 \delta^{f_{1}, \ldots, f_{F}}_{l_{1}, \ldots, l_{F}}
 \approx \theta + \sum_{f = 1}^{F} \delta^{f}_{l_{f}},
 $$
-and then checking for excess heterogeneity within the first-order intersection
+and then check for excess heterogeneity within the first-order intersection
 groups.  If we continue to see excesses then we can add the first-order
 intersections into the model,
 $$
@@ -881,28 +985,26 @@ $$
 + \sum_{f_{1} = 1}^{F} \sum_{f_{1} = f_{2} + 1}^{F}
 + \delta^{f_{1}, f_{2}}_{l_{f_{1}}, f_{2}}.
 $$
+
+In practice expansion based on posterior retrodictive checks alone is limited
+by our ability to design a summary statistic that is directly sensitive to the
+potential heterogeneity.  This is especially true in complex models where the
+heterogeneity is only one of many different, varying contributions to the data
+generating process.  The residual scaffolding, however, can still be useful even
+without sensitive posterior retrodictive checks.  Instead of terminating when
+the posterior retrodictive checks show no deviant behavior we can terminate when
+the posterior inferences for the most recent, highest-order contribution are
+consistent with zero.
+
 By following the natural order of the residuals we model only as much
 heterogeneity as is supported by our observations, avoiding degenerate
 inferences from over-parameterized models without sacrificing explanatory power
-within the scope of those observations.
-
-Of course if that scope changes then the validity of a truncated model will
-also, in general, change.  In particular a truncated model that is sufficient
-for a small data set is unlikely to remain sufficient when we consider larger
-data sets where we can resolve more and more subtle behaviors that often
-manifest only in the higher-order interaction contributions.
-
-Another limitation to expanding based on posterior retrodictive checks alone is
-that we may not be able to design a summary statistic that is directly sensitive
-to the potential heterogeneity.  This is especially true in complex models where
-the heterogeneity is only one of many different, varying contributions to the
-data generating process.  The residual scaffolding, however, is still useful
-even without sensitive posterior retrodictive checks.  Because the incremental
-model expansion compartmentalizes each order of the residuals we can fit and
-analyze them one at a time.  Moreover we can motivate appropriate truncations
-using the sequential posterior inferences, expanding the order of the residuals
-until the posterior for the incremental contributions become consistent with
-zero.
+within the scope of those observations.  Of course if that scope changes then
+the validity of a truncated model will also, in general, change.  In particular
+a truncated model that is sufficient for a small data set is unlikely to remain
+sufficient when we consider larger data sets where we can resolve more and more
+subtle behaviors that often manifest only in the higher-order interaction
+contributions.
 
 ## Extra Credit: Getting Tensor {#sec:tensor}
 
@@ -960,7 +1062,7 @@ $N_{1} \cdot N_{2}$ elements.
 
 The tensor product of $I$ vectors defines an $I$-dimensional, or rank $I$,
 _multidimensional array_.  Each element is identified with $I$ indices, where
-the $i$th index identifiesw hich element of the $i$th component vector
+the $i$th index identifies which element of the $i$th component vector
 contributes to the tensor element.
 
 The direct sum and tensor product play nicely with each other, generating an
@@ -1020,13 +1122,15 @@ $$
 \end{align*}
 $$
 which has the exact same form as residual expansion that we derived in
-[Section 3.2](#sec:residual_expansion)!  In particular we can associate
-$\mathbf{a}$ and $\mathbf{b}$ with two factors, $\mathbf{1} \otimes \mathbf{1}$
-the rank zero baseline contribution, $\mathbf{a} \otimes \mathbf{1}$ and
-$\mathbf{1} \otimes \mathbf{b}$ the rank one main contributions, and
-$\mathbf{a} \otimes \mathbf{b}$ the rank two interaction contribution.
-Truncating the residual expansion then corresponds to a _low rank approximation_
-of the tensor product $(\mathbf{1} \oplus \mathbf{a} \oplus \mathbf{b})^{2}$.
+[Section 3.2](#sec:residual_expansion)! 
+
+In particular we can associate $\mathbf{a}$ and $\mathbf{b}$ with two factors,
+$\mathbf{1} \otimes \mathbf{1}$ the rank zero baseline contribution,
+$\mathbf{a} \otimes \mathbf{1}$ and $\mathbf{1} \otimes \mathbf{b}$ the rank one
+main contributions, and $\mathbf{a} \otimes \mathbf{b}$ the rank two interaction
+contribution.  Truncating the residual expansion then corresponds to a
+_low rank approximation_ of the tensor product
+$(\mathbf{1} \oplus \mathbf{a} \oplus \mathbf{b})^{2}$.
 
 For example given the factor $\mathbf{a}$ with four levels and the factor
 $\mathbf{b}$ with three levels we can expand
@@ -1058,10 +1162,9 @@ knitr::include_graphics("figures/rank3_tensor_decomp/rank3_tensor_decomp.png")
 <br><br>
 </center>
 
-In general given $I$ factors we can _systematically_ generate and organize all
-of the terms in the residual expansion, including all of the higher-order
-interaction factors, by expanding
-
+In general given $I$ factors we can use this particular tensor algebra to
+_systematically_ generate and organize all of the terms in the residual
+expansion, including all of the higher-order interaction factors, by expanding
 $$
 \big( \mathbf{1} \oplus ( \oplus_{i = 1}^{I} \mathbf{f}_{i} ) \big)^{I},
 $$
@@ -1086,7 +1189,8 @@ with just one level, the main contributions are given by the main factors, and
 the first-order interaction contribution is given by the interaction factors
 formed by intersecting the levels from each pair of main factors.  How many
 observations are associated with each level, or the _occupancy_, provides
-critical information about how degenerate our inferences might be.
+critical information about how degenerate our inferences of those levels will
+be with the levels of lower-order factors.
 
 Those levels that have no occupancy at all are of particular interest.  Let's
 define a _factor configuration_ as a binary classification of which levels have
@@ -1103,20 +1207,63 @@ knitr::include_graphics("figures/context_to_inter/context_to_inter.png")
 </center>
 
 Careful analysis of these configurations can alert us to degeneracies between
-the different residual contributions.  For example if we observe only one
-first-order intersection level then all of the interaction residuals associated
-with the two component levels cannot be distinguished from the main residuals.
-In order to be able to resolve each different interaction we need to observe
-enough different contexts to differentiate between behavior common to the main
-factors and residual heterogeneity particular to the interactions!
+the different residual contributions.  For example consider a first-order
+factor where only one level is observed.
 
 <center>
 <br>
 ```{r, out.width = "50%", echo=FALSE}
-knitr::include_graphics("figures/context_to_inter_degen/context_to_inter_degen.png")
+knitr::include_graphics("figures/context_to_inter_degen1/context_to_inter_degen1.png")
 ```
 <br><br>
 </center>
+
+Because only one level is observed we can shift a constant between the baseline
+term and this main factor contribution without affecting the reconstructed
+behavior,
+$$
+\begin{align*}
+\theta^{f_{1}, f_{2}}_{l_{1}, l_{2}}
+&=
+\theta + \delta^{f_{1}}_{l_{1}}
+\\
+&=
+\big( \theta + \alpha \big) + \big( \delta^{f_{1}}_{l_{1}} - \alpha \big),
+\end{align*}
+$$
+resulting in a non-identified likelihood function.  We need to observe _some_
+heterogeneity in order to distinguish the two contributions!
+
+Similarly consider two factors but observe only one interaction level associated
+with two factor levels.
+
+<center>
+<br>
+```{r, out.width = "50%", echo=FALSE}
+knitr::include_graphics("figures/context_to_inter_degen2/context_to_inter_degen2.png")
+```
+<br><br>
+</center>
+
+In this case we can shift a constant between the two main factor contributions
+and the corresponding interaction contributions without affecting the
+reconstructed behavior,
+$$
+\begin{align*}
+\theta^{f_{1}, f_{2}}_{2, 2}
+&=
+\theta
++ \delta^{f_{1}}_{2} + \delta^{f_{2}}_{2}
++ \delta^{f_{1}, f_{2}}_{2, 2}
+\\
+&=
+\theta
++ \big( \delta^{f_{1}}_{2} - \alpha \big)
++ \big( \delta^{f_{2}}_{2} - \beta \big)
++ \big( \delta^{f_{1}, f_{2}}_{2, 2} + \alpha + \beta \big),
+\end{align*}
+$$
+resulting in yet another non-identifiable likelihood function.
 
 These non-identified configurations lead to degenerate likelihood functions no
 matter how much data we replicate with that particular factor configuration.
@@ -1139,7 +1286,7 @@ informs what orders of residuals might be feasible as well as on which
 contributions we might need to focus elicitation of domain expertise for
 more informative prior models.
 
-## The Limitations of Multifactor Models
+## The Limitations of Overlapping Multifactor Models
 
 Ultimately the residual decomposition is just a way of organizing heterogeneity
 across the overlapping levels of the component factors.  As with any
@@ -1150,14 +1297,23 @@ external circumstances we are implicitly making assumptions not just about the
 multifactor model itself but also the generative process from which those
 heterogeneities arise, and hence the _interpretation_ of the multifactor model.
 
-In particular how well a decomposition of heterogeneity across the factor levels
+This is especially important when the interpretation of the factor levels, or
+their assignments, is ambiguous.  For example because many common demographic
+factors like ethnicity and race are socially constructed, their level
+assignments can differ significantly when self-identified by the individuals
+themselves or externally identified by researchers.  Even if substantial
+heterogeneity manifests across the assigned levels we will have trouble
+determining how that heterogeneity generalizes if we don't understand how those
+levels were assigned, and hence the precise interpretation of the factors.
+
+Moreveor how well a decomposition of heterogeneity across the factor levels
 and their intersections captures the behavior of any latent generative process
 depends on exactly which factors, and which levels within those factors, are
 considered.  If the factor levels poorly correlate with the generative process
 then even multifactor models with higher-order interactions will resolve only a
 partial picture of that process; the heterogeneity that manifests across those
 levels and their intersections will provide only limited information that, at
-best, awkwardly generalizes to external circumstances.  Indeed the less 
+best, awkwardly generalizes to external circumstances.  Indeed the less
 sensitive the levels are to the generative structure, the more prone the
 resulting multifactor models will be to contorting to accidental patterns in the
 observations that do happen to align with the factors.
@@ -1180,15 +1336,12 @@ uncertain and in the worst case misleading as the rigid factors adapt to
 only certain projections of the latent phenomenological behavior of interest.
 When trying to increases sales, for example, a multifactor model based on
 demographic factors will be of limited use if patterns in purchasing behavior
-do not manifest as strong hetergeneity within demographic levels and their
-lower-order interactions.  Consequently the choice of factors is critical to the
-utility of a multifactor model.  The more each factor is sensitive to the 
-relevant behavior the more generative consequences the resulting multifactor 
-model will be able to represent.
+do not manifest as a strong heterogeneity within demographic levels and their
+lower-order interactions.
 
-At the same time the levels within each factor that are observed can be just as
-important.  When observations exhaust all of the input factor levels we know
-that our data are sensitive to the full range of possible behaviors that the
+At the same time the factor levels that are actually observed can be just as
+critical.  When observations exhaust all of the input factor levels we know that
+our data are sensitive to the full range of possible behaviors that the
 multifactor model can accommodate.  If many levels are unobserved, however, then
 the resulting multifactor model will not take full advantage of the given
 factors!
@@ -1211,14 +1364,14 @@ the design for which levels are observed is very much not exchangeable here!
 Because of this limitation the resulting multifactor model will be sensitive
 only to behavior around that chosen baseline.  When working with only partially
 observed factors it's critical to investigate the behavior near the boundary
-levels for any indications of trends that might persist beyond, for example 
-trends that peak around the "X" in the above figure.  In some cases expanding 
-factor designs to include more levels can be more useful than adding new 
+levels for any indications of trends that might persist beyond, for example
+trends that peak around the "X" in the above figure.  In some cases expanding
+factor designs to include more levels can be more useful than adding new
 factors!
 
-As critical as the choice of main factors, and the choice of observed levels in
-those factors, is, we do not always have the luxury of choice in practice.  In
-many cases the available factors are determined not by careful statistical
+As critical as the choice of main factors, their observed levels, and their
+interpretations is, we do not always have the luxury of that choice in practice.
+In many cases the available factors are determined not by careful statistical
 design but rather by external conventions or even alternative priorities such as
 privacy.  For example when working with survey data we are typically limited to
 common demographic factors that may correlate poorly with the behaviors in which
@@ -1240,9 +1393,10 @@ known in many fields.  For instance the framework of _intersectionality_
 consequences that vary across the intersections of common demographic features.
 The experience of a Black woman, for example, cannot in most circumstances be
 accurately characterized solely by the experiences common to all women and the
-experiences common to all Black people.  Ignoring this interaction results in
-not just poor inferences but also ineffectual policy informed by those
-inferences.
+experiences common to all Black people.  Ignoring this interaction then results
+in not just poor inferences but also ineffectual policy informed by those
+inferences.  Of course the importance of these interactions is further
+complicated by the interpretation of race as discussed above!
 
 In order to ensure robust inferences we cannot take for granted the dominance of
 the main factors, and the negligibility of the interaction factors.  While
@@ -1250,6 +1404,13 @@ finite measurements may not be able to resolve any heterogeneity in the
 interactions factors, especially the higher-order interaction factors, we have
 to explicitly verify that this is the case in any given analysis with, for
 example, posterior inferences or posterior retrodictive checks.
+
+Ultimately the choice of both main and interaction factors is critical to the
+utility of a multifactor model.  The more each factor is sensitive to the
+relevant behavior the more generative consequences the resulting multifactor
+model will be able to represent.  Similarly the more precisely we can interpret
+each factor the more we can understand those generative consequences and the
+better we will be able to determine when those consequences generalize.
 
 # Experiments
 
@@ -1282,7 +1443,7 @@ c_green_trans <- c("#00FF0080")
 
 par(family="CMU Serif", las=1, bty="l", cex.axis=1, cex.lab=1, cex.main=1,
     xaxs="i", yaxs="i", mar = c(5, 5, 3, 5))
-    
+   
 set.seed(9958284)
 ```
 
@@ -1392,7 +1553,7 @@ polygon(c(x, rev(x)), c(pad_cred[3,], rev(pad_cred[7,])),
         col = c_mid, border = NA)
 polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
         col = c_mid_highlight, border = NA)
-for (l in 1:L)
+for (l in 1:(L + 1))
   lines(x[(2*l-1):(2*l)], pad_cred[5,(2*l-1):(2*l)], col=c_dark, lwd=2)
 
 axis(1, at=1:(L + 1),
@@ -1438,7 +1599,7 @@ for (l in 1:L) {
           col = c_mid, border = NA)
   polygon(c(x, rev(x)), c(pad_cred[4,], rev(pad_cred[6,])),
           col = c_mid_highlight, border = NA)
-  for (k in 1:K)
+  for (k in 1:(K + 1))
     lines(x[(2*k-1):(2*k)], pad_cred[5,(2*k-1):(2*k)], col=c_dark, lwd=2)
 
 
@@ -1511,7 +1672,7 @@ ub <- max(c(2.25 * mean_tau,  cred[9,]))
 
 par(mar=c(5, 5, 3, 1))
 plot(1, type="n", main="Marginal Heterogeneity",
-     xlim=c(0.5, L + 1.5), xlab="", xaxt="n",
+     xlim=c(0.5, L + 0.5), xlab="", xaxt="n",
      ylim=c(lb, ub), ylab="Marginal Posterior")
 
 lines(c(0.5, L + 0.5), c(2 * mean_tau, 2 * mean_tau), col="gray80", lwd=3, lty=2)
@@ -1566,9 +1727,9 @@ for (l in 1:L) {
        xlim=c(0.5, K + 0.5), xlab="", xaxt="n",
        ylim=c(lb, ub), ylab="Marginal Posterior")
 
-  lines(c(0.5, L + 0.5), c(2 * mean_tau, 2 * mean_tau), col="gray80", lwd=3, lty=2)
-  lines(c(0.5, L + 0.5), c(0, 0), col="gray80", lwd=3, lty=2)
-  lines(c(0.5, L + 0.5), c(-2 * mean_tau, -2 * mean_tau), col="gray80", lwd=3, lty=2)
+  lines(c(0.5, K + 0.5), c(2 * mean_tau, 2 * mean_tau), col="gray80", lwd=3, lty=2)
+  lines(c(0.5, K + 0.5), c(0, 0), col="gray80", lwd=3, lty=2)
+  lines(c(0.5, K + 0.5), c(-2 * mean_tau, -2 * mean_tau), col="gray80", lwd=3, lty=2)
 
   polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
           col = c_light, border = NA)
@@ -1763,7 +1924,7 @@ ub <- max(c(2.25 * mean_tau,  cred[9,]))
 
 par(mar=c(5, 5, 3, 1))
 plot(1, type="n", main="Marginal Heterogeneity",
-     xlim=c(0.5, L + 1.5), xlab="", xaxt="n",
+     xlim=c(0.5, L + 0.5), xlab="", xaxt="n",
      ylim=c(lb, ub), ylab="Marginal Posterior")
 
 lines(c(0.5, L + 0.5), c(2 * mean_tau, 2 * mean_tau), col="gray80", lwd=3, lty=2)
@@ -1817,9 +1978,9 @@ for (l in 1:L) {
        xlim=c(0.5, K + 0.5), xlab="", xaxt="n",
        ylim=c(lb, ub), ylab="Marginal Posterior")
 
-  lines(c(0.5, L + 0.5), c(2 * mean_tau, 2 * mean_tau), col="gray80", lwd=3, lty=2)
-  lines(c(0.5, L + 0.5), c(0, 0), col="gray80", lwd=3, lty=2)
-  lines(c(0.5, L + 0.5), c(-2 * mean_tau, -2 * mean_tau), col="gray80", lwd=3, lty=2)
+  lines(c(0.5, K + 0.5), c(2 * mean_tau, 2 * mean_tau), col="gray80", lwd=3, lty=2)
+  lines(c(0.5, K + 0.5), c(0, 0), col="gray80", lwd=3, lty=2)
+  lines(c(0.5, K + 0.5), c(-2 * mean_tau, -2 * mean_tau), col="gray80", lwd=3, lty=2)
 
   polygon(c(x, rev(x)), c(pad_cred[1,], rev(pad_cred[9,])),
           col = c_light, border = NA)
@@ -1908,7 +2069,7 @@ ub <- max(c(2.25 * mean_tau,  cred[9,]))
 
 par(mar=c(5, 5, 3, 1))
 plot(1, type="n", main="Marginal Heterogeneity",
-     xlim=c(0.5, L + 1.5), xlab="", xaxt="n",
+     xlim=c(0.5, L + 0.5), xlab="", xaxt="n",
      ylim=c(lb, ub), ylab="Marginal Posterior")
 
 lines(c(0.5, L + 0.5), c(2 * mean_tau, 2 * mean_tau), col="gray80", lwd=3, lty=2)
@@ -2005,7 +2166,7 @@ hist(data$factor2_to_factor1[data$factor3_to_factor2[data$obs_to_factor3]],
 
 A general three factor nested model is similar to the full marginal conditional
 model we build for a single factor, only with one more layers of nesting.
-Knowing that me might need flexibility we start with a general implementation
+Knowing that we might need flexibility we start with a general implementation
 where we can readily configure the parameterization of each hierarchical
 parameter.
 
@@ -2051,7 +2212,7 @@ We can't let them escape.
 ```{r}
 partition <- util$partition_div(fit)
 div_samples <- partition[[1]]
-nondiv_samples <- partition[[2]][1:1000,]
+nondiv_samples <- partition[[2]]
 ```
 
 The population parameters for the first factor don't show any indication of
@@ -2166,7 +2327,7 @@ for (l1 in 1:data$N_factor1_levels) {
   nested_factor2_idx <- which(data$factor2_to_factor1 == l1)
 
   par(mfrow=c(1, 4))
-  
+ 
   for (l2 in nested_factor2_idx) {
     if (l2 %in% data$factor2_cp_idx) {
       cp_idx <- which(l2 == data$factor2_cp_idx)
@@ -2178,7 +2339,7 @@ for (l1 in 1:data$N_factor1_levels) {
     name_y <- paste("delta_factor2_tau[", l1, "]", sep='')
 
     plot(nondiv_samples[name_x][,1], log(nondiv_samples[name_y][,1]),
-         col=c_dark_trans, pch=16, 
+         col=c_dark_trans, pch=16,
          main=paste("l1 = ", l1, ", l2 = ", l2, sep=""),
          xlab=name_x, xlim=c(-8, 8),
          ylab=paste("log(", name_y, ")", sep=''), ylim=c(-7, 4))
@@ -2205,7 +2366,7 @@ for (l2 in 1:data$N_factor2_levels) {
       name_x <- paste("delta_factor3_ncp[", ncp_idx, "]", sep='')
     }
     name_y <- paste("delta_factor3_tau[", l2, "]", sep='')
-  
+ 
     plot(nondiv_samples[name_x][,1], log(nondiv_samples[name_y][,1]),
          col=c_dark_trans, pch=16,
          main=paste("l2 = ", l2, ", l3 = ", l3, sep=""),
@@ -2214,7 +2375,7 @@ for (l2 in 1:data$N_factor2_levels) {
     points(div_samples[name_x][,1], log(div_samples[name_y][,1]),
            col=c_green_trans, pch=16)
   }
-  
+ 
   mtext(paste("Factor Three Hierarchy Nested Within Factor Two Level", l2), outer = TRUE)
 }
 ```
@@ -2590,13 +2751,13 @@ order incrementally.
 
 To critique each iteration of the overlapping multifactor model we'll use a
 regularized $F$ statistic that is common in frequentist analysis of variance
-estimation.  In particular we'll compare the empirical variance of the empirical
-means in each sufficiently occupied factor level to the empirical variance of
-the empirical means of the sufficiently occupied factor levels, where a
-sufficiently occupied level requires at least two observations.  Because the
-factor heterogeneity should manifest directly in the mean of the observations
-here this regularized $F$ statistic should be relatively sensitive to excess
-heterogeneity.
+estimation.  In each sufficiently occupied factor level, where a sufficiently
+occupied level requires at least two observations, we'll compare the empirical
+mean of the empirical variances, or the _within group variation_, to the
+empirical variance of the empirical means, or the _between group variation_. 
+Because the factor heterogeneity should manifest directly in the mean of the
+observations here this regularized $F$ statistic should be relatively sensitive
+to excess heterogeneity.
 
 ```{r}
 writeLines(readLines('stan_programs/compute_f_stat.stan'))
@@ -2679,9 +2840,9 @@ util$check_all_diagnostics(fit)
 ```
 
 The posterior retrodictive checks, however, look unsatisfying.  Our model is
-unable to capturing not only the heterogeneity across the first-order
-interaction levels but also the heterogeneity across the Main Factor 2 levels,
-even though we've already added a hierarchy for this factor!
+unable to capture not only the heterogeneity across the first-order interaction
+levels but also the heterogeneity across the Main Factor 2 levels, even though
+we've already added a hierarchy for this factor!
 
 ```{r}
 samples <- extract(fit)
@@ -2742,8 +2903,9 @@ util$check_all_diagnostics(fit)
 ```
 
 The posterior retrodictive checks for the main factors and the first-order
-interaction factors all look much better, but the checks for the second-order
-interaction factor suggests that we're not quite done.
+interaction factors all look much better, and the check for the second-order
+interaction factor suggests that we can't resolve any higher-order 
+contributions.
 
 ```{r}
 samples <- extract(fit)
@@ -2782,8 +2944,8 @@ for (f in 1:1) {
 }
 ```
 
-Unsatisfied with just the first-order interactions we can now consider the
-full residual expansion by adding the second-order interaction factor as well.
+To be safe, however, let's include the second-order interactions and investigate
+the corresponding inferences.
 
 ```{r}
 writeLines(readLines("stan_programs/overlapping_factors_ver3.stan"))
@@ -3055,17 +3217,13 @@ util$check_all_diagnostics(fit)
 Why did we have to center the Main Factor 2 levels only after adding the
 second-order interaction factors but not before?  Remember that none of the
 residual contributions influence the likelihood function independently of the
-others.  When higher-order contributions are larger than the lower-order 
-contributions adding higher-order residuals can give the lower-order residuals
-freedom to explore different configurations, and unfortunately sometimes even
-more computationally pathological configurations.
+others.  When higher-order contributions are non-zero their addition can give
+the lower-order residuals freedom to explore different configurations, and
+unfortunately sometimes even more computationally pathological configurations.
 
 In any case our careful centering seems to have done the trick and we can move
-onto posterior inferences.  First our posterior retrodicive checks which are
-reasonable at all three orders.  While there is a mild deviation in Interaction 
-Factor 123 it isn't particular worrisome given the heaviness of the posterior 
-retrodictive distribution tail.
-
+onto posterior inferences.  First our posterior retrodicive checks have not 
+gotten any worse.
 
 ```{r}
 samples <- extract(fit)
@@ -3105,17 +3263,16 @@ for (f in 1:1) {
 ```
 
 Satisfied that the full residual expansion adequately captures the features of
-the true data generating process that we can resolve we can then consider
-posterior inferences.  First let's look at the baseline parameter.
-
+the true data generating process that we can resolve with the given data, we can
+now consider posterior inferences.  First let's look at the baseline parameter.
 
 ```{r}
 par(mfrow=c(1, 1))
 par(mar=c(5, 5, 3, 5))
 
-hist(samples$baseline, breaks=seq(-10, 20, 0.1), main="",
+hist(samples$baseline, breaks=seq(-10, 20, 0.25), main="",
      col=c_dark, border=c_dark_highlight,
-     xlim=c(10, 20), xlab="Baseline", yaxt='n', ylab="")
+     xlim=c(-10, 20), xlab="Baseline", yaxt='n', ylab="")
 ```
 
 Then we can consider the main factor contributions to the overall heterogeneity.
@@ -3123,7 +3280,7 @@ Then we can consider the main factor contributions to the overall heterogeneity.
 ```{r, fig.height=4}
 plot_factor_posteriors <- function(type, title, f) {
   layout(matrix(c(1, 1, 2), nrow=1))
-  
+ 
   par(mar=c(5, 5, 3, 1))
 
   L <- data[paste("N_", type, "_factor_levels", sep="")][[1]][f]
@@ -3142,7 +3299,7 @@ plot_factor_posteriors <- function(type, title, f) {
 
   l <- min(c(-2.25 * mean_tau, cred[1,]))
   u <- max(c(2.25 * mean_tau,  cred[9,]))
-  
+ 
   plot(1, type="n", main=title,
        xlim=c(0.5, L + 0.5), xlab="Level",
        ylim=c(l, u), ylab="Marginal Posterior")
@@ -3186,10 +3343,9 @@ plot_factor_posteriors("inter1", "Interaction 23", 3)
 ```
 
 Finally we can examine the second-order interaction contributions, which are
-largely consistent with zero.  This in particular verifies that even if the 
-deviation in the Interaction 123 posterior retrodictive check were significant
-it would not be due to missing interactions.
-
+largely consistent with zero given the resolution afforded by the observed data.
+This in particular verifies the previous Interaction 123 posterior retrodictive
+check.
 
 ```{r, fig.height=4}
 plot_factor_posteriors("inter2", "Interaction 123", 1)
@@ -3228,7 +3384,7 @@ for (f in 1:data$N_main_factors) {
 
 What we can do, however, is _reconstruct_ the proper heterogeneity in the
 new factor configurations to generate predictions specific to the new
-circumstance.  First we have to build all of the interaction factors for these 
+circumstance.  First we have to build all of the interaction factors for these
 new factor configurations.
 
 ```{r, cache=TRUE, cache.lazy = FALSE, warning=FALSE, message=FALSE}
@@ -4054,7 +4210,7 @@ ub <- max(c(+2.25 * mean_tau, cred[9,]))
 
 par(mar=c(5, 5, 3, 1))
 plot(1, type="n", main="Shipment Heterogenity",
-     xlim=c(0.5, L + 1.5), xlab="", xaxt="n",
+     xlim=c(0.5, L + 0.5), xlab="", xaxt="n",
      ylim=c(lb, ub), ylab="Marginal Posterior")
 
 lines(c(0.5, L + 0.5), c(2 * mean_tau, 2 * mean_tau), col="gray80", lwd=3, lty=2)
@@ -4435,7 +4591,7 @@ util$check_all_diagnostics(fit)
 
 As is the case for any distribution over functions, we have to make a few
 compromises when visualizing the prior pushforward distribution over the success
-probability evolutions.  On the left we plot an ensemble of some of the 
+probability evolutions.  On the left we plot an ensemble of some of the
 evolutions and on the right we plot marginal quantiles that provide a
 quantification of the range of point-wise behaviors.
 
@@ -4477,7 +4633,7 @@ polygon(c(data$fine_t, rev(data$fine_t)), c(cred[4,], rev(cred[6,])),
 lines(data$fine_t, cred[5,], col=c_dark, lwd=2)
 ```
 
-We then continue to incorporating the observational model and fitting the
+We then continue by incorporating the observational model and fitting the
 corresponding posterior distribution.
 
 ```{r}
@@ -4512,13 +4668,13 @@ for (f in 1:3) {
          main=title, col=c_dark, border=c_dark_highlight,
          xlim=c(0, lims[f]), xlab="F Statistic", yaxt='n', ylab="")
     abline(v=F_main_obs[f, c], col="white", lty=1, lw=3)
-    abline(v=F_main_obs[f, c], col="black", lty=1, lw=2)        
+    abline(v=F_main_obs[f, c], col="black", lty=1, lw=2)       
   }
 }
 ```
 
 While we're suspicious of how well this model fits the observed data let's take
-a minute to examine its posterior inferences.  The marginal posterior 
+a minute to examine its posterior inferences.  The marginal posterior
 distribution for both the logit intercept `\alpha` and the baseline strongly
 contract from the prior model.
 
@@ -4996,8 +5152,8 @@ Delightfully that seems to have done the trick.
 util$check_all_diagnostics(fit)
 ```
 
-Now we can investigate the posterior retrodictive behavior.  No significant
-deviations in across the main factor levels for any of the check times.
+Now we can investigate the posterior retrodictive behavior.  We don't see any
+significant deviations across the main factor levels for any of the check times.
 
 ```{r}
 samples <- extract(fit)
@@ -5261,8 +5417,8 @@ In this case study I use "factor model" to refer to models with known level
 assignments, but in some fields the term is also used to refer to models with
 unknown level assignments, such as independent component analysis
 [@Bishop:2006].  Any confusion here can be avoided by explicitly denoting
-whether the factors, and the factor level assignments, are given or have to be
-inferred from data.
+whether the factors, and the factor level assignments, are given or are meant to
+be inferred from data.
 
 The term "multilevel" is often associated with factor models, sometimes to the
 point of being treated as synonyms.  Historically, however, "multilevel"
@@ -5280,15 +5436,15 @@ Another term in the orbit of factor models is "random effect" and
 classical statistics "random effect" denotes factor level parameters that are
 modeled hierarchically while "fixed effect" denotes factor level parameter
 modeled independently.  In other words a "random effect" implies a single factor
-hierarchical model that ignores the residual heterogeneity within the factor
-levels.  Similarly the term "random effects model" denotes models with multiple
-random effects and "mixed effects models" denotes models with some random
-effects and some fixed effects, although neither term indicates _how_ the
-effects are integrated together.  Better is the term "additive model" or more
-precisely "additive mixed effects model" which indicates that multiple random
-effects corresponding to different factors, including main factors and their
-derived interactions, are added together as in the residual expansions of nested
-multifactor model and overlapping multifactor models.  Morevoer the term
+hierarchical model as defined in [Section 1.3](#sec:single_factor_model).
+Similarly the term "random effects model" denotes models with multiple random
+effects and "mixed effects models" denotes models with some random effects and
+some fixed effects, although neither term indicates _how_ the effects are
+integrated together.  Better is the term "additive model" or more precisely
+"additive mixed effects model" which indicates that multiple random effects
+corresponding to different factors, including main factors and their derived
+interactions, are added together as in the residual expansions of nested
+multifactor model and overlapping multifactor models.  Moreover the term
 "additive mixed effects model" almost always implies that the residual expansion
 is used to model the location parameter of some family of probability density
 functions; when the observational model is not specified by a family of normal
@@ -5335,7 +5491,7 @@ factors.  With this approach we can model complex experimental side effects and
 isolate latent phenomena of interest in our inferences, and we can even
 heuristically model the phenomena itself by how it manifests in variation within
 the included factors.  When sufficient care is taken to ensure that the
-the limitations of this modeling technique are understood and investigated, 
+the limitations of this modeling technique are understood and investigated,
 factor models become a powerful addition to our modeling technique toolbox.
 
 By building multifactor models ourselves in Stan we not only facilitate those
@@ -5345,13 +5501,15 @@ this fully armed and operational modeling technique.
 
 # Acknowledgements {-}
 
+I thank Jessica Graves and Charles Margossian for valuable comments.
+
 A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
 Abhinav Katoch, Abhishek Vasu, Adam Bartonicek, Adam Fleischhacker,
 Adam Golinski, Adan, Alan O'Donnell, Alex ANDORRA, Alexander Bartik,
 Alexander Noll, Alfredo Garbuno Iñigo, Allison M. Campbell, Anders Valind,
 Andrea Serafino, Andrew Rouillard, Annie Chen, Anthony Wuersch, Antoine Soubret,
 Arya, asif zubair, Austin Carter, Austin Rochford, Austin Rochford,
-Avraham Adler, Bao Tin Hoang, Ben Matthews, Ben Swallow, Benjamin Phillabaum, 
+Avraham Adler, Bao Tin Hoang, Ben Matthews, Ben Swallow, Benjamin Phillabaum,
 enoit Essiambre, Bo Schwartz Madsen, Brian Hartley, Bryan Yu,
 Brynjolfur Gauti Jónsson, Cameron Smith, Canaan Breiss, Cat Shark,
 Chad Scherrer, Charles Naylor, Chase Dwelle, Chris Jones, Chris Zawora,
@@ -5392,7 +5550,7 @@ Stone Chen, Sus, Susan Holmes, Suyog Chandramouli, Sören Berg, tardisinc,
 Teddy Groves, Teresa Ortiz, Thomas Littrell, Thomas Vladeck, Théo Galy-Fajou,
 Tiago Cabaço, Tim Howes, Tim Radtke, Tobychev , Tom Knowles, Tom McEwen,
 Tommy Naugle, Tuan Nguyen Anh, Tyrel Stokes, Utku Turk, Virginia Webber,
-vittorio trotta, Vladimir Markov, Will Dearden, Will Farr, yolhaj, yureq, Z, 
+vittorio trotta, Vladimir Markov, Will Dearden, Will Farr, yolhaj, yureq, Z,
 Zach A, and ZAKH.
 
 # References {-}
@@ -5402,7 +5560,7 @@ Zach A, and ZAKH.
 # License {-}
 
 A repository containing the material used in this case study is available on
-[GitHub](https://github.com/betanalpha/knitr_case_studies/tree/master/factor_models).
+[GitHub](https://github.com/betanalpha/knitr_case_studies/tree/master/factor_modeling).
 
 The code in this case study is copyrighted by Michael Betancourt and licensed
 under the new BSD (3-clause) license:
