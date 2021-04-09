@@ -1,0 +1,90 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math, decorations.pathreplacing}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{darkteal}{RGB}{29, 79, 79}
+\definecolor{darkolive}{RGB}{97, 123, 45}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.2, thick]
+  
+\draw[white] (-22, -10) rectangle (94, 22);
+
+\node[align=center] at (-13, 12) { Parallel\\Sequences };
+
+\node[align=center] at (9, 17) { Sample 1 };
+\draw[decorate,decoration={brace,amplitude=5pt}] (2, 14) -- (16, 14);
+
+\node at (-3, 12) { Seed 1 };
+
+\foreach \x [count=\n] in {-0.7652753,  0.5532082,  1.4655993, -1.0053407,  0.3907344} {
+  \fill[black] ({3 * \n}, \x / 2 + 12) circle (0.2);  
+}
+
+\node[align=center] at (9 + 30, 17) { Sample 2 };
+\draw[decorate,decoration={brace,amplitude=5pt}] (2 + 30, 14) -- (16 + 30, 14);
+
+\node at (-3 + 30, 12) { Seed 2 };
+
+\foreach \x [count=\n] in {-1.9280710,  1.1094778, -1.3272656,  0.8603705, -1.9228339} {
+  \fill[black] ({3 * (\n + 10) }, \x / 2 + 12) circle (0.2);  
+}
+
+\node[align=center] at (9 + 60, 17) { Sample 3 };
+\draw[decorate,decoration={brace,amplitude=5pt}] (2 + 60, 14) -- (16 + 60, 14);
+
+\node at (-3 + 60, 12) { Seed 3 };
+
+\foreach \x [count=\n] in {-4.02778138, -0.63106303,  0.08444687, -1.38147446, -0.81062203} {
+  \fill[black] ({3 * (\n + 20)}, \x / 2 + 12) circle (0.2);  
+}
+
+\node[align=center] at (-13, 0) { Partitioned\\Serial Sequence };
+
+\node at (-3, 0) { Seed 1 };
+  
+\foreach \x [count=\n] in {0.9494158,  0.1507678, -0.3048048, -2.8635426,  0.7495722,  
+                           0.1215513, -0.1705861, -1.8838696, -1.4042253, -1.4550850, 
+                           -0.9672299,  2.2525815, -1.9434739,  0.8808244,  0.7173805, 
+                           -0.9276827,  0.5257431, -2.4838600,  2.7182654,  3.2108698, 
+                           -0.2379500,  0.6035409, -0.3382850,  1.0259082, 3.4795917, 
+                           2.2764663,  0.2916784, -1.4621727,  3.2662689, -1.2423804} {
+  \fill[black] ({3 * \n}, \x / 2 + 0) circle (0.2);  
+}
+
+\fill[opacity=0.75, white] ({3 * 5.5}, -4) rectangle ({3 * 10.5}, 4);
+\fill[opacity=0.75, white] ({3 * 15.5}, -4) rectangle ({3 * 20.5}, 4);
+\fill[opacity=0.75, white] ({3 * 25.5}, -4) rectangle ({3 * 30.5}, 4);
+
+\draw[decorate,decoration={brace,amplitude=5pt,mirror}] (2, -3) -- (16, -3);
+\node[align=center] at (9, -6) { Sample 1 };
+
+\draw[decorate,decoration={brace,amplitude=5pt,mirror}] (2 + 30, -3) -- (16 + 30, -3);
+\node[align=center] at (9 + 30, -6) { Sample 2 };
+
+\draw[decorate,decoration={brace,amplitude=5pt,mirror}] (2 + 60, -3) -- (16 + 60, -3);
+\node[align=center] at (9 + 60, -6) { Sample 3 };
+
+%\node[dark,align=center] at (24, -4) { Some Possible\\Extensions };
+  
+\end{tikzpicture}
+
+\end{document}  

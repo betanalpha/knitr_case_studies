@@ -1,0 +1,143 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{darkteal}{RGB}{29, 79, 79}
+\definecolor{darkolive}{RGB}{97, 123, 45}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function x(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %  
+    return \xb;
+  };
+  function y(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %   
+    return \yb;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.25, thick]
+  
+\pgfmathsetmacro{\theta}{45}
+\pgfmathsetmacro{\phi}{25}
+  
+\pgfmathsetmacro{\delta}{10}
+
+
+\begin{scope}[shift={(0, 0)}]
+  \draw[white] (-20, -13) rectangle (15, 15);
+
+  \draw [->, >=stealth, line width=1]    ({x(-\delta, 0, -\delta, \theta, \phi)}, {y(-\delta, 0, -\delta, \theta, \phi)})
+                                      -- ({x(1.5 * \delta, 0, -\delta, \theta, \phi)}, {y(1.5 * \delta, 0, -\delta, \theta, \phi)});
+  \node[] at ({x(1.5 * \delta, 0, -\delta, \theta, \phi) + 1}, {y(1.5 * \delta, 0, -\delta, \theta, \phi)}) { $x_{1}$ };
+
+
+  \draw [->, >=stealth, line width=1]    ({x(-\delta, 0,      -\delta, \theta, \phi)}, {y(-\delta, 0,      -\delta, \theta, \phi)})
+                                      -- ({x(-\delta, \delta, -\delta, \theta, \phi)}, {y(-\delta, \delta, -\delta, \theta, \phi)});
+  \node[] at ({x(-\delta, \delta, -\delta, \theta, \phi)}, {y(-\delta, \delta, -\delta, \theta, \phi) + 2}) { $\pi(x_{1}, x_{2})$ };
+  
+
+  \draw [->, >=stealth, line width=1]    ({x(-\delta, 0, -\delta, \theta, \phi)}, {y(-\delta, 0, -\delta, \theta, \phi)})
+                                      -- ({x(-\delta, 0, 1.5 * \delta, \theta, \phi)}, {y(-\delta, 0, 1.5 * \delta, \theta, \phi)});
+  \node[] at ({x(-\delta, 0, 1.5 * \delta, \theta, \phi) + 1}, {y(-\delta, 0, 1.5 * \delta, \theta, \phi) + 1}) { $x_{2}$ };
+  
+  \foreach \y in {0.02, 0.04, ..., 1} {
+  %\foreach \y in {0.01, 0.5, 0.9} {
+    \pgfmathsetmacro{\r}{sqrt(-2 * 10 * ln(\y))}
+    \pgfmathsetmacro{\prop}{100 * \y)};
+    \colorlet{custom}{dark!\prop!white};
+    \fill[custom] ({x(\r * cos(150), \delta * \y, \r * sin(150), \theta, \phi)}, {y(\r * cos(150), \delta * \y, \r * sin(150), \theta, \phi)}) 
+      \foreach \n in {1, ..., 30} { -- ({x(\r * cos(12 * \n + 150), \delta * \y, \r * sin(12 * \n + 150), \delta * \theta, \phi)}, 
+                                        {y(\r * cos(12 * \n + 150), \delta * \y, \r * sin(12 * \n + 150), \delta * \theta, \phi)} ) };
+  }
+
+\end{scope}
+
+\begin{scope}[shift={(0, -28)}]
+  \draw[white] (-20, -14) rectangle (15, 14);
+
+  \foreach \y in {0, 0.01, ..., 10} {
+  %\foreach \y in {0, 1, ..., 10} {
+    \pgfmathsetmacro{\prop}{10 * \y};
+    \colorlet{custom}{darkteal!\prop!white};
+    \draw[custom, line width=2]    ({x(2 * \y - \delta, \y, \delta, \theta, \phi)}, {y(2 * \y - \delta, \y, \delta, \theta, \phi)})
+                                -- ({x(\delta, \y, 2 * \y - \delta, \theta, \phi)}, {y(\delta, \y, 2 * \y - \delta, \theta, \phi)});
+                 
+    \pgfmathsetmacro{\prop}{10 * \y};
+    \colorlet{custom}{darkolive!\prop!white};
+    \draw[custom, line width=2]    ({x(-\delta, -\y, -2 * \y + \delta, \theta, \phi)}, {y(-\delta, -\y, -2 * \y + \delta, \theta, \phi)})
+                                -- ({x(-2 * \y + \delta, -\y, -\delta, \theta, \phi)}, {y(-2 * \y + \delta, -\y, -\delta, \theta, \phi)});
+  }
+
+  \draw [->, >=stealth, line width=1]    ({x(-\delta, 0, -\delta, \theta, \phi)}, {y(-\delta, 0, -\delta, \theta, \phi)})
+                                      -- ({x(1.5 * \delta, 0, -\delta, \theta, \phi)}, {y(1.5 * \delta, 0, -\delta, \theta, \phi)});
+  \node[] at ({x(1.5 * \delta, 0, -\delta, \theta, \phi) + 1}, {y(1.5 * \delta, 0, -\delta, \theta, \phi)}) { $x_{1}$ };
+
+
+  \draw [->, >=stealth, line width=1]    ({x(-\delta, -\delta, -\delta, \theta, \phi)}, {y(-\delta, -\delta, -\delta, \theta, \phi)})
+                                      -- ({x(-\delta, +\delta, -\delta, \theta, \phi)}, {y(-\delta, +\delta, -\delta, \theta, \phi)});
+  \node[] at ({x(-\delta, \delta, -\delta, \theta, \phi)}, {y(-\delta, \delta, -\delta, \theta, \phi) + 2}) { $y = \left< f \right>_{1:2}(x_{1}, x_{2})$ };
+  
+
+  \draw [->, >=stealth, line width=1]    ({x(-\delta, 0, -\delta, \theta, \phi)}, {y(-\delta, 0, -\delta, \theta, \phi)})
+                                      -- ({x(-\delta, 0, 1.5 * \delta, \theta, \phi)}, {y(-\delta, 0, 1.5 * \delta, \theta, \phi)});
+  \node[] at ({x(-\delta, 0, 1.5 * \delta, \theta, \phi) + 1}, {y(-\delta, 0, 1.5 * \delta, \theta, \phi) + 1}) { $x_{2}$ };
+  
+  %\draw[dark]    ({x(-\delta, 0, -\delta, \theta, \phi)}, {y(-\delta, 0, -\delta, \theta, \phi)})
+  %            -- ({x(\delta, 0, -\delta, \theta, \phi)}, {y(\delta, 0, -\delta, \theta, \phi)})
+  %            -- ({x(\delta, 0, \delta, \theta, \phi)}, {y(\delta, 0, \delta, \theta, \phi)})
+  %            -- ({x(-\delta, 0, \delta, \theta, \phi)}, {y(-\delta, 0, \delta, \theta, \phi)})
+  %            -- cycle;
+  
+\end{scope}
+
+\begin{scope}[shift={(38, -28)}]
+  \draw[white] (-18, -14) rectangle (17, 14);
+
+  \draw[->, >=stealth, line width=1] (-\delta, { -cos(\phi) * \delta }) -- (-\delta, {cos(\phi) * \delta});
+  \node[] at (-12, 0) { $y$ };
+  
+  \draw[->, >=stealth, line width=1] (-\delta, { -cos(\phi) * \delta }) -- (\delta, {-cos(\phi) * \delta});
+  \node[] at (0, { -cos(\phi) * \delta - 2 }) { $(\left< f \right>_{1:2})_{*} \pi(y)$ };
+  
+   \fill[domain={-cos(\phi) * \delta}:{cos(\phi) * \delta}, smooth, samples=150, line width=1, variable=\y, color=dark] 
+    plot ({1.5 * \delta * exp(-0.5 * \y * \y / 5) - \delta},{\y});
+  
+\end{scope}
+  
+\end{tikzpicture}
+
+\end{document}  

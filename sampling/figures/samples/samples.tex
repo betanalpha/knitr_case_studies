@@ -1,0 +1,165 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math, decorations.pathreplacing}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{darkteal}{RGB}{29, 79, 79}
+\definecolor{darkolive}{RGB}{97, 123, 45}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.25, thick]
+  
+\begin{scope}[shift={(0, 0)}]
+  
+  \draw[white] (0, -7) rectangle (39, 10);
+ 
+  \node at (19.5, 8) { $\sigma_{1}$ };
+ 
+  \foreach \n in {1, 2, ..., 9} {
+    \node at ({3 * \n}, 0) { $x_{\n}$ };
+  }
+  
+  \foreach \x [count=\n] in {-1.2423804, -0.7652753,  0.5532082,  1.4655993, -1.0053407,  
+                             0.3907344, -1.9280710,  1.1094778, -1.3272656} {
+    \fill[dark] ({3 * \n}, \x + 4) circle (0.2);  
+  }
+  
+  \foreach \n in {4, 5, 6, 7, 8, 9} {
+    \fill[opacity=0.75, white] ({3 * \n - 1.5}, -2) rectangle +(3, 9);
+  }
+  
+  \node at (30, 0) { $\ldots$ };
+  \node[dark] at (30, 4) { $\ldots$ };
+
+  \node[opacity=0.25] at (33, 0) { $x_{N}$ };
+  \fill[dark, opacity=0.25] (33, -1.92283385 + 4) circle (0.2);  
+
+  \node at (36, 0) { $\ldots$ };
+  \node[dark] at (36, 4) { $\ldots$ };
+
+  \node at (18, -4) { $x_{\sigma_{1}(1)} = x_{1}, \, x_{\sigma_{1}(2)} = x_{2}, \, x_{\sigma_{1}(3)} = x_{3} $ };
+
+\end{scope}
+
+
+\begin{scope}[shift={(42, 0)}]
+  
+  \draw[white] (0, -7) rectangle (39, 10);
+  
+  \node at (19.5, 8) { $\sigma_{2}$ };
+ 
+  \foreach \n in {1, 2, ..., 9} {
+    \node at ({3 * \n}, 0) { $x_{\n}$ };
+  }
+
+  \foreach \x [count=\n] in {-1.2423804, -0.7652753,  0.5532082,  1.4655993, -1.0053407,  
+                             0.3907344, -1.9280710,  1.1094778, -1.3272656} {
+    \fill[dark] ({3 * \n}, \x + 4) circle (0.2);  
+  }
+  
+  \foreach \n in {2, 3, 5, 6, 8, 9} {
+    \fill[opacity=0.75, white] ({3 * \n - 1.5}, -2) rectangle +(3, 9);
+  }
+  
+  \node at (30, 0) { $\ldots$ };
+  \node[dark] at (30, 4) { $\ldots$ };
+
+  \node[opacity=0.25] at (33, 0) { $x_{N}$ };
+  \fill[dark, opacity=0.25] (33, -1.92283385 + 4) circle (0.2);  
+
+  \node at (36, 0) { $\ldots$ };
+  \node[dark] at (36, 4) { $\ldots$ };
+
+  \node at (18, -4) { $x_{\sigma_{2}(1)} = x_{1}, \, x_{\sigma_{2}(2)} = x_{4}, \, x_{\sigma_{2}(3)} = x_{7} $ };
+
+\end{scope}
+
+
+\begin{scope}[shift={(0, -19)}]
+  
+  \draw[white] (0, -7) rectangle (39, 10);
+  
+  \node at (19.5, 8) { $\sigma_{3}$ };
+ 
+  \foreach \n in {1, 2, ..., 9} {
+    \node at ({3 * \n}, 0) { $x_{\n}$ };
+  }
+  
+  \foreach \x [count=\n] in {-1.2423804, -0.7652753,  0.5532082,  1.4655993, -1.0053407,  
+                             0.3907344, -1.9280710,  1.1094778, -1.3272656} {
+    \fill[dark] ({3 * \n}, \x + 4) circle (0.2);  
+  }
+  
+  \foreach \n in {1, 2, 4, 5, 6, 8} {
+    \fill[opacity=0.75, white] ({3 * \n - 1.5}, -2) rectangle +(3, 9);
+  }
+  
+  \node at (30, 0) { $\ldots$ };
+  \node[dark] at (30, 4) { $\ldots$ };
+
+  \node[opacity=0.25] at (33, 0) { $x_{N}$ };
+  \fill[dark, opacity=0.25] (33, -1.92283385 + 4) circle (0.2);  
+
+  \node at (36, 0) { $\ldots$ };
+  \node[dark] at (36, 4) { $\ldots$ };
+
+  \node at (18, -4) { $x_{\sigma_{3}(1)} = x_{3}, \, x_{\sigma_{3}(2)} = x_{9}, \, x_{\sigma_{3}(3)} = x_{7} $ };
+
+\end{scope}
+
+
+\begin{scope}[shift={(42, -19)}]
+  
+  \draw[white] (0, -7) rectangle (39, 10);
+  
+  \node at (19.5, 8) { $\sigma_{4}$ };
+ 
+  \foreach \n in {1, 2, ..., 9} {
+    \node at ({3 * \n}, 0) { $x_{\n}$ };
+  }
+
+  \foreach \x [count=\n] in {-1.2423804, -0.7652753,  0.5532082,  1.4655993, -1.0053407,  
+                             0.3907344, -1.9280710,  1.1094778, -1.3272656} {
+    \fill[dark] ({3 * \n}, \x + 4) circle (0.2);  
+  }
+  
+  \foreach \n in {4, 5, 6, 7, 8, 9} {
+    \fill[opacity=0.75, white] ({3 * \n - 1.5}, -2) rectangle +(3, 9);
+  }
+  
+  \node at (30, 0) { $\ldots$ };
+  \node[dark] at (30, 4) { $\ldots$ };
+
+  \node[opacity=0.25] at (33, 0) { $x_{N}$ };
+  \fill[dark, opacity=0.25] (33, -1.92283385 + 4) circle (0.2);  
+
+  \node at (36, 0) { $\ldots$ };
+  \node[dark] at (36, 4) { $\ldots$ };
+
+  \node at (18, -4) { $x_{\sigma_{4}(1)} = x_{3}, \, x_{\sigma_{4}(2)} = x_{2}, \, x_{\sigma_{4}(3)} = x_{1} $ };
+
+\end{scope}
+
+
+
+  
+\end{tikzpicture}
+
+\end{document}  

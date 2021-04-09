@@ -1,0 +1,114 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{darkteal}{RGB}{29, 79, 79}
+\definecolor{darkolive}{RGB}{97, 123, 45}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function normal(\x) {
+    return exp(-0.5 * \x * \x);
+  };
+  function laplace(\x) {
+    return exp(-sqrt(\x * \x));
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.25, thick]
+  
+\begin{scope}[shift={(0, 0)}]
+
+  \draw[white] (-19, -4) rectangle (12, 22);
+
+  \draw[gray60, dashed, line width=1.5] (0, 0)  -- (0, 14);
+  \node[black] at (0, 15) { $\mathbb{E}_{\pi}[f]$ };
+
+  \draw[domain={-10:9.8}, smooth, samples=150, line width=1, variable=\x, color=dark] 
+    plot ({\x},{10 * laplace(0.75 * (\x - 2)) + 5 * normal(0.9 * (\x + 0)) + 5 * normal(0.7 * (\x + 3))});
+
+  \draw [->, >=stealth, line width=1] (-10, 0) -- (10, 0);
+  \node[] at (0, -2) { $y$ };
+
+  \draw [->, >=stealth, line width=1] (-10, 0) -- (-10, 15);
+  \node[] at (-14.5, 7.5) { $(\left<f\right>_{1:N})_{*} \pi(y)$ };
+
+  \node[] at (0, 20) { $N \approx 0$ };
+  
+\end{scope}
+
+\begin{scope}[shift={(33, 0)}]
+
+  \draw[white] (-19, -4) rectangle (12, 22);
+
+  \draw[gray60, dashed, line width=1.5] (0, 0)  -- (0, 14);
+  \node[black] at (0, 15) { $\mathbb{E}_{\pi}[f]$ };
+
+  \foreach \n in {1, 2, ..., 5} {
+    \pgfmathsetmacro{\prop}{20 * \n};
+    \colorlet{custom}{dark!\prop!white};
+    
+    \pgfmathsetmacro{\sigma}{3 / \n};
+    \draw[domain={-10:9.8}, smooth, samples=150, line width=1, variable=\x, color=custom] 
+      plot ({\x},{6 * normal(\x / \sigma) / \sigma});
+  }
+  
+  \draw [->, >=stealth, line width=1] (-10, 0) -- (10, 0);
+  \node[] at (0, -2) { $y$ };
+
+  \draw [->, >=stealth, line width=1] (-10, 0) -- (-10, 15);
+  \node[] at (-14.5, 7.5) { $(\left<f\right>_{1:N})_{*} \pi(y)$ };
+
+  \node[] at (0, 20) { $N \gg 0$ };
+  \node[] at (0, 18) { Central Limit Theorem Regime };
+  
+\end{scope}
+
+\begin{scope}[shift={(66, 0)}]
+
+  \draw[white] (-19, -4) rectangle (12, 22);
+
+  \draw[gray60, dashed, line width=1.5] (0, 0)  -- (0, 14);
+  \node[black] at (0, 15) { $\mathbb{E}_{\pi}[f]$ };
+
+  \foreach \n in {1, 2, ..., 5} {
+    \pgfmathsetmacro{\prop}{20 * \n};
+    \colorlet{custom}{dark!\prop!white};
+    
+    \pgfmathsetmacro{\sigma}{0.1 / \n};
+    \draw[domain={-1:1}, smooth, samples=150, line width=1, variable=\x, color=custom] 
+      plot ({\x},{14.5 * normal(\x / \sigma)});
+  }
+  
+  \draw [->, >=stealth, line width=1] (-10, 0) -- (10, 0);
+  \node[] at (0, -2) { $y$ };
+
+  \draw [->, >=stealth, line width=1] (-10, 0) -- (-10, 15);
+  \node[] at (-14.5, 7.5) { $(\left<f\right>_{1:N})_{*} \pi(y)$ };
+
+  \node[] at (0, 20) { $N \rightarrow \infty$ };
+  \node[] at (0, 18) { Asymptotic Limit };
+  
+\end{scope}
+  
+\end{tikzpicture}
+
+\end{document}  
