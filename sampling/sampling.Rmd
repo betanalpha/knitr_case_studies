@@ -1356,13 +1356,14 @@ visualizations.  For example if we partition the output space $Y$ into $K$
 disjoint intervals,
 $$
 \begin{align*}
-B_{1} &= (\beta_{0}, \beta_{1}),
+B_{1} &= I(\beta_{0}, \beta_{1}),
 \\
-B_{2} &= (\beta_{1}, \beta_{2}),
+B_{2} &= I(\beta_{1}, \beta_{2}),
 \\
-&\ldots,
+&\ldots
 \\
-B_{K}(\beta_{K - 1}, \beta_{K}),
+B_{K} &= I(\beta_{K - 1}, \beta_{K}),
+\end{align*}
 $$
 then we can estimate and visualize the probability in each,
 $$
@@ -1382,6 +1383,7 @@ P_{k}
 \\
 &\approx
 \frac{1}{N} \sum_{n = 1}^{N} \mathbb{I}_{B_{k}}(f(x_{n}))
+\\
 &\approx
 \frac{ N[B_{k}]  }{N}.
 \end{align*}
@@ -1499,7 +1501,7 @@ An alternative way to characterize the shape of the pushforward distribution
 instead of moments or cumulants are _quantiles_.  A $p$-quantile is defined
 implicitly as the point $y_{p} \in Y$ satisfying
 $$
-p = \mathbb{P}_{\pi} [ I(y_{\text{\min}, y_{p}) ].
+p = \mathbb{P}_{\pi} [ I(y_{\text{min}}, y_{p}) ].
 $$
 
 <center>
@@ -1544,7 +1546,7 @@ least
 $$
 N \gt \frac{1 - p}{\alpha^{2} \cdot p}
 $$
-with $alpha$ relatively small.  Personally I try to keep $\alpha = 0.05$ or
+with $\alpha$ relatively small.  Personally I try to keep $\alpha = 0.05$ or
 smaller, in which case estimating even $y_{0.05}$ requires a sample size of
 almost 10,000!  More extreme quantiles like $y_{0.01}$ and $y_{0.99}$ require
 even larger samples and consequently their estimates are often unreliable.
@@ -1636,9 +1638,10 @@ entirely, including its common use in ridge plots and violin plots.  Histograms
 and empirical cumulative distribution functions together provide nearly
 equivalent information with much clearer limitations and error quantifications.
 
-## Let's Go To Monte Carlo
+# Let's Go To Monte Carlo
 
-Let's put all of this into practice with some explicit demonstrations.
+Let's put sampling and the Monte Carlo method into practice with some explicit
+demonstrations.
 
 To facilitate the computation of Monte Carlo estimators we first need to define
 a Welford accumulator that accurately computes empirical means and variances of
@@ -1671,7 +1674,7 @@ In this section we'll consider first one dimensional and then multidimensional
 target distributions, each of which demonstrates some of the important features
 of the Monte Carlo method.
 
-### One Dimensional Target Distribution
+## One-Dimensional Normal Target
 
 We start with a one-dimensional ambient space $X = \mathbb{R}$ and a target
 distribution specified by a normal density function.
@@ -1687,7 +1690,7 @@ N <- 1000
 sample <- rnorm(N, mu, sigma)
 ```
 
-#### Identify Function
+### Identify Function
 
 Because the ambient space is one-dimensional we can explore the target
 distribution using Monte Carlo methods.  All we have to do is consider the
@@ -1845,7 +1848,7 @@ upper_inter <- sapply(idx, function (n) min(p[n] + 2 * delta[n], 1))
 
 plot(1, type="n", main="",
      xlim=c(-6, 6), xlab="X",
-     ylim=c(0, 0.15), ylab="Estimated Probabilities")
+     ylim=c(0, 0.15), ylab="Estimated Bin Probabilities")
 
 polygon(c(x, rev(x)), c(lower_inter, rev(upper_inter)),
         col = c_light, border = NA)
@@ -2017,7 +2020,7 @@ for reference or some sense of estimator error we have no way to determine
 whether the excess corresponds to a real feature or is simply an artifact of the
 kernel density estimator.
 
-#### Logistic Function
+### Logistic Function
 
 Now let's consider a more sophisticated function that warps the target
 distribution.  The logistic function compresses the entire real line into the
@@ -2098,7 +2101,7 @@ upper_inter <- sapply(idx, function (n) min(p[n] + 2 * delta[n], 1))
 
 plot(1, type="n", main="",
      xlim=c(0, 1), xlab="Y",
-     ylim=c(0, 0.15), ylab="Estimated Probabilities")
+     ylim=c(0, 0.15), ylab="Estimated Bin Probabilities")
 
 polygon(c(x, rev(x)), c(lower_inter, rev(upper_inter)),
         col = c_light, border = NA)
@@ -2232,7 +2235,564 @@ distribution while we're here.
 quantile(pushforward_sample, probs=c(0.5))
 ```
 
-### Multidimensional Target Distribution
+## One-Dimensional Student's t Target
+
+In the previous section we somewhat carelessly assumed that the Monte Carlo
+central limit theorem was valid for all the functions we considered.  For a
+target distribution specified by a normal density function this is not an
+unreasonable assumption, but in general this carelessness can get us into
+trouble.
+
+To see how the Monte Carlo method can go awry let's consider a target
+distribution specified by a Student's t probability density function,
+$$
+\pi(x ; \nu) =
+\frac{1}{ \sqrt{\pi \, \nu } }
+\frac{\Gamma(\frac{\nu + 1}{2})}
+{ \Gamma(\frac{\nu}{2}) }
+\left(1 + \frac{1}{\nu} \left( x \right)^{2}
+\right)^{- \frac{\nu + 1}{2}}.
+$$
+When $\nu > 1$ the expectation value of the identity function, or the mean,
+is equal to 0, but for $\nu \le 1$ the expectation value is ill-defined in the
+sense that _all_ real values satisfy the definition of the mean.  Similarly when
+$\nu > 2$ the expectation value of the square of the identify function is finite
+and variance is equal to $\nu / (\nu - 2)$.  For $\nu \le 2$, however, both
+quantities are infinite.
+
+Poor behavior in both the mean and the variance of a function of interest
+obstructs the corresponding Monte Carlo central limit theorem, although in
+different ways.  Let's explore what happens to Monte Carlo estimators for
+different values of $\nu$.
+
+### Ill-defined Mean, Infinite Variance
+
+When $\nu = 1$ neither the mean nor the variance is well-defined.
+
+```{r}
+set.seed(9958284)
+
+nu <- 1
+
+N <- 1000
+sample <- rt(N, nu)
+```
+
+That said the Monte Carlo estimator of the identify function returns what seems
+to be a reasonable result.
+
+```{r}
+id <- function(x) {
+  return(x)
+}
+
+pushforward_sample = sapply(sample, function(x) identity(x))
+estimate <- compute_mc_stats(pushforward_sample)
+data.frame("MC_Est" = estimate[1], "MCSE" = estimate[2])
+```
+
+What happens, however, if we investigate the convergence of this estimator as
+the sample size grows?
+
+```{r}
+iter <- 2:N
+mc_stats <- sapply(iter, function(n) compute_mc_stats(pushforward_sample[0:n]))
+
+plot(1, type="n", main="",
+     xlab="Sample Size", xlim=c(0, max(iter)),
+     ylab="Monte Carlo Estimator",
+     ylim=c(min(mc_stats[1,] - 3 * mc_stats[2,]), max(mc_stats[1,] + 3 * mc_stats[2,])))
+
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 3 * mc_stats[2,],
+          rev(mc_stats[1,] + 3 * mc_stats[2,])),
+        col = c_light_highlight, border = NA)
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 2 * mc_stats[2,],
+          rev(mc_stats[1,] + 2 * mc_stats[2,])),
+        col = c_mid, border = NA)
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 1 * mc_stats[2,],
+          rev(mc_stats[1,] + 1 * mc_stats[2,])),
+        col = c_mid_highlight, border = NA)
+lines(iter, mc_stats[1,], col=c_dark, lwd=2)
+```
+
+That's a bit unpleasant.  Instead of consistently shrinking around some single
+value the estimator seems to be occasionally jerked around by extreme values.
+
+Maybe this is just an artifact of $N$ being too small.  Let's try a larger
+sample.
+
+```{r}
+new_sample <- rt(9000, nu)
+extended_sample <- c(sample, new_sample)
+pushforward_sample = sapply(extended_sample, function(x) identity(x))
+
+iter <- 2:10000
+mc_stats <- sapply(iter, function(n) compute_mc_stats(pushforward_sample[0:n]))
+
+plot(1, type="n", main="",
+     xlab="Sample Size", xlim=c(0, max(iter)),
+     ylab="Monte Carlo Estimator",
+     ylim=c(min(mc_stats[1,] - 3 * mc_stats[2,]), max(mc_stats[1,] + 3 * mc_stats[2,])))
+
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 3 * mc_stats[2,],
+          rev(mc_stats[1,] + 3 * mc_stats[2,])),
+        col = c_light_highlight, border = NA)
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 2 * mc_stats[2,],
+          rev(mc_stats[1,] + 2 * mc_stats[2,])),
+        col = c_mid, border = NA)
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 1 * mc_stats[2,],
+          rev(mc_stats[1,] + 1 * mc_stats[2,])),
+        col = c_mid_highlight, border = NA)
+lines(iter, mc_stats[1,], col=c_dark, lwd=2)
+```
+
+The sudden, large jumps persist even to large sample sizes, preventing the Monte
+Carlo estimator from settling into a nice convergence.
+
+That said we shouldn't be expecting a nice convergence because there is nothing
+nice to converge towards!  Because the mean is ill-defined the pushforward
+distribution of the ensemble average doesn't converge to a single point but
+rather tries to expand to cover the entire real line.  We can confirm that a
+Monte Carlo central limit theorem doesn't hold by looking at the behavior of
+many Monte Carlo estimators: if the central limit theorem holds then the
+ensemble of standardized estimators,
+$$
+\frac{ \left< f \right>_{1:N}(x_{\sigma_{s}(1)}, \ldots, x_{\sigma_{s}(N)}) }
+{ \sqrt{ \mathbb{V}_{\pi}[f] / N } },
+$$
+should be consistent with a standard normal density function centered around
+the exact expectation value.
+
+```{r}
+N <- 1000
+R <- 10000
+mc_delta <- rep(0, R)
+
+for (r in 1:R) {
+  ensemble_sample <- rt(N, nu)
+  pushforward_sample = sapply(ensemble_sample, function(x) identity(x))
+  estimate <- compute_mc_stats(pushforward_sample)
+  mc_delta[r] <- (estimate[1] - 0) / estimate[2]
+}
+
+
+bins <- seq(-6, 6, 0.25)
+
+counts <- hist(mc_delta, breaks=bins, plot=FALSE)$counts
+p <- counts / R
+delta <- sqrt(p * (1 - p) / R)
+
+B <- length(p)
+idx <- rep(1:B, each=2)
+x <- sapply(1:length(idx), function(b) if(b %% 2 == 1) bins[idx[b]] else bins[idx[b] + 1])
+lower_inter <- sapply(idx, function (n) max(p[n] - 2 * delta[n], 0))
+upper_inter <- sapply(idx, function (n) min(p[n] + 2 * delta[n], 1))
+
+p <- p / 0.25
+lower_inter <- lower_inter / 0.25
+upper_inter <- upper_inter / 0.25
+
+plot(1, type="n", main="Standardized Monte Carlo Estimator",
+     xlim=c(-6, 6), xlab="X",
+     ylim=c(0, 0.5), ylab="Estimated Bin Probability\nDivided By Bin Width")
+
+polygon(c(x, rev(x)), c(lower_inter, rev(upper_inter)),
+        col = c_light, border = NA)
+lines(x, p[idx], col=c_dark, lwd=2)
+```
+
+We'd have to be really desperate to consider this normal behavior!  Although
+we can always _construct_ Monte Carlo estimators they will _reliably inform_
+properties of the target distribution only if the Monte Carlo central limit
+theorem holds for each function of interest.
+
+Monte Carlo estimation of the expectation of the identify function is
+misbehaving, but what about the expectation values of other functions?  No
+matter the target distribution probabilities are always well-defined and hence
+the estimation of indicator functions will always be well-defined.  More
+formally the mean and variance of any indicator function is always finite.
+
+For example consider the same interval that we did in the previous section.
+
+```{r}
+indicator <- function(x) {
+  return(ifelse(-1 < x & x < 0, 1, 0))
+}
+```
+
+The exact probability allocated to this interval is given by the Student-t
+cumulative distribution function,
+
+```{r}
+pt(0,nu) - pt(-1, nu)
+```
+
+Welcomingly the Monte Carlo estimator returns a consistent result.
+
+```{r}
+pushforward_sample = sapply(sample, function(x) indicator(x))
+estimate <- compute_mc_stats(pushforward_sample)
+data.frame("MC_Est" = estimate[1], "MCSE" = estimate[2])
+```
+
+### Well-Defined Mean But Infinite Variance
+
+Now let's consider $\nu = 1.5$ in which case the mean becomes well-defined
+and equal to $0$.  The variance, however, is still infinitely large.
+
+```{r}
+nu <- 1.5
+
+N <- 1000
+sample <- rt(N, nu)
+```
+
+The Monte Carlo estimate of the mean appears to be consistent with the exact
+value.
+
+```{r}
+id <- function(x) {
+  return(x)
+}
+
+pushforward_sample = sapply(sample, function(x) identity(x))
+estimate <- compute_mc_stats(pushforward_sample)
+data.frame("MC_Est" = estimate[1], "MCSE" = estimate[2])
+```
+
+Looking at the convergence, however, we see a persistent bias in the estimator
+and jumps in the estimated Monte Carlo standard error.
+
+```{r}
+iter <- 2:N
+mc_stats <- sapply(iter, function(n) compute_mc_stats(pushforward_sample[0:n]))
+
+plot(1, type="n", main="",
+     xlab="Sample Size", xlim=c(0, max(iter)),
+     ylab="Monte Carlo Estimator",
+     ylim=c(min(mc_stats[1,] - 3 * mc_stats[2,]), max(mc_stats[1,] + 3 * mc_stats[2,])))
+
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 3 * mc_stats[2,],
+          rev(mc_stats[1,] + 3 * mc_stats[2,])),
+        col = c_light_highlight, border = NA)
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 2 * mc_stats[2,],
+          rev(mc_stats[1,] + 2 * mc_stats[2,])),
+        col = c_mid, border = NA)
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 1 * mc_stats[2,],
+          rev(mc_stats[1,] + 1 * mc_stats[2,])),
+        col = c_mid_highlight, border = NA)
+lines(iter, mc_stats[1,], col=c_dark, lwd=2)
+abline(h=0, col="grey", lty="dashed", lw=2)
+```
+
+Misbehavior manifesting mostly in the Monte Carlo error isn't surprising given
+that the error implied by the Monte Carlo central limit theorem relies on a
+finite variance which does not hold in this case.  We can investigate the
+failure of the central limit theorem more carefully by looking at many values
+of the standardized Monte Carlo residual,
+$$
+\frac{ \left< f \right>_{1:N}(x_{\sigma_{s}(1)}, \ldots, x_{\sigma_{s}(N)}) - 0 }
+{ \sqrt{ \mathbb{V}_{\pi}[f] / N } },
+$$
+which would be consistent with a standard normal density function centered
+around zero.
+
+```{r}
+R <- 10000
+mc_delta <- rep(0, R)
+
+for (r in 1:R) {
+  sample <- rt(N, nu)
+  pushforward_sample = sapply(sample, function(x) identity(x))
+  estimate <- compute_mc_stats(pushforward_sample)
+  mc_delta[r] <- (estimate[1] - 0) / estimate[2]
+}
+
+bins <- seq(-6, 6, 0.25)
+
+counts <- hist(mc_delta, breaks=bins, plot=FALSE)$counts
+p <- counts / R
+delta <- sqrt(p * (1 - p) / R)
+
+B <- length(p)
+idx <- rep(1:B, each=2)
+x <- sapply(1:length(idx), function(b) if(b %% 2 == 1) bins[idx[b]] else bins[idx[b] + 1])
+lower_inter <- sapply(idx, function (n) max(p[n] - 2 * delta[n], 0))
+upper_inter <- sapply(idx, function (n) min(p[n] + 2 * delta[n], 1))
+
+p <- p / 0.25
+lower_inter <- lower_inter / 0.25
+upper_inter <- upper_inter / 0.25
+
+plot(1, type="n", main="Standardized Monte Carlo Residual",
+     xlim=c(-6, 6), xlab="X",
+     ylim=c(0, 0.5), ylab="Estimated Bin Probability\nDivided By Bin Width")
+
+polygon(c(x, rev(x)), c(lower_inter, rev(upper_inter)),
+        col = c_light, border = NA)
+lines(x, p[idx], col=c_dark, lwd=2)
+
+x <- seq(-6, 6, 0.1)
+lines(x, dnorm(x, 0, 1), col="white", lwd=2.5)
+lines(x, dnorm(x, 0, 1), col="black", lwd=2)
+```
+
+Although the empirical behavior of the Monte Carlo estimator concentrates in a
+single mode around zero as expected, the shape is much flatter than what we
+would expect from the central limit theorem, with an excess of estimators with
+larger error than expected in the "shoulders".
+
+In this case the Monte Carlo error itself is reasonably well-behaved but the
+error quantification afforded by the Monte Carlo central limit theorem is
+unreliable.  For the Monte Carlo method to be useful in practice where we don't
+have exact results for comparison, however, we need to be able to depend on both
+the estimated expectation value and the estimated error.
+
+### Well-Defined Mean and Variance
+
+Finally let's consider $\nu = 3$ where the mean is well-defined and equal to
+$0$ and the variance is well-defined and equal to $3$.
+
+```{r}
+set.seed(9958284)
+
+nu <- 3
+
+N <- 1000
+sample <- rt(N, nu)
+```
+
+The Monte Carlo estimator of the mean is consistent with the exact value.
+
+```{r}
+id <- function(x) {
+  return(x)
+}
+
+pushforward_sample = sapply(sample, function(x) identity(x))
+estimate <- compute_mc_stats(pushforward_sample)
+data.frame("MC_Est" = estimate[1], "MCSE" = estimate[2])
+```
+
+Moreover the estimator converges towards the exact value as expected from the
+Monte Carlo central limit theorem.
+
+```{r}
+iter <- 2:N
+mc_stats <- sapply(iter, function(n) compute_mc_stats(pushforward_sample[0:n]))
+
+plot(1, type="n", main="",
+     xlab="Sample Size", xlim=c(0, max(iter)),
+     ylab="Monte Carlo Estimator",
+     ylim=c(min(mc_stats[1,] - 3 * mc_stats[2,]), max(mc_stats[1,] + 3 * mc_stats[2,])))
+
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 3 * mc_stats[2,],
+          rev(mc_stats[1,] + 3 * mc_stats[2,])),
+        col = c_light_highlight, border = NA)
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 2 * mc_stats[2,],
+          rev(mc_stats[1,] + 2 * mc_stats[2,])),
+        col = c_mid, border = NA)
+polygon(c(iter, rev(iter)),
+        c(mc_stats[1,] - 1 * mc_stats[2,],
+          rev(mc_stats[1,] + 1 * mc_stats[2,])),
+        col = c_mid_highlight, border = NA)
+lines(iter, mc_stats[1,], col=c_dark, lwd=2)
+```
+
+Because we know the exact expectation value we can empirically confirm the
+existence of a central limit theorem for the identify function by looking at
+the ensemble behavior of the estimator.
+
+```{r}
+N <- 1000
+R <- 10000
+mc_delta <- rep(0, R)
+
+for (r in 1:R) {
+  sample <- rt(N, nu)
+  pushforward_sample = sapply(sample, function(x) identity(x))
+  estimate <- compute_mc_stats(pushforward_sample)
+  mc_delta[r] <- (estimate[1] - 0) / estimate[2]
+}
+
+bins <- seq(-6, 6, 0.25)
+
+counts <- hist(mc_delta, breaks=bins, plot=FALSE)$counts
+p <- counts / R
+delta <- sqrt(p * (1 - p) / R)
+
+B <- length(p)
+idx <- rep(1:B, each=2)
+x <- sapply(1:length(idx), function(b) if(b %% 2 == 1) bins[idx[b]] else bins[idx[b] + 1])
+lower_inter <- sapply(idx, function (n) max(p[n] - 2 * delta[n], 0))
+upper_inter <- sapply(idx, function (n) min(p[n] + 2 * delta[n], 1))
+
+p <- p / 0.25
+lower_inter <- lower_inter / 0.25
+upper_inter <- upper_inter / 0.25
+
+plot(1, type="n", main="Standardized Monte Carlo Residual",
+     xlim=c(-6, 6), xlab="X",
+     ylim=c(0, 0.5), ylab="Estimated Bin Probability\nDivided By Bin Width")
+
+polygon(c(x, rev(x)), c(lower_inter, rev(upper_inter)),
+        col = c_light, border = NA)
+lines(x, p[idx], col=c_dark, lwd=2)
+
+x <- seq(-6, 6, 0.1)
+lines(x, dnorm(x, 0, 1), col="white", lwd=2.5)
+lines(x, dnorm(x, 0, 1), col="black", lwd=2)
+```
+
+### Spur of the Moment
+
+In practice we don't know if a Monte Carlo central limit theorem holds.
+Moreover if we're estimating an expectation value then we probably don't know
+its exact value, which prevents us from diagnosing any break downs of the
+central limit theorem empirically using ensemble behavior.  Even if we could
+this approach would be quite computationally expensive.
+
+One way to probe for any discourteous behavior of the exact mean and variance
+of the pushforward distribution along a function of interest, and hence the
+validity fo the Monte Carlo central limit theorem for that function, is to
+estimate _tail_ behavior.  The tails of a one-dimensional probability
+distribution are the regions above and below the central bulk where the
+distribution concentrates; if too much probability is allocated too deep into
+either tail then we should be skeptical of the central limit theorem.
+
+That said quantifying the tail behavior of a distribution from only a finite
+sample is easier said than done.  One heuristic approach relies on a result
+from @Pickands:1975 who showed that tail behavior of one-dimensional
+distributions is well-approximated by a generalized Pareto density function.
+Fitting a generalized Pareto model to extreme samples should then provide some
+information about ill-mannered tail behavior.  In particular the exponent
+parameter of the generalized Pareto model, denoted $k$, is sensitive to
+moment-destroying behavior; the larger $k$ the more problematic the tail
+behavior.
+
+As with density estimation trying to find generalized Pareto density functions
+compatible with a finite sample is an inference problem, but for heuristic
+diagnostic purposes a fast point estimation method can still be useful.
+Following @VehtariEtAl:2015a we fit $k$ from tail samples using the estimation
+method from @ZhangEtAl:2009 to give the estimate $\hat{k}$.
+
+```{r}
+khat <- function(x) {
+  N <- length(x)
+  x <- sort(x)
+
+  if (x[1] <= 0) {
+    print("x must be positive!")
+    return (0)
+  }
+
+  q <- x[floor(0.25 * N + 0.5)]
+
+  M <- 20 + floor(sqrt(N))
+
+  b_hat_vec <- rep(0, M)
+  log_w_vec <- rep(0, M)
+
+  for (m in 1:M) {
+    b_hat_vec[m] <- 1 / x[N] + (1 - sqrt(M / (m - 0.5))) / (3 * q)
+    k_hat <- - mean( log (1 - b_hat_vec[m] * x) )
+    log_w_vec[m] <- length(x) * ( log(b_hat_vec[m] / k_hat) + k_hat - 1)
+  }
+
+  max_log_w <- max(log_w_vec)
+  b_hat <- sum(b_hat_vec * exp(log_w_vec - max_log_w)) / sum(exp(log_w_vec - max_log_w))
+
+  mean( log (1 - b_hat * x) )
+}
+```
+
+To generate the samples in each tail we split the sample by those points with
+values below and above the median.  In cases where the median equals either
+the minimum or the maximum value, which happens for example when we're looking
+at the values of an indicator function while estimating a probability, we can't
+really define tails properly and instead return a default value of $0$.
+
+```{r}
+tail_khats <- function(x) {
+  x_center <- median(x)
+  x_left <- abs(x[x <= x_center] - x_center)
+  x_right <- x[x > x_center] - x_center
+
+  if (x_center == min(x) | x_center == max(x))
+    return (c(0, 0))
+  else
+    return (c(khat(x_left), khat(x_right)))
+}
+```
+
+How does this diagnostic perform on our previous examples?  When neither the
+mean nor the variance are well-defined we see left and right tail $\hat{k}$ for
+the identify function around $0.7$.
+
+```{r}
+N <- 1000
+
+nu <- 1
+sample <- rt(N, nu)
+pushforward_sample = sapply(sample, function(x) identity(x))
+tail_khats(pushforward_sample)
+```
+
+The tail $\hat{k}$ for the indicator function we employed defaults to zero
+because we can't even separate out the bulk from the tails with only two
+possible values!
+
+```{r}
+pushforward_sample = sapply(sample, function(x) indicator(x))
+tail_khats(pushforward_sample)
+```
+
+Increasing $\nu$ so that the mean becomes well-defined but the variance remains
+problematic we see the tail $\hat{k}$ reduce to around $0.4$.
+
+```{r}
+nu <- 1.5
+sample <- rt(N, nu)
+pushforward_sample = sapply(sample, function(x) identity(x))
+tail_khats(pushforward_sample)
+```
+
+Once both the mean and the variance become well-defined, and the Monte Carlo
+central limit theorem kicks in, the estimated $\hat{k}$ plummets to values
+close to $0$.
+
+```{r}
+nu <- 3
+sample <- rt(N, nu)
+pushforward_sample = sapply(sample, function(x) identity(x))
+tail_khats(pushforward_sample)
+```
+
+Setting a hard threshold for $\hat{k}$ that separates trustful and suspicious
+behavior is challenging due to the approximate nature of the estimation.  If
+the threshold is too small then we might worry too much even if the Monte Carlo
+method is behaving fine and if the threshold is too large then we might ignore
+misbehavior estimators.  Moreover when the sample size is too small the
+estimated $\hat{k}$ can be highly variable and any fixed threshold is prone to
+misclassification.
+
+Erring on the side of caution requiring $\hat{k} \le 0.25$ or even lower is a
+sensible threshold for an empirical diagnostic, especially when complemented
+with domain expertise about the target distribution and the function whose
+expectations are of interest.
+
+## Multidimensional Normal Target
 
 One of the key features of the Monte Carlo method is that it is equally useful
 for higher-dimensional target distributions as lower-dimensional target
@@ -2259,7 +2819,7 @@ We can't analyze the full dimensionality of this distribution at once, but we
 can analyze lower-dimensional summary functions that characterize relevant
 behavior.
 
-#### Component Projection Function
+### Component Projection Function
 
 First let's consider a projection function that maps a point in the product
 space onto the 5th component.
@@ -2373,14 +2933,14 @@ polygon(c(x, rev(x)), c(lower_inter, rev(upper_inter)),
 lines(x, ecdf_probs, col=c_dark, lwd=2)
 ```
 
-When moments or quantiles are not all that well-behaved quantiles are often more
+When moments or cumulants are not all that well-behaved quantiles are often more
 robust characterizations of the component distribution.
 
 ```{r}
 quantile(pushforward_sample, probs=c(0.5))
 ```
 
-#### Radial Function
+### Radial Function
 
 Often the most interesting features of a multidimensional probability
 distribution manifest in functions that combine multiple component spaces
@@ -2601,55 +3161,57 @@ Still good old Monte Carlo will always be there for us when we need it.
 
 # Acknowledgements {-}
 
-A very special thanks to everyone supporting me on Patreon: Aapeli Nevala, 
-Abhinav Katoch, Adam Bartonicek, Adam Fleischhacker, Adam Golinski, Adan, 
-Alan O'Donnell, Alessandro Varacca, Alex ANDORRA, Alexander Bartik, 
-Alexander Noll, Alfredo Garbuno Iñigo, Allison M. Campbell, Anders Valind, 
-Andrea Serafino, Andrew Rouillard, Angus Williams, Annie Chen, Anthony Wuersch, 
+I thank Hyunji Moon for helpful comments.
+
+A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
+Abhinav Katoch, Adam Bartonicek, Adam Fleischhacker, Adam Golinski, Adan,
+Alan O'Donnell, Alessandro Varacca, Alex ANDORRA, Alexander Bartik,
+Alexander Noll, Alfredo Garbuno Iñigo, Allison M. Campbell, Anders Valind,
+Andrea Serafino, Andrew Rouillard, Angus Williams, Annie Chen, Anthony Wuersch,
 Antoine Soubret, Ara Winter, Arya, asif zubair, Austin Carter, Austin Rochford,
-Austin Rochford, Avraham Adler, Bao Tin Hoang, Ben Matthews, Ben Swallow, 
-Benjamin Phillabaum, Benoit Essiambre, Bo Schwartz Madsen, Brian Hartley, 
-Bryan Yu, Brynjolfur Gauti Jónsson, Cameron Smith, Canaan Breiss, Cat Shark, 
-Chad Scherrer, Charles Naylor, Chase Dwelle, Chris Jones, Chris Zawora, 
-Christopher Mehrvarzi, Chuck Carlson, Cole Monnahan, Colin Carroll, 
-Colin McAuliffe, D, Damien Mannion, dan mackinlay, dan muck, Dan W Joyce, 
-Daniel Hocking, Daniel Rowe, Darshan Pandit, David Burdelski, David Christle, 
-David Humeau, David Pascall, Derek G Miller, dilsher singh dhillon, Diogo Melo, 
-Donna Perry, Doug Rivers, Dylan Murphy, Ed Berry, Ed Cashin, Eduardo, 
-Elizaveta Semenova, Eric Novik, Erik Banek, Ero Carrera, Ethan Goan, Evan Cater, 
-Fabio Zottele, Federico Carrone, Felipe González, Fergus Chadwick, Filipe Dias, 
-Finn Lindgren, Florian Wellmann, Francesco Corona, Geoff Rollins, George Ho, 
-Georgia S, Granville Matheson, Gustaf Rydevik, Hamed Bastan-Hagh, 
-Hany Abdulsamad, Haonan Zhu, Hugo Botha, Huib Meulenbelt, Hyunji Moon, Ian , 
-Ignacio Vera, Ilaria Prosdocimi, Isaac S, J, J Michael Burgess, 
-Jair Andrade Ortiz, James Doss-Gollin, James McInerney, James Wade, JamesU, 
-Janek Berger, Jason Martin, Jeff Dotson, Jeff Helzner, Jeffrey Arnold, 
-Jeffrey Burnett, Jeffrey Erlich, Jessica Graves, Joel Kronander, John Flournoy, 
-John Zito, Jon , Jonathan Sedar, Jonathan St-onge, Jonathon Vallejo, 
-Joran Jongerling, Jose Pereira, Josh Weinstock, Joshua Duncan, Joshua Griffith, 
-Joshua Mayer, Josué Mendoza, Justin Bois, Karim Naguib, Karim Osman, Kejia Shi, 
-Kevin Thompson, Kádár András, lizzie , Luiz Carvalho, Luiz Pessoa, Marc Dotson, 
-Marc Trunjer Kusk Nielsen, Marek Kwiatkowski, Mario Becerra, Mark Donoghoe, 
-Mark Worrall, Markus P., Martin Modrák, Matthew Hawthorne, Matthew Kay, 
-Matthew Quick, Matthew T Stern, Maurits van der Meer, Maxim Kesin, Melissa Wong, 
-Merlin Noel Heidemanns, Michael Cao, Michael Colaresi, Michael DeWitt, 
-Michael Dillon, Michael Lerner, Michael Redman, Michael Tracy, Mick Cooney, 
-Miguel de la Varga, Mike Lawrence, MisterMentat , Mohammed Charrout, 
-Márton Vaitkus, Name, Nathaniel Burbank, Nerf-Shepherd , Nicholas Cowie, 
-Nicholas Erskine, Nicholas Ursa, Nick S, Nicolas Frisby, Noah Guzman, 
-Octavio Medina, Ole Rogeberg, Oliver Crook, Olivier Ma, Omri Har Shemesh, 
-Pablo León Villagrá, Patrick Boehnke, Pau Pereira Batlle, Paul Oreto, 
-Peter Smits, Pieter van den Berg , Pintaius Pedilici, ptr, Ravin Kumar, 
-Reece Willoughby, Reed Harder, Riccardo Fusaroli, Robert Frost, Robert Goldman, 
-Robert kohn, Robert Mitchell V, Robin Taylor, Rong Lu, Roofwalker, 
-Ryan Grossman, Rémi , Scott Block, Scott Treloar, Sean Talts, Serena, Seth Axen, 
-Shira , sid phani, Simon Dirmeier, Simon Duane, Simon Lilburn, Srivatsa Srinath, 
-Stephanie Fitzgerald, Stephen Lienhard, Stephen Oates, Steve Bertolani, Stijn , 
-Stone Chen, Sus, Susan Holmes, Suyog Chandramouli, Sören Berg, Tao Ye, tardisinc, 
-Teddy Groves, Teresa Ortiz, Thomas Littrell, Thomas Vladeck, Théo Galy-Fajou, 
-Tiago Cabaço, Tim Howes, Tim Radtke, Tobychev , Tom Knowles, Tom McEwen, 
-Tommy Naugle, Tristan Mahr, Tuan Nguyen Anh, Tyrel Stokes, Utku Turk, 
-vittorio trotta, Vladimir Markov, Will Dearden, Will Farr, Will Tudor-Evans, 
+Austin Rochford, Avraham Adler, Bao Tin Hoang, Ben Matthews, Ben Swallow,
+Benjamin Phillabaum, Benoit Essiambre, Bo Schwartz Madsen, Brian Hartley,
+Bryan Yu, Brynjolfur Gauti Jónsson, Cameron Smith, Canaan Breiss, Cat Shark,
+Chad Scherrer, Charles Naylor, Chase Dwelle, Chris Jones, Chris Zawora,
+Christopher Mehrvarzi, Chuck Carlson, Cole Monnahan, Colin Carroll,
+Colin McAuliffe, D, Damien Mannion, dan mackinlay, dan muck, Dan W Joyce,
+Daniel Hocking, Daniel Rowe, Darshan Pandit, David Burdelski, David Christle,
+David Humeau, David Pascall, Derek G Miller, dilsher singh dhillon, Diogo Melo,
+Donna Perry, Doug Rivers, Dylan Murphy, Ed Berry, Ed Cashin, Eduardo,
+Elizaveta Semenova, Eric Novik, Erik Banek, Ero Carrera, Ethan Goan, Evan Cater,
+Fabio Zottele, Federico Carrone, Felipe González, Fergus Chadwick, Filipe Dias,
+Finn Lindgren, Florian Wellmann, Francesco Corona, Geoff Rollins, George Ho,
+Georgia S, Granville Matheson, Gustaf Rydevik, Hamed Bastan-Hagh,
+Hany Abdulsamad, Haonan Zhu, Hugo Botha, Huib Meulenbelt, Hyunji Moon, Ian ,
+Ignacio Vera, Ilaria Prosdocimi, Isaac S, J, J Michael Burgess,
+Jair Andrade Ortiz, James Doss-Gollin, James McInerney, James Wade, JamesU,
+Janek Berger, Jason Martin, Jeff Dotson, Jeff Helzner, Jeffrey Arnold,
+Jeffrey Burnett, Jeffrey Erlich, Jessica Graves, Joel Kronander, John Flournoy,
+John Zito, Jon , Jonathan Sedar, Jonathan St-onge, Jonathon Vallejo,
+Joran Jongerling, Jose Pereira, Josh Weinstock, Joshua Duncan, Joshua Griffith,
+Joshua Mayer, Josué Mendoza, Justin Bois, Karim Naguib, Karim Osman, Kejia Shi,
+Kevin Thompson, Kádár András, lizzie , Luiz Carvalho, Luiz Pessoa, Marc Dotson,
+Marc Trunjer Kusk Nielsen, Marek Kwiatkowski, Mario Becerra, Mark Donoghoe,
+Mark Worrall, Markus P., Martin Modrák, Matthew Hawthorne, Matthew Kay,
+Matthew Quick, Matthew T Stern, Maurits van der Meer, Maxim Kesin, Melissa Wong,
+Merlin Noel Heidemanns, Michael Cao, Michael Colaresi, Michael DeWitt,
+Michael Dillon, Michael Lerner, Michael Redman, Michael Tracy, Mick Cooney,
+Miguel de la Varga, Mike Lawrence, MisterMentat , Mohammed Charrout,
+Márton Vaitkus, Name, Nathaniel Burbank, Nerf-Shepherd , Nicholas Cowie,
+Nicholas Erskine, Nicholas Ursa, Nick S, Nicolas Frisby, Noah Guzman,
+Octavio Medina, Ole Rogeberg, Oliver Crook, Olivier Ma, Omri Har Shemesh,
+Pablo León Villagrá, Patrick Boehnke, Pau Pereira Batlle, Paul Oreto,
+Peter Smits, Pieter van den Berg , Pintaius Pedilici, ptr, Ravin Kumar,
+Reece Willoughby, Reed Harder, Riccardo Fusaroli, Robert Frost, Robert Goldman,
+Robert kohn, Robert Mitchell V, Robin Taylor, Rong Lu, Roofwalker,
+Ryan Grossman, Rémi , Scott Block, Scott Treloar, Sean Talts, Serena, Seth Axen,
+Shira , sid phani, Simon Dirmeier, Simon Duane, Simon Lilburn, Srivatsa Srinath,
+Stephanie Fitzgerald, Stephen Lienhard, Stephen Oates, Steve Bertolani, Stijn ,
+Stone Chen, Sus, Susan Holmes, Suyog Chandramouli, Sören Berg, Tao Ye, tardisinc,
+Teddy Groves, Teresa Ortiz, Thomas Littrell, Thomas Vladeck, Théo Galy-Fajou,
+Tiago Cabaço, Tim Howes, Tim Radtke, Tobychev , Tom Knowles, Tom McEwen,
+Tommy Naugle, Tristan Mahr, Tuan Nguyen Anh, Tyrel Stokes, Utku Turk,
+vittorio trotta, Vladimir Markov, Will Dearden, Will Farr, Will Tudor-Evans,
 yolhaj, yureq, Z, Zach A, ZAKH, and Zwelithini Tunyiswa.
 
 # References {-}
