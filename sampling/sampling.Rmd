@@ -161,7 +161,7 @@ $$
 \end{align*}
 $$
 at least when that base expectation $\mathbb{E}_{\pi}[ f ]$ is well-defined.
-In other words in expectation of the ensemble average is consistent with the
+In other words an expectation of the ensemble average is consistent with the
 expectation of the initial function.
 
 To really understand the behavior of the ensemble average, however, we have to
@@ -246,17 +246,12 @@ _strong law of large numbers_.
 
 ### The Central Limit Theorem
 
-For large but finite $N$ the higher-order cumulants of the ensemble average
-don't vanish exactly, but they are still overshadowed by the mean.  When $N$ is
-reasonably large the pushforward distribution is approximately characterized by
-only its mean and variance.  More formally the pushforward probability density
-function is well-approximated by a normal probability density function
-$$
-(\left< f \right>_{1:N})_{*} \pi_{1:N}(y) =
-\text{normal} \left( y \mid \mathbb{E}_{\pi}[f], \sqrt{ \frac{\mathbb{V}_{\pi}[f]}{N} } \right)
-+ \mathcal{O}(N^{-2}),
-$$
-with
+The law of large numbers determines to what the pushforward of the ensemble 
+distribution along an ensemble average function will converge, but we can also 
+characterize _how_ it will converge asymptotically.  If the pushforward mean and 
+variance are well-defined then the pushforward probability density function 
+will converge to a normal probability density function after an appropriate 
+shift and scaling,
 $$
 \lim_{N \rightarrow \infty}
 \frac{ (\left< f \right>_{1:N})_{*} \pi_{1:N}(y) - \mathbb{E}_{\pi}[f] }
@@ -264,14 +259,27 @@ $$
 =
 \text{normal} ( y \mid 0, 1 ).
 $$
-This intermediate approximation is known as a _central limit theorem_.
+This asymptotic behavior is known as a _central limit theorem_.
 
-As the ensemble size $N$ grows the variance narrows and this normal
-approximation converges to the limiting Dirac distribution.  In other words
-the law of large numbers determines to _what_ the pushforward distribution along
-the ensemble average will converge, but the central limit theorem quantifies
-_how_ it converges.  The how is far more useful in practical circumstances where
-infinity is just out of reach.
+If the third cumulant of the pushforward distribution is also well-behaved then
+the central limit theorem also approximately holds preasymptotically.  For large 
+but finite $N$ we have
+$$
+(\left< f \right>_{1:N})_{*} \pi_{1:N}(y) =
+\text{normal} \left( y \mid \mathbb{E}_{\pi}[f], \sqrt{ \frac{\mathbb{V}_{\pi}[f]}{N} } \right)
++ \mathcal{O}(N^{-\frac{3}{2}}).
+$$
+This preasymptotic characterization of the pushforward distribution is far more 
+useful than the asymptotic characterizations in practical circumstances where 
+infinity is _just_ out of reach.
+
+In this case we can characterize the convergence of the pushforward distribution
+for all ensemble sizes $N$.  Initially the pushforward distribution is 
+characterized by all of the pushforward cumulants, but as $N$ grows the mean 
+and variance quickly being to dominate and the pushforward probability density 
+function becomes approximately normal.  As $N$ continues to grow the variance 
+narrows and this normal approximation converges to the limiting Dirac 
+distribution.
 
 <center>
 <br>
@@ -333,8 +341,9 @@ $$
 then that ensemble element recovers the exact same value to which the pushforward
 distribution along the corresponding ensemble average converges!  If this
 limiting behavior holds for _all_ well-behaved functions
-$f : X \rightarrow \mathbb{R}$ then the element defines a sequence that is
-_asymptotically consistent_ with the base probability distribution.
+$f : X \rightarrow \mathbb{R}$ then this ensemble element encodes the exact same 
+information as $\pi$!  We will refer to these sequences as 
+_asymptotically consistent_ with $\pi$.
 
 <center>
 <br>
@@ -423,7 +432,8 @@ any selection of $N$ points from an asymptotically consistent sequence as a
 _sample_ of size $N$.
 
 If the infinite population contains the same information as $\pi$ then we might
-hope that a sample will contain enough information to _approximate_ $\pi$.
+hope that a finite sample will contain enough information to _approximate_ 
+$\pi$.
 Unfortunately this is only the case for certain very special sequences.
 
 For a fixed sample size $N$ there are a countably infinite number of possible
@@ -868,10 +878,10 @@ $$
 Likewise the inverse cumulative distribution function, also known as the
 _quantile function_,
 $$
-q(y) = \Pi^{-1}(y),
+q(p) = \Pi^{-1}(p),
 $$
-maps the uniform distribution over the unit real interval $\upsilon$ back to the
-target distribution $\pi$,
+pushes forward the uniform distribution over the unit real interval $\upsilon$ 
+back to the target distribution $\pi$,
 $$
 q_{*} \upsilon = \pi.
 $$
@@ -1030,12 +1040,12 @@ properties will be compatible with each other.
 Because we can recover any well-defined expectation value as an ensemble average
 over any asymptotically consistent sequence, these sequences contain exactly the
 same information as the corresponding probability distribution.
-Preasymptotically consistent sequences allow us not only approximate expectation
-values with ensemble averages over only finite samples but also quantify the
-error of that approximation with the pushforward distribution along the ensemble
-average function.  The _Monte Carlo method_ appeals to the central limit theorem
-to approximate that pushforward distribution and, consequently, this error
-quantification.
+Preasymptotically consistent sequences allow us to not only approximate 
+expectation values with ensemble averages over only finite samples but also 
+quantify the error of that approximation with the pushforward distribution along 
+the ensemble average function.  The _Monte Carlo method_ appeals to the central 
+limit theorem to approximate that pushforward distribution and, consequently, 
+this error quantification.
 
 This approach provides a general way to estimate the expectation values of any
 probability distribution for which we can generate pseudo-random numbers.  In
@@ -1057,19 +1067,13 @@ $(\left< f \right>_{N})_{*} \pi_{1:N}$.
 Although $\pi_{1:N}$ is straightforward to construct in practice the pushforward
 distribution $(\left< f \right>_{N})_{*} \pi_{1:N}$ is much more challenging.
 Fortunately if $N$ is large enough then we can appeal to the central limit
-theorem,
-$$
-\frac{ (\left< f \right>_{1:N})_{*} \pi_{1:N}(y) - \mathbb{E}_{\pi}[f] }
-{ \sqrt{ \mathbb{V}_{\pi}[f] / N } }
-+ \mathcal{O}(N^{-2}) = \text{normal}(0, 1).
-$$
-For any fixed $N$ we can rearrange this to give the approximate probability
-density function for the pushforward distribution,
+theorem: for any fixed $N$ the probability density function for the pushforward 
+distribution is approimately normal,
 $$
 (\left< f \right>_{1:N})_{*} \pi_{1:N}(y)
 =
 \text{normal} \left( y \mid \mathbb{E}_{\pi}[f], \sqrt{ \frac{\mathbb{V}_{\pi}[f]}{N} } \right)
-+ \mathcal{O}(N^{-2}).
++ \mathcal{O}(N^{-\frac{3}{2}}).
 $$
 When those higher-order terms are negligible, which typically requires only
 $N \approx 10$ or so, we can quantify the variation in the possible ensemble
@@ -1107,19 +1111,20 @@ The Monte Carlo estimator can also be interpreted as the sample mean of the
 corresponding function values,
 $$
 \begin{align*}
-\hat{\mu}[f](x_{1}, \ldots, x_{N})
-&=
 \left< f \right>_{1:N}(x_{1}, \ldots, x_{N})
+&=
 \\
 &=
-\frac{1}{N} \sum_{n = 1}^{N} f(x_{n}),
+\frac{1}{N} \sum_{n = 1}^{N} f(x_{n})
+\\
+&= \hat{\mu}[f](x_{1}, \ldots, x_{N}),
 \end{align*}
 $$
 with the estimated Monte Carlo standard error proportional to the sample
 standard deviation of those values,
 $$
 \begin{align*}
-\hat{\sigma}[f](x_{1}, \ldots, x_{N})
+\widehat{\text{MC-SE}[f]} (x_{1}, \ldots, x_{N})
 &=
 \sqrt{ \frac{\hat{V}[f] (x_{1}, \ldots, x_{N}) }{N} }
 \\
@@ -1132,15 +1137,16 @@ $$
 The standard error gives the absolute error, but when the exact expectation
 value is small the _relative_ error,
 $$
-\frac{ \hat{\sigma}[f]  }{ \hat{\mu}[f]  },
+\frac{ \widehat{\text{MC-SE}[f]}  }{ \hat{\mu}[f]  },
 $$
 is often more relevant.  A key feature of the Monte Carlo method is that because
 we know how the sample size affects the estimation precision we can determine
-how large of a sample we need to achieve a given error.  For example if we want
-a relative error of at most $\alpha$ then we need a sample size of at least
+how large of a sample we need to achieve a given error.  For example if in a 
+given application we need the relative error to be at most $\alpha$ then we 
+need a sample size of at least
 $$
 \begin{align*}
-\alpha &\ge \frac{ \hat{\sigma}[f]  }{ \hat{\mu}[f]  }
+\alpha &\ge \frac{ \widehat{\text{MC-SE}[f]} }{ \hat{\mu}[f]  }
 \\
 \alpha &\ge \sqrt{ \frac{\hat{V}[f]}{N \cdot \hat{\mu}[f]^{2} } }
 \\
@@ -1157,7 +1163,7 @@ proceeds in four steps.
 2. Evaluate the sample mean, $\hat{\mu}[f](x_{1}, \ldots, x_{N})$.
 3. Evaluate the sample standard deviation, $\hat{\sigma}[f](x_{1}, \ldots, x_{N})$.
 4. Return the Monte Carlo estimator $\hat{\mu}[f](x_{1}, \ldots, x_{N})$ and
-standard error $\hat{\sigma}[f](x_{1}, \ldots, x_{N}) / \sqrt{N}$.
+estimated standard error $\hat{\sigma}[f](x_{1}, \ldots, x_{N}) / \sqrt{N}$.
 
 The evaluations in Steps 2 and 3 can be accomplished in various ways, but the
 most efficient method utilizes _Welford accumulators_ [@Welford:1962] to compute
@@ -1582,7 +1588,7 @@ $$
 \end{align*}
 $$
 In order to estimate the numerator we would need an infinitely large sample size
-so that those infinitesimally narrow bins would could be occupied!  Moreover
+so that those infinitesimally narrow bins would would be occupied!  Moreover
 the limit here depends on how $\delta y$ shrinks to zero which depends on
 exactly how we parameterize $Y$.
 
@@ -1760,7 +1766,7 @@ data.frame("MC_Est" = estimate[1], "MCSE" = estimate[2])
 ```
 
 Again we're within two estimated Monte Carlo standard errors of the exact
-variance, $\sigma = 1.25$.
+variance, $\sigma^{2} = 1.5625$.
 
 In practice we won't know the expected value and instead we have to use our
 estimated mean.
@@ -2859,7 +2865,8 @@ estimate <- compute_mc_stats(pushforward_sample)
 data.frame("MC_Est" = estimate[1], "MCSE" = estimate[2])
 ```
 
-Once again we have consistency with the exact value, in this case $\sigma = 1$.
+Once again we have consistency with the exact value, in this case 
+$\sigma^{2} = 1$.
 
 To demonstrate probability estimation consider the interval
 $I(-2, 2) \subset \mathbb{R}$.  To estimate this probability with Monte Carlo
@@ -3076,7 +3083,7 @@ consistent sequences that explore a target expectation faster than the
 preasymptotically consistent sequences used by Monte Carlo [@Lemieux:2009].
 
 Quasi-random numbers are sequences designed to fill the ambient space more
-uniformly than random numbers such that ensemble averages over _contiguous_
+uniformly than random numbers such that ensemble averages over contiguous
 subsequences will converge to target expectation values faster than Monte Carlo
 estimators using samples of the same size.  Proving this accelerated convergence
 requires a more sophisticated theoretical analysis than what we used to motivate
@@ -3161,7 +3168,7 @@ Still good old Monte Carlo will always be there for us when we need it.
 
 # Acknowledgements {-}
 
-I thank Hyunji Moon for helpful comments.
+I thank Hyunji Moon and Charles Margossian for helpful comments.
 
 A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
 Abhinav Katoch, Adam Bartonicek, Adam Fleischhacker, Adam Golinski, Adan,
