@@ -1,0 +1,70 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{darkteal}{RGB}{29, 79, 79}
+\definecolor{darkolive}{RGB}{97, 123, 45}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function normal(\x) {
+    return exp(-0.5 * \x * \x);
+  };
+  function laplace(\x) {
+    return exp(-sqrt(\x * \x));
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.25, thick]
+  
+\begin{scope}[shift={(0, 0)}]
+
+  \draw[white] (-12, -4) rectangle (12, 17);
+
+  \draw[mid, dashed] (-3.3, 0) -- (-3.3, 6.5);
+  \node[mid, align=center] at (-3.3, 7) { $-\tau_{2}$ };
+  
+  \draw[mid, dashed] (-0.5, 0) -- (-0.5, 13.5);
+  \node[mid, align=center] at (-1.5, 14) { $-\tau_{1}$ };
+  
+  \draw[mid, dashed] (0, 0) -- (0, 14.5);
+  \node[mid, align=center] at (0.25, 15.25) { $0$ };
+  
+  \draw[mid, dashed] (0.5, 0) -- (0.5, 13.5);
+  \node[mid, align=center] at (1.5, 14) { $+\tau_{1}$ };
+  
+  \draw[mid, dashed] (3.3, 0) -- (3.3, 6.5);
+  \node[mid, align=center] at (3.3, 7) { $+\tau_{2}$ };
+
+  \draw[domain={-9:9}, smooth, samples=150, line width=1, variable=\x, color=dark] 
+    plot ({\x},{12 * normal(2 * \x)});
+    
+  \draw[domain={-9.9:9.9}, smooth, samples=150, line width=1, variable=\x, color=light] 
+    plot ({\x},{(14.5 / 3.16) * normal(0.3 * \x)});
+  
+  \draw [<->, >=stealth, line width=1] (-10, 0) -- (10, 0);
+  \node[] at (0, -2) { $\theta_{k}$ };
+  
+\end{scope}
+  
+\end{tikzpicture}
+
+\end{document}  

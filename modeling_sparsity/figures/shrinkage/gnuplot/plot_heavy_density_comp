@@ -1,0 +1,41 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "heavy_density_comp.eps"
+
+set datafile separator ','
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-50:50]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange [0:3]
+
+set arrow from -1, 0 to -1, 8 nohead lt 1 lw 2 lc rgb "$light"
+set arrow from 0, 0 to 0, 8 nohead lt 1 lw 2 lc rgb "$light"
+set arrow from 1, 0 to 1, 8 nohead lt 1 lw 2 lc rgb "$light"
+
+plot  \
+1 w l lt 1 lw 3 lc rgb "$light" notitle, \
+"../prior_density_comps.csv" u 1:(\$6 / \$5) w l lt 1 lw 3 lc rgb "$dark" notitle
+

@@ -1,0 +1,50 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+priors=("normal_mixture" "laplace" "cauchy")
+prior_idxs=(3 5 7)
+
+i=0
+while [ $i -lt 3 ]; do
+
+  let post_idx=${prior_idxs[$i]}+1
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "${priors[$i]}_outer.eps"
+
+set datafile separator ','
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-5:125]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange [0:0.6]
+
+plot  \
+"../outer_density_comps.csv" u 1:${prior_idxs[$i]} w l lt 1 lw 2 lc rgb "$dark" notitle, \
+"../outer_density_comps.csv" u 1:2 w l lt 1 lw 2 lc rgb "$mid" notitle, \
+"../outer_density_comps.csv" u 1:$post_idx w l lt 1 lw 2 lc rgb "$light" notitle
+
+END
+
+  let ++i
+done

@@ -1,0 +1,83 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray60}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.45, thick]
+
+\begin{scope}[shift={(0, 0)}]
+  \draw[white] (-8, -7) rectangle (8, 9);
+    
+  \begin{scope}
+    \clip (-7, -7) rectangle (7, 6);
+        \node at (0, 0) {\includegraphics[width=4.5cm]{normal_wide.eps}};
+  \end{scope}
+  
+  \node[dark] at (-2, -1) { Prior };
+  \node[mid] at (3.5, -3) { Likelihood };
+  \node[light] at (0, 2.75) { Posterior };
+  
+  \node[align=center] at (0, 7.5) { Wide Likelihood Function };
+  
+  \draw [<->, >=stealth, line width=1] (-5 - 0.025, -5) -- +(10, 0);
+  \node[] at (0, -6) { $\theta_{k}$ };
+\end{scope}
+
+\begin{scope}[shift={(18, 0)}]
+  \draw[white] (-8, -7) rectangle (8, 9);
+    
+  \begin{scope}
+    \clip (-7, -7) rectangle (7, 6);
+        \node at (0, 0) {\includegraphics[width=4.5cm]{normal_narrow_small.eps}};
+  \end{scope}
+  
+  \node[dark] at (-2, -1) { Prior };
+  \node[mid] at (3, -1) { Likelihood };
+  \node[light] at (0, 5.25) { Posterior };
+  
+  \node[align=center] at (0, 7.5) { Narrow Likelihood Function\\Concentrating On Small Values };
+  
+  \draw [<->, >=stealth, line width=1] (-5 - 0.025, -5) -- +(10, 0);
+  \node[] at (0, -6) { $\theta_{k}$ };
+\end{scope}
+
+\begin{scope}[shift={(36, 0)}]
+  \draw[white] (-8, -7) rectangle (8, 9);
+    
+\begin{scope}
+    \clip (-7, -7) rectangle (7, 6);
+        \node at (0, 0) {\includegraphics[width=4.5cm]{normal_narrow_large.eps}};
+  \end{scope}
+  
+  \node[dark] at (-2, -1) { Prior };
+  \node[mid] at (6, -1) { Likelihood };
+  \node[light] at (1.75, 5.25) { Posterior };
+  
+  \node[align=center] at (0, 7.5) { Narrow Likelihood Function\\Concentrating On Large Values };
+  
+  \draw [<->, >=stealth, line width=1] (-5 - 0.025, -5) -- +(10, 0);
+  \node[] at (0, -6) { $\theta_{k}$ };
+\end{scope}
+
+\end{tikzpicture}
+
+\end{document}  

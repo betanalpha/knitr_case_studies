@@ -1,0 +1,60 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{darkteal}{RGB}{29, 79, 79}
+\definecolor{darkolive}{RGB}{97, 123, 45}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function normal(\x) {
+    return exp(-0.5 * \x * \x);
+  };
+  function laplace(\x) {
+    return exp(-sqrt(\x * \x));
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.25, thick]
+  
+\begin{scope}[shift={(0, 0)}]
+
+  \draw[white] (-12, -4) rectangle (12, 16);
+  
+  \draw[mid, dashed] (0, 0) -- (0, 13);
+  \node[mid, align=center] at (0.2, 14) { $0$ };
+  
+  \foreach \tau in {0.617206, 3.199458, 2.217758, 1.322655, 1.658522} {
+    \pgfmathsetmacro{\prop}{25 * \tau};
+    \colorlet{custom}{dark!\prop!white};
+    
+    \draw[domain={-10:9.8}, smooth, samples=150, line width=1, variable=\x, color=custom] 
+      plot ({\x},{7 * normal(\x / \tau) / \tau});
+  }
+    
+  \draw [<->, >=stealth, line width=1] (-10, 0) -- (10, 0);
+  \node[] at (0, -2) { $\theta_{k}$ };
+  
+\end{scope}
+  
+\end{tikzpicture}
+
+\end{document}  

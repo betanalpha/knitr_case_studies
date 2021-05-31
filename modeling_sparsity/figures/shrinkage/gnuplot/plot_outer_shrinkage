@@ -1,0 +1,74 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "normal_mixture_outer_mean_shrinkage.eps"
+
+set datafile separator ','
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set arrow from 1, 0 to 1, 8 nohead lt 1 lw 2 lc rgb "$light"
+set arrow from 10, 0 to 10, 8 nohead lt 1 lw 2 lc rgb "$light"
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[0:200]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange [0:1.35]
+
+plot  \
+1 w l lt 1 lw 2 lc rgb "$light" notitle, \
+"../outer_shrinkage.csv" u 1:(\$4 / \$2) every ::2 w l lt 1 lw 2 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "normal_mixture_outer_sd_shrinkage.eps"
+
+set datafile separator ','
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set arrow from 1, 0 to 1, 8 nohead lt 1 lw 2 lc rgb "$light"
+set arrow from 10, 0 to 10, 8 nohead lt 1 lw 2 lc rgb "$light"
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[0:200]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange [0:1.35]
+
+plot  \
+1 w l lt 1 lw 2 lc rgb "$light" notitle, \
+"../outer_shrinkage.csv" u 1:(\$5 / \$3)  w l lt 1 lw 2 lc rgb "$dark" notitle
+
+END

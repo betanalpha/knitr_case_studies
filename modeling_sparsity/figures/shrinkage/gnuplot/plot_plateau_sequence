@@ -1,0 +1,95 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "plateau_prior.eps"
+
+set datafile separator ','
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-15:15]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange [0:0.4]
+
+plot  \
+"../density_comps.csv" u 1:9 w l lt 1 lw 2 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "plateau_likelihood.eps"
+
+set datafile separator ','
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-15:15]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange [0:0.4]
+
+plot  \
+"../density_comps.csv" u 1:2 w l lt 1 lw 2 lc rgb "$dark" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "plateau_posterior.eps"
+
+set datafile separator ','
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-15:15]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange [0:0.4]
+
+plot  \
+"../density_comps.csv" u 1:10 w l lt 1 lw 2 lc rgb "$dark" notitle
+
+END
