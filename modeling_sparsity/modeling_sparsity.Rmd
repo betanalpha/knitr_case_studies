@@ -721,7 +721,7 @@ for (k in 1:9) {
 ```
 
 The posterior interactions for all of the six parameters with small true values
-and $tau_{1}$ exhibit strong funnel geometries.  This indicates that the
+and $\tau_{1}$ exhibit strong funnel geometries.  This indicates that the
 hierarchical prior model is dominating the structure of the posterior
 distribution here.  Interestingly the posterior behavior for the three
 parameters with large true values shows no indications of a funnel despite the
@@ -1820,7 +1820,7 @@ for (k in 1:9) {
 }
 ```
 
-Let's try dropping the first six $w$ values even smaller.
+Let's try dropping the first six $w$ to even smaller values.
 
 ```{r, warning=FALSE, message=FALSE}
 data$w <- c(0.25, 0.25, 0.25,
@@ -2079,7 +2079,7 @@ util$check_all_diagnostics(fit)
 Paraphrasing the great scholar Rihanna, shine bright like a diamond you pairs
 plots.  With $\tau$ no longer fixed and only limited partial pooling to
 restrict it's possible values the regularization for each $\lambda_{k}$ is even
-weaker now.  This allows the $\theta_{k}$-$\lambda_{k]}$ funnels to be drawn out
+weaker now.  This allows the $\theta_{k}$-$\lambda_{k}$ funnels to be drawn out
 to even more pathological extents.
 
 ```{r}
@@ -2680,11 +2680,7 @@ horseshoe_fit <- stan(file='stan_programs/fit_sales_horseshoe.stan',
 The diagnostics...do not look good.
 
 ```{r}
-capture.output(util$check_n_eff(horseshoe_fit))[1:5]
-capture.output(util$check_rhat(horseshoe_fit))[1:5]
-util$check_div(horseshoe_fit)
-util$check_treedepth(horseshoe_fit)
-util$check_energy(horseshoe_fit)
+util$check_all_diagnostics(horseshoe_fit)
 ```
 
 Let's try to decipher what's going wrong by investigating some of the horseshoe
@@ -3112,7 +3108,7 @@ par(mfrow=c(1, 1))
 plot(as.numeric(infer_crps_comp[1,]), as.numeric(pred_crps_comp[1,]),
      col=c_dark, pch=16, cex=1.0,
      xlim=c(0, 10), xlab="Inferential ECRPS",
-     ylim=c(1000, 5000), ylab="Predictive ECRPS")
+     ylim=c(1000, 5500), ylab="Predictive ECRPS")
 
 for (m in 1:4) {
   text(infer_crps_comp[1,m], pred_crps_comp[1,m] + 200,
