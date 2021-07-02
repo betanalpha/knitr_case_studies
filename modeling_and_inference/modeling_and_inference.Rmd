@@ -374,7 +374,7 @@ $\theta \in \Theta$, to each model configuration, $s \in \mathcal{S}$.  Keep in
 mind that the parameterizations themselves are not unique; in general there will 
 be many equivalent ways of labeling the model configurations.
 
-Given a parameterization we can then specify the observational model with family 
+Given a parameterization we can then specify the observational model with a family 
 of probability density functions over the observational space, 
 $\pi_{\mathcal{S}} (y ; s)$.  In practice we index these densities a particular
 parameterization, $\pi_{\mathcal{S}} (y ; \theta)$.
@@ -411,7 +411,7 @@ $$
 \prod_{n = 1}^{N} \pi_{\mathcal{S}} (y_{n} ; \mu, \sigma).
 $$
 
-Once we limit out consideration to a given observational model, our inferential 
+Once we limit our consideration to a given observational model, our inferential 
 goal becomes the quantification of those model configurations that are somehow
 similar to the true data generating process, and hence useful for informing our 
 ultimate decisions.  If the observational model contains the true data 
@@ -438,7 +438,7 @@ the, frankly ridiculous, complexity of the natural world.
 
 The inferences generated from an observational model that doesn't contain the
 true data generating process may still be meaningful so long as the data 
-generating processes it does contain capture the structure of the true data 
+generating processes captures the structure of the true data 
 generating process _relevant_ to our ultimate inferential goals.  For example, 
 an ecological model that neglects quantum mechanics and general relativity is 
 too technically meager to capture the _full reality_ of any observation of 
@@ -735,7 +735,7 @@ The utility of those decisions will of course depend on how well the
 observational model approximates the relevant properties of the true data 
 generating process.
 
-In order to formally define inference we to define how consistency is 
+In order to formally define inference we need to define how consistency is 
 mathematically encoded, and then how to calculate consistency assignments in 
 light of a given observation. Unfortunately there is no unique way to encode 
 consistency, and hence no unique way of constructing inferences.
@@ -1564,7 +1564,7 @@ with the specific observation and decreases for those model configurations
 that are less consistent.  In other words, the likelihood function quantifies
 the relative consistency of each model configuration with the observed data.
 
-Formally these likelihood evaluations provides only _relative_ information -- 
+Formally these likelihood evaluations provide only _relative_ information -- 
 the absolute likelihood value depends on how we parameterize the observation
 space and hence doesn't have any well-posed meaning.  Indeed from the Bayesian
 perspective it's not the likelihood function that quantifies consistency with 
@@ -1589,7 +1589,7 @@ $$
 { \mathrm{d} \pi_{\mathcal{S}} } (\theta)
 =
 \frac{ \pi_{\mathcal{S}}(\tilde{y} \mid \theta) }
-{ \pi_{\mathcal{S} (\tilde{y}) }.
+{ \pi_{\mathcal{S}} (\tilde{y}). 
 }
 $$
 The likelihood ratio defines a numerical quantification of data consistency 
@@ -1624,7 +1624,7 @@ $$
 \end{align*}
 $$ 
 The name Bayesian inference derives from this application of Bayes' Theorem,
-which can lead to confusion in practice because Bayes' Theorem a general result
+which can lead to confusion in practice because Bayes' Theorem is a general result
 from probability theory and not unique to this application.  In other words
 using Bayes' Theorem does not define Bayesian inference.  Using probability 
 distributions to quantify information about the model configuration space 
@@ -1980,7 +1980,7 @@ statistical libraries.
 
 Even with a closed-form posterior density function, however, the expectation 
 value of more sophisticated functions will not always be available analytically. 
-Moreover, closed-form posterior density function rely on very simple models and
+Moreover, closed-form posterior density functions rely on very simple models and
 hence are unrealistic in all but the simplest applications.  In practice we
 instead rely on probabilistic computational methods to _approximate_ various
 posterior expectation values.  Markov chain Monte Carlo, for example, is a 
@@ -2033,7 +2033,7 @@ The optimal decision _in the context of the available information_ is then
 given by taking the action that maximizes these expected utilities.  This 
 defines the _Bayesian decision making process_
 $$
-a^{*}(\tilde{y}) = \underset{a \in A}{\text{argmax}} U(a, \tilde{y}).
+a^{*}(\tilde{y}) = \underset{a \in A}{\text{argmax}} \overline{U}(a, \tilde{y}).
 $$
 Mathematically Bayesian decision theory is straightforward and a natural 
 consequence of using probability theory to quantify information.  At the same
@@ -2221,7 +2221,7 @@ posterior probability.  That accuracy would ensure that whatever conclusions we
 draw from our model, in particular the decisions informed by those inferences,
 would be faithful to the real latent system being analyzed.
 
-In general, however, there are no such guarantee in Bayesian inference.  The 
+In general, however, there are no such guarantees in Bayesian inference.  The 
 posterior distribution naively follows the information encoded in the model and 
 the observation.  Without a carefully designed model the posterior distribution 
 is vulnerable to being led astray by irrelevant quirks in a given observation,
@@ -2352,7 +2352,7 @@ domain expertise encoded in the prior distribution, while contraction near one
 indicates a likelihood function that strongly informs that parameter.
 
 Conveniently, these two posterior expectations are sensitive to an array of 
-pathological behavior that can compromises our inferences.  The ideal behavior
+pathological behavior that can compromise our inferences.  The ideal behavior
 concentrates towards strong contraction and small z-scores, indicating a 
 posterior distribution that strongly concentrates around the true model
 configuration.  A posterior distribution with strong contraction and a large 
@@ -2626,7 +2626,7 @@ both methodologies to take advantage of it.  In that case the computational
 burden of both approaches becomes nearly equivalent.
 
 On the other hand, if the asymptotic limit poorly approximates the observational
-model then we have to rely the general frequentist and Bayesian methodologies.
+model then we have to rely on the general frequentist and Bayesian methodologies.
 Here we can no longer rely on the asymptotic calibration of maximum likelihood 
 estimators and instead have to engineer a bespoke estimator and go through the 
 costly calibration process in its entirety.  In comparison, building and 
