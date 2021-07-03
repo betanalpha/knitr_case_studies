@@ -1,0 +1,63 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usepackage{pgfmath}
+\usepackage{pgfplots}
+\usetikzlibrary{calc, intersections, pgfplots.fillbetween}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\newcommand*{\offset}{0.025}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=2, thick]
+
+  \pgfmathsetmacro{\d}{2}
+
+  \draw[white] (-20, -20) rectangle (20, 20);
+
+  \begin{scope}[shift={(0, 0)}, rotate=45]
+  
+  \pgfmathsetmacro{\r}{11}
+    
+  \pgfmathsetmacro{\x}{\r * sqrt(1 - (1 - 0.5 * \d / \r) * (1 + 0.5 * \d / \r))}
+  \pgfmathsetmacro{\y}{0.5 * \r * sqrt((2 - \d / \r) * (2 + \d / \r))}
+  \pgfmathsetmacro{\theta}{atan(\y / \x)}
+  
+  \fill[dark] (\x, \y) arc(\theta:-\theta:\r) arc({\theta - 180}:{180 - \theta}:\r);
+
+  \pgfmathsetmacro{\r}{10.5}
+
+  \pgfmathsetmacro{\x}{\r * sqrt(1 - (1 - 0.5 * \d / \r) * (1 + 0.5 * \d / \r))}
+  \pgfmathsetmacro{\y}{0.5 * \r * sqrt((2 - \d / \r) * (2 + \d / \r))}
+  \pgfmathsetmacro{\theta}{atan(\y / \x)}
+  
+  \fill[dark] (\x - 2, \y) arc(\theta:-\theta:\r) arc({\theta - 180}:{180 - \theta}:\r);
+  
+  \fill[dark] (-2, 0) circle (8);
+  \draw[white, line width=25] (-2, 0) circle (6);
+  \draw[white, line width=25] (-2, 0) circle (4);
+  \draw[white, line width=25] (-2, 0) circle (2);
+  
+  \end{scope}
+
+
+\end{tikzpicture}
+
+\end{document}  

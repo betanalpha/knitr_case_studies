@@ -1,0 +1,254 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{calc, arrows.meta}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\newcommand*{\offset}{0.025}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.2, thick]
+
+  \pgfmathsetmacro{\r}{2}
+  
+  \begin{scope}[shift={(0, 0)}]
+    \draw[white] (-12, -4) rectangle (16, 37);
+  
+    \node[align=center] at (2, 33) { Narratively Generative Model\\For First Measurement Process };
+  
+    \coordinate (A) at (0, 0);
+    
+    \coordinate (B) at (-4, 8);
+    \coordinate (C) at (3, 10);
+    
+    \coordinate (D) at (-2, 16);
+
+    \coordinate (E) at (-8, 26);
+    \coordinate (F) at (-2, 26);
+    \coordinate (G) at (4, 26);
+    
+    \coordinate (H) at (12, 12);
+    \coordinate (I) at (10, 18);
+    
+    \foreach \B/\E in {A/B, A/C, B/C, B/D, C/D, D/E, D/F, D/G} {
+      \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=12, color=mid, line width=1.5] (\B) -- (\E);
+    }
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (A) circle (\r)
+    node[color=black] { $\theta_{1}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (B) circle (\r)
+    node[color=black] { $\theta_{2}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (C) circle (\r)
+    node[color=black] { $\theta_{3}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (D) circle (\r)
+    node[color=black] { $\theta_{4}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (E) circle (\r) 
+    node[color=black] { $y_{1}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (F) circle (\r)
+    node[color=black] { $y_{2}$ };
+      
+    \filldraw[fill=white, draw=dark, line width=1.5] (G) circle (\r)
+    node[color=black] { $y_{3}$ };
+
+  \end{scope}
+  
+  \begin{scope}[shift={(28, 0)}]
+    \draw[white] (-12, -4) rectangle (16, 37);
+  
+    \node[align=center] at (2, 33) { Narratively Generative Model\\For Second Measurement Process };
+  
+    \coordinate (A) at (0, 0);
+    
+    \coordinate (B) at (-4, 8);
+    \coordinate (C) at (3, 10);
+    
+    \coordinate (H) at (12, 12);
+    \coordinate (I) at (10, 18);
+    
+    \foreach \B/\E in {A/B, A/C, B/C, C/H} {
+      \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=12, color=mid, line width=1.5] (\B) -- (\E);
+    }
+    
+    \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=14.5, color=mid, line width=1.5] (C) -- (I);
+    \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=12, color=mid, line width=1.5] (H) -- (I);
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (A) circle (\r)
+    node[color=black] { $\theta_{1}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (B) circle (\r)
+    node[color=black] { $\theta_{2}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (C) circle (\r)
+    node[color=black] { $\theta_{3}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (D) circle (\r)
+    node[color=black] { $\theta_{4}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (E) circle (\r) 
+    node[color=black] { $y_{1}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (F) circle (\r)
+    node[color=black] { $y_{2}$ };
+      
+    \filldraw[fill=white, draw=dark, line width=1.5] (G) circle (\r)
+    node[color=black] { $y_{3}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (H) circle (\r)
+    node[color=black] { $\theta_{5}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (I) circle [x radius={2 * \r}, y radius={\r}]
+    node[color=black] { $y_{4}, y_{5}$ };
+
+  \end{scope}
+  
+  \begin{scope}[shift={(56, 0)}]
+    \draw[white] (-12, -4) rectangle (16, 37);
+  
+    \node[align=center] at (2, 33) { Overlapping\\Narratively Generative Models };
+  
+    \pgfmathsetmacro{\deltax}{0.75}
+    \pgfmathsetmacro{\deltay}{0.75}
+    \coordinate (AA) at (0 + \deltax, 0 + \deltay);
+    \coordinate (BB) at (-4 + \deltax, 8 + \deltay);
+    \coordinate (CC) at (3 + \deltax, 10 + \deltay);
+  
+    \coordinate (A) at (0, 0);
+    
+    \coordinate (B) at (-4, 8);
+    \coordinate (C) at (3, 10);
+    
+    \coordinate (D) at (-2, 16);
+
+    \coordinate (E) at (-8, 26);
+    \coordinate (F) at (-2, 26);
+    \coordinate (G) at (4, 26);
+    
+    \coordinate (H) at (12, 12);
+    \coordinate (I) at (10, 18);
+    
+   \foreach \B/\E in {AA/BB, AA/CC, BB/CC, CC/H} {
+      \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=12, color=mid, line width=1.5] (\B) -- (\E);
+    }
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (AA) circle (\r);
+    \filldraw[fill=white, draw=dark, line width=1.5] (BB) circle (\r);
+    \filldraw[fill=white, draw=dark, line width=1.5] (CC) circle (\r);
+
+    \foreach \B/\E in {A/B, A/C, B/C, B/D, C/D, D/E, D/F, D/G} {
+      \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=12, color=mid, line width=1.5] (\B) -- (\E);
+    }
+    
+    \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=14.5, color=mid, line width=1.5] (CC) -- (I);
+    \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=12, color=mid, line width=1.5] (H) -- (I);
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (A) circle (\r)
+    node[color=black] { $\theta_{1}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (B) circle (\r)
+    node[color=black] { $\theta_{2}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (C) circle (\r)
+    node[color=black] { $\theta_{3}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (D) circle (\r)
+    node[color=black] { $\theta_{4}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (E) circle (\r) 
+    node[color=black] { $y_{1}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (F) circle (\r)
+    node[color=black] { $y_{2}$ };
+      
+    \filldraw[fill=white, draw=dark, line width=1.5] (G) circle (\r)
+    node[color=black] { $y_{3}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (H) circle (\r)
+    node[color=black] { $\theta_{5}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (I) circle [x radius={2 * \r}, y radius={\r}]
+    node[color=black] { $y_{4}, y_{5}$ };
+
+  \end{scope}
+  
+  \begin{scope}[shift={(84, 0)}]
+    \draw[white] (-12, -4) rectangle (16, 37);
+  
+    \node[align=center] at (2, 33) { Merged Joint\\Narratively Generative Model };
+  
+    \coordinate (A) at (0, 0);
+    
+    \coordinate (B) at (-4, 8);
+    \coordinate (C) at (3, 10);
+    
+    \coordinate (D) at (-2, 16);
+
+    \coordinate (E) at (-8, 26);
+    \coordinate (F) at (-2, 26);
+    \coordinate (G) at (4, 26);
+    
+    \coordinate (H) at (12, 12);
+    \coordinate (I) at (10, 18);
+    
+    \foreach \B/\E in {A/B, A/C, B/C, B/D, C/D, D/E, D/F, D/G, C/H} {
+      \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=12, color=mid, line width=1.5] (\B) -- (\E);
+    }
+    
+    \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=14.5, color=mid, line width=1.5] (C) -- (I);
+    \draw[-{Stealth[length=6pt, width=6pt]}, shorten <=12.1, shorten >=12, color=mid, line width=1.5] (H) -- (I);
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (A) circle (\r)
+    node[color=black] { $\theta_{1}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (B) circle (\r)
+    node[color=black] { $\theta_{2}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (C) circle (\r)
+    node[color=black] { $\theta_{3}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (D) circle (\r)
+    node[color=black] { $\theta_{4}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (E) circle (\r) 
+    node[color=black] { $y_{1}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (F) circle (\r)
+    node[color=black] { $y_{2}$ };
+      
+    \filldraw[fill=white, draw=dark, line width=1.5] (G) circle (\r)
+    node[color=black] { $y_{3}$ };
+
+    \filldraw[fill=white, draw=dark, line width=1.5] (H) circle (\r)
+    node[color=black] { $\theta_{5}$ };
+    
+    \filldraw[fill=white, draw=dark, line width=1.5] (I) circle [x radius={2 * \r}, y radius={\r}]
+    node[color=black] { $y_{4}, y_{5}$ };
+
+  \end{scope}
+
+
+\end{tikzpicture}
+
+\end{document}  
