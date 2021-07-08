@@ -82,7 +82,7 @@ $$y_{n} \sim \mathcal{N}(\theta_{n}, \sigma_{n}),$$
 where $n \in \left\{1, \ldots, 8 \right\}$ and the
 $\left\{ y_{n}, \sigma_{n} \right\}$ are given as data.
 
-Inferring the hierarchical hyperparameters, $\mu$ and $\sigma$, together with
+Inferring the hierarchical hyperparameters, $\mu$ and $\tau$, together with
 the group-level parameters, $\theta_{1}, \ldots, \theta_{8}$, allows the model
 to pool data across the groups and reduce their posterior variance.
 Unfortunately this pooling also squeezes the posterior distribution into a
@@ -180,7 +180,7 @@ almost 2% of the iterations in our lone Markov chain ended with a divergence,
 ```{r, comment=NA}
 check_div(fit_cp)
 ```
-Even with a single short chain these divergences are able to identity the bias
+Even with a single short chain these divergences are able to identify the bias
 and advise skepticism of any resulting MCMC estimators.
 
 Additionally, because the divergent transitions, here shown here in green, tend
@@ -288,7 +288,7 @@ points(div_params_cp80$'theta[1]', log(div_params_cp80$tau),
 
 Divergences in Hamiltonian Monte Carlo arise when the Hamiltonian transition
 encounters regions of extremely large curvature, such as the opening of the
-hierarchical funnel.  Unable to accurate resolve these regions, the transition
+hierarchical funnel.  Unable to accurately resolve these regions, the transition
 malfunctions and flies off towards infinity.  With the transitions unable to
 completely explore these regions of extreme curvature, we lose geometric
 ergodicity and our MCMC estimators become biased.
