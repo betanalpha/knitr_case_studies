@@ -1,5 +1,5 @@
 ---
-title: "Probabilistic Storytelling"
+title: "(What's the Probabilistic Story) Modeling Glory?"
 author: "Michael Betancourt"
 date: "July 2021"
 bibliography: generative_modeling.bib
@@ -23,53 +23,54 @@ knitr::opts_chunk$set(comment=NA)
 ```
 
 Generative modeling is often suggested as a useful approach for designing
-probabilistic models that effectively capture the relevant structure of a given
-application.  The specific details of this approach, however, is left vague
-enough to limit how useful it can actually be in practice.  In this case study I
-present an explicit definition of generative modeling that motivates a wealth of
-productive model building techniques.
+probabilistic models that capture the relevant structure of a given application.
+The specific details of this approach, however, is left vague enough to limit
+how useful it can actually be in practice.  In this case study I present an
+explicit definition of generative modeling as a way to bridge implicit domain
+expertise and explicit probabilistic models, motivating a wealth of useful model
+critique and construction techniques.
 
 # Generating What Now?
 
 An immediate problem with the concept of "generative modeling" is that the term
 isn't always used consistently.  In particular what makes a model "generative"
-is very different in fields dominated by machine learning and fields dominated
-by contemporary applied statistics.  To construct any self-consistent
+can be very different in fields dominated by machine learning and fields
+dominated by contemporary applied statistics.  To construct any self-consistent
 formalization of the term we have to be careful to differentiate between these
 two colloquial uses.
 
 ## Generative As Sampling
 
-In machine learning "generative" typically describes a probabilistic model
-$\pi(y; \theta)$ from which one can generate exact samples,
+In machine learning a generative model is typically defined as a probabilistic
+model of all quantities that vary from observation to observation; in other
+words a model over the entire observational space, $Y$ [@Bishop:2006].  For
+example given an observational space parameterized by two variables
+$y = (y_{1}, y_{2})$ the conditional model $\pi(y_{1} | y_{2} ; \theta)$ would
+not be generative because it lacks a probabilistic model for $y_{2}$.
+Such incomplete model specifications, often denoted _discriminative_ models,
+commonly arise in regression modeling where the observational space $Y \times X$
+separates into variates, $y \in Y$, and covariates, $x \in X$, and only the
+conditional relationship $\pi(y | x; \theta)$ is modeled.
+
+One immediate benefit of a model $\pi(y; \theta)$ that spans the entire
+observational space is that, at least in theory, we can construct exact sampling
+mechanisms for all of the variables in the observational space,
 $$
 \tilde{y} \sim \pi(y; \theta),
 $$
-for all model configurations $\theta$ [@Bishop:2006].  I will refer to this
-notion of generative as _procedurally generative_.
+for each model configurations $\theta$.  For example the non-generative
+conditional model $\pi(y_{1} | y_{2} ; \theta)$ admits sampling mechanisms
+for $y_{1}$ only once $y_{2}$ has been fixed to a particular value, but we have
+no natural way to choose such a value.  The generative model
+$\pi(y_{1} | y_{2} ; \theta) \pi(y_{2}; \theta)$, however, admits sampling
+mechanisms for $y_{2}$ which then enables ancestral sampling.
 
-One immediate requirement from this definition is that the entire observational
-space $Y$ must be modeled probabilistically.  For example consider an
-observational space parameterized by two variables $y = (y_{1}, y_{2})$ with
-only the conditional model $\pi(y_{1} | y_{2} ; \theta)$ specified.  Samples for
-$y_{1}$ cannot be generated without first fixing a value for $y_{2}$, but we
-have no information to motivate such a value!  This incomplete model
-specification arises for example in regression modeling where the data separates
-into variates, $y$, and covariates, $x$, and only the conditional relationship
-$\pi(y | x; \theta)$ is modeled.  Variates can be sampled conditional on
-covariate values, but nothing informs the covariate values themselves.  These
-conditional models are often denoted _discriminative_ models.
+Indeed the phrase "generative model" is often used colloquially to imply
+probabilistic modelings equipped, if not outright defined, by an explicit, exact
+sampling mechanism from which we can "generate" samples in practice.  I will
+refer to this notion as _procedurally generative_.
 
-Provided that the observational model $\pi(y; \theta)$ defines a proper
-probability distribution that spans the entire observational space we can
-technically construct algorithms capable of generating exact samples, at least
-theory.  Unfortuantely these generic algorithms are unlikely to be practical
-unless the observational space is low-dimensional.  Consequently procedurally
-generative modeling is sometimes used to imply not only that we can generate
-exact samples in theory but also that we can generate them efficiently in
-practice.
-
-One way to ensure efficient exact sampling algorithms is to require a
+One way to construct explicit, exact sampling algorithms is to utilize a
 conditional decomposition of the observational model $\pi(y; \theta)$ into a
 sequence of one-dimensional conditional probability distributions,
 $$
@@ -79,25 +80,25 @@ $$
 \, \pi(y_{1}; \theta),
 $$
 where each $y_{n}$ is a one-dimensional variable.  If we can efficiently
-generate exact samples from those one-dimensional distributions then we generate
-exact samples from the entire model through ancestral sampling.
+generate exact samples from these one-dimensional distributions then we can
+generate exact samples from the entire model through ancestral sampling.
 
-In contemporary machine learning ancestral sampling methods have largely given
-way to _pushforward_ methods.  Here the observational model $\pi(y; \theta)$ is
-implicitly defined as the pushforward of some simple base distribution,
-$\pi(x)$, along a family of complicated transformations,
+In contemporary machine learning ancestral sampling mechanisms have largely
+given way to _pushforward_ sampling mechanisms.  Here the observational model
+$\pi(y; \theta)$ is defined only implicitly as the pushforward of some simple
+base distribution, $\pi(x)$, along a family of complicated transformations,
 $\phi_{\theta} : X \rightarrow Y$,
 $$
 \pi(y; \theta) = (\phi_{\theta})_{*} \pi(x).
 $$
-We can engineer the base distribution to admit efficient exact sampling
-mechanisms then we can immediately generate exact samples from these
-pushforward distributions by applying the transformations to base samples,
+If the base distribution is engineered to admit an efficient exact sampling
+mechanism then we can immediately generate exact samples from these pushforward
+distributions by applying the transformations to base samples,
 $$
 \begin{align*}
 \tilde{x} &\sim \pi(x)
 \\
-\tilde{y} = \phi_{\theta}(\tilde{x}).
+\tilde{y} &= \phi_{\theta}(\tilde{x}).
 \end{align*}
 $$
 These families of complex transformations are often built out of popular machine
@@ -105,9 +106,10 @@ learning techniques for function approximation, such as neural networks and
 kernel methods, resulting in popular methods such as Generative Adversarial
 Networks [@GoodfellowEtAl:2014].
 
-A procedurally generative Bayesian model over the observational space and model
-configuration space requires that we can generate exact samples from joint model
-$\pi(y, \theta)$.  For example by exploiting the conditional decomposition
+A procedurally generative _Bayesian model_ $\pi(y, \theta)$ requires an exact
+sampling mechanism that samples the variables in the observational space _and_
+the model configuration space.  For example by exploiting the conditional
+decomposition
 $$
 \pi(y, \theta) = \pi(y | \theta) \, \pi(\theta)
 $$
@@ -116,13 +118,13 @@ procedurally generative observational model $\pi(y | \theta)$, as discussed
 above, with a procedurally generative prior model $\pi(\theta)$.  Because we
 cannot generate samples from unnormalizeable prior models, such as those
 specified by uniform density functions over the real line, these improper prior
-models immediately impede a procedurally generative Bayesian model.
+models immediately obstruct procedurally generativity.
 
 That said procedural generation doesn't require that we utilize this particular
 conditional decomposition.  _Any_ conditional decomposition of the full Bayesian
 model $\pi(y, \theta)$ into well-defined, one-dimensional conditional
-probability distributions will admit efficient ancestral sampling, and there are
-many of these conditional decompositions to consider.  For example a relatively
+probability distributions will admit ancestral sampling, and there are many of
+these conditional decompositions to consider.  For example a relatively
 low-dimensional model $\pi(y_{1}, y_{2}, \theta_{1}, \theta_{2})$ admits 24
 different one-dimensional conditional decompositions!
 
@@ -136,43 +138,40 @@ knitr::include_graphics("figures/procedural_decomp/procedural_decomp.png")
 
 In practice some of these decompositions might result in simpler conditional
 dependencies which can facilitate the implementation of ancestral sampling.
-The challenge is how to engineer not just any conditional decomposition but a
-particularly useful one.
+The practical challenge is engineering not just any conditional decomposition
+but a particularly useful one.
 
 ## Generative As Story Telling
 
-In applied statistical settings "generative" more commonly refers not to
-sampling mechanisms but rather the interpretation of the model itself.  Here
-generative describes models that follow the progressive structure of some
-assumed data generating process; in other words they model not just the outcome
-of a measurement but also the internal composition of that measurement.  I will
-refer to this notion of generative as _narratively generative_.
+In applied statistical settings "generative" more commonly refers not to how a
+model is implemented but rather how the model is _interpreted_.  Here generative
+describes models that follow the progressive structure of some assumed data
+generating process; in other words they model not just the outcome of a
+measurement but also the internal composition of that measurement.  I will refer
+to this notion of generative as _narratively generative_.
 
-Considering the stories of the possible data generating processes helps guide
-the translation of our implicit domain expertise about a system being studied
-into an explicit mathematical model, which make this narrative focus extremely
-powerful in practice.  In particular many of the familiar techniques in
-storytelling have immediate parallels in narratively generative model building.
+Any model with a narrative interpretation tells a set of stories, and
+consequently we can utilize familiar storytelling techniques to understand the
+structure of these models.  For example consider that stories are often told as
+a sequence of smaller, constituent stories, with each constituent story building
+upon and referencing previous constituent stories in the progression of the
+overall narrative.  Books are constructed from chapters, television series from
+episodes, plays from acts, and so on.  Likewise a narratively generative model
+can be built from smaller, component models, each capturing one part of some
+larger data generating story.
 
-Perhaps most importantly stories are often told as a sequence of smaller,
-constituent stories, with each constituent story building upon and referencing
-previous constituent stories in the progression of the overall narrative.  Books
-are constructed from chapters, television series from episodes, plays from acts,
-and so on.  Likewise a narratively generative model can be built from smaller,
-component models, each capturing one part of the larger data generating story.
+A narratively generative Bayesian model $\pi(y, \theta)$ defines a collection of
+mathematical stories for how the data could be generated, with the model
+configurations $\theta$ labeling each story.  The narrative structure of these
+stories implies a distinguished conditional decomposition of $\pi(y, \theta)$
+where each conditional distribution captures just one part of the data
+generating story.  This distinguished conditional decomposition then immediately
+defines a distinguished directed graphical model representation where leaf nodes
+can contain only data variables and any root nodes can contain only model
+configuration variables.
 
-In other words if the joint Bayesian model $\pi(y, \theta)$ is interpreted as
-a collection of mathematical stories of how the data could be generated, with
-the model configurations $\theta$ labeling each story, then any narratively
-generative structure implies a distinguished conditional decomposition of the
-joint distribution where each individual conditional distribution captures the
-possible narratives for one part of the data generating story.  This
-distinguished conditional decomposition then immediately defines a distinguished
-directed graphical model representation where leaf nodes can contain only data
-variables and any root nodes can contain only model configuration variables.
-
-For example consider the joint model that we introduced in the previous section,
-$\pi(y_{1}, y_{2}, \theta_{1}, \theta_{2})$.  The simplest narratively
+For example consider the Bayesian model that we introduced in the previous
+section, $\pi(y_{1}, y_{2}, \theta_{1}, \theta_{2})$.  The simplest narratively
 generative decomposition separates the joint model into an observational model,
 $\pi(y_{1}, y_{2} | \theta_{1}, \theta_{2})$, and a prior model,
 $\pi(\theta_{1}, \theta_{2})$.
@@ -208,12 +207,12 @@ knitr::include_graphics("figures/narrative_decomp/3/3.png")
 </center>
 
 Each of these directed graphical models captures a different set of mathematical
-narratives for how the data generating process might proceed.  The fewer
+narratives for how the assumed data generating process might behave.  The fewer
 variables in each node the more refined those stories are.  The simpler and more
-coherent the overall narrative the fewer arrows will connect between each node,
-and the more linear the probabilistic graphical model will appear.  The more
-convoluted the story the more the nodes will influence each other, and the more
-connected the network of arrows between I the nodes will be.
+coherent the overall narrative the fewer arrows will connect each node, and the
+more linear the probabilistic graphical model will appear.  The more convoluted
+the story the more the nodes will influence each other, and the more connected
+the network of arrows between the nodes will be.
 
 <center>
 <br>
@@ -223,13 +222,13 @@ knitr::include_graphics("figures/simple_vs_complex/simple_vs_complex.png")
 <br><br>
 </center>
 
-Conditioning on data $\tilde{y}$ results in a posterior distribution over the
-model configurations
+Conditioning on observed data $\tilde{y}$ results in a posterior distribution
+over the model configurations
 $$
 \pi(\theta \mid \tilde{y}) \propto \pi(\tilde{y}, \theta)
 $$
-that quantifies how consistent each the possible mathematical stories of the
-data generating process is with observed outcomes.
+that quantifies how consistent each the possible mathematical stories is with
+those observed outcomes.
 
 <center>
 <br>
@@ -239,48 +238,76 @@ knitr::include_graphics("figures/posterior/posterior.png")
 <br><br>
 </center>
 
-In other words our modeling goal is to describe as many reasonable data
-generating stories as possible so that our posterior distribution can identify
-stories that well approximate the true data generating process.
+In other words an ideal narratively generative model captures all of the
+possible data generating stories so that our posterior distribution can identify
+which of those stories well-approximate the true data generating process.
+
+By introducing a precise interpretation for internal structure of a model, this
+narrative perspective provides a bridge between explicit mathematical models and
+our implicit domain expertise.  This connection then provides a foundation for a
+wealth of powerful modeling techniques.
+
+For example this bridge can help us understand the limitations of a given model
+and any derived inferences.  If the mathematical stories captured by the model
+are meaningful only in a narrow circumstance then we know that we shouldn't
+expect any inferences or predictions derived from that model to be useful
+outside of those circumstances.
+
+At the same time understanding the circumstances in which those mathematical
+stories are relevant also facilitates model critique.  If none of the stories
+are even approximately relevant to a given application then we probably should
+consider another model.  This critique is especially useful in the use of
+prefabricated models which are often applied without any consideration of
+relevance.  By first recognizing the mathematical narratives implicit in a
+prefabricated model we make it easier to recognize when that model is applicable
+and when its not.
+
+Perhaps most importantly a narrative perspective aids the development of bespoke
+models customized to a given application.  Narrative structure provides the
+foundation on which we can translate our implicit domain expertise about a
+system being studied into explicit probabilistic models.  We will explore
+narrative model building techniques in depth in
+[Section 2](#sec:building_techniques).
 
 ## The Best of Both Worlds
 
 Models that are both procedurally _and_ narratively generative are particularly
-useful in practice.  The narrative focus facilitates model building through
-narratively meaningful conditional decompositions.  If that model is also
-procedurally generative, however, then we can also utilize ancestrally sampling
-to _simulate_ from the data generating processes assumed by that model.
+useful in practice.  While the narrative focus facilitates model building
+through narratively meaningful conditional decompositions, the procedural focus
+allows us to _simulate_ from the data generating processes assumed by that model.
 
 These simulations are extremely useful for evaluating the consequences of our
 modeling assumptions, including prior checks, algorithmic Bayesian calibration,
 and inferential Bayesian calibration.  For more see
 [my workflow case study](https://betanalpha.github.io/assets/case_studies/principled_bayesian_workflow.html).
 
-# Advanced Narrative Techniques
+# Advanced Narrative Techniques {#sec:building_techniques}
 
-Embracing a narrative focus can not only clarify many of the more subtle aspects
-of model building but also motivating a variety of powerful modeling techniques,
-each derived from an intuitive storytelling consideration.  In this section
-we'll review many of these insights and their practical consequences.
+Embracing a narrative focus not only clarifies many of the more subtle aspects
+of probabilistic model building but also motivates a variety of powerful
+model building techniques, each derived from an intuitive storytelling
+consideration.  In this section we'll review many of these insights and their
+practical consequences.
 
 ## Clear and Concise Language
 
 Poor story telling can obfuscate even the simplest story, burying a
 straightforward narrative underneath confusing language and unnecessary
 complexity.  In narratively generative modeling the language in which we tell
-our stories is determined by the parameterization of the observational space and
-the model configuration space; in particular these parameterizations determine
-the conditional structure of the joint model.  Consequently the apparent
-complexity of a narratively generative model can be determined more by how these
-spaces are parameterized rather than any inherent complexity of the stories they
-describe.
+our stories is the _parameterization_ of the observational space and the model
+configuration space; in particular these parameterizations determine the
+complexity of any conditional decomposition of the joint model.  Consequently
+the apparent intricacy of a narratively generative model can be determined more
+by how these spaces are parameterized rather than any inherent complexity of the
+stories they describe.
 
 For example consider the common assumption that an identical measurement is
-repeated $N$ times without the replications directly influencing each other.  If
-we directly parameterize the observational space with the variables that capture
-the outcome of these measurements, $y_{1}, \ldots, y_{n}, \ldots, y_{N}$, then
-this narrative assumption implies that these variables are conditionally
-independent given a particular configuration of the measurement process,
+repeated $N$ times without the outcome of the replications directly influencing
+each other in any way.  If we directly parameterize the observational space with
+the variables that capture the individual outcome of these measurements,
+$y_{1}, \ldots, y_{n}, \ldots, y_{N}$, then this narrative assumption implies
+that these variables are conditionally independent given a particular
+configuration of the measurement process,
 $$
 \begin{align*}
 \pi(y_{1}, \ldots, y_{n}, \ldots, y_{N}, \theta)
@@ -291,7 +318,7 @@ $$
 $$
 Moreover these conditional distributions are exactly the same.
 
-This conditional independence also implies a particularly streamlined directed
+This conditional independence implies a particularly streamlined directed
 graphical model representation.  Because the conditional distributions are
 identical we can also utilize the plate notation for an even more compact
 notation.
@@ -369,19 +396,19 @@ placed later in the progression.
 
 This ordering of the component models, and the mathematical stories they
 capture, is often said to define the _causal structure_ of the data generating
-process.  Like "generative" the term "causal" is used inconsistently which
-often causes, pun absolutely intended, confusion.  For example in physics
-causality refers to _all_ of the possible physical influences that one system
-can exert an other, limited largely by physical distance between the two systems
-and the speed with which interactions can be exchanged across that distance.  On
-the other hand in statistics and computer science causality typically refers not
-to all possible influences but rather to only those influences that are
-explicitly modeled.
+process.  Like "generative" the term "causal" is used inconsistently across
+fields which often causes, pun absolutely intended, confusion.  For example in
+physics causality refers to _all_ of the possible physical influences that one
+system can exert an other, limited largely by physical distance between the two
+systems and the speed with which interactions can be exchanged across that
+distance.  On the other hand in statistics and computer science causality
+typically refers not to all possible influences but rather to only those
+influences that are explicitly modeled.  In any practical model we ignore an
+infinity of physical interactions that we assume are too weak to meaningful
+affect a given data generating process.
 
-In any practical model we ignore an infinity of physical interactions that we
-assume are too weak to meaningful affect a given data generating process.  To
-avoid any confusion between these different notions of causality I will refer to
-the structure of this latter interpretation as the
+To avoid any confusion between these different notions of causality I will refer
+to the this latter interpretation as defining the
 _narratively generative structure_ of a model.
 
 ## Serialization {#sec:recursion}
@@ -410,7 +437,7 @@ Such recursive, narratively generative structure can drastically facilitate the
 development of expansive, intricate, and yet self-consistent narratives.
 
 For example instead of trying to build a narrative by piecing together detailed
-scenes in sequential order, it is often often much more productive to outline
+scenes in sequential order, it is often often much more productive to _outline_
 the overarching plot as a sequence of broad arcs, each of which can then be
 elaborated into more smaller scenes that are more manageable to construct in the
 necessary detail.  Likewise the most effective way to develop a sophisticated
@@ -451,9 +478,9 @@ Because we have to assemble only a small number of modules together at each
 stage this modular approach compartmentalizes the model building complexity
 which often makes the task much more manageable in practice.  Moreover while
 many modules need to be built custom for each particular application, some
-modules capture more universal behavior that can be used repeatedly not only
+modules that capture more universal behavior can be used repeatedly not only
 within a single model but also across different models.  Once we familiarize
-ourselves with the properties of one of these general components they become
+ourselves with the properties of one of these general components it becomes
 available for any future modeling problem.
 
 ## Writing To The Audience {#sec:resolution}
@@ -463,14 +490,14 @@ vocabulary the more intricate of a story we can tell, but the most detailed
 story isn't always the most appropriate for a given audience.  Similarly the
 most sophisticated model that we can construct isn't always the most effective
 model for a given application.  Sometimes a relatively simple model, which
-captures the relevant behavior without introducing extraneous complexity, is
-most appropriate.
+captures the most relevant behavior without introducing extraneous complexity,
+is most appropriate.
 
 In statistical applications the appropriate level of detail is often determined
 by the measurement process itself.  Any finite measurement resolves the latent
 structure of an observed system only so well, and realized observations are
 sensitive to only those features of the system that manifest strongly enough in
-the measurement process.  The better the measurement process the finer the
+the measurement process.  The more precise the measurement process the finer the
 details that we can resolve.
 
 <center>
@@ -493,7 +520,7 @@ perhaps in addition to any weaker features that might be of particular
 inferential interest.  The recursive modeling building strategy that we
 discussed in [Section 2.3](#sec:recursion) is especially helpful here; by
 iteratively refining an initial crude model we can self-consistently incorporate
-more and more detail until we've converged to the necessarily level of
+more and more detail until we've converged to the necessary level of
 sophistication.
 
 Narratively generative models built in this way will rarely depend on the
@@ -505,11 +532,10 @@ given resolution, or in other words the _emergent phenomena_.
 All of this said we have to keep in mind that a narratively generative model
 motivated by the limitations of one measurement process will not necessarily be
 sufficient for modeling the outcomes of _other_ measurement processes.  For
-example if we repeat a measurement then the combined observations may be
-sensitive to more detailed structure that our initial model could resolve.  In
-this case we might have to further refine the model in order to draw inferences
-that can take advantage of the additional information in the combined
-observations.
+example if we repeat a measurement then the combined observations may be able to
+resolve more detailed structure.  In this case we might have to further refine
+the initial model in order to draw inferences that can take advantage of the
+additional information in the combined observations.
 
 Similarly if our inferential goals depend on details that fall below the
 resolution of a given measurement process then our initial model may provide
@@ -523,7 +549,7 @@ sophistication.
 While many stories naturally separate into constituent stories, some stories are
 indivisible.  Similarly not every probabilistic model will be narratively
 generative.  If we do not understand some aspect of a data generating processes
-well enough then we may not be able to motivate component model with any useful
+well enough then we may not be able to motivate component models with any useful
 narratively generative structure.
 
 Moreover some stories that can be divided are still best told all at once.
@@ -533,14 +559,14 @@ process is not able to resolve the resulting substructure such a decomposition
 can introduce unnecessary complexity that can be more harmful than beneficial.
 
 In general a narratively generative model will decompose into a mixture of both
-generative and non-generative component models.  Some of the generative
-component models might then further decompose into one-dimensional conditional
-distributions but some might be best left whole.  This results in directed
-graphical model representations with separate nodes for each variable and nodes
-that encapsulate multiple variables, respectively.  At the same time the
-non-generative components will also define nodes that encapsulate multiple
-variables.  The broader definition of directed graphical models that I
-introduced in my
+narratively generative and non-narratively generative component models.  Some of
+the narratively generative component models might then further decompose into
+one-dimensional conditional distributions but some might be best left whole.
+This results in directed graphical model representations with separate nodes for
+each variable and nodes that encapsulate multiple variables, respectively.  At
+the same time the non-narratively generative components will also define nodes
+that encapsulate multiple variables.  The broader definition of directed
+graphical models that I introduced in my
 [product space case study](#https://betanalpha.github.io/assets/case_studies/probability_on_product_spaces.html)
 can accommodate all of these nodes, making it particularly useful for working
 with models that capturing the intricate complexity of realistic applications.
@@ -558,7 +584,7 @@ should not, prevent us from modeling other components narratively generatively
 where ever possible.  In the social sciences, for example, the latent
 phenomenology is often far too complex to be modeled with anything but a
 heuristic model that captures some of the more pronounced emergent behaviors.
-That heuristic component model, however, can be paired with a narratively
+That heuristic component model, however, can often be paired with a narratively
 generative component models of the rest of the measurement process.  By
 exploiting our domain expertise of both the experimental design, _and how that
 design was actually implemented_, these narratively generative component models
@@ -568,7 +594,7 @@ phenomenological model.
 
 In other words "narratively generative" is not a binary qualification of a
 probabilistic model.  Some models have deeper narratively generative structure
-than others, but that doesn't necessarily make them more useful.  Narratively
+than others, but that doesn't necessarily make them more useful.  Narrative
 generativity is not a goal in of itself but rather a tool to help coalesce our
 domain expertise and facilitate the development of the most useful model
 possible in any given application.
@@ -590,11 +616,11 @@ knitr::include_graphics("figures/weave/weave.png")
 
 By restricting any shared behavior to the same component models a narratively
 generative model automatically captures the interactions between multiple
-measurement processes.  Critically inferences from the combined model then
-properly incorporate any correlations between observations realized from those
-measurement processes.  In other words incorporating the narratively generative
-structure of multiple measurement processes into a single narratively generative
-model implements _data fusion_.
+measurement processes.  Critically inferences from the combined model
+_automatically_ incorporate any correlations between observations realized from
+those measurement processes.  In other words incorporating the narratively
+generative structure of multiple measurement processes into a single narratively
+generative model implements _data fusion_.
 
 One way to build a narratively generative model that consistently incorporates
 multiple measurement processes is to first build a model for one measurement
@@ -724,7 +750,7 @@ $\pi(\phi \mid \tilde{y}_{1}, \tilde{y}_{2})$, with appropriate expectation
 values.
 
 Working with the full narratively generative model all at once not only requires
-fewer steps, and hence fewer opportunities to introduce mistakes, but is also
+fewer steps, and hence fewer opportunities to introduce mistakes, but also is
 much more practical to implement!
 
 ## Sequels and Spinoffs
@@ -818,15 +844,19 @@ statistical application.
 
 In order to ensure that a narratively generative model captures the relevant
 features of a system being studied we have to carefully assess it against both
-our own domain expertise and the structure of any observed data.  Discrepancies
-in these comparisons inform holes in the stories our model tells.  We can use
-these holes, however, to motivate an improved narration and, hopefully, a better
-model.
+our own domain expertise and the details of any observed data.  Discrepancies in
+these comparisons inform holes in the stories our model tells, and any
+narrative interpretation of these holes motivates an improved narration and,
+hopefully, a better model.
 
 General strategies for model assessment and critique are considered in my
 [workflow case study](https://betanalpha.github.io/assets/case_studies/principled_bayesian_workflow.html).
-These strategies become especially effective when coupled with any narratively
-generative structure of a model.
+Narratively generative structure is particularly useful for motivating
+summary functions and statistics that isolate meaningful structure, and hence
+interpretable prior and posterior retrodictive checks.
+
+Altogether a narratively generative perspective is particularly well-suited to
+iterative model development.
 
 # Anthology of Interest
 
@@ -925,6 +955,187 @@ knitr::include_graphics("figures/examples/fusion/3/3.png")
 If this linear approximation is sufficiently accurate then this model may be
 able to reasonably approximate the true data generating process.
 
+## Intervention Circumvention
+
+Narratively generative structure is particularly useful for comparing and
+contrasting mathematical models with similar, and hence easily confused,
+assumptions.
+
+Consider for example an experiment that is made under carefully controlled
+circumstances quantified by the variables $x \in X$.  If the resulting data
+generating process is assumed to vary across these circumstances then any
+compatible observational model for the outcomes $y \in Y$ will take the form
+$$
+\pi(y, \theta; \tilde{x}).
+$$
+Inferences derived from this model are applicable whenever those circumstances
+can be similarly controlled.
+
+<center>
+<br>
+```{r, out.width = "30%", echo=FALSE}
+knitr::include_graphics("figures/examples/intervention/1/1.png")
+```
+<br><br>
+</center>
+
+In more chaotic settings, however, the circumstances might not be fixed.  If the
+variables $x$ also vary with each realized observation then they have to modeled
+along with the outcomes, $y$,
+$$
+\pi(y, x, \theta).
+$$
+Our previous model is no longer appropriate in these settings.
+
+<center>
+<br>
+```{r, out.width = "30%", echo=FALSE}
+knitr::include_graphics("figures/examples/intervention/2/2.png")
+```
+<br><br>
+</center>
+
+An appropriate narratively generative model for this system has to quantify how
+both $y$ and $x$ are generated in each observation, which requires a more
+sophisticated story and more assumptions.  For example if the circumstances $x$
+are generated before the nominal measurement outcome $y$ then the conditional
+decomposition
+$$
+\pi(y, x, \theta)
+= \pi(y, x \mid \theta) \, \pi(\theta)
+= \pi(y \mid x, \theta) \, \pi(x \mid \theta) \, \pi(\theta)
+$$
+specifies the natural narratively generative model.
+
+<center>
+<br>
+```{r, out.width = "30%", echo=FALSE}
+knitr::include_graphics("figures/examples/intervention/3/3.png")
+```
+<br><br>
+</center>
+
+Moreover if the conditional model for $y$ and $x$ are parameterized by different
+model configuration variables then the narratively generative model reduces to
+$$
+\begin{align*}
+\pi(y, x, \theta_{1}, \theta_{2})
+&=
+\pi(y \mid x, \theta_{2}) \, \pi(x \mid \theta_{1}) \,
+\pi(\theta_{1}) \, \pi(\theta_{2})
+\\
+&=
+\pi(y \mid x, \theta_{2}) \, \pi(\theta_{2}) \,
+\pi(x \mid \theta_{1}) \, \pi(\theta_{1})
+\\
+&=
+\pi(y, \theta_{2} \mid x) \,
+\pi(x, \theta_{1}).
+\end{align*}
+$$
+
+<center>
+<br>
+```{r, out.width = "30%", echo=FALSE}
+knitr::include_graphics("figures/examples/intervention/4/4.png")
+```
+<br><br>
+</center>
+
+The first term in this particular narratively generative model,
+$\pi(y, \theta_{2} \mid x)$, has the same mathematical structure as the model
+for the controlled experiment, $\pi(y, \theta; x)$.
+
+<center>
+<br>
+```{r, out.width = "70%", echo=FALSE}
+knitr::include_graphics("figures/examples/intervention/5/5.png")
+```
+<br><br>
+</center>
+
+Indeed if the $x$ are modeled with a Dirac distribution that concentrates
+entirely at $\tilde{x}$ then the model for the uncontrolled experiment reduces
+to the model for the controlled experiment,
+$$
+\pi(y, x, \theta_{1}, \theta_{2})
+=
+\pi(y, \theta_{2} \mid \tilde{x}) \, \delta(x - \tilde{x})
+=
+\pi(y, \theta_{2}; \tilde{x}).
+$$
+These narrative assumptions allows us to compare and contrast the appropriate
+models for the controlled and uncontrolled measurements.
+
+This, however, is far from the only narratively generative model that might be
+applicable to the uncontrolled setting.  For example the conditional models for
+$y$ and $x$ might share a dependence on some of the model configuration
+variables,
+$$
+\begin{align*}
+\pi(y, x, \theta_{1}, \theta_{2})
+&=
+\pi(y \mid x, \theta_{1}, \theta_{2}) \, \pi(x \mid \theta_{1}) \,
+\pi(\theta_{1}) \, \pi(\theta_{2}),
+\end{align*}
+$$
+which prevents the narrative from decomposing into independent stories for how
+the variables $x$ and the variables $y$ are generated.
+
+<center>
+<br>
+```{r, out.width = "30%", echo=FALSE}
+knitr::include_graphics("figures/examples/intervention/6/6.png")
+```
+<br><br>
+</center>
+
+Alternatively if the measurement process censors certain circumstances $x$
+depending on the outcome $y$ then we might have to instead consider the
+conditional decomposition
+$$
+\pi(y, x, \theta)
+= \pi(y, x \mid \theta), \pi(\theta)
+= \pi(x \mid y, \theta) \, \pi(y \mid \theta) \, \pi(\theta).
+$$
+where $\pi(x \mid y, \theta)$ models the censoring process.
+
+<center>
+<br>
+```{r, out.width = "30%", echo=FALSE}
+knitr::include_graphics("figures/examples/intervention/7/7.png")
+```
+<br><br>
+</center>
+
+The mathematical distinction between some of these models can be subtle, but
+a narratively generative perspective often provides a clarifying interpretation.
+For example the models $\pi(y, \theta_{1} \mid x)$ and $\pi(y, \theta; x)$ might
+be exactly the same mathematically, but they have different narratively
+generative interpretations which makes then appropriate for modeling different
+systems.  Sometimes the conditional model $\pi(y, \theta_{1} \mid x)$ is
+relevant for modeling uncontrolled experiments but sometimes it is not, and the
+narratively generative interpretation identifies exactly when.
+
+By incorporating this interpretation from the beginning, narratively generative
+modeling avoids the mathematical ambiguity entirely which often clarifies the
+model building process.  Once we identify which variables are fixed by the
+measurement process and which are outcomes of the measurement process, including
+often neglected variables like the total number of observations, we can use the
+narratively generative perspective to translate our domain expertise into a
+joint model over all of the outcomes.  Occasionally some of the component models
+might simplify into common model templates, in which case we can take advantage
+of that simplified structure.  If the component models don't simplify, however,
+then we know that those templates are inappropriate for the problem at hand.
+
+In causal inference the relationship between the models $\pi(y, x, \theta_{1})$
+and $\pi(y, \theta_{1} \mid x)$ quantifies the effect of an _intervention_ where
+the variables $x$ are, actually or hypothetically, fixed [@Pearl:2009].  By
+examining the narratively generative structure of our model we can analyze these
+effects without having to consider any tools from causal inference.  Indeed
+these tools can all be reframed as implicit probabilistic modeling assumptions
+[@LattimoreEtAl:2019a; @LattimoreEtAl:2019b].
+
 ## Always Be Closing
 
 Now let's consider an example with a little more backstory.  In this example
@@ -933,7 +1144,7 @@ will be converted to a sale.  For example we may be interested in how likely a
 customer who enters a physical store is to buy a particular item, or a customer
 who browses a website is to signup for a subscription to a particular service.
 
-Observations of previous engagements have resulting in binary data coding a
+Observations of previous engagements have resulted in binary data coding a
 failed conversation with $0$ and a successful conversation with $1$.  If we
 assume that all customers behave identically then we can model this data with a
 Bernoulli observational model parameterized by a single probability parameter
@@ -1018,16 +1229,16 @@ knitr::include_graphics("figures/examples/customer_conversion/3/3.png")
 <br><br>
 </center>
 
-Unfortunately our ignorance about the customer categorization will dilutes how
-well the observation inform the two component behaviors, and our inferential
+Unfortunately our ignorance about the customer categorization will dilute how
+well the observation informs the two component behaviors, and our inferential
 uncertainties will probably leave much to be desired.  That is until one of our
 colleagues mentions a separate data set consisting of _only_ VIP customers.  If
 we can use these observations to inform $\theta^{\text{VIP}}$ then the initial
 observations should be able to better inform $\lambda$ and $\psi$.
 
-To do this we incorporate our initial measurement process and this complementary
-measurement process into a single narratively generative model that branches at
-$\theta^{\text{VIP}}$,
+To do this we can incorporate our initial measurement process and this
+complementary measurement process into a single narratively generative model
+that branches at $\theta^{\text{VIP}}$,
 $$
 \begin{align*}
 \pi(y_{1}, \ldots, y_{N}, &y^{\text{VIP}}_{1}, \ldots, y^{\text{VIP}}_{N^{\text{VIP}}},
@@ -1116,7 +1327,8 @@ $$
 \pi(\theta_{S}) \, \pi(\theta_{B}) \, \pi(\lambda)
 \\
 \rho_{k} =& \int_{b_{k}}^{b_{k + 1}} \mathrm{d} E \,
-\left[ \lambda \cdot \pi(E \mid \theta_{S}) + (1 - \lambda) \cdot \pi(E \mid \theta_{B}) \right].
+\left[ \lambda \cdot \pi(E \mid \theta_{S})
++ (1 - \lambda) \cdot \pi(E \mid \theta_{B}) \right].
 \end{align*}
 $$
 
@@ -1175,9 +1387,9 @@ allows our initial measurement to better inform $\lambda$ and $\theta_{S}$.
 With the details of the background contamination incorporated into our full
 model we can return to the consideration of the signal process.  While we've
 been doing all of this work to better understand the experiment our colleagues
-have been hard a work expanding the initial theoretical model
+have been hard at work expanding the initial theoretical model
 $\pi(E \mid \theta_{S})$ into a much more sophisticated model that incorporates
-many different interaction phenomena,
+many different interacting phenomena,
 $$
 \pi(E \mid \theta_{S}(\psi_{3}, \psi_{4}))
 \pi(\psi_{4} \mid \psi_{3}, \psi_{2}) \, \pi(\psi_{3} \mid \psi_{1}, \psi_{2}).
@@ -1203,7 +1415,8 @@ $$
 \pi(\psi_{2}) \, \pi(\psi_{1}) \, \pi(\theta_{B}) \, \pi(\lambda)
 \\
 \rho_{k} =& \int_{b_{k}}^{b_{k + 1}} \mathrm{d} E \,
-\left[ \lambda \cdot \pi(E \mid \theta_{S}(\psi_{3}, \psi_{4})) + (1 - \lambda) \cdot \pi(E \mid \theta_{B}) \right]
+\left[ \lambda \cdot \pi(E \mid \theta_{S}(\psi_{3}, \psi_{4}))
++ (1 - \lambda) \cdot \pi(E \mid \theta_{B}) \right]
 \\
 \tau_{k} =& \int_{b_{k}}^{b_{k + 1}} \mathrm{d} E \, \pi(E \mid \theta_{B}).
 \end{align*}
@@ -1224,9 +1437,9 @@ for inconsistent, heuristic methods for "propagating uncertainty" or
 ## The Eyes Have It
 
 For this example we'll go from physics to physiology.  Here our interest is in
-understanding firstly how a drug propagates through a human body and then the
-effects of that drug on certain systems in the human body.  These two concerns
-are known as _pharmacokinetics_ and _pharmacodynamics_, respectively.
+understanding firstly how a drug propagates through a human body and then how
+that drug effects certain systems in the human body.  These two concerns are
+known as _pharmacokinetics_ and _pharmacodynamics_, respectively.
 
 We begin by modeling the human body as a set of disjoint but interacting
 _compartments_.  These compartments might for example model individual organs,
@@ -1314,13 +1527,14 @@ $$
 \text{logit} \, (\theta_{i, n}) = \frac{ \theta_{i, n} }{ 1 - \theta_{i, n} },
 $$
 depends on the difference between a patient's cognitive ability, modeled with
-the parameter $\alpha_{i}$, the difficulty of the question, modeled with the
+the parameter $\alpha_{i}$, and the difficulty of the question, modeled with the
 parameter $\beta_{n}$,
 $$
 \text{logit} \, (\theta_{i, n}) \propto \alpha_{i} - \beta_{n}.
 $$
-The constant of proportionality quantifies how sensitive the answers are to this
-contrast, which is referred to the discrimination of the question,
+The constant of proportionality $\gamma_{n}$ quantifies how sensitive the
+answers are to this contrast, which is referred to the discrimination of the
+question,
 $$
 \text{logit} \, (\theta_{i, n}) =
 \gamma_{n} \left( \alpha_{i} - \beta_{n} \right).
@@ -1412,9 +1626,9 @@ into these complex systems.
 
 Our final example is motivated by an analysis of malaria vaccines in
 @Sherrard-SmithEtAl:2017.  Here we'll consider a simplified, hypothetical
-bacterial infection that spreads through mosquitos.
+bacterial infection that spreads through mosquitos bites.
 
-To begin we'll set up our hypothetical domain expertise.  A hypothetical
+To begin we'll outline our hypothetical domain expertise.  A hypothetical
 bacteria is known to mature in the blood of infected mice.  Any mosquito that
 feeds on this blood transfers some of the mature bacteria into its gut where the
 mature bacteria can reproduce.  The resulting immature bacteria then diffuse
@@ -1455,10 +1669,10 @@ mosquito gut in each bite and then is able to reproduce there.  This model could
 be anything from a complex system of ordinary differential equations or even a
 heuristic approximation such as a linearized model, depending on our domain
 expertise and how detailed of a story we need.  Here we'll leave that choice
-open and denote the model with a general function whose output gives the
-bacterial density in the mosquitos, $\lambda_{2}$.  The observational model for
-the observed bacterial density in the sampled mosquito will be given by another
-Poisson model conditioned on $\lambda_{2}$,
+open and denote the model with a general deterministic function whose output
+gives the bacterial density in the mosquitos, $\lambda_{2}$.  The observational
+model for the observed bacterial density in the sampled mosquito will be given
+by another Poisson model conditioned on $\lambda_{2}$,
 $$
 \begin{align*}
 \pi(y_{1}, y_{2}^{C}, \lambda_{1}, \psi_{1 \rightarrow 2})
@@ -1524,7 +1738,7 @@ which of these stories are compatible with those measurements.
 At this point we can consider how the treatment might potentially interrupt this
 infection cycle.  The first feature of this hypothetical treatment is that it
 may be able to prevent the bacteria from reproducing at all, in which case there
-will be no immature bacteria in the mosquito guts at all.  We can incorporate
+will no immature bacteria will make it to the mosquito gut.  We can incorporate
 this into our model by mixing the nominal Poisson model with a zero component,
 $$
 \pi(y_{2}^{T} \mid \lambda_{2}, \rho)
@@ -1570,7 +1784,7 @@ The treatment, however, is not done yet.  Even if the bacteria are able to
 reproduce then there is a chance that the treatment will compromise all of the
 offspring, rendering them unable to grow to maturity where they can infect a new
 host.  In other words there are two ways to suppress infection in the second
-mouse entirely: with probability $\rho$ the treatment can suppress reproduction
+mouse entirely: with probability $\rho$ the treatment can suppress reproduction,
 and then if reproduction succeeds it can still limit the viability of the
 offspring with probability $\sigma$.  Combining all of these possibilities
 results in a zero-inflated mixture model for the bacterial density in the final
@@ -1655,8 +1869,8 @@ Narratively generative modeling is a powerful framework for transcribing our
 implicit domain expertise about a measurement process into an explicit
 mathematical model through storytelling.  The approach is particularly useful
 when eliciting domain expertise from colleagues with only limited statistical
-experience; while they may not understand probabilistic modeling they may be
-experts in the relevant measurement processes being modeled.  To paraphrase
+experience; while they may not understand probabilistic modeling they are likely
+to be experts in the measurement processes being modeled.  To paraphrase
 Brillat-Savarin, "Tell me how your data were generated, and I will tell you what
 your model is."
 
@@ -1669,6 +1883,8 @@ expand that vocabulary, increasing the sophistication of the models that we can
 build and the insights we can attain from them.
 
 # Acknowledgements
+
+I thank Robert Goldman for helpful comments.
 
 A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
 Abhinav Katoch, Adam Bartonicek, Adam Fleischhacker, Adam Golinski, Adan,
