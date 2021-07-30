@@ -437,8 +437,8 @@ Such recursive, narratively generative structure can drastically facilitate the
 development of expansive, intricate, and yet self-consistent narratives.
 
 For example instead of trying to build a narrative by piecing together detailed
-scenes in sequential order, it is often often much more productive to _outline_
-the overarching plot as a sequence of broad arcs, each of which can then be
+scenes in sequential order, it is often much more productive to _outline_ the
+overarching plot as a sequence of broad arcs, each of which can then be
 elaborated into more smaller scenes that are more manageable to construct in the
 necessary detail.  Likewise the most effective way to develop a sophisticated
 probabilistic model is often to first develop a crude model of the entire data
@@ -720,7 +720,7 @@ $$
 \pi(\theta_{2}, \phi, \tilde{y}_{1}, \tilde{y}_{2})
 =
 \pi(y_{2} \mid \theta_{2}, \phi) \, \pi(\theta_{1}) \,
-\pi(\phi \mid \tilde{y}_{2})
+\pi(\phi \mid \tilde{y}_{1})
 $$
 in tools like Stan.
 
@@ -884,7 +884,7 @@ $$
 \left[ \prod_{n = 1}^{N_{1}} \pi(y_{1, n} \mid \theta_{1}) \right] \pi(\theta_{1})
 \\
 & \quad \cdot
-\left[ \prod_{n = 1}^{N_{2}} \pi(y_{1, n} \mid \theta_{2}) \right] \pi(\theta_{2}).
+\left[ \prod_{n = 1}^{N_{2}} \pi(y_{2, n} \mid \theta_{2}) \right] \pi(\theta_{2}).
 \end{align*}
 $$
 
@@ -911,7 +911,7 @@ $$
 \left[ \prod_{n = 1}^{N_{1}} \pi(y_{1, n} \mid \theta_{1}) \right] \pi(\theta_{1})
 \\
 & \quad \cdot
-\left[ \prod_{n = 1}^{N_{2}} \pi(y_{1, n} \mid \theta_{2}(\theta_{1}, \psi)) \right] \pi(\psi).
+\left[ \prod_{n = 1}^{N_{2}} \pi(y_{2, n} \mid \theta_{2}(\theta_{1}, \psi)) \right] \pi(\psi).
 \end{align*}
 $$
 
@@ -939,7 +939,7 @@ $$
 \left[ \prod_{n = 1}^{N_{1}} \pi(y_{1, n} \mid \theta_{1}) \right] \pi(\theta_{1})
 \\
 & \quad \cdot
-\left[ \prod_{n = 1}^{N_{2}} \pi(y_{1, n} \mid \alpha + \beta \cdot \theta_{1}) \right]
+\left[ \prod_{n = 1}^{N_{2}} \pi(y_{2, n} \mid \alpha + \beta \cdot \theta_{1}) \right]
 \pi(\alpha) \, \pi(\beta).
 \end{align*}
 $$
@@ -1884,7 +1884,7 @@ build and the insights we can attain from them.
 
 # Acknowledgements
 
-I thank Robert Goldman for helpful comments.
+I thank Robert Goldman and David Galley for helpful comments.
 
 A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
 Abhinav Katoch, Adam Bartonicek, Adam Fleischhacker, Adam Golinski, Adan,
