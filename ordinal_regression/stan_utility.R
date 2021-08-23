@@ -19,7 +19,7 @@ check_div <- function(fit, quiet=FALSE) {
 check_treedepth <- function(fit, max_depth = 10, quiet=FALSE) {
   sampler_params <- get_sampler_params(fit, inc_warmup=FALSE)
   treedepths <- do.call(rbind, sampler_params)[,'treedepth__']
-  n = length(treedepths[sapply(treedepths, function(x) x == max_depth)])
+  n = length(treedepths[sapply(treedepths, function(x) x >= max_depth)])
   N = length(treedepths)
 
   if (!quiet)

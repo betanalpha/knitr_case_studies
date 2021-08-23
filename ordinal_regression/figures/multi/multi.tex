@@ -31,11 +31,11 @@
       return 12 * 4 * exp(\x) / ((1 + exp(\x)) * (1 + exp(\x)));
     };
   };
-  function comp_logistic(\x) {
+  function logistic(\x) {
     if \x > 0 then {
-      return 12 * exp(-\x) / (1 + exp(-\x));
+      return 12 / (1 + exp(-\x));
     } else {
-      return 12 / (1 + exp(\x));
+      return 12 * exp(\x) / (1 + exp(\x));
     };
   };
 }
@@ -72,7 +72,7 @@
   \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (-8 + \dx, 0) -- +(-1.25, 0);
   \node[] at (0 + \dx, -3.5) { $X$ };
   
-  \node[] at (-13 + \dx, 6) { $\pi_{c}(x)$ };
+  \node[] at (-13 + \dx, 6) { $\pi(x)$ };
   
   \draw[dashed, color=gray70] (-10.75, 12) -- (-9.25, 12);
   \draw[dashed, color=gray70] (-8, 12) -- (9.0, 12);
@@ -81,15 +81,15 @@
   \node[] at (-9.25, -2) { $c_{0} = -\infty$ };
   \draw[dashed, color=gray70] (-9.25, -1) -- +(0, 13);
   
-  \node[right] at (-16, 12) { $\Pi_{c}(c_{0}) = 1$ };
+  \node[right] at (-16, 12) { $\Pi(c_{5}) = 1$ };
  
   \foreach \x [count=\i] in {-2, -0.05, 1.9} {
     \node[] at (\x, -2) { $c_{\i}$ };
     \draw[dashed, color=gray70] (\x, -1) -- +(0, 13);
-    \draw[dashed, color=gray70] (-10.75, {comp_logistic(\x)}) -- (-9.25, {comp_logistic(\x)});
-    \draw[dashed, color=gray70] (-9.25, {comp_logistic(\x)}) -- (9.25, {comp_logistic(\x)});
-    \draw[dashed, color=gray70] (9.25, {comp_logistic(\x)}) -- (10.75, {comp_logistic(\x)});
-    \node[right] at (-16, {comp_logistic(\x)}) { $\Pi_{c}(c_{\i})$ };
+    \draw[dashed, color=gray70] (-10.75, {logistic(\x)}) -- (-9.25, {logistic(\x)});
+    \draw[dashed, color=gray70] (-9.25, {logistic(\x)}) -- (9.25, {logistic(\x)});
+    \draw[dashed, color=gray70] (9.25, {logistic(\x)}) -- (10.75, {logistic(\x)});
+    \node[right] at (-16, {logistic(\x)}) { $\Pi(c_{\i})$ };
   }
   
   \node[] at (9.25, -2) { $c_{4} = +\infty$ };
@@ -98,7 +98,7 @@
   \draw[dashed, color=gray70] (-10.75, 0) -- (-9.25, 0);
   \draw[dashed, color=gray70] (9.25, 0) -- (10.75, 0);
   
-  \node[right] at (-16, 0) { $\Pi_{c}(c_{5}) = 0$ };
+  \node[right] at (-16, 0) { $\Pi(c_{1}) = 0$ };
   
   \draw [-, >=stealth, line width=1] (-8, 0) -- +(16, 0);
   \draw [-, dash pattern={on 1pt off 1pt}, line width=1] (8, 0) -- +(1.25, 0);
@@ -106,27 +106,27 @@
   \node[] at (0, -3.5) { $X$ };
 
   \draw[domain=-7.75:7.75, smooth, samples=150, line width=1, variable=\x, color=dark] 
-    plot ({\x},{comp_logistic(\x)});
-  \draw [-, dash pattern={on 1pt off 1pt}, line width=1, color=dark] (-9.25, 12) -- +(1.5, 0);
-  \draw[line width=1, color=dark] (-8, 12) -- +(0.25, 0);
-  \draw [-, dash pattern={on 1pt off 1pt}, line width=1, color=dark] (8, 0) -- +(1.25, 0);
-  \draw[line width=1, color=dark] (8, 0) -- +(-0.25, 0);
+    plot ({\x},{logistic(\x)});
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1, color=dark] (-9.25, 0) -- +(1.5, 0);
+  \draw[line width=1, color=dark] (-8, 0) -- +(0.25, 0);
+  \draw [-, dash pattern={on 1pt off 1pt}, line width=1, color=dark] (8, 12) -- +(1.25, 0);
+  \draw[line width=1, color=dark] (8, 12) -- +(-0.25, 0);
       
-  \draw[<->, >=stealth, line width=1, color=dark] (11, {comp_logistic(-2)}) -- (11, 12);
-  \node[right] at (11.5, {0.5 * (comp_logistic(-2) + 12)}) 
-    { $p_{1} = \Pi_{c}(c_{0}) - \Pi_{c}(c_{1})$ };
+  \draw[<->, >=stealth, line width=1, color=dark] (11, 0) -- (11, {logistic(-2)});
+  \node[right] at (11.5, {0.5 * (logistic(-2) + 0)}) 
+    { $p_{1} = \Pi(c_{1}) - \Pi(c_{0})$ };
   
-  \draw[<->, >=stealth, line width=1, color=dark] (11, {comp_logistic(-0.05)}) -- (11, {comp_logistic(-2)});
-  \node[right] at (11.5, {0.5 * (comp_logistic(-2) + comp_logistic(-0.05))}) 
-    { $p_{2} = \Pi_{c}(c_{1}) - \Pi_{c}(c_{2})$ };  
+  \draw[<->, >=stealth, line width=1, color=dark] (11, {logistic(-2)}) -- (11, {logistic(-0.05)});
+  \node[right] at (11.5, {0.5 * (logistic(-0.05) + logistic(-2))}) 
+    { $p_{2} = \Pi(c_{2}) - \Pi(c_{1})$ };  
   
-  \draw[<->, >=stealth, line width=1, color=dark] (11, {comp_logistic(1.9)}) -- (11, {comp_logistic(-0.05)});
-  \node[right] at (11.5, {0.5 * (comp_logistic(-0.05) + comp_logistic(1.9))}) 
-    { $p_{3} = \Pi_{c}(c_{2}) - \Pi_{c}(c_{3})$ };
+  \draw[<->, >=stealth, line width=1, color=dark] (11, {logistic(-0.05)}) -- (11, {logistic(1.9)});
+  \node[right] at (11.5, {0.5 * (logistic(1.9) + logistic(-0.05))}) 
+    { $p_{3} = \Pi(c_{3}) - \Pi(c_{2})$ };
     
-  \draw[<->, >=stealth, line width=1, color=dark] (11, 0) -- (11, {comp_logistic(1.9)});
-  \node[right] at (11.5, {0.5 * (comp_logistic(1.9) + 0)}) 
-    { $p_{4} = \Pi_{c}(c_{3}) - \Pi_{c}(c_{4})$ };
+  \draw[<->, >=stealth, line width=1, color=dark] (11, {logistic(1.9)}) -- (11, 12);
+  \node[right] at (11.5, {0.5 * (12 + logistic(1.9))}) 
+    { $p_{4} = \Pi(c_{}) - \Pi(c_{3})$ };
     
 \end{tikzpicture}
 

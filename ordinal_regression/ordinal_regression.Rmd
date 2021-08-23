@@ -19,6 +19,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(comment=NA)
+knitr::opts_knit$set(global.par = TRUE)
 ```
 
 Regression models quantify statistical correlations by allowing latent effects 
@@ -67,9 +68,7 @@ case with only two ordinals, and hence two probabilities to model.
 
 We begin by introducing a latent continuous space, $X = \mathbb{R}$, with a 
 probability distribution specified by the probability density function, 
-$\pi(x)$.  For technical reasons that will be explained in the next section we 
-will utilize the _complementary density_, $\pi_{c}(x) = \pi(-x)$ in our
-construction.
+$\pi(x)$.
 
 Next we partition $X$ into two intervals using three _cut points_, 
 $\{c_{0}, c_{1}, c_{2}\}$.  The first cut point extends to minus infinity,
@@ -90,16 +89,13 @@ knitr::include_graphics("figures/binary_density/binary_density.png")
 </center>
 
 In practice we can compute these probabilities as differences between the
-complementary cumulative distribution function,
+cumulative distribution function evaluated at the cut points,
 $$
-\Pi_{c}(x) 
-= \int_{-\infty}^{x} \mathrm{d} x \, \pi_{c}(x)
-= \int_{x}^{\infty} \mathrm{d} x \, \pi(x),
-$$
-evaluated at the cut points,
-$$
-p_{k} 
-= \Pi_{c}(c_{k - 1}) - \Pi_{c}(c_{k}).
+\begin{align*}
+p_{1} &= \Pi(c_{1}) - \Pi(c_{0}) = \Pi(c_{1}) - 0
+\\
+p_{2} &= \Pi(c_{2}) - \Pi(c_{1}) = 1 - \Pi(c_{1}).
+\end{align*}
 $$
 
 <center>
@@ -113,9 +109,11 @@ knitr::include_graphics("figures/binary_cumulative/binary_cumulative.png")
 This construction immediately generalizes to more ordinals by partitioning $X$
 into more intervals. Using $K + 1$ ordered cut points we can partition $X$ into 
 $K$ intervals, from which we can compute $K$ ordinal probabilities.  As before 
-the probabilities are most easily computed as differences between the 
-complementary cumulative distribution function, $\Pi_{c}(x)$, evaluated at the
-cut points.
+the probabilities are most easily computed as differences between the cumulative 
+distribution function evaluated at the cut points,
+$$
+p_{k} = \Pi(c_{k}) - \Pi(c_{k - 1}).
+$$
 
 <center>
 <br>
@@ -141,8 +139,7 @@ $$
 The complete ordinal model is then given by
 $$
 \pi(k \mid c_{0}, \ldots, c_{K})
-= \Pi_{c}(c_{k - 1}) - \Pi_{c}(c_{k})
-= \Pi(-c_{k - 1}) - \Pi(-c_{k}).
+= \Pi(c_{k}) - \Pi(c_{k - 1}).
 $$
 If the observed ordinals are aggregated into total counts for each category then 
 a multinomial observational model can also be used.
@@ -168,25 +165,47 @@ $$
 $$
 whose cumulative distribution function is given by the logistic function,
 $$
-\Pi = \frac{1}{1 + e^{-x}},
+\Pi(x) = \frac{1}{1 + e^{-x}} \equiv \sigma(x),
 $$
 defines an _ordinal logistic_ or _ordered logistic_ model.  Employing a 
 probability distribution specified by a Gaussian probability density function
 defines an _ordinal probit_ or _ordered probit_ model.
 
+The logistic function $\sigma(x)$ satisfies the identify
+$$
+1 - \sigma(x) = \sigma(-x),
+$$
+which allows us to write the corresponding ordinal probabilities in the 
+equivalent form 
+$$
+\begin{align*}
+p_{k} 
+&= \sigma(c_{k}) - \sigma(c_{k - 1})
+\\
+&= 1 - \sigma(-c_{k}) - (1 - \sigma(c_{k - 1}))
+\\
+&= \sigma(-c_{k - 1}) - \sigma(-c_{k}),
+\end{align*}
+$$
+which is more conventional in some fields.
+
 ## Cut to the Feeling
 
-How do we model the influence of some latent effect or _affinity_, $\gamma$, on 
-the ordinal probabilities?  In particular how can we design our model such that 
-a positive affinity, $\gamma > 0$ drags probability to higher ordinals while a 
-negative affinity, $\gamma < 0$, drags probability to lower ordinals?
+How do we model the influence of some latent phenomena on the ordinal 
+probabilities?  In particular if the latent phenomena is an _affinity_, 
+$\gamma$, that correlates with higher ordinal outcomes then how can we design 
+our model such that a positive affinity, $\gamma > 0$ drags probability to 
+higher ordinals while a negative affinity, $\gamma < 0$, drags probability to 
+lower ordinals?
 
-Fortunately we can readily accomplish this moderation in our construction by 
-translating $X$ upwards by the size of the affinity, $x \mapsto x + \gamma$, 
-while keeping the cut points fixed.  Because of our prescient use of 
-complementary probability density functions and cumulative distribution 
-functions above, a positive translation by $\gamma$ will correspond to 
-probabilities concentrating towards higher ordinals as desired.
+We can readily accomplish this moderation in our construction by translating 
+$X$ downwards by the size of the affinity, $x \mapsto x - \gamma$, while keeping 
+the cut points fixed.  When $\gamma$ is positive this translation shifts the 
+latent probability density function to larger values of $x$, concentrating the 
+integrated probabilities to higher ordinals as desired.  Similarly when $\gamma$
+is negative this translation shifts the latent probability density function to
+smaller values of $x$, concentrating the integrated probabilities to lower 
+ordinals.
 
 <center>
 <br>
@@ -196,32 +215,38 @@ knitr::include_graphics("figures/multi_density_shift/multi_density_shift.png")
 <br><br>
 </center>
 
-In the presence of a moderating affinity the ordinal probabilities are computed 
-as
+In terms of the ordinal probabilities translating from $x$ to $x - \gamma$ while 
+keeping the cut points fixed is equivalent to translating the cut points from 
+$c_{k}$ to $c_{k} - \gamma$ while keeping $x$ fixed.  Consequently in the
+presence of a moderating affinity the ordinal probabilities can become
 $$
 p_{k}
-= \Pi_{c}(c_{k - 1} - \gamma) - \Pi_{c}(c_{k} - \gamma),
+= \Pi(c_{k} - \gamma) - \Pi(c_{k - 1} - \gamma).
 $$
-or, in terms of the regular cumulative distribution function,
+For the ordinal logistic model we take advantage of the properties of the
+logistic function to write this in the equivalent form
 $$
 \begin{align*}
 p_{k}
-&= \Pi_{c}(c_{k - 1} - \gamma) - \Pi_{c}(c_{k} - \gamma)
+&= \sigma(c_{k} - \gamma) - \sigma(c_{k - 1} - \gamma)
 \\
-&= \Pi(\gamma - c_{k - 1}) - \Pi(\gamma - c_{k}),
+&= 1 - \sigma(\gamma - c_{k}) - (1 - \sigma(\gamma - c_{k - 1}))
+\\
+&= \sigma(\gamma - c_{k - 1}) - \sigma(\gamma - c_{k}),
 \end{align*}
 $$
-corresponding to the definitions given in the Stan functions reference guide.
+which is for example how the `ordered_logistic_lpmf` function is defined in the 
+Stan functions reference guide.
 
-Note that we can accomplish this same behavior by keeping $X$ fixed but 
-translating all of the interior cut points down by the affinity.  In other
-words the ordinal probabilities inform only the _relative_ location of the
+Because of this equivalence between translation the latent space and the cut 
+points the ordinal probabilities inform only the _relative_ location of the
 affinity and the cut points in this construction.  When the latent affinity and 
 cut points are modeled jointly this induces a non-identifiability in the 
-observational model.  In order to avoid the propagation of this 
-non-identifiability from the observational model into the posterior distribution 
-we have to carefully anchor the affinity, the cut points, or perhaps even 
-both to some base line values in the prior model.
+observational model and strong degeneracies in the resulting likelihood 
+functions.  In order to prevent these degeneracies from propagating from the 
+realized likelihood functions into the corresponding posterior distributions
+we have to carefully anchor the affinity, the cut points, or perhaps even both 
+to some base line values in the prior model.
 
 An even better approach is to avoid modeling any baseline affinity at all
 and instead use this construction to model _heterogeneity_ in the affinity
@@ -257,7 +282,10 @@ library(rstan)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-input_data <- read_rdump("ordinal1.data.R")
+par(family="CMU Serif", las=1, bty="l", cex.axis=1, cex.lab=1, cex.main=1,
+    xaxs="i", yaxs="i", mar = c(5, 5, 3, 1))
+
+input_data <- read_rdump("data/ordinal1.data.R")
 
 table(input_data$y)
 ```
@@ -267,17 +295,18 @@ concentrate around the fourth category.
 The Stan program implementing our ordinal regression model with uniform priors 
 for both the internal cut points and the latent affinity $\gamma$ is given by
 ```{r}
-writeLines(readLines("ordered_logistic_uniform.stan"))
+writeLines(readLines("stan_programs/ordered_logistic_uniform.stan"))
 ```
 
 Unfortunately fitting this model to the data yields less that satisfactory 
 results.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 util <- new.env()
 source('stan_utility.R', local=util)
 
-fit <- stan(file='ordered_logistic_uniform.stan', data=input_data, seed=4938483)
+fit <- stan(file='stan_programs/ordered_logistic_uniform.stan', 
+            data=input_data, seed=4938483)
 
 util$check_all_diagnostics(fit)
 ```
@@ -315,12 +344,13 @@ In order to suppress the non-identifiability inherent to our construction of
 ordinal probabilities we need a stronger prior model.  Let's consider a 
 Gaussian prior density function for the affinity,
 ```{r}
-writeLines(readLines("ordered_logistic_weak.stan"))
+writeLines(readLines("stan_programs/ordered_logistic_weak.stan"))
 ```
 
 This yields a much better fit,
-```{r}
-fit <- stan(file='ordered_logistic_weak.stan', data=input_data, seed=4938483)
+```{r, warning=FALSE, message=FALSE}
+fit <- stan(file='stan_programs/ordered_logistic_weak.stan', 
+            data=input_data, seed=4938483)
 
 util$check_all_diagnostics(fit)
 ```
@@ -350,7 +380,7 @@ hist(params$c[, 4], breaks=seq(-9, 6, 0.25),
      col=c_light_highlight, border=c_dark_highlight, add=T)
 ```
 
-and a posterior predictive check shows no signs of misfit,
+and a posterior retroedictive check shows no signs of misfit,
 ```{r}
 B <- 5
 idx <- rep(1:B, each=2)
@@ -386,7 +416,7 @@ lines(x, pad_obs_counts, col="black", lty=1, lw=2)
 Before we become too confident with our newfound ordinal powers, however, let's
 consider a second data set.
 ```{r}
-input_data <- read_rdump("ordinal2.data.R")
+input_data <- read_rdump("data/ordinal2.data.R")
 
 table(input_data$y)
 ```
@@ -396,8 +426,9 @@ reasonable statistical fluctuation that leaves us with no data in the first
 category.
 
 Our model is much less successful in fitting this data,
-```{r}
-fit <- stan(file='ordered_logistic_weak.stan', data=input_data, seed=4938483)
+```{r, warning=FALSE, message=FALSE}
+fit <- stan(file='stan_programs/ordered_logistic_weak.stan', 
+            data=input_data, seed=4938483)
 
 util$check_all_diagnostics(fit)
 ```
@@ -475,10 +506,14 @@ only to find that this transformation is singular and yields an ill-posed
 probability density function.  This is because the internal cut points and 
 affinity are non-identified and the map to probabilities is many-to-one.
 
-Instead we condition on an _anchor point_, $\phi$, and then map the $K$ 
-probabilities and their sum-to-one constraint to the $K - 1$ cut points and a 
-new variable that encodes the constraint, $S = \sum_{k = 1}^{K} p_{k} = 1$.  If
-we use a latent logistic probability density function and define
+In order to avoid this singularity we have to fix the cut points around some 
+_anchor point_, $\phi$.  This allows us to transform the $K$ probabilities 
+$(p_{1}, \ldots, p_{K})$ to a new variable that encodes the normalization, 
+$S = \sum_{k = 1}^{K} p_{k} = 1$ and the $K - 1$ cut points, 
+$(S, c_{1}, \ldots, c_{K - 1})$.  
+
+More formally if we are using a latent logistic probability density function 
+with
 $$
 \sigma(x) = \frac{1}{1 + e^{-x}},
 $$
@@ -491,18 +526,22 @@ $$
 = \frac{ \mathrm{d} \sigma}{ \mathrm{d} x}(x)
 = \sigma(x) \cdot (1 - \sigma(x)),
 $$
-then we can write the map from probabilities to parameters as
+then we can write the map from cut points to probabilities as
 $$
 \begin{align*}
 p_{k} &= \sigma \, (\phi - c_{k - 1}) - \sigma(\phi - c_{k})
 \\
-S &= 1
+\sum_{k = 1}^{K} p_{k} &= S
 \end{align*} 
 $$
 with the inverse map given by
 $$
 \begin{align*}
-c_{1} &= \phi - \lambda(1 - p_{1})
+S &= 1
+\\
+c_{1} &= \phi - \lambda(S - p_{1})
+\\
+&\ldots
 \\
 c_{k} &= \phi - \lambda( \sigma(\phi - c_{k - 1}) - p_{k}).
 \end{align*}
@@ -514,28 +553,28 @@ J_{k, 1}
 = \frac{ \partial p_{k} }{ \partial S }
 = 1,
 $$
-a diagonal band,
+a diagonal band for $k > 1$,
 $$
-J_{k + 1, k + 1} 
-= \frac{ \partial p_{k + 1} }{ \partial c_{k + 1} }
-= - \rho(c_{k}),
+J_{k, k} 
+= \frac{ \partial p_{k} }{ \partial c_{k + 1} }
+= -\rho(\phi - c_{k}),
 $$
 an off-diagonal band,
 $$
 J_{k, k + 1} 
-= \frac{ \partial p_{k + 1} }{ \partial c_{k} }
-= \rho(c_{k}),
+= \frac{ \partial p_{k} }{ \partial c_{k + 1} }
+= \rho(\phi - c_{k}),
 $$
 and zeroes everywhere else.  For example a five category model would give the 
 Jacobian matrix
 $$
-J(\mathbf{c}) =
+J(\mathbf{c}, \phi) =
 \left( \begin{array}{cccc} 
-1 & \rho(c_{1}) & 0 & 0 & 0\\
-1 & -\rho(c_{1}) & \rho(c_{2}) & 0 & 0 \\
-1 & 0 & -\rho(c_{2}) & \rho(c_{3}) & 0 \\
-1 & 0 & 0 & -\rho(c_{3}) & \rho(c_{4}) \\
-1 & 0 & 0 & 0 & -\rho(c_{4}).
+1 & \rho(\phi - c_{1}) & 0 & 0 & 0\\
+1 & -\rho(\phi - c_{1}) & \rho(\phi - c_{2}) & 0 & 0 \\
+1 & 0 & -\rho(\phi - c_{2}) & \rho(\phi - c_{3}) & 0 \\
+1 & 0 & 0 & -\rho(\phi - c_{3}) & \rho(\phi - c_{4}) \\
+1 & 0 & 0 & 0 & -\rho(\phi - c_{4}).
 \end{array} \right)
 $$
 
@@ -545,18 +584,18 @@ $$
 \pi(\mathbf{c}, S \mid \boldsymbol{\alpha}, \phi)
 =
 \mathcal{D}( \mathbf{p}(\mathbf{c}, \phi) \mid \boldsymbol{\alpha})
-\cdot \delta(S - 1) \cdot \left| J(\mathbf{c}) \right|,
+\cdot \delta(S - 1) \cdot \left| J(\mathbf{c}, \phi) \right|,
 $$
 where $\mathcal{D}(x \mid \boldsymbol{\alpha})$ is the Dirichlet probability
 density function and $\delta(S - 1)$ is a Dirac delta function encoding the
 summation constraint.  We can immediately marginalize out the auxiliary
-variable $S$ to give a probability density function that defines  our desired
+variable $S$ to give a probability density function that defines our desired
 cut point prior model,
 $$
 \pi(\mathbf{c}, \mid \boldsymbol{\alpha}, \phi)
 =
 \mathcal{D}( \mathbf{p}(\mathbf{c}, \phi) \mid \boldsymbol{\alpha})
-\cdot \left| J(\mathbf{c}) \right|.
+\cdot \left| J(\mathbf{c}, \phi) \right|.
 $$
 Unfortunately the Jacobian matrix does does not have any convenient structure 
 that might allow an analytic determinant.  Consequently we'll have to 
@@ -566,11 +605,12 @@ problematic when estimating many tens of categories.
 
 This prior model is straightforward to implement in Stan,
 ```{r}
-writeLines(readLines("ordered_logistic_induced.stan"))
+writeLines(readLines("stan_programs/ordered_logistic_induced.stan"))
 ```
 and immediately yields a better fit to the second data set,
-```{r}
-fit <- stan(file='ordered_logistic_induced.stan', data=input_data, seed=4938483)
+```{r, warning=FALSE, message=FALSE}
+fit <- stan(file='stan_programs/ordered_logistic_induced.stan', 
+            data=input_data, seed=4938483)
 
 util$check_all_diagnostics(fit)
 ```
@@ -599,7 +639,7 @@ hist(params$c[, 4], breaks=seq(-11, 6, 0.25),
      col=c_light_highlight, border=c_dark_highlight, add=T)
 ```
 
-and the posterior predictive check shows no signs of misfit,
+and the posterior retrodictive check shows no signs of misfit,
 ```{r}
 obs_counts <- hist(input_data$y, breaks=(1:(B + 1)) - 0.5, plot=FALSE)$counts
 pad_obs_counts <- sapply(idx, function(n) obs_counts[n])
@@ -633,12 +673,12 @@ configurations and then simulate observations from the prior predictive
 distribution.  Even better, the sampling is straightforward to implement in 
 Stan,
 ```{r}
-writeLines(readLines("simulate_ordinal.stan"))
+writeLines(readLines("stan_programs/simulate_ordinal.stan"))
 ```
 
 Given a prior predictive simulation,
-```{r}
-simu <- stan(file='simulate_ordinal.stan', iter=1, chains=1, 
+```{r, warning=FALSE, message=FALSE}
+simu <- stan(file='stan_programs/simulate_ordinal.stan', iter=1, chains=1, 
              seed=4838282, algorithm="Fixed_param")
 
 simu_params <- extract(simu)
@@ -648,8 +688,9 @@ input_data <- list("N" = 50, "K" = 5, "y" = array(simu_params$y[1,]))
 table(input_data$y)
 ```
 we can fit,
-```{r}
-fit <- stan(file='ordered_logistic_induced.stan', data=input_data, seed=4938483)
+```{r, warning=FALSE, message=FALSE}
+fit <- stan(file='stan_programs/ordered_logistic_induced.stan', 
+                  data=input_data, seed=4938483)
                    
 util$check_all_diagnostics(fit)
 ```
@@ -664,24 +705,24 @@ hist(params$gamma, main="", xlab="gamma", yaxt='n', ylab="",
 abline(v=simu_params$gamma, col="white", lty=1, lw=3)
 abline(v=simu_params$gamma, col="black", lty=1, lw=2)
                    
-hist(params$c[, 1], breaks=seq(-11, 6, 0.25), main="", 
+hist(params$c[, 1], breaks=seq(-13, 8, 0.25), main="", 
      xlab="Internal Cut Points", xlim=c(-11, 6), 
      yaxt='n', ylab="", ylim=c(0, 600),
      col=c_dark, border=c_dark_highlight)
 abline(v=simu_params$c[1], col="white", lty=1, lw=3)
 abline(v=simu_params$c[1], col="black", lty=1, lw=2)
            
-hist(params$c[, 2], breaks=seq(-11, 6, 0.25), 
+hist(params$c[, 2], breaks=seq(-13, 8, 0.25), 
      col=c_mid_highlight, border=c_dark_highlight, add=T)
 abline(v=simu_params$c[2], col="white", lty=1, lw=3)
 abline(v=simu_params$c[2], col="black", lty=1, lw=2)
 
-hist(params$c[, 3], breaks=seq(-11, 6, 0.25),
+hist(params$c[, 3], breaks=seq(-13, 8, 0.25),
      col=c_mid, border=c_dark_highlight, add=T)
 abline(v=simu_params$c[3], col="white", lty=1, lw=3)
 abline(v=simu_params$c[3], col="black", lty=1, lw=2)
 
-hist(params$c[, 4], breaks=seq(-11, 6, 0.25),
+hist(params$c[, 4], breaks=seq(-13, 8, 0.25),
      col=c_light_highlight, border=c_dark_highlight, add=T)
 abline(v=simu_params$c[4], col="white", lty=1, lw=3)
 abline(v=simu_params$c[4], col="black", lty=1, lw=2)
@@ -704,8 +745,9 @@ critical tools in the construction of principled priors in practice.
 
 # Acknowledgements {-}
 
-I thank Max Kesin and Mark Donoghoe for helpful comments.  Additionally I am 
-indebted for the feedback from those who have attended my courses and talks.
+I thank Max Kesin, Mark Donoghoe, shleeneu, and Jan Siml for helpful comments.
+Additionally I am indebted for the feedback from those who have attended my 
+courses and talks.
 
 A very special thanks to everyone supporting me on Patreon: 
 Abhinav Katoch, AdamMaruf, Aki Vehtari, Alan O'Donnell, Alexander Bartik, 
@@ -753,10 +795,6 @@ and licensed under the CC BY-NC 4.0 license:
 https://creativecommons.org/licenses/by-nc/4.0/
 
 # Original Computing Environment {-}
-
-This case study uses `RStan 2.18.1` to avoid a bug present in the vectorization 
-of the `ordered_logistic_lpmf` function in versions `2.19.0` and `2.19.1` of the
-Stan Math Library.
 
 ```{r, comment=NA}
 writeLines(readLines(file.path(Sys.getenv("HOME"), ".R/Makevars")))
