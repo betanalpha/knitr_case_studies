@@ -1,0 +1,102 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3]
+  \pgfmathsetmacro{\scale}{10}
+
+  \begin{scope}[shift={(0, 0)}]
+    \draw[white] (-13, -4) rectangle (13, 13);
+
+    \draw[light, line width=1.1] ({-\scale * 1}, 0) -- ({\scale * 1}, 0);
+    \node at ({-\scale * 1.1}, 0) { $-\infty$ };
+    \node at ({+\scale * 1.1}, 0) { $+\infty$ };
+    
+    \foreach \xi in {0, 0.1, ..., 1} {
+      \fill[mid] ({\scale * \xi}, 0) circle (0.05);
+      \fill[mid] ({- \scale * \xi}, 0) circle (0.05);
+    }
+    
+    \pgfmathsetmacro{\xi}{0.5}
+    
+    \draw[gray80, line width=1.1] ({+\scale * \xi}, -0.2) -- +(0, 0.4);
+    \draw[gray80, line width=1.1] ({-\scale * \xi}, -0.2) -- +(0, 0.4); 
+                   
+    \node[] at (0, -3) {$\mathbb{R}$};
+  \end{scope} 
+ 
+
+  \begin{scope}[shift={(30, 0)}]
+    \draw[white] (-13, -4) rectangle (13, 13);  
+    
+    \draw[white, line width=1.1] ({\scale * 0}, {\scale * 0.5}) circle (0.5 * \scale);
+  
+    \foreach \xi in {0.1, 0.2, ..., 10} {
+      \pgfmathsetmacro{\prop}{100 * (1 - exp(-\xi - 0.1))}  
+      \colorlet{custom}{mid!\prop!white}
+      
+      \pgfmathsetmacro{\x}{\scale * \xi / (\xi * \xi + 1)}
+      \pgfmathsetmacro{\y}{\scale * \xi * \xi / (\xi * \xi + 1)}
+      \pgfmathsetmacro{\theta}{90 - 2 * atan(1 / \xi)}
+      
+      \draw[custom, line width=1.1] (\x, \y) arc(\theta:180 - \theta:0.5 * \scale);
+    }
+  
+    \foreach \xi in {0, 0.1, ..., 10} {
+      \fill[mid] ({+\scale * \xi / (\xi * \xi + 1)}, {\scale * \xi * \xi / (\xi * \xi + 1)}) circle (0.05);
+      \fill[mid] ({-\scale * \xi / (\xi * \xi + 1)}, {\scale * \xi * \xi / (\xi * \xi + 1)}) circle (0.05);
+    }
+    
+    \node[] at (0, {\scale * 1.075}) {$\pm \infty$};
+    \fill[color=dark] (0, {\scale}) circle (0.1);
+    
+    \draw[light, line width=1.1] ({-\scale * 1}, 0) -- ({\scale * 1}, 0);
+    \node at ({-\scale * 1.1}, 0) { $-\infty$ };
+    \node at ({+\scale * 1.1}, 0) { $+\infty$ };
+    
+    \foreach \xi in {0, 0.1, ..., 1} {
+      \fill[mid] ({\scale * \xi}, 0) circle (0.05);
+      \fill[mid] ({- \scale * \xi}, 0) circle (0.05);
+    }
+    
+    \pgfmathsetmacro{\xi}{0.5}
+    
+    \draw[gray80, line width=1.1] ({+\scale * \xi}, -0.2) -- +(0, 0.4);
+    \draw[gray80, line width=1.1] ({-\scale * \xi}, -0.2) -- +(0, 0.4); 
+    
+    \pgfmathsetmacro{\x}{\scale * \xi / (\xi * \xi + 1)}
+    \pgfmathsetmacro{\y}{\scale * \xi * \xi / (\xi * \xi + 1)}
+    \pgfmathsetmacro{\theta}{90 - 2 * atan(1 / \xi)}
+      
+    \draw[gray80, line width=1.1]    ({\x - 0.3 * cos(\theta)}, {\y - 0.3 * sin(\theta)})
+                                  -- ({\x + 0.3 * cos(\theta)}, {\y + 0.3 * sin(\theta)});
+  
+    \draw[gray80, line width=1.1]    ({-\x - 0.3 * cos(\theta)}, {\y + 0.3 * sin(\theta)})
+                                  -- ({-\x + 0.3 * cos(\theta)}, {\y - 0.3 * sin(\theta)});
+                                  
+    \node[] at (0, -3) {Stereographic Projection of $\mathbb{R}$};
+  \end{scope} 
+ 
+\end{tikzpicture}
+
+\end{document}  

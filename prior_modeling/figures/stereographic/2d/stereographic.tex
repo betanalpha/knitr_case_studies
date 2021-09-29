@@ -1,0 +1,200 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray60}{gray}{0.95}
+
+\tikzmath{
+  function x(\x, \y) {
+    \xa = \x / (1 + \x * \x + \y * \y);
+    return \xa;
+    %return \xa * (-0.4 * \y + 2) / 2;
+  };
+  function y(\x, \y, \phi) {
+    \sumsq = \x * \x + \y * \y;
+    \denom = 1 / (1 + \sumsq);
+    \ya = \y * \denom;
+    \za = \sumsq * \denom;
+    \yb = \ya * cos(\phi) - \za * sin(\phi);
+    return \yb;
+  };
+  function z(\x, \y, \phi) {
+    \sumsq = \x * \x + \y * \y;
+    \denom = 1 / (1 + \sumsq);
+    \ya = \y * \denom;
+    \za = \sumsq * \denom;
+    \zb = \za * cos(\phi) + \ya * sin(\phi);
+    return \zb;
+  };
+  function xi(\x, \y) {
+    return \x * (-0.4 * \y + 2) / 2;
+  };
+  function zeta(\y, \phi) {
+    return \y * sin(\phi);
+  };
+  function mineta(\x, \phi) {
+    \sphi = sin(\phi);
+    \xsq = \x * \x;
+    \spsi = (1 - \xsq) / (1 + \xsq);
+    return \spsi * (1 - sqrt(1 - \sphi * \sphi * (1 + \xsq) )) / \sphi;
+  };
+  function maxeta(\x, \phi) {
+    return (\x * \x - 1) / 6;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.3]
+  \pgfmathsetmacro{\phi}{15}
+  \pgfmathsetmacro{\lmin}{-1}
+  \pgfmathsetmacro{\lmax}{1}
+  \pgfmathsetmacro{\scale}{10}
+  
+\begin{scope}[shift={(0, 0)}]
+  
+    \draw[white] (-13, -6) rectangle (13, 12);
+    
+    % Linear density
+    \fill[light]    ({\scale * xi(\lmin, \lmin)}, {\scale * zeta(\lmin, \phi)})
+                 -- ({\scale * xi(\lmin, \lmax)}, {\scale * zeta(\lmax, \phi)})
+                 -- ({\scale * xi(\lmax, \lmax)}, {\scale * zeta(\lmax, \phi)}) 
+                 -- ({\scale * xi(\lmax, \lmin)}, {\scale * zeta(\lmin, \phi)})
+                 -- cycle;
+    
+    % Horizontal lines
+    \foreach \xi in {-0.8, -0.6, ..., 0.8} {
+      \draw[mid]    ({\scale * xi(\xi, \lmin)}, {\scale * zeta(\lmin, \phi)}) 
+                    -- ({\scale * xi(\xi, \lmax)}, {\scale * zeta(\lmax, \phi)});
+    }
+    
+    % Vertical lines
+    \foreach \eta in {-0.8, -0.6, ..., 0.8} {
+      \draw[mid]    ({\scale * xi(\lmin, \eta)}, {\scale * zeta(\eta, \phi)}) 
+                    -- ({\scale * xi(\lmax, \eta)}, {\scale * zeta(\eta, \phi)});
+    }
+  
+    % Linear boundary
+    \draw [gray80, line width=1.1, domain=0:355, samples=50, variable=\theta] 
+      plot ({\scale * xi(0.8 * cos(\theta), 0.8 * sin(\theta)}, 
+            {\scale * zeta(0.8 * sin(\theta), \phi)});
+   
+    \node[] at (0, -5) {$\mathbb{R}^{2}$};
+   
+  \end{scope}
+
+  
+  \begin{scope}[shift={(30, 0)}]
+  
+    \draw[white] (-13, -6) rectangle (13, 12);
+    
+    % Linear density
+    \fill[light]    ({\scale * xi(\lmin, \lmin)}, {\scale * zeta(\lmin, \phi)})
+                 -- ({\scale * xi(\lmin, \lmax)}, {\scale * zeta(\lmax, \phi)})
+                 -- ({\scale * xi(\lmax, \lmax)}, {\scale * zeta(\lmax, \phi)}) 
+                 -- ({\scale * xi(\lmax, \lmin)}, {\scale * zeta(\lmin, \phi)})
+                 -- cycle;
+    
+    % Horizontal lines
+    \foreach \xi in {-0.8, -0.6, ..., 0.8} {
+      \draw[mid]    ({\scale * xi(\xi, \lmin)}, {\scale * zeta(\lmin, \phi)}) 
+                    -- ({\scale * xi(\xi, \lmax)}, {\scale * zeta(\lmax, \phi)});
+    }
+    
+    % Vertical lines
+    \foreach \eta in {-0.8, -0.6, ..., 0.8} {
+      \draw[mid]    ({\scale * xi(\lmin, \eta)}, {\scale * zeta(\eta, \phi)}) 
+                    -- ({\scale * xi(\lmax, \eta)}, {\scale * zeta(\eta, \phi)});
+    }
+  
+    % Linear boundary
+    \draw [gray80, line width=1.1, domain=0:355, samples=50, variable=\theta] 
+      plot ({\scale * xi(0.8 * cos(\theta), 0.8 * sin(\theta)}, 
+            {\scale * zeta(0.8 * sin(\theta), \phi)});
+    
+    % Sphere outline
+    \fill[white] (0, {\scale * 0.5 * cos(\phi)}) circle ({\scale * 0.5});
+    
+    % Spherical density
+    \foreach \theta in {180, 179.25, ..., 0} {
+      \pgfmathsetmacro{\prop}{100 * exp(-\theta / 135.0)}  
+      \colorlet{custom}{mid!\prop!white}
+      \fill[color=custom] 
+        (0, {cos(\phi) * \scale * 1. * 0.5 * (1 + cos(\theta))}) 
+          circle ({\scale * 1.001 * 0.5 * sin(\theta)} and {sin(\phi) * \scale * 1.001 * 0.5 * sin(\theta)});
+    }
+    
+    % Background line aggregate
+    \begin{scope} {
+      \clip ({-\scale * 0.25}, {\scale * 0.905}) rectangle ({\scale * 0.25}, {\scale * 0.5 * (1 + cos(\phi))});
+      \fill[mid] (0, {\scale * 0.5 * cos(\phi)}) circle ({\scale * 0.5});
+    }
+    \end{scope}
+    
+    % Background stereographic vertical lines
+    \foreach \xi in {-8.0, -7.8, ..., 8.0} {
+      \draw [mid, domain=-8:{maxeta(\xi, \phi)},, samples=60, variable=\eta] 
+        plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi)});
+    }
+    
+    % Background stereographic horizontal lines
+    \foreach \eta in {-1.2, -1.4, ..., -8} {
+      \draw [mid, domain=-8:8, samples=100, variable=\xi] 
+        plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+    }
+  
+    \foreach \eta in {-0.2, -0.4, ..., -1}  {
+      \draw [mid, domain=-10:10, samples=300, variable=\xi] 
+        plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+    }
+    
+    \pgfmathsetmacro{\eta}{0.0}
+    \draw [mid, domain=-1:-10, samples=100, variable=\xi] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+    \draw [mid, domain=1:10, samples=100, variable=\xi] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+  
+    \pgfmathsetmacro{\eta}{0.2}
+    \draw [mid, domain=-1.25:-10, samples=100, variable=\xi] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+    \draw [mid, domain=1.25:10, samples=100, variable=\xi] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+  
+    \pgfmathsetmacro{\eta}{0.4}
+    \draw [mid, domain=-1.5:-10, samples=100, variable=\xi] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+    \draw [mid, domain=1.5:10, samples=100, variable=\xi] 
+      plot ({\scale * x(\xi, \eta)}, {\scale * z(\xi, \eta, \phi});
+      
+    % Stereographic boundary
+    \draw [gray80, line width=1.1, domain=0:-180, samples=30, variable=\theta] 
+      plot ({\scale * x(0.8 * cos(\theta), 0.8 * sin(\theta)}, 
+            {\scale * z(0.8 * cos(\theta), 0.8 * sin(\theta), \phi)});
+    
+    % Point at infinity
+    \node[] at (0, {\scale * 1.05}) {$\infty$};
+    \fill[color=dark] (0, {\scale * cos(\phi)}) circle (5pt);
+   
+    \node[] at (0, -5) {Stereographic Projection of $\mathbb{R}^{2}$};
+   
+  \end{scope}
+ 
+\end{tikzpicture}
+
+\end{document}  

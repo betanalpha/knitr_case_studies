@@ -1,0 +1,342 @@
+\documentclass[11pt, oneside]{article}
+\usepackage{geometry} 
+\geometry{letterpaper}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{url}
+
+\begin{document}
+
+Consider the marginal prior density function
+%
+\begin{align*}
+\pi(\theta_{1}, \theta_{2}) 
+&=
+\pi(\theta_{1}) \cdot \pi(\theta_{2}) 
+\\
+&=
+\text{normal}(\theta_{1} \mid 0, \tau_{1}) \cdot \text{normal}(\theta_{2} \mid 0, \tau_{2}) 
+\\
+&\propto
+\exp \left( - \frac{1}{2} \left[ \frac{ \theta_{1}^{2} }{ \tau_{1}^{2} } + \frac{ \theta_{2}^{2} }{ \tau_{2}^{2} } \right] \right),
+\end{align*}
+%
+and a probability density function that encodes a desired pushforward behavior on $\phi = \theta_{1} + \theta_{2}$,
+%
+\begin{equation*}
+\pi(\phi) 
+=
+\text{normal}(\phi \mid \mu, \tau_{+})
+\propto
+\exp \left( - \frac{1}{2} \left( \frac{ \phi - \mu }{\tau_{+} } \right)^{2} \right).
+\end{equation*}
+
+Naively we might assume that multiplying these two probability density function together,
+%
+\begin{align*}
+\rho(\theta_{1}, \theta_{2})
+&=
+\pi(\theta_{1}, \theta_{2}) \cdot \pi(\theta_{1} + \theta_{2}) 
+\\
+&\propto
+\exp \left( - \frac{1}{2} \left[ 
+\frac{ \theta_{1}^{2} }{ \tau_{1}^{2} } 
++ \frac{ \theta_{2}^{2} }{ \tau_{2}^{2} } 
++ \left( \frac{ \theta_{1} + \theta_{2} - \mu }{\tau_{+} } \right)^{2}
+\right] \right),
+\end{align*}
+%
+yields a prior density function consistent with the both the marginal and pushforward behavior.  Unfortunately this is not the case.
+
+To see why let's reparameterize to
+%
+\begin{align*}
+\eta_{1} &= \theta_{1}
+\\
+\eta_{2} &= \theta_{1} + \theta_{2}.
+\end{align*}
+%
+The Jacobian determinant of this transformation is just
+%
+\begin{equation*}
+| J | (\eta_{1}, \eta_{2})
+=
+\begin{vmatrix}
+\frac{ \partial \eta_{1} }{ \partial \theta_{1} } & \frac{ \partial \eta_{1} }{ \partial \theta_{2} } \\
+\frac{ \partial \eta_{1} }{ \partial \theta_{1} } & \frac{ \partial \eta_{2} }{ \partial \theta_{2} }
+\end{vmatrix}
+=
+\begin{vmatrix}
+1 & 0 \\
+1 & 1
+\end{vmatrix}
+=
+1
+\end{equation*}
+%
+so that
+%
+\begin{align*}
+\rho(\eta_{1}, \eta_{2})
+&=
+\rho \left( \theta_{1}(\eta_{1}, \eta_{2}), \theta_{2}(\eta_{1}, \eta_{2}) \right) \frac{1}{| J | (\eta_{1}, \eta_{2})}
+\\
+&= \rho \left( \eta_{1}, \eta_{2} - \eta_{1} \right)
+\\
+&\propto
+\exp \left( - \frac{1}{2} \left[ 
+\frac{ \eta_{1}^{2} }{ \tau_{1}^{2} } 
++ \left( \frac{ \eta_{2} - \eta_{1} }{ \tau_{2} } \right)^{2}
++ \left( \frac{ \eta_{2} - \mu }{\tau_{+} } \right)^{2}
+\right] \right)
+\\
+&\propto
+\exp \left( - \frac{1}{2} f(\eta_{1}, \eta_{2}) \right).
+\end{align*}
+
+Expanding each term in square brackets and gathering like terms gives
+%
+\begin{align*}
+f(\eta_{1}, \eta_{2})
+&=
+\frac{ \eta_{1}^{2} }{ \tau_{1}^{2} } 
++ \frac{ \eta_{2}^{2} }{ \tau_{2}^{2} } 
+- 2 \frac{ \eta_{1} \cdot \eta_{2} }{ \tau_{2}^{2} } 
++ \frac{ \eta_{1}^{2} }{ \tau_{2}^{2} } 
++ \frac{ \eta_{2}^{2} }{ \tau_{+}^{2} } 
+- 2 \frac{ \mu \cdot \eta_{2} }{ \tau_{+}^{2} } 
++ \mathrm{const}
+\\
+&=
+\left( \frac{ 1 }{ \tau_{1}^{2} } + \frac{ 1 }{ \tau_{2}^{2} } \right) \eta_{1}^{2} 
++ \left( \frac{ 1 }{ \tau_{2}^{2} } + \frac{ 1 }{ \tau_{+}^{2} } \right) \eta_{2}^{2}
+- 2 \left( \frac{ \eta_{1} }{ \tau_{2}^{2} } + \frac{ \mu }{ \tau_{+}^{2} } \right) \eta_{2} 
++ \mathrm{const}
+\\
+&=
+\left( \frac{ \tau_{1}^{2} + \tau_{2}^{2} }{ \tau_{1}^{2} \cdot \tau_{2}^{2} } \right) \eta_{1}^{2}
++ \left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right) \eta_{2}^{2}
+- 2 \left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right) \eta_{2}
++ \mathrm{const}.
+\end{align*}
+%
+Completing the square for $\eta_{2}$ gives
+%
+\begin{align*}
+f(\eta_{1}, \eta_{2})
+&= \quad
+\left( \frac{ \tau_{1}^{2} + \tau_{2}^{2} }{ \tau_{1}^{2} \cdot \tau_{2}^{2} } \right) \eta_{1}^{2}
+\\
+&\quad +
+\left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)
+\left[ \eta_{2} - 
+\left( \frac{ \tau_{2}^{2} \cdot \tau_{+}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right) \right]^{2}
+\\
+&\quad -
+\left( \frac{ \tau_{2}^{2} \cdot \tau_{+}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)^{2}
+\\
+&\quad +
+\mathrm{const}
+\\
+&= \quad
+\left( \frac{ \tau_{1}^{2} + \tau_{2}^{2} }{ \tau_{1}^{2} \cdot \tau_{2}^{2} } \right) \eta_{1}^{2}
+\\
+&\quad +
+\left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)
+\left[ \eta_{2} -
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \right]^{2}
+\\
+&\quad -
+\left( \frac{ \tau_{2}^{2} \cdot \tau_{+}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)^{2}
+\\
+&\quad +
+\mathrm{const}
+\\
+&= \quad
+\left( \frac{ \tau_{1}^{2} + \tau_{2}^{2} }{ \tau_{1}^{2} \cdot \tau_{2}^{2} } \right) \eta_{1}^{2}
+\\
+&\quad +
+\left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)
+\left[ \eta_{2} -
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \right]^{2}
+\\
+&\quad -
+\left( \frac{ \tau_{2}^{2} \cdot \tau_{+}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot
+\frac{ \eta_{1}^{2} \cdot \tau_{+}^{4} + 2 \, \eta_{1} \cdot \mu \cdot \tau_{+}^{2} \cdot \tau_{2}^{2}}{ \tau_{2}^{4} \cdot \tau_{+}^{4} } 
+\\
+&\quad +
+\mathrm{const}
+\\
+&= \quad
+\left( \frac{ \tau_{1}^{2} + \tau_{2}^{2} }{ \tau_{1}^{2} \cdot \tau_{2}^{2} } \right) \eta_{1}^{2}
+\\
+&\quad +
+\left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)
+\left[ \eta_{2} -
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \right]^{2}
+\\
+&\quad -
+\left( \frac{ 1 }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot
+\frac{ \eta_{1}^{2} \cdot \tau_{+}^{4} + 2 \, \eta_{1} \cdot \mu \cdot \tau_{+}^{2} \cdot \tau_{2}^{2}}{ \tau_{2}^{2} \cdot \tau_{+}^{2} } 
+\\
+&\quad +
+\mathrm{const}
+\end{align*}
+%
+Gathering terms,
+%
+\begin{align*}
+f(\eta_{1}, \eta_{2})
+&= \quad
+\left[ \left( \frac{ \tau_{1}^{2} + \tau_{2}^{2} }{ \tau_{1}^{2} \cdot \tau_{2}^{2} } \right) -
+\left( \frac{ 1 }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot
+\frac{ \tau_{+}^{2} }{ \tau_{2}^{2} } \right] \eta_{1}^{2}
+\\
+&\quad -
+2 \, \left( \frac{ 1 }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot \mu \cdot \eta_{1}
+\\
+&\quad +
+\left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)
+\left[ \eta_{2} -
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \right]^{2}
+\\
+&\quad +
+\mathrm{const}
+\\
+&= \quad
+\left[ \frac{ ( \tau_{1}^{2} + \tau_{2}^{2} ) \cdot (\tau_{2}^{2} + \tau_{+}^{2})
+- \tau_{1}^{2} \cdot \tau_{+}^{2} }
+{ \tau_{1}^{2} \cdot \tau_{2}^{2} \cdot (\tau_{2}^{2} + \tau_{+}^{2}) } \right] \eta_{1}^{2}
+\\
+&\quad -
+2 \, \left( \frac{ 1 }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot \mu \cdot \eta_{1}
+\\
+&\quad +
+\left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)
+\left[ \eta_{2} -
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \right]^{2}
+\\
+&\quad +
+\mathrm{const}
+\\
+&= \quad
+\left[ \frac{ \tau_{2}^{2} \cdot ( \tau_{1}^{2} + \tau_{2}^{2} + \tau_{+}^{2} ) }
+{ \tau_{1}^{2} \cdot \tau_{2}^{2} \cdot (\tau_{2}^{2} + \tau_{+}^{2}) } \right] \eta_{1}^{2}
+\\
+&\quad -
+2 \, \left( \frac{ 1 }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot \mu \cdot \eta_{1}
+\\
+&\quad +
+\left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)
+\left[ \eta_{2} -
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \right]^{2}
+\\
+&\quad +
+\mathrm{const}
+\\
+&= \quad
+\left[ \frac{ \tau_{1}^{2} + \tau_{2}^{2} + \tau_{+}^{2} }
+{ \tau_{1}^{2} \cdot (\tau_{2}^{2} + \tau_{+}^{2}) } \right] \eta_{1}^{2}
+\\
+&\quad -
+2 \, \left( \frac{ 1 }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot \mu \cdot \eta_{1}
+\\
+&\quad +
+\left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)
+\left[ \eta_{2} -
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \right]^{2}
+\\
+&\quad +
+\mathrm{const}.
+\end{align*}
+
+Now we can complete the square for $\eta_{1}$ to give
+%
+\begin{align*}
+f(\eta_{1}, \eta_{2})
+&= \quad
+\left[ \frac{ \tau_{1}^{2} + \tau_{2}^{2} + \tau_{+}^{2} }
+{ \tau_{1}^{2} \cdot (\tau_{2}^{2} + \tau_{+}^{2}) }  \right] 
+\cdot \left[ \eta_{1} -
+\frac{ \tau_{1}^{2} \cdot (\tau_{2}^{2} + \tau_{+}^{2}) } 
+{ \tau_{1}^{2} + \tau_{2}^{2} + \tau_{+}^{2} }
+\left( \frac{ 1 }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \cdot \mu
+\right]^{2} 
+\\
+&\quad +
+\left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)
+\left[ \eta_{2} -
+\left( \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right) \right]^{2}
+\\
+&\quad +
+\mathrm{const}
+\\
+&= \quad
+\left[ \frac{ \tau_{1}^{2} + \tau_{2}^{2} + \tau_{+}^{2} }
+{ \tau_{1}^{2} \cdot (\tau_{2}^{2} + \tau_{+}^{2}) }  \right] 
+\cdot \left[ \eta_{1} -
+\frac{ \tau_{1}^{2} \cdot \mu }{ \tau_{1}^{2} + \tau_{2}^{2} + \tau_{+}^{2} } \right]^{2} 
+\\
+&\quad +
+\left( \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{2}^{2} \cdot \tau_{+}^{2} } \right)
+\left[ \eta_{2} -
+\frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} } \right]^{2}
+\\
+&\quad +
+\mathrm{const}
+\\
+&=
+g(\eta_{1}) + h(\eta_{1}, \eta_{2}) + \mathrm{const}.
+\end{align*}
+%
+Exponentiating these quadratics will yield normal density functions.
+
+We can now substitute this back into the probability density function to give
+%
+\begin{align*}
+\rho(\eta_{1}, \eta_{2})
+&\propto
+\exp \left( - \frac{1}{2} f(\eta_{1}, \eta_{2}) \right)
+\\
+&\propto
+\exp \left( - \frac{1}{2} h(\eta_{1}, \eta_{2} \right)
+\cdot \exp \left( - \frac{1}{2} g(\eta_{1}) \right)
+\\
+&=
+\rho (\eta_{2} \mid \eta_{1}) \cdot \rho(\eta_{1})
+\\
+&= \;
+\text{normal} \left( \eta_{2} \mid \frac{ \eta_{1} \cdot \tau_{+}^{2} + \mu \cdot \tau_{2}^{2} }{ \tau_{2}^{2} + \tau_{+}^{2} }, \frac{ \tau_{2} \cdot \tau_{+} }{ \sqrt{ \tau_{2}^{2} + \tau_{+}^{2} } } \right)
+\\
+&\quad \cdot
+\text{normal} \left( \eta_{1} \mid \frac{ \tau_{1}^{2} \cdot \mu }{ \tau_{1}^{2} + \tau_{2}^{2} + \tau_{+}^{2} },
+\tau_{1} \cdot \sqrt{ \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{1}^{2} + \tau_{2}^{2} + \tau_{+}^{2} } } \right)
+\end{align*}
+
+Because of this conditional decomposition we can immediately integrate out $\eta_{2}$ which gives the marginal density function for $\eta_{1} = \theta_{1}$,
+%
+\begin{align*}
+\rho(\eta_{1}) 
+&=
+\int \mathrm{d} \eta_{2} \, \rho(\eta_{1}, \eta_{2})
+\\
+&=
+\int \mathrm{d} \eta_{2} \, \rho(\eta_{2} \mid \eta_{1}) \cdot \rho(\eta_{1})
+\\
+&=
+\left[ \int \mathrm{d} \eta_{2} \, \rho(\eta_{2} \mid \eta_{1}) \right] \cdot \rho(\eta_{1})
+\\
+&=
+\rho(\eta_{1})
+\\
+&=
+\text{normal} \left( \eta_{1} \mid \frac{ \tau_{1}^{2} \cdot \mu }{ \tau_{1}^{2} + \tau_{2}^{2} + \tau_{+}^{2} }, 
+\tau_{1} \cdot \sqrt{ \frac{ \tau_{2}^{2} + \tau_{+}^{2} }{ \tau_{1}^{2} + \tau_{2}^{2} + \tau_{+}^{2} } } \right),
+\end{align*}
+%
+which is quite different from the original marginal of $\text{normal}(\eta_{1} \mid 0, \tau_{1})$!  The naive multiplication has both translated and scaled the original prior model.
+
+\end{document}  

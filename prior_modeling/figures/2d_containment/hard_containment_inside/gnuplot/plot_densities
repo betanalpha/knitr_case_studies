@@ -1,0 +1,118 @@
+#!/bin/bash
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "prior.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-5:5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:5]
+
+set zlabel ''
+set zrange[-7:0]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 500
+set isosamples 500
+
+splot (x**2 + y**2 < 4 ? -1 : 1 / 0) notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "likelihood.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-5:5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:5]
+
+set zlabel ''
+set zrange[-7:0]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 300
+set isosamples 300
+
+splot - 0.5 * ( ((x - 0.5) / 0.25)**2 + ((y + 0.5) / 0.25)**2) notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 30' size 5, 5
+set output "posterior.eps"
+
+set pm3d map implicit at s
+
+set title ""
+
+set border 0
+
+set lmargin screen 0.0
+set rmargin screen 1.0
+set bmargin screen 0.0
+set tmargin screen 1.0
+
+set xtics nomirror scale 0
+set format x ''
+set xrange[-5:5]
+
+set ytics nomirror scale 0
+set format y ''
+set yrange[-5:5]
+
+set zlabel ''
+set zrange[-7:0]
+
+unset cbtics
+unset colorbox
+
+set palette rgbformulae 8, 9, 9 negative
+
+set samples 300
+set isosamples 300
+
+splot (x**2 + y**2 < 4 ? - 0.5 * ( ((x - 0.5) / 0.25)**2 + ((y + 0.5) / 0.25)**2) : 1 / 0) notitle
+
+END

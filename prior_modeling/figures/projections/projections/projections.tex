@@ -1,0 +1,564 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function x(\x, \y, \z, \thetaview, \phiview) {
+    \xa = +cos(\thetaview) * \x + sin(\thetaview) * \z;
+    \ya = \y;
+    \za = -sin(\thetaview) * \x + cos(\thetaview) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phiview) * \ya + sin(\phiview) * \za;
+    %\zb = -sin(\phiview) * \ya + cos(\phiview) * \za;
+    %  
+    return \xb;
+  };
+  function y(\x, \y, \z, \thetaview, \phiview) {
+    \xa = +cos(\thetaview) * \x + sin(\thetaview) * \z;
+    \ya = \y;
+    \za = -sin(\thetaview) * \x + cos(\thetaview) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phiview) * \ya + sin(\phiview) * \za;
+    %\zb = -sin(\phiview) * \ya + cos(\phiview) * \za;
+    %   
+    return \yb;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=1]
+
+
+\begin{scope}[shift={(0, 0)}]
+
+  % H
+  \pgfmathsetmacro{\thetaview}{180}
+  \pgfmathsetmacro{\phiview}{90}
+
+  \pgfmathsetmacro{\d}{1}
+  \pgfmathsetmacro{\D}{6}
+  
+  \draw[white] (-7.75, -8) rectangle +(10, 10);
+  
+  \draw[->, >=stealth, color=light] ({x(-1, -1, -1, \thetaview, \phiview))}, {y(-1, -1, -1, \thetaview, \phiview)}) 
+            --  ({x(0, -1, -1, \thetaview, \phiview))}, {y(0, -1, -1, \thetaview, \phiview)})
+  node[below] { $+\theta_{1}$ };
+  
+  \draw[->, >=stealth, color=dark] ({x(-1, -1, -1, \thetaview, \phiview))}, {y(-1, -1, -1, \thetaview, \phiview)}) 
+            --  ({x(-1, -1, 0, \thetaview, \phiview))}, {y(-1, -1, 0, \thetaview, \phiview)})
+  node[right] { $+\theta_{3}$ };
+
+  % Lower Left
+
+  % Front Face
+  \fill[fill=dark]    ({x(0, 0, 0, \thetaview, \phiview))}, {y(0, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, 0, 0, \thetaview, \phiview))}, {y(\d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0, \thetaview, \phiview))}, {y(\d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, \d, 0, \thetaview, \phiview))}, {y(0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, 0, 0, \thetaview, \phiview))}, {y(0, 0, 0, \thetaview, \phiview)});
+          
+  % Right Face
+  \fill[fill=light]    ({x(\d, 0, 0, \thetaview, \phiview))}, {y(\d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, 0, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d, 0, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0, \thetaview, \phiview))}, {y(\d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, 0, 0, \thetaview, \phiview))}, {y(\d, 0, 0, \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x(0, \d, 0, \thetaview, \phiview))}, {y(0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(0, \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0, \thetaview, \phiview))}, {y(\d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, \d, 0, \thetaview, \phiview))}, {y(0, \d, 0, \thetaview, \phiview)});
+
+
+  % Top Left
+  
+  % Front Face
+  \fill[fill=dark]    ({x( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview)});
+
+  % Right Face
+  \fill[fill=light]    ({x(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d +  0, \D, \thetaview, \phiview))}, {y(\d, \D - \d +  0, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d, \D, \thetaview, \phiview))}, {y(\d, \D - \d + \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d + \d, \D, \thetaview, \phiview))}, {y( 0, \D - \d + \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d, \D, \thetaview, \phiview))}, {y(\d, \D - \d + \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)});
+
+
+  % Bottom Cross
+  
+  % Front Face
+  \fill[fill=dark]   ({x(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d,  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d,  0, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview)});
+  
+  % Top Face
+  \fill[fill=mid]   ({x(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d, \d, 0.5 * (\D + \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview)});  
+
+  % Top Cross
+  
+  % Front Face
+  \fill[fill=dark]   ({x(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d,  \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d,  \D, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \D - \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \D - \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \D - \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \D - \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview)});
+  
+  % Top Face
+  \fill[fill=mid]   ({x(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d, \D, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d, \D, 0.5 * (\D + \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \D, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \D, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview)});  
+
+
+  % Lower Right
+  
+  % Front Face
+  \fill[fill=dark]    ({x(\D - \d + 0, 0, 0, \thetaview, \phiview))}, {y(\D - \d + 0, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, \d, 0, \thetaview, \phiview))}, {y(\D - \d + 0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, 0, 0, \thetaview, \phiview))}, {y(\D - \d + 0, 0, 0, \thetaview, \phiview)});
+  % Right Face
+  \fill[fill=light]    ({x(\D - \d + \d, 0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0, \D, \thetaview, \phiview))}, {y(\D - \d + \d, 0, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, \D, \thetaview, \phiview))}, {y(\D - \d + \d, \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, 0, 0, \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x(\D - \d + 0, \d, 0, \thetaview, \phiview))}, {y(\D - \d + 0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, \d, \D, \thetaview, \phiview))}, {y(\D - \d + 0, \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, \D, \thetaview, \phiview))}, {y(\D - \d + \d, \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, \d, 0, \thetaview, \phiview))}, {y(\D - \d + 0, \d, 0, \thetaview, \phiview)});
+
+
+  % Chevron
+  
+  % Front Face
+  \fill[fill=dark]    ({x(\D - \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview))}, {y(\D - \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview)})
+          -- ({x(\D - \d , \D - \d, 0, \thetaview, \phiview))}, {y(\D - \d, \D - \d, 0, \thetaview, \phiview)})
+          -- ({x(\D, \D - \d, 0, \thetaview, \phiview))}, {y(\D, \D - \d, 0, \thetaview, \phiview)})
+          -- ({x(\D, 0.5 * \D, 0.25 * \D, \thetaview, \phiview))}, {y(\D, 0.5 * \D, 0.25 * \D, \thetaview, \phiview)})
+          -- ({x(\D, \d, 0, \thetaview, \phiview))}, {y(\D, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d, \d, 0, \thetaview, \phiview)});    
+
+  % Right Face
+  \fill[fill=light]    ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview))}, {y(\D - \d + \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \D - \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d, 0, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \D - \d, 1.5 * \d, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d, 1.5 * \d, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, 0.5 * \D, 0.25 * \D + 1.5 * \d, \thetaview, \phiview))}, {y(\D - \d + \d, 0.5 * \D, 0.25 * \D + 1.5 * \d, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \d, 1.5 * \d, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 1.5 * \d, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)});
+
+  % Top Right
+  
+  % Front Face
+  \fill[fill=dark]    ({x(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d +  0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d + \d, 0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview)});
+
+  % Right Face
+  \fill[fill=light]    ({x(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d +  0, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview)});
+          
+\end{scope}
+
+
+\begin{scope}[shift={(5, -0.25)}]
+
+  \draw[white] (-2, -7.75) rectangle +(10, 10);
+
+  % M
+  \pgfmathsetmacro{\thetaview}{90}
+  \pgfmathsetmacro{\phiview}{0}
+
+  \pgfmathsetmacro{\d}{1}
+  \pgfmathsetmacro{\D}{6}
+  
+  \begin{scope}[rotate=-90]
+  
+  \draw[->, >=stealth, color=mid]  ({x(-1, -1, -1, \thetaview, \phiview))}, {y(-1, -1, -1, \thetaview, \phiview)}) 
+            --  ({x(-1, 0, -1, \thetaview, \phiview))}, {y(-1, 0, -1, \thetaview, \phiview)})
+  node[right] { $+\theta_{2}$ };
+  
+  \draw[->, >=stealth, color=dark] ({x(-1, -1, -1, \thetaview, \phiview))}, {y(-1, -1, -1, \thetaview, \phiview)}) 
+            --  ({x(-1, -1, 0, \thetaview, \phiview))}, {y(-1, -1, 0, \thetaview, \phiview)})
+  node[right] { $+\theta_{3}$ };
+
+  % Lower Left
+
+  % Front Face
+  \fill[fill=dark]    ({x(0, 0, 0, \thetaview, \phiview))}, {y(0, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, 0, 0, \thetaview, \phiview))}, {y(\d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0, \thetaview, \phiview))}, {y(\d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, \d, 0, \thetaview, \phiview))}, {y(0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, 0, 0, \thetaview, \phiview))}, {y(0, 0, 0, \thetaview, \phiview)});
+          
+  % Right Face
+  \fill[fill=light]    ({x(\d, 0, 0, \thetaview, \phiview))}, {y(\d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, 0, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d, 0, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0, \thetaview, \phiview))}, {y(\d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, 0, 0, \thetaview, \phiview))}, {y(\d, 0, 0, \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x(0, \d, 0, \thetaview, \phiview))}, {y(0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(0, \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0, \thetaview, \phiview))}, {y(\d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, \d, 0, \thetaview, \phiview))}, {y(0, \d, 0, \thetaview, \phiview)});
+
+
+  % Top Left
+  
+  % Front Face
+  \fill[fill=dark]    ({x( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview)});
+
+  % Right Face
+  \fill[fill=light]    ({x(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d +  0, \D, \thetaview, \phiview))}, {y(\d, \D - \d +  0, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d, \D, \thetaview, \phiview))}, {y(\d, \D - \d + \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d + \d, \D, \thetaview, \phiview))}, {y( 0, \D - \d + \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d, \D, \thetaview, \phiview))}, {y(\d, \D - \d + \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)});
+
+
+  % Bottom Cross
+  
+  % Front Face
+  \fill[fill=dark]   ({x(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d,  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d,  0, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview)});
+  
+  % Top Face
+  \fill[fill=mid]   ({x(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d, \d, 0.5 * (\D + \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview)});  
+
+  % Top Cross
+  
+  % Front Face
+  \fill[fill=dark]   ({x(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d,  \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d,  \D, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \D - \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \D - \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \D - \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \D - \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview)});
+  
+  % Top Face
+  \fill[fill=mid]   ({x(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d, \D, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d, \D, 0.5 * (\D + \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \D, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \D, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview)});  
+
+
+  % Lower Right
+  
+  % Front Face
+  \fill[fill=dark]    ({x(\D - \d + 0, 0, 0, \thetaview, \phiview))}, {y(\D - \d + 0, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, \d, 0, \thetaview, \phiview))}, {y(\D - \d + 0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, 0, 0, \thetaview, \phiview))}, {y(\D - \d + 0, 0, 0, \thetaview, \phiview)});
+  % Right Face
+  \fill[fill=light]    ({x(\D - \d + \d, 0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0, \D, \thetaview, \phiview))}, {y(\D - \d + \d, 0, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, \D, \thetaview, \phiview))}, {y(\D - \d + \d, \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, 0, 0, \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x(\D - \d + 0, \d, 0, \thetaview, \phiview))}, {y(\D - \d + 0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, \d, \D, \thetaview, \phiview))}, {y(\D - \d + 0, \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, \D, \thetaview, \phiview))}, {y(\D - \d + \d, \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, \d, 0, \thetaview, \phiview))}, {y(\D - \d + 0, \d, 0, \thetaview, \phiview)});
+
+
+  % Chevron
+  
+  % Front Face
+  \fill[fill=dark]    ({x(\D - \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview))}, {y(\D - \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview)})
+          -- ({x(\D - \d , \D - \d, 0, \thetaview, \phiview))}, {y(\D - \d, \D - \d, 0, \thetaview, \phiview)})
+          -- ({x(\D, \D - \d, 0, \thetaview, \phiview))}, {y(\D, \D - \d, 0, \thetaview, \phiview)})
+          -- ({x(\D, 0.5 * \D, 0.25 * \D, \thetaview, \phiview))}, {y(\D, 0.5 * \D, 0.25 * \D, \thetaview, \phiview)})
+          -- ({x(\D, \d, 0, \thetaview, \phiview))}, {y(\D, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d, \d, 0, \thetaview, \phiview)});    
+
+  % Right Face
+  \fill[fill=light]    ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview))}, {y(\D - \d + \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \D - \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d, 0, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \D - \d, 1.5 * \d, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d, 1.5 * \d, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, 0.5 * \D, 0.25 * \D + 1.5 * \d, \thetaview, \phiview))}, {y(\D - \d + \d, 0.5 * \D, 0.25 * \D + 1.5 * \d, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \d, 1.5 * \d, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 1.5 * \d, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)});
+
+  % Top Right
+  
+  % Front Face
+  \fill[fill=dark]    ({x(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d +  0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d + \d, 0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview)});
+
+  % Right Face
+  \fill[fill=light]    ({x(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d +  0, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview)});
+
+  \end{scope}
+
+\end{scope}
+
+\begin{scope}[shift={(21.5, -6)}]
+
+  % C
+  \pgfmathsetmacro{\thetaview}{180}
+  \pgfmathsetmacro{\phiview}{0}
+  
+  \draw[white] (-7.75, -2) rectangle +(10, 10);
+
+  \pgfmathsetmacro{\d}{1}
+  \pgfmathsetmacro{\D}{6}
+  
+  \draw[->, >=stealth, color=light] ({x(-1, -1, -1, \thetaview, \phiview))}, {y(-1, -1, -1, \thetaview, \phiview)}) 
+            --  ({x(0, -1, -1, \thetaview, \phiview))}, {y(0, -1, -1, \thetaview, \phiview)})
+  node[below] { $+\theta_{1}$ };
+  
+  \draw[->, >=stealth, color=mid]  ({x(-1, -1, -1, \thetaview, \phiview))}, {y(-1, -1, -1, \thetaview, \phiview)}) 
+            --  ({x(-1, 0, -1, \thetaview, \phiview))}, {y(-1, 0, -1, \thetaview, \phiview)})
+  node[left] { $+\theta_{2}$ };
+
+  % Lower Left
+
+  % Front Face
+  \fill[fill=dark]    ({x(0, 0, 0, \thetaview, \phiview))}, {y(0, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, 0, 0, \thetaview, \phiview))}, {y(\d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0, \thetaview, \phiview))}, {y(\d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, \d, 0, \thetaview, \phiview))}, {y(0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, 0, 0, \thetaview, \phiview))}, {y(0, 0, 0, \thetaview, \phiview)});
+          
+  % Right Face
+  \fill[fill=light]    ({x(\d, 0, 0, \thetaview, \phiview))}, {y(\d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, 0, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d, 0, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0, \thetaview, \phiview))}, {y(\d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\d, 0, 0, \thetaview, \phiview))}, {y(\d, 0, 0, \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x(0, \d, 0, \thetaview, \phiview))}, {y(0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(0, \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d, \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \d, 0, \thetaview, \phiview))}, {y(\d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(0, \d, 0, \thetaview, \phiview))}, {y(0, \d, 0, \thetaview, \phiview)});
+
+
+  % Top Left
+  
+  % Front Face
+  \fill[fill=dark]    ({x( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d + \d, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d +  0, 0.5 * (\D - \d), \thetaview, \phiview)});
+
+  % Right Face
+  \fill[fill=light]    ({x(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d +  0, \D, \thetaview, \phiview))}, {y(\d, \D - \d +  0, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d, \D, \thetaview, \phiview))}, {y(\d, \D - \d + \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d +  0,  0.5 * (\D - \d), \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d + \d, \D, \thetaview, \phiview))}, {y( 0, \D - \d + \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d, \D, \thetaview, \phiview))}, {y(\d, \D - \d + \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)}) 
+          -- ({x( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview))}, {y( 0, \D - \d + \d,  0.5 * (\D - \d), \thetaview, \phiview)});
+
+
+  % Bottom Cross
+  
+  % Front Face
+  \fill[fill=dark]   ({x(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d,  0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d,  0, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       0, 0.5 * (\D - \d), \thetaview, \phiview)});
+  
+  % Top Face
+  \fill[fill=mid]   ({x(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d, \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d, \d, 0.5 * (\D + \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \d, 0.5 * (\D + \d), \thetaview, \phiview)});  
+
+  % Top Cross
+  
+  % Front Face
+  \fill[fill=dark]   ({x(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d,  \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d,  \D, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \D - \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \D - \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \D - \d, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \D - \d, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,       \D, 0.5 * (\D - \d), \thetaview, \phiview)});
+  
+  % Top Face
+  \fill[fill=mid]   ({x(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+         -- ({x(\D - \d, \D, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d, \D, 0.5 * (\D + \d), \thetaview, \phiview)})
+         -- ({x(\D - \d, \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\D - \d, \D, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \D, 0.5 * (\D - \d), \thetaview, \phiview))}, {y(\d,      \D, 0.5 * (\D - \d), \thetaview, \phiview)})
+         -- ({x(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\d,      \D, 0.5 * (\D + \d), \thetaview, \phiview)});  
+
+
+  % Lower Right
+  
+  % Front Face
+  \fill[fill=dark]    ({x(\D - \d + 0, 0, 0, \thetaview, \phiview))}, {y(\D - \d + 0, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, \d, 0, \thetaview, \phiview))}, {y(\D - \d + 0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, 0, 0, \thetaview, \phiview))}, {y(\D - \d + 0, 0, 0, \thetaview, \phiview)});
+  % Right Face
+  \fill[fill=light]    ({x(\D - \d + \d, 0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, 0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0, \D, \thetaview, \phiview))}, {y(\D - \d + \d, 0, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, \D, \thetaview, \phiview))}, {y(\D - \d + \d, \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, 0, 0, \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x(\D - \d + 0, \d, 0, \thetaview, \phiview))}, {y(\D - \d + 0, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, \d, \D, \thetaview, \phiview))}, {y(\D - \d + 0, \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, \D, \thetaview, \phiview))}, {y(\D - \d + \d, \d, \D, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + 0, \d, 0, \thetaview, \phiview))}, {y(\D - \d + 0, \d, 0, \thetaview, \phiview)});
+
+
+  % Chevron
+  
+  % Front Face
+  \fill[fill=dark]    ({x(\D - \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview))}, {y(\D - \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview)})
+          -- ({x(\D - \d , \D - \d, 0, \thetaview, \phiview))}, {y(\D - \d, \D - \d, 0, \thetaview, \phiview)})
+          -- ({x(\D, \D - \d, 0, \thetaview, \phiview))}, {y(\D, \D - \d, 0, \thetaview, \phiview)})
+          -- ({x(\D, 0.5 * \D, 0.25 * \D, \thetaview, \phiview))}, {y(\D, 0.5 * \D, 0.25 * \D, \thetaview, \phiview)})
+          -- ({x(\D, \d, 0, \thetaview, \phiview))}, {y(\D, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d, \d, 0, \thetaview, \phiview)});    
+
+  % Right Face
+  \fill[fill=light]    ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview))}, {y(\D - \d + \d, 0.5 * \D, 0.25 * \D, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \D - \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d, 0, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \D - \d, 1.5 * \d, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d, 1.5 * \d, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, 0.5 * \D, 0.25 * \D + 1.5 * \d, \thetaview, \phiview))}, {y(\D - \d + \d, 0.5 * \D, 0.25 * \D + 1.5 * \d, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \d, 1.5 * \d, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 1.5 * \d, \thetaview, \phiview)})
+          -- ({x(\D - \d + \d, \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \d, 0, \thetaview, \phiview)});
+
+  % Top Right
+  
+  % Front Face
+  \fill[fill=dark]    ({x(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d +  0, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d, 0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d + \d, 0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d, 0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d +  0, 0, \thetaview, \phiview)});
+
+  % Right Face
+  \fill[fill=light]    ({x(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d +  0, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d +  0,  0, \thetaview, \phiview)});
+
+  % Top Face
+  \fill[fill=mid]    ({x(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d, 0.5 * (\D + \d), \thetaview, \phiview)}) 
+          -- ({x(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d + \d, \D - \d + \d,  0, \thetaview, \phiview)}) 
+          -- ({x(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview))}, {y(\D - \d +  0, \D - \d + \d,  0, \thetaview, \phiview)});
+
+\end{scope}
+
+\end{tikzpicture}
+
+\end{document}  

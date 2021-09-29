@@ -1,0 +1,79 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.25, thick]
+
+  
+  \begin{scope}[shift={(0, 0)}]
+    \draw[white] (-16, -3) rectangle (12, 13);
+    
+    \node at (0, 12) { Reasonable Prior Check };
+  
+    \fill[color=gray80, opacity=0.33] (-5.5, 0) rectangle (5.5, 10.5);
+    
+    \foreach[count=\n] \y in {0.000, 0.000, 1.000, 4.000, 2.000, 5.000, 3.000, 17.000, 17.000, 43.000, 49.000, 90.000, 111.000, 151.000, 193.000, 298.000, 333.000, 352.000, 420.000, 418.000, 422.000, 397.000, 362.000, 319.000, 283.000, 200.000, 148.000, 126.000, 78.000, 64.000, 36.000, 25.000, 15.000, 6.000, 5.000, 5.000, 0.000, 2.000, 0.000, 0.000} {
+      \fill[dark] ({(\n - 1) / 2 - 10}, 0) rectangle ({(\n) / 2 - 10}, {0.025 * \y});
+    }
+    
+    \draw[-, color=gray70, line width=1] (-5.5, 0) -- (-5.5, 10.5);
+    \draw[->, >=stealth, line width=1, color=gray70] (-5.5, 5) -- +(1.5, 0);
+  
+    \draw[-, color=gray70, line width=1] (5.5, 0) -- (5.5, 10.5);
+    \draw[->, >=stealth, line width=1, color=gray70] (5.5, 5) -- +(-1.5, 0);
+  
+    \draw [->, >=stealth, line width=1] (-10.00, -0.05) -- +(0, 10);
+    \draw [->, >=stealth, line width=1] (-10.05, +0.00) -- +(20, 0);
+    
+    \node[] at (-13, 5) { $s_{*} \pi(\gamma)$ };
+    \node[] at (0, -1.5) { $\gamma = s(y, \theta)$ };
+  \end{scope}
+  
+  \begin{scope}[shift={(30, 0)}]
+    \draw[white] (-16, -3) rectangle (12, 13);
+    
+    \node at (0, 12) { Suspicious Prior Check };
+  
+    \fill[color=gray80, opacity=0.33] (-5.5, 0) rectangle (5.5, 10.5);
+    
+    \foreach[count=\n] \y in {54.000, 52.000, 41.000, 60.000, 81.000, 80.000, 95.000, 92.000, 91.000, 97.000, 130.000, 118.000, 118.000, 134.000, 122.000, 131.000, 157.000, 154.000, 147.000, 143.000, 130.000, 128.000, 137.000, 141.000, 138.000, 137.000, 153.000, 113.000, 125.000, 93.000, 113.000, 102.000, 113.000, 80.000, 80.000, 94.000, 71.000, 67.000, 59.000, 53.000} {
+      \fill[dark] ({(\n - 1) / 2 - 10}, 0) rectangle ({(\n) / 2 - 10}, {0.025 * \y});
+    }
+    
+    \draw[-, color=gray70, line width=1] (-5.5, 0) -- (-5.5, 10.5);
+    \draw[->, >=stealth, line width=1, color=gray70] (-5.5, 5) -- +(1.5, 0);
+  
+    \draw[-, color=gray70, line width=1] (5.5, 0) -- (5.5, 10.5);
+    \draw[->, >=stealth, line width=1, color=gray70] (5.5, 5) -- +(-1.5, 0);
+  
+    \draw [->, >=stealth, line width=1] (-10.00, -0.05) -- +(0, 10);
+    \draw [->, >=stealth, line width=1] (-10.05, +0.00) -- +(21, 0);
+    
+    \node[] at (-13, 5) { $s_{*} \pi(\gamma)$ };
+    \node[] at (0, -1.5) { $\gamma = s(y, \theta)$ };
+  \end{scope}
+  
+\end{tikzpicture}
+
+\end{document}  

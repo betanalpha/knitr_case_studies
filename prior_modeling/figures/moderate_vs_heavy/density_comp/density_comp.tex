@@ -1,0 +1,75 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.4, thick]
+
+\begin{scope}[shift={(0, 0)}]
+    \draw[white] (-9.75, -7) rectangle (9.75, 9);
+      
+    \begin{scope}
+      \clip (-7, -7) rectangle (7, 6);
+          \node at (0, 0) {\includegraphics[height=4cm]{density_comp.eps}};
+    \end{scope}
+   
+    
+    \node[dark] at (-3, -4) { Normal };
+    \node[light] at (2, 0) { Cauchy };
+    
+    \node[align=right] at (-2.5, 7) { Lower\\Extremity\\Threshold };
+    \node[align=left] at (+2.5, 7) { Upper\\Extremity\\Threshold };
+    
+    \draw [->, >=stealth, line width=1] (-6.22 - 0.035, -5) -- +(12.44, 0);
+    \node at (0, -6) { $\theta$ };
+    
+    \draw [->, >=stealth, line width=1] (-6.22, -5 - 0.035) -- +(0, 11);
+    \node[rotate=90, align=center] at (-8, 0) { Probability\\Distribution Function };
+
+\end{scope}
+
+\begin{scope}[shift={(20, 0)}]
+    \draw[white] (-9.75, -7) rectangle (9.75, 9);
+      
+    \begin{scope}
+      \clip (-7, -7) rectangle (7, 6);
+          \node at (0, 0) {\includegraphics[height=4cm]{density_comp_zoom.eps}};
+    \end{scope}
+   
+    
+    \node[dark] at (-4, 0) { Normal };
+    \node[light] at (1, -4) { Cauchy };
+    
+    \node[align=left] at (-4, 7) { Upper\\Extremity\\Threshold };
+    
+    \draw [->, >=stealth, line width=1] (-6.22 - 0.035, -5) -- +(12.44, 0);
+    \node at (0, -6) { $\theta$ };
+    
+    \draw [->, >=stealth, line width=1] (-6.22, -5 - 0.035) -- +(0, 11);
+    \node[rotate=90, align=center] at (-8, 0) { Probability\\Distribution Function };
+
+\end{scope}
+
+
+\end{tikzpicture}
+
+\end{document}  
