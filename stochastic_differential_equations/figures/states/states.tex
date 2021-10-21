@@ -1,0 +1,89 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray60}{gray}{0.95}
+
+\tikzmath{
+  function trajectory(\x) {
+    return -4 + 0.01 * (\x + 13)^2 + sin(30 * \x);
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=0.25]
+ 
+  \begin{scope}[shift={(0, 0)}]
+
+    \draw[white] (-16, -12) rectangle (16, 11);
+    
+    \node[] at (0, 9.5) { Initial and Final State };
+   
+    \draw [->, >=stealth, line width=1] (-13, -8) -- +(26, 0);
+    \draw [->, >=stealth, line width=1] (-13, -8.058) -- +(0, 16);
+    \node[] at (0, -10) { $t$ };
+    \node[text=black] at (-14.5, 0) { $x$ };
+  
+    \foreach \x in {-13, 13} {
+      \fill[dark] ({\x}, {trajectory(\x)}) circle (0.25);
+    }
+  
+  \end{scope}
+  
+  \begin{scope}[shift={(32, 0)}]
+
+    \draw[white] (-16, -12) rectangle (16, 11);
+
+    \node[] at (0, 9.5) { Intermediate States };
+   
+    \draw [->, >=stealth, line width=1] (-13, -8) -- +(26, 0);
+    \draw [->, >=stealth, line width=1] (-13, -8.058) -- +(0, 16);
+    \node[] at (0, -10) { $t$ };
+    \node[text=black] at (-14.5, 0) { $x$ };
+    
+    \foreach \x in {-13, -11, ..., 13} {
+      \fill[dark] ({\x}, {trajectory(\x)}) circle (0.25);
+    }
+  
+  \end{scope}
+  
+  \begin{scope}[shift={(64, 0)}]
+
+    \draw[white] (-16, -12) rectangle (16, 11);
+
+    \draw[domain=-13:13, smooth, samples=100, line width=2, variable=\x, color=dark] 
+      plot ({\x}, {trajectory(\x)});
+
+    \node[] at (0, 9.5) { Trajectory };
+   
+    \draw [->, >=stealth, line width=1] (-13, -8) -- +(26, 0);
+    \draw [->, >=stealth, line width=1] (-13, -8.058) -- +(0, 16);
+    \node[] at (0, -10) { $t$ };
+    \node[text=black] at (-14.5, 0) { $x$ };
+  
+    \foreach \x in {-13, -11, ..., 13} {
+      \fill[light] ({\x}, {trajectory(\x)}) circle (0.25);
+    }
+  
+  \end{scope}
+  
+\end{tikzpicture}
+
+\end{document}  
