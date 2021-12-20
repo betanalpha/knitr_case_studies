@@ -1,0 +1,3402 @@
+%!PS-Adobe-2.0 EPSF-2.0
+%%Title: post_ribbons.eps
+%%Creator: gnuplot 5.0 patchlevel 1
+%%CreationDate: Mon Dec 13 20:53:53 2021
+%%DocumentFonts: (atend)
+%%BoundingBox: 50 50 986 626
+%%EndComments
+%%BeginProlog
+/gnudict 256 dict def
+gnudict begin
+%
+% The following true/false flags may be edited by hand if desired.
+% The unit line width and grayscale image gamma correction may also be changed.
+%
+/Color true def
+/Blacktext false def
+/Solid false def
+/Dashlength 1 def
+/Landscape false def
+/Level1 false def
+/Level3 false def
+/Rounded false def
+/ClipToBoundingBox false def
+/SuppressPDFMark false def
+/TransparentPatterns false def
+/gnulinewidth 5.000 def
+/userlinewidth gnulinewidth def
+/Gamma 1.0 def
+/BackgroundColor {-1.000 -1.000 -1.000} def
+%
+/vshift -116 def
+/dl1 {
+  10.0 Dashlength userlinewidth gnulinewidth div mul mul mul
+  Rounded { currentlinewidth 0.75 mul sub dup 0 le { pop 0.01 } if } if
+} def
+/dl2 {
+  10.0 Dashlength userlinewidth gnulinewidth div mul mul mul
+  Rounded { currentlinewidth 0.75 mul add } if
+} def
+/hpt_ 31.5 def
+/vpt_ 31.5 def
+/hpt hpt_ def
+/vpt vpt_ def
+/doclip {
+  ClipToBoundingBox {
+    newpath 50 50 moveto 986 50 lineto 986 626 lineto 50 626 lineto closepath
+    clip
+  } if
+} def
+%
+% Gnuplot Prolog Version 5.0 (Dec 2014)
+%
+%/SuppressPDFMark true def
+%
+/M {moveto} bind def
+/L {lineto} bind def
+/R {rmoveto} bind def
+/V {rlineto} bind def
+/N {newpath moveto} bind def
+/Z {closepath} bind def
+/C {setrgbcolor} bind def
+/f {rlineto fill} bind def
+/g {setgray} bind def
+/Gshow {show} def   % May be redefined later in the file to support UTF-8
+/vpt2 vpt 2 mul def
+/hpt2 hpt 2 mul def
+/Lshow {currentpoint stroke M 0 vshift R 
+	Blacktext {gsave 0 setgray textshow grestore} {textshow} ifelse} def
+/Rshow {currentpoint stroke M dup stringwidth pop neg vshift R
+	Blacktext {gsave 0 setgray textshow grestore} {textshow} ifelse} def
+/Cshow {currentpoint stroke M dup stringwidth pop -2 div vshift R 
+	Blacktext {gsave 0 setgray textshow grestore} {textshow} ifelse} def
+/UP {dup vpt_ mul /vpt exch def hpt_ mul /hpt exch def
+  /hpt2 hpt 2 mul def /vpt2 vpt 2 mul def} def
+/DL {Color {setrgbcolor Solid {pop []} if 0 setdash}
+ {pop pop pop 0 setgray Solid {pop []} if 0 setdash} ifelse} def
+/BL {stroke userlinewidth 2 mul setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+/AL {stroke userlinewidth 2 div setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+/UL {dup gnulinewidth mul /userlinewidth exch def
+	dup 1 lt {pop 1} if 10 mul /udl exch def} def
+/PL {stroke userlinewidth setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+3.8 setmiterlimit
+% Classic Line colors (version 5.0)
+/LCw {1 1 1} def
+/LCb {0 0 0} def
+/LCa {0 0 0} def
+/LC0 {1 0 0} def
+/LC1 {0 1 0} def
+/LC2 {0 0 1} def
+/LC3 {1 0 1} def
+/LC4 {0 1 1} def
+/LC5 {1 1 0} def
+/LC6 {0 0 0} def
+/LC7 {1 0.3 0} def
+/LC8 {0.5 0.5 0.5} def
+% Default dash patterns (version 5.0)
+/LTw {PL [] 1 setgray} def
+/LTb {BL [] LCb DL} def
+/LTa {AL [1 udl mul 2 udl mul] 0 setdash LCa setrgbcolor} def
+/LT0 {PL [] LC0 DL} def
+/LT1 {PL [2 dl1 3 dl2] LC1 DL} def
+/LT2 {PL [1 dl1 1.5 dl2] LC2 DL} def
+/LT3 {PL [6 dl1 2 dl2 1 dl1 2 dl2] LC3 DL} def
+/LT4 {PL [1 dl1 2 dl2 6 dl1 2 dl2 1 dl1 2 dl2] LC4 DL} def
+/LT5 {PL [4 dl1 2 dl2] LC5 DL} def
+/LT6 {PL [1.5 dl1 1.5 dl2 1.5 dl1 1.5 dl2 1.5 dl1 6 dl2] LC6 DL} def
+/LT7 {PL [3 dl1 3 dl2 1 dl1 3 dl2] LC7 DL} def
+/LT8 {PL [2 dl1 2 dl2 2 dl1 6 dl2] LC8 DL} def
+/SL {[] 0 setdash} def
+/Pnt {stroke [] 0 setdash gsave 1 setlinecap M 0 0 V stroke grestore} def
+/Dia {stroke [] 0 setdash 2 copy vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath stroke
+  Pnt} def
+/Pls {stroke [] 0 setdash vpt sub M 0 vpt2 V
+  currentpoint stroke M
+  hpt neg vpt neg R hpt2 0 V stroke
+ } def
+/Box {stroke [] 0 setdash 2 copy exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath stroke
+  Pnt} def
+/Crs {stroke [] 0 setdash exch hpt sub exch vpt add M
+  hpt2 vpt2 neg V currentpoint stroke M
+  hpt2 neg 0 R hpt2 vpt2 V stroke} def
+/TriU {stroke [] 0 setdash 2 copy vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath stroke
+  Pnt} def
+/Star {2 copy Pls Crs} def
+/BoxF {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath fill} def
+/TriUF {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath fill} def
+/TriD {stroke [] 0 setdash 2 copy vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath stroke
+  Pnt} def
+/TriDF {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath fill} def
+/DiaF {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath fill} def
+/Pent {stroke [] 0 setdash 2 copy gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath stroke grestore Pnt} def
+/PentF {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath fill grestore} def
+/Circle {stroke [] 0 setdash 2 copy
+  hpt 0 360 arc stroke Pnt} def
+/CircleF {stroke [] 0 setdash hpt 0 360 arc fill} def
+/C0 {BL [] 0 setdash 2 copy moveto vpt 90 450 arc} bind def
+/C1 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C2 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C3 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C4 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 180 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C5 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc
+	2 copy moveto
+	2 copy vpt 180 270 arc closepath fill
+	vpt 0 360 arc} bind def
+/C6 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C7 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C8 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 270 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C9 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 270 450 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C10 {BL [] 0 setdash 2 copy 2 copy moveto vpt 270 360 arc closepath fill
+	2 copy moveto
+	2 copy vpt 90 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C11 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 180 arc closepath fill
+	2 copy moveto
+	2 copy vpt 270 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C12 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 180 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C13 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc closepath fill
+	2 copy moveto
+	2 copy vpt 180 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C14 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 360 arc closepath fill
+	vpt 0 360 arc} bind def
+/C15 {BL [] 0 setdash 2 copy vpt 0 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/Rec {newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto
+	neg 0 rlineto closepath} bind def
+/Square {dup Rec} bind def
+/Bsquare {vpt sub exch vpt sub exch vpt2 Square} bind def
+/S0 {BL [] 0 setdash 2 copy moveto 0 vpt rlineto BL Bsquare} bind def
+/S1 {BL [] 0 setdash 2 copy vpt Square fill Bsquare} bind def
+/S2 {BL [] 0 setdash 2 copy exch vpt sub exch vpt Square fill Bsquare} bind def
+/S3 {BL [] 0 setdash 2 copy exch vpt sub exch vpt2 vpt Rec fill Bsquare} bind def
+/S4 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt Square fill Bsquare} bind def
+/S5 {BL [] 0 setdash 2 copy 2 copy vpt Square fill
+	exch vpt sub exch vpt sub vpt Square fill Bsquare} bind def
+/S6 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt vpt2 Rec fill Bsquare} bind def
+/S7 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt vpt2 Rec fill
+	2 copy vpt Square fill Bsquare} bind def
+/S8 {BL [] 0 setdash 2 copy vpt sub vpt Square fill Bsquare} bind def
+/S9 {BL [] 0 setdash 2 copy vpt sub vpt vpt2 Rec fill Bsquare} bind def
+/S10 {BL [] 0 setdash 2 copy vpt sub vpt Square fill 2 copy exch vpt sub exch vpt Square fill
+	Bsquare} bind def
+/S11 {BL [] 0 setdash 2 copy vpt sub vpt Square fill 2 copy exch vpt sub exch vpt2 vpt Rec fill
+	Bsquare} bind def
+/S12 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill Bsquare} bind def
+/S13 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill
+	2 copy vpt Square fill Bsquare} bind def
+/S14 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill
+	2 copy exch vpt sub exch vpt Square fill Bsquare} bind def
+/S15 {BL [] 0 setdash 2 copy Bsquare fill Bsquare} bind def
+/D0 {gsave translate 45 rotate 0 0 S0 stroke grestore} bind def
+/D1 {gsave translate 45 rotate 0 0 S1 stroke grestore} bind def
+/D2 {gsave translate 45 rotate 0 0 S2 stroke grestore} bind def
+/D3 {gsave translate 45 rotate 0 0 S3 stroke grestore} bind def
+/D4 {gsave translate 45 rotate 0 0 S4 stroke grestore} bind def
+/D5 {gsave translate 45 rotate 0 0 S5 stroke grestore} bind def
+/D6 {gsave translate 45 rotate 0 0 S6 stroke grestore} bind def
+/D7 {gsave translate 45 rotate 0 0 S7 stroke grestore} bind def
+/D8 {gsave translate 45 rotate 0 0 S8 stroke grestore} bind def
+/D9 {gsave translate 45 rotate 0 0 S9 stroke grestore} bind def
+/D10 {gsave translate 45 rotate 0 0 S10 stroke grestore} bind def
+/D11 {gsave translate 45 rotate 0 0 S11 stroke grestore} bind def
+/D12 {gsave translate 45 rotate 0 0 S12 stroke grestore} bind def
+/D13 {gsave translate 45 rotate 0 0 S13 stroke grestore} bind def
+/D14 {gsave translate 45 rotate 0 0 S14 stroke grestore} bind def
+/D15 {gsave translate 45 rotate 0 0 S15 stroke grestore} bind def
+/DiaE {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath stroke} def
+/BoxE {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath stroke} def
+/TriUE {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath stroke} def
+/TriDE {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath stroke} def
+/PentE {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath stroke grestore} def
+/CircE {stroke [] 0 setdash 
+  hpt 0 360 arc stroke} def
+/Opaque {gsave closepath 1 setgray fill grestore 0 setgray closepath} def
+/DiaW {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V Opaque stroke} def
+/BoxW {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V Opaque stroke} def
+/TriUW {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V Opaque stroke} def
+/TriDW {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V Opaque stroke} def
+/PentW {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  Opaque stroke grestore} def
+/CircW {stroke [] 0 setdash 
+  hpt 0 360 arc Opaque stroke} def
+/BoxFill {gsave Rec 1 setgray fill grestore} def
+/Density {
+  /Fillden exch def
+  currentrgbcolor
+  /ColB exch def /ColG exch def /ColR exch def
+  /ColR ColR Fillden mul Fillden sub 1 add def
+  /ColG ColG Fillden mul Fillden sub 1 add def
+  /ColB ColB Fillden mul Fillden sub 1 add def
+  ColR ColG ColB setrgbcolor} def
+/BoxColFill {gsave Rec PolyFill} def
+/PolyFill {gsave Density fill grestore grestore} def
+/h {rlineto rlineto rlineto gsave closepath fill grestore} bind def
+%
+% PostScript Level 1 Pattern Fill routine for rectangles
+% Usage: x y w h s a XX PatternFill
+%	x,y = lower left corner of box to be filled
+%	w,h = width and height of box
+%	  a = angle in degrees between lines and x-axis
+%	 XX = 0/1 for no/yes cross-hatch
+%
+/PatternFill {gsave /PFa [ 9 2 roll ] def
+  PFa 0 get PFa 2 get 2 div add PFa 1 get PFa 3 get 2 div add translate
+  PFa 2 get -2 div PFa 3 get -2 div PFa 2 get PFa 3 get Rec
+  TransparentPatterns {} {gsave 1 setgray fill grestore} ifelse
+  clip
+  currentlinewidth 0.5 mul setlinewidth
+  /PFs PFa 2 get dup mul PFa 3 get dup mul add sqrt def
+  0 0 M PFa 5 get rotate PFs -2 div dup translate
+  0 1 PFs PFa 4 get div 1 add floor cvi
+	{PFa 4 get mul 0 M 0 PFs V} for
+  0 PFa 6 get ne {
+	0 1 PFs PFa 4 get div 1 add floor cvi
+	{PFa 4 get mul 0 2 1 roll M PFs 0 V} for
+ } if
+  stroke grestore} def
+%
+/languagelevel where
+ {pop languagelevel} {1} ifelse
+dup 2 lt
+	{/InterpretLevel1 true def
+	 /InterpretLevel3 false def}
+	{/InterpretLevel1 Level1 def
+	 2 gt
+	    {/InterpretLevel3 Level3 def}
+	    {/InterpretLevel3 false def}
+	 ifelse }
+ ifelse
+%
+% PostScript level 2 pattern fill definitions
+%
+/Level2PatternFill {
+/Tile8x8 {/PaintType 2 /PatternType 1 /TilingType 1 /BBox [0 0 8 8] /XStep 8 /YStep 8}
+	bind def
+/KeepColor {currentrgbcolor [/Pattern /DeviceRGB] setcolorspace} bind def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 8 8 L 0 8 M 8 0 L stroke} 
+>> matrix makepattern
+/Pat1 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 8 8 L 0 8 M 8 0 L stroke
+	0 4 M 4 8 L 8 4 L 4 0 L 0 4 L stroke}
+>> matrix makepattern
+/Pat2 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 0 8 L
+	8 8 L 8 0 L 0 0 L fill}
+>> matrix makepattern
+/Pat3 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -4 8 M 8 -4 L
+	0 12 M 12 0 L stroke}
+>> matrix makepattern
+/Pat4 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -4 0 M 8 12 L
+	0 -4 M 12 8 L stroke}
+>> matrix makepattern
+/Pat5 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -2 8 M 4 -4 L
+	0 12 M 8 -4 L 4 12 M 10 0 L stroke}
+>> matrix makepattern
+/Pat6 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -2 0 M 4 12 L
+	0 -4 M 8 12 L 4 -4 M 10 8 L stroke}
+>> matrix makepattern
+/Pat7 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 8 -2 M -4 4 L
+	12 0 M -4 8 L 12 4 M 0 10 L stroke}
+>> matrix makepattern
+/Pat8 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 -2 M 12 4 L
+	-4 0 M 12 8 L -4 4 M 8 10 L stroke}
+>> matrix makepattern
+/Pat9 exch def
+/Pattern1 {PatternBgnd KeepColor Pat1 setpattern} bind def
+/Pattern2 {PatternBgnd KeepColor Pat2 setpattern} bind def
+/Pattern3 {PatternBgnd KeepColor Pat3 setpattern} bind def
+/Pattern4 {PatternBgnd KeepColor Landscape {Pat5} {Pat4} ifelse setpattern} bind def
+/Pattern5 {PatternBgnd KeepColor Landscape {Pat4} {Pat5} ifelse setpattern} bind def
+/Pattern6 {PatternBgnd KeepColor Landscape {Pat9} {Pat6} ifelse setpattern} bind def
+/Pattern7 {PatternBgnd KeepColor Landscape {Pat8} {Pat7} ifelse setpattern} bind def
+} def
+%
+%
+%End of PostScript Level 2 code
+%
+/PatternBgnd {
+  TransparentPatterns {} {gsave 1 setgray fill grestore} ifelse
+} def
+%
+% Substitute for Level 2 pattern fill codes with
+% grayscale if Level 2 support is not selected.
+%
+/Level1PatternFill {
+/Pattern1 {0.250 Density} bind def
+/Pattern2 {0.500 Density} bind def
+/Pattern3 {0.750 Density} bind def
+/Pattern4 {0.125 Density} bind def
+/Pattern5 {0.375 Density} bind def
+/Pattern6 {0.625 Density} bind def
+/Pattern7 {0.875 Density} bind def
+} def
+%
+% Now test for support of Level 2 code
+%
+Level1 {Level1PatternFill} {Level2PatternFill} ifelse
+%
+/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont
+dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall
+currentdict end definefont pop
+%
+/MFshow {
+   { dup 5 get 3 ge
+     { 5 get 3 eq {gsave} {grestore} ifelse }
+     {dup dup 0 get findfont exch 1 get scalefont setfont
+     [ currentpoint ] exch dup 2 get 0 exch R dup 5 get 2 ne {dup dup 6
+     get exch 4 get {textshow} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq
+     {dup 3 get {2 get neg 0 exch R pop} {pop aload pop M} ifelse} {dup 5
+     get 1 eq {dup 2 get exch dup 3 get exch 6 get stringwidth pop -2 div
+     dup 0 R} {dup 6 get stringwidth pop -2 div 0 R 6 get
+     textshow 2 index {aload pop M neg 3 -1 roll neg R pop pop} {pop pop pop
+     pop aload pop M} ifelse }ifelse }ifelse }
+     ifelse }
+   forall} def
+/Gswidth {dup type /stringtype eq {stringwidth} {pop (n) stringwidth} ifelse} def
+/MFwidth {0 exch { dup 5 get 3 ge { 5 get 3 eq { 0 } { pop } ifelse }
+ {dup 3 get{dup dup 0 get findfont exch 1 get scalefont setfont
+     6 get Gswidth pop add} {pop} ifelse} ifelse} forall} def
+/MLshow { currentpoint stroke M
+  0 exch R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/MRshow { currentpoint stroke M
+  exch dup MFwidth neg 3 -1 roll R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/MCshow { currentpoint stroke M
+  exch dup MFwidth -2 div 3 -1 roll R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/XYsave    { [( ) 1 2 true false 3 ()] } bind def
+/XYrestore { [( ) 1 2 true false 4 ()] } bind def
+Level1 SuppressPDFMark or 
+{} {
+/SDict 10 dict def
+systemdict /pdfmark known not {
+  userdict /pdfmark systemdict /cleartomark get put
+} if
+SDict begin [
+  /Title (post_ribbons.eps)
+  /Subject (gnuplot plot)
+  /Creator (gnuplot 5.0 patchlevel 1)
+  /Author (Betancourt)
+%  /Producer (gnuplot)
+%  /Keywords ()
+  /CreationDate (Mon Dec 13 20:53:53 2021)
+  /DOCINFO pdfmark
+end
+} ifelse
+end
+%
+% Support for boxed text - Ethan A Merritt May 2005
+%
+/InitTextBox { userdict /TBy2 3 -1 roll put userdict /TBx2 3 -1 roll put
+           userdict /TBy1 3 -1 roll put userdict /TBx1 3 -1 roll put
+	   /Boxing true def } def
+/ExtendTextBox { Boxing
+    { gsave dup false charpath pathbbox
+      dup TBy2 gt {userdict /TBy2 3 -1 roll put} {pop} ifelse
+      dup TBx2 gt {userdict /TBx2 3 -1 roll put} {pop} ifelse
+      dup TBy1 lt {userdict /TBy1 3 -1 roll put} {pop} ifelse
+      dup TBx1 lt {userdict /TBx1 3 -1 roll put} {pop} ifelse
+      grestore } if } def
+/PopTextBox { newpath TBx1 TBxmargin sub TBy1 TBymargin sub M
+               TBx1 TBxmargin sub TBy2 TBymargin add L
+	       TBx2 TBxmargin add TBy2 TBymargin add L
+	       TBx2 TBxmargin add TBy1 TBymargin sub L closepath } def
+/DrawTextBox { PopTextBox stroke /Boxing false def} def
+/FillTextBox { gsave PopTextBox 1 1 1 setrgbcolor fill grestore /Boxing false def} def
+0 0 0 0 InitTextBox
+/TBxmargin 20 def
+/TBymargin 20 def
+/Boxing false def
+/textshow { ExtendTextBox Gshow } def
+%
+%%EndProlog
+%%Page: 1 1
+gnudict begin
+gsave
+doclip
+50 50 translate
+0.050 0.050 scale
+0 setgray
+newpath
+(Times-Roman) findfont 350 scalefont setfont
+BackgroundColor 0 lt 3 1 roll 0 lt exch 0 lt or or not {BackgroundColor C 1.000 0 0 18720.00 11520.00 BoxColFill} if
+1.000 UL
+LTb
+LCb setrgbcolor
+0 1152 M
+stroke
+LTb
+LCb setrgbcolor
+0 2688 M
+stroke
+LTb
+LCb setrgbcolor
+0 4224 M
+stroke
+LTb
+LCb setrgbcolor
+0 5760 M
+stroke
+LTb
+LCb setrgbcolor
+0 7295 M
+stroke
+LTb
+LCb setrgbcolor
+0 8831 M
+stroke
+LTb
+LCb setrgbcolor
+0 10367 M
+stroke
+LTb
+LCb setrgbcolor
+851 0 M
+stroke
+LTb
+LCb setrgbcolor
+5105 0 M
+stroke
+LTb
+LCb setrgbcolor
+9360 0 M
+stroke
+LTb
+LCb setrgbcolor
+13614 0 M
+stroke
+LTb
+LCb setrgbcolor
+17868 0 M
+stroke
+LTb
+LCb setrgbcolor
+1.000 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+LCb setrgbcolor
+-595 5759 M
+currentpoint gsave translate -270 rotate 0 0 moveto
+[ [(Times-Roman) 350.0 0.0 true true 0 (y)]
+] -116.7 MCshow
+grestore
+LTb
+LCb setrgbcolor
+9359 -525 M
+[ [(Times-Roman) 350.0 0.0 true true 0 (x)]
+] -116.7 MCshow
+LTb
+LCb setrgbcolor
+% Begin plot #1
+1.000 UL
+LTb
+0.86 0.74 0.74 C 0 7167 N 0 -771 34 5 0 782 h
+34 7183 N 0 -760 34 4 0 771 h
+68 7198 N 0 -752 34 6 0 760 h
+102 7212 N 0 -741 34 4 0 752 h
+136 7227 N 0 -730 34 4 0 741 h
+170 7242 N 0 -720 34 3 0 730 h
+204 7255 N 0 -713 34 4 0 720 h
+238 7266 N 0 -704 34 3 0 713 h
+272 7278 N 0 -696 34 5 0 704 h
+306 7291 N 0 -686 34 5 0 696 h
+340 7306 N 0 -679 34 4 0 686 h
+374 7317 N 0 -669 34 3 0 679 h
+408 7330 N 0 -658 34 3 0 669 h
+442 7344 N 0 -649 34 3 0 658 h
+476 7356 N 0 -640 35 2 0 649 h
+511 7367 N 0 -633 34 3 0 640 h
+545 7377 N 0 -627 34 5 0 633 h
+579 7388 N 0 -618 34 3 0 627 h
+613 7400 N 0 -612 34 4 0 618 h
+647 7410 N 0 -604 34 3 0 612 h
+681 7421 N 0 -594 34 0 0 604 h
+715 7431 N 0 -586 34 3 0 594 h
+749 7442 N 0 -577 34 1 0 586 h
+783 7452 N 0 -573 34 3 0 577 h
+817 7459 N 0 -564 34 2 0 573 h
+851 7470 N 0 -560 34 4 0 564 h
+885 7478 N 0 -555 34 3 0 560 h
+919 7486 N 0 -548 34 2 0 555 h
+953 7495 N 0 -542 34 2 0 548 h
+987 7503 N 0 -535 34 1 0 542 h
+1021 7511 N 0 -528 34 1 0 535 h
+1055 7519 N 0 -521 34 1 0 528 h
+1089 7527 N 0 -516 34 2 0 521 h
+1123 7534 N 0 -509 34 2 0 516 h
+1157 7543 N 0 -504 34 2 0 509 h
+1191 7550 N 0 -500 34 3 0 504 h
+1225 7557 N 0 -494 34 1 0 500 h
+1259 7564 N 0 -490 34 2 0 494 h
+1293 7570 N 0 -486 34 3 0 490 h
+1327 7577 N 0 -482 34 1 0 486 h
+1361 7582 N 0 -477 34 0 0 482 h
+1395 7587 N 0 -472 34 1 0 477 h
+1429 7593 N 0 -467 34 1 0 472 h
+1463 7599 N 0 -461 35 0 0 467 h
+1498 7605 N 0 -456 34 1 0 461 h
+1532 7611 N 0 -454 34 3 0 456 h
+1566 7616 N 0 -451 34 0 0 454 h
+1600 7619 N 0 -449 34 2 0 451 h
+1634 7623 N 0 -445 34 1 0 449 h
+1668 7628 N 0 -442 34 1 0 445 h
+1702 7632 N 0 -438 34 -1 0 442 h
+1736 7635 N 0 -438 34 2 0 438 h
+1770 7637 N 0 -435 34 0 0 438 h
+1804 7640 N 0 -432 34 -1 0 435 h
+1838 7642 N 0 -429 34 0 0 432 h
+1872 7645 N 0 -428 34 0 0 429 h
+1906 7646 N 0 -426 34 -1 0 428 h
+1940 7647 N 0 -423 34 -1 0 426 h
+1974 7649 N 0 -423 34 1 0 423 h
+2008 7650 N 0 -421 34 0 0 423 h
+2042 7652 N 0 -420 34 1 0 421 h
+2076 7654 N 0 -417 34 -2 0 420 h
+2110 7655 N 0 -416 34 0 0 417 h
+2144 7656 N 0 -412 34 -2 0 416 h
+2178 7658 N 0 -410 34 -1 0 412 h
+2212 7659 N 0 -409 34 -1 0 410 h
+2246 7659 N 0 -407 34 -1 0 409 h
+2280 7660 N 0 -406 34 -1 0 407 h
+2314 7660 N 0 -407 34 -1 0 406 h
+2348 7658 N 0 -405 34 -2 0 407 h
+2382 7658 N 0 -405 34 0 0 405 h
+2416 7658 N 0 -403 34 -2 0 405 h
+2450 7658 N 0 -403 35 -2 0 403 h
+2485 7656 N 0 -400 34 -2 0 403 h
+2519 7657 N 0 -399 34 -2 0 400 h
+2553 7656 N 0 -399 34 -1 0 399 h
+2587 7655 N 0 -397 34 -2 0 399 h
+2621 7655 N 0 -395 34 -3 0 397 h
+2655 7654 N 0 -394 34 -3 0 395 h
+2689 7652 N 0 -395 34 -2 0 394 h
+2723 7649 N 0 -394 34 -2 0 395 h
+2757 7648 N 0 -392 34 -3 0 394 h
+2791 7647 N 0 -394 34 -2 0 392 h
+2825 7643 N 0 -394 34 -2 0 394 h
+2859 7641 N 0 -396 34 -2 0 394 h
+2893 7637 N 0 -397 34 -1 0 396 h
+2927 7635 N 0 -396 34 -4 0 397 h
+2961 7632 N 0 -394 34 -4 0 396 h
+2995 7630 N 0 -395 34 -2 0 394 h
+3029 7627 N 0 -396 34 -3 0 395 h
+3063 7623 N 0 -393 34 -4 0 396 h
+3097 7622 N 0 -393 34 -4 0 393 h
+3131 7618 N 0 -393 34 -4 0 393 h
+3165 7614 N 0 -391 34 -4 0 393 h
+3199 7612 N 0 -392 34 -3 0 391 h
+3233 7608 N 0 -392 34 -5 0 392 h
+3267 7603 N 0 -393 34 -4 0 392 h
+3301 7598 N 0 -393 34 -4 0 393 h
+3335 7594 N 0 -393 34 -4 0 393 h
+3369 7590 N 0 -393 34 -4 0 393 h
+3403 7586 N 0 -392 34 -5 0 393 h
+3437 7582 N 0 -393 35 -3 0 392 h
+3472 7578 N 0 -394 34 -4 0 393 h
+3506 7573 N 0 -393 34 -6 0 394 h
+3540 7568 N 0 -392 34 -5 0 393 h
+3574 7564 N 0 -392 34 -5 0 392 h
+3608 7559 N 0 -391 34 -6 0 392 h
+3642 7554 N 0 -391 34 -6 0 391 h
+3676 7548 N 0 -391 34 -5 0 391 h
+3710 7543 N 0 -391 34 -6 0 391 h
+3744 7537 N 0 -391 34 -5 0 391 h
+3778 7532 N 0 -391 34 -6 0 391 h
+3812 7526 N 0 -392 34 -5 0 391 h
+3846 7520 N 0 -393 34 -5 0 392 h
+3880 7514 N 0 -393 34 -6 0 393 h
+3914 7508 N 0 -393 34 -6 0 393 h
+3948 7502 N 0 -394 34 -6 0 393 h
+3982 7495 N 0 -395 34 -5 0 394 h
+4016 7489 N 0 -394 34 -7 0 395 h
+4050 7483 N 0 -394 34 -6 0 394 h
+4084 7477 N 0 -396 34 -6 0 394 h
+4118 7469 N 0 -397 34 -5 0 396 h
+4152 7463 N 0 -397 34 -7 0 397 h
+4186 7456 N 0 -397 34 -7 0 397 h
+4220 7449 N 0 -396 34 -7 0 397 h
+4254 7443 N 0 -396 34 -7 0 396 h
+4288 7436 N 0 -394 34 -8 0 396 h
+4322 7430 N 0 -393 34 -8 0 394 h
+4356 7423 N 0 -393 34 -7 0 393 h
+4390 7416 N 0 -393 34 -8 0 393 h
+4424 7408 N 0 -394 35 -7 0 393 h
+4459 7400 N 0 -394 34 -8 0 394 h
+4493 7392 N 0 -393 34 -8 0 394 h
+4527 7385 N 0 -394 34 -7 0 393 h
+4561 7377 N 0 -394 34 -7 0 394 h
+4595 7370 N 0 -393 34 -8 0 394 h
+4629 7363 N 0 -393 34 -8 0 393 h
+4663 7355 N 0 -392 34 -9 0 393 h
+4697 7347 N 0 -392 34 -7 0 392 h
+4731 7340 N 0 -392 34 -8 0 392 h
+4765 7332 N 0 -391 34 -9 0 392 h
+4799 7324 N 0 -390 34 -9 0 391 h
+4833 7316 N 0 -390 34 -8 0 390 h
+4867 7308 N 0 -389 34 -9 0 390 h
+4901 7300 N 0 -389 34 -9 0 389 h
+4935 7291 N 0 -388 34 -9 0 389 h
+4969 7283 N 0 -387 34 -9 0 388 h
+5003 7275 N 0 -388 34 -8 0 387 h
+5037 7266 N 0 -386 34 -10 0 388 h
+5071 7258 N 0 -386 34 -9 0 386 h
+5105 7249 N 0 -386 34 -9 0 386 h
+5139 7240 N 0 -386 34 -9 0 386 h
+5173 7231 N 0 -384 34 -10 0 386 h
+5207 7223 N 0 -385 34 -9 0 384 h
+5241 7213 N 0 -385 34 -9 0 385 h
+5275 7204 N 0 -384 34 -10 0 385 h
+5309 7195 N 0 -382 34 -10 0 384 h
+5343 7187 N 0 -381 34 -10 0 382 h
+5377 7178 N 0 -381 34 -10 0 381 h
+5411 7168 N 0 -380 35 -10 0 381 h
+5446 7159 N 0 -379 34 -11 0 380 h
+5480 7149 N 0 -379 34 -10 0 379 h
+5514 7139 N 0 -377 34 -11 0 379 h
+5548 7130 N 0 -377 34 -10 0 377 h
+5582 7120 N 0 -375 34 -11 0 377 h
+5616 7111 N 0 -375 34 -10 0 375 h
+5650 7101 N 0 -374 34 -11 0 375 h
+5684 7091 N 0 -374 34 -10 0 374 h
+5718 7081 N 0 -373 34 -11 0 374 h
+5752 7071 N 0 -372 34 -11 0 373 h
+5786 7061 N 0 -371 34 -11 0 372 h
+5820 7051 N 0 -370 34 -11 0 371 h
+5854 7041 N 0 -369 34 -12 0 370 h
+5888 7030 N 0 -368 34 -11 0 369 h
+5922 7020 N 0 -367 34 -11 0 368 h
+5956 7010 N 0 -365 34 -12 0 367 h
+5990 7000 N 0 -365 34 -11 0 365 h
+6024 6989 N 0 -363 34 -12 0 365 h
+6058 6979 N 0 -362 34 -11 0 363 h
+6092 6969 N 0 -361 34 -11 0 362 h
+6126 6959 N 0 -360 34 -12 0 361 h
+6160 6948 N 0 -359 34 -12 0 360 h
+6194 6937 N 0 -358 34 -11 0 359 h
+6228 6927 N 0 -357 34 -12 0 358 h
+6262 6916 N 0 -355 34 -12 0 357 h
+6296 6906 N 0 -353 34 -12 0 355 h
+6330 6896 N 0 -352 34 -12 0 353 h
+6364 6885 N 0 -351 34 -12 0 352 h
+6398 6874 N 0 -349 35 -13 0 351 h
+6433 6863 N 0 -348 34 -12 0 349 h
+6467 6852 N 0 -348 34 -12 0 348 h
+6501 6840 N 0 -347 34 -12 0 348 h
+6535 6829 N 0 -345 34 -13 0 347 h
+6569 6818 N 0 -343 34 -13 0 345 h
+6603 6807 N 0 -342 34 -12 0 343 h
+6637 6796 N 0 -342 34 -12 0 342 h
+6671 6784 N 0 -340 34 -13 0 342 h
+6705 6773 N 0 -340 34 -12 0 340 h
+6739 6761 N 0 -338 34 -13 0 340 h
+6773 6750 N 0 -337 34 -13 0 338 h
+6807 6738 N 0 -335 34 -13 0 337 h
+6841 6727 N 0 -334 34 -13 0 335 h
+6875 6715 N 0 -332 34 -13 0 334 h
+6909 6704 N 0 -331 34 -13 0 332 h
+6943 6692 N 0 -329 34 -13 0 331 h
+6977 6681 N 0 -328 34 -13 0 329 h
+7011 6669 N 0 -326 34 -13 0 328 h
+7045 6658 N 0 -325 34 -13 0 326 h
+7079 6646 N 0 -324 34 -13 0 325 h
+7113 6634 N 0 -322 34 -14 0 324 h
+7147 6622 N 0 -321 34 -13 0 322 h
+7181 6610 N 0 -319 34 -14 0 321 h
+7215 6598 N 0 -318 34 -13 0 319 h
+7249 6586 N 0 -316 34 -13 0 318 h
+7283 6575 N 0 -315 34 -14 0 316 h
+7317 6562 N 0 -313 34 -14 0 315 h
+7351 6550 N 0 -312 34 -13 0 313 h
+7385 6538 N 0 -310 35 -14 0 312 h
+7420 6526 N 0 -309 34 -13 0 310 h
+7454 6514 N 0 -308 34 -13 0 309 h
+7488 6502 N 0 -307 34 -14 0 308 h
+7522 6489 N 0 -306 34 -13 0 307 h
+7556 6477 N 0 -305 34 -14 0 306 h
+7590 6464 N 0 -304 34 -14 0 305 h
+7624 6451 N 0 -302 34 -14 0 304 h
+7658 6439 N 0 -300 34 -14 0 302 h
+7692 6427 N 0 -298 34 -14 0 300 h
+7726 6415 N 0 -297 34 -14 0 298 h
+7760 6402 N 0 -296 34 -14 0 297 h
+7794 6389 N 0 -295 34 -13 0 296 h
+7828 6377 N 0 -292 34 -15 0 295 h
+7862 6365 N 0 -290 34 -14 0 292 h
+7896 6353 N 0 -290 34 -14 0 290 h
+7930 6339 N 0 -288 34 -14 0 290 h
+7964 6327 N 0 -287 34 -13 0 288 h
+7998 6315 N 0 -285 34 -15 0 287 h
+8032 6302 N 0 -284 34 -14 0 285 h
+8066 6289 N 0 -281 34 -15 0 284 h
+8100 6277 N 0 -280 34 -14 0 281 h
+8134 6264 N 0 -279 34 -14 0 280 h
+8168 6251 N 0 -278 34 -14 0 279 h
+8202 6238 N 0 -276 34 -15 0 278 h
+8236 6225 N 0 -275 34 -14 0 276 h
+8270 6212 N 0 -273 34 -15 0 275 h
+8304 6199 N 0 -273 34 -14 0 273 h
+8338 6185 N 0 -272 34 -14 0 273 h
+8372 6172 N 0 -271 35 -14 0 272 h
+8407 6159 N 0 -271 34 -14 0 271 h
+8441 6145 N 0 -269 34 -15 0 271 h
+8475 6132 N 0 -268 34 -14 0 269 h
+8509 6119 N 0 -268 34 -14 0 268 h
+8543 6105 N 0 -267 34 -14 0 268 h
+8577 6092 N 0 -265 34 -15 0 267 h
+8611 6079 N 0 -264 34 -14 0 265 h
+8645 6066 N 0 -263 34 -14 0 264 h
+8679 6053 N 0 -263 34 -14 0 263 h
+8713 6039 N 0 -261 34 -15 0 263 h
+8747 6026 N 0 -261 34 -14 0 261 h
+8781 6012 N 0 -261 34 -14 0 261 h
+8815 5998 N 0 -261 34 -14 0 261 h
+8849 5984 N 0 -261 34 -14 0 261 h
+8883 5970 N 0 -260 34 -14 0 261 h
+8917 5957 N 0 -260 34 -14 0 260 h
+8951 5943 N 0 -259 34 -14 0 260 h
+8985 5930 N 0 -257 34 -15 0 259 h
+9019 5917 N 0 -256 34 -14 0 257 h
+9053 5904 N 0 -256 34 -14 0 256 h
+9087 5890 N 0 -255 34 -15 0 256 h
+9121 5876 N 0 -255 34 -14 0 255 h
+9155 5862 N 0 -254 34 -14 0 255 h
+9189 5849 N 0 -254 34 -14 0 254 h
+9223 5835 N 0 -254 34 -14 0 254 h
+9257 5821 N 0 -254 34 -14 0 254 h
+9291 5807 N 0 -254 34 -14 0 254 h
+9325 5793 N 0 -253 35 -14 0 254 h
+9360 5780 N 0 -253 34 -14 0 253 h
+9394 5766 N 0 -253 34 -14 0 253 h
+9428 5752 N 0 -252 34 -14 0 253 h
+9462 5739 N 0 -252 34 -15 0 252 h
+9496 5724 N 0 -251 34 -14 0 252 h
+9530 5711 N 0 -252 34 -14 0 251 h
+9564 5696 N 0 -252 34 -14 0 252 h
+9598 5682 N 0 -251 34 -14 0 252 h
+9632 5669 N 0 -251 34 -14 0 251 h
+9666 5655 N 0 -252 34 -14 0 251 h
+9700 5640 N 0 -252 34 -14 0 252 h
+9734 5626 N 0 -251 34 -14 0 252 h
+9768 5613 N 0 -251 34 -14 0 251 h
+9802 5599 N 0 -252 34 -14 0 251 h
+9836 5584 N 0 -254 34 -13 0 252 h
+9870 5569 N 0 -255 34 -13 0 254 h
+9904 5555 N 0 -256 34 -14 0 255 h
+9938 5540 N 0 -256 34 -14 0 256 h
+9972 5526 N 0 -257 34 -13 0 256 h
+10006 5512 N 0 -258 34 -14 0 257 h
+10040 5497 N 0 -259 34 -13 0 258 h
+10074 5483 N 0 -259 34 -14 0 259 h
+10108 5469 N 0 -262 34 -12 0 259 h
+10142 5454 N 0 -262 34 -14 0 262 h
+10176 5440 N 0 -263 34 -13 0 262 h
+10210 5426 N 0 -264 34 -13 0 263 h
+10244 5412 N 0 -266 34 -13 0 264 h
+10278 5397 N 0 -267 34 -13 0 266 h
+10312 5383 N 0 -266 35 -15 0 267 h
+10347 5369 N 0 -267 34 -13 0 266 h
+10381 5355 N 0 -268 34 -13 0 267 h
+10415 5341 N 0 -269 34 -13 0 268 h
+10449 5327 N 0 -270 34 -13 0 269 h
+10483 5313 N 0 -272 34 -13 0 270 h
+10517 5298 N 0 -273 34 -13 0 272 h
+10551 5284 N 0 -274 34 -13 0 273 h
+10585 5270 N 0 -275 34 -13 0 274 h
+10619 5256 N 0 -277 34 -13 0 275 h
+10653 5241 N 0 -278 34 -13 0 277 h
+10687 5227 N 0 -281 34 -12 0 278 h
+10721 5212 N 0 -282 34 -13 0 281 h
+10755 5198 N 0 -282 34 -13 0 282 h
+10789 5185 N 0 -284 34 -13 0 282 h
+10823 5170 N 0 -285 34 -12 0 284 h
+10857 5157 N 0 -286 34 -13 0 285 h
+10891 5143 N 0 -286 34 -14 0 286 h
+10925 5129 N 0 -287 34 -13 0 286 h
+10959 5115 N 0 -289 34 -12 0 287 h
+10993 5101 N 0 -290 34 -13 0 289 h
+11027 5087 N 0 -292 34 -12 0 290 h
+11061 5073 N 0 -294 34 -12 0 292 h
+11095 5059 N 0 -295 34 -13 0 294 h
+11129 5045 N 0 -296 34 -12 0 295 h
+11163 5032 N 0 -298 34 -12 0 296 h
+11197 5018 N 0 -300 34 -12 0 298 h
+11231 5004 N 0 -301 34 -12 0 300 h
+11265 4991 N 0 -302 34 -13 0 301 h
+11299 4977 N 0 -304 35 -12 0 302 h
+11334 4963 N 0 -305 34 -12 0 304 h
+11368 4950 N 0 -306 34 -12 0 305 h
+11402 4937 N 0 -307 34 -13 0 306 h
+11436 4923 N 0 -308 34 -12 0 307 h
+11470 4910 N 0 -309 34 -12 0 308 h
+11504 4897 N 0 -311 34 -12 0 309 h
+11538 4883 N 0 -311 34 -13 0 311 h
+11572 4870 N 0 -313 34 -11 0 311 h
+11606 4857 N 0 -314 34 -12 0 313 h
+11640 4844 N 0 -315 34 -12 0 314 h
+11674 4831 N 0 -318 34 -11 0 315 h
+11708 4817 N 0 -318 34 -12 0 318 h
+11742 4805 N 0 -321 34 -11 0 318 h
+11776 4791 N 0 -323 34 -12 0 321 h
+11810 4777 N 0 -324 34 -12 0 323 h
+11844 4764 N 0 -326 34 -11 0 324 h
+11878 4751 N 0 -327 34 -11 0 326 h
+11912 4739 N 0 -328 34 -12 0 327 h
+11946 4726 N 0 -330 34 -11 0 328 h
+11980 4713 N 0 -330 34 -12 0 330 h
+12014 4701 N 0 -332 34 -11 0 330 h
+12048 4688 N 0 -333 34 -11 0 332 h
+12082 4676 N 0 -335 34 -11 0 333 h
+12116 4663 N 0 -335 34 -12 0 335 h
+12150 4651 N 0 -337 34 -10 0 335 h
+12184 4639 N 0 -338 34 -11 0 337 h
+12218 4627 N 0 -339 34 -12 0 338 h
+12252 4614 N 0 -340 34 -11 0 339 h
+12286 4602 N 0 -341 35 -11 0 340 h
+12321 4590 N 0 -342 34 -11 0 341 h
+12355 4578 N 0 -343 34 -11 0 342 h
+12389 4566 N 0 -344 34 -11 0 343 h
+12423 4554 N 0 -346 34 -10 0 344 h
+12457 4542 N 0 -346 34 -11 0 346 h
+12491 4531 N 0 -348 34 -10 0 346 h
+12525 4519 N 0 -349 34 -11 0 348 h
+12559 4507 N 0 -350 34 -11 0 349 h
+12593 4495 N 0 -351 34 -11 0 350 h
+12627 4483 N 0 -352 34 -11 0 351 h
+12661 4471 N 0 -354 34 -10 0 352 h
+12695 4459 N 0 -356 34 -10 0 354 h
+12729 4447 N 0 -357 34 -10 0 356 h
+12763 4436 N 0 -358 34 -11 0 357 h
+12797 4424 N 0 -359 34 -10 0 358 h
+12831 4413 N 0 -359 34 -11 0 359 h
+12865 4402 N 0 -360 34 -10 0 359 h
+12899 4391 N 0 -362 34 -9 0 360 h
+12933 4380 N 0 -363 34 -10 0 362 h
+12967 4369 N 0 -363 34 -10 0 363 h
+13001 4359 N 0 -364 34 -10 0 363 h
+13035 4348 N 0 -365 34 -10 0 364 h
+13069 4337 N 0 -366 34 -9 0 365 h
+13103 4327 N 0 -367 34 -10 0 366 h
+13137 4316 N 0 -368 34 -9 0 367 h
+13171 4306 N 0 -368 34 -10 0 368 h
+13205 4296 N 0 -369 34 -9 0 368 h
+13239 4286 N 0 -370 34 -10 0 369 h
+13273 4275 N 0 -371 35 -9 0 370 h
+13308 4265 N 0 -372 34 -9 0 371 h
+13342 4255 N 0 -373 34 -9 0 372 h
+13376 4245 N 0 -373 34 -10 0 373 h
+13410 4235 N 0 -373 34 -9 0 373 h
+13444 4226 N 0 -374 34 -9 0 373 h
+13478 4216 N 0 -374 34 -10 0 374 h
+13512 4206 N 0 -375 34 -9 0 374 h
+13546 4196 N 0 -376 34 -9 0 375 h
+13580 4186 N 0 -377 34 -9 0 376 h
+13614 4176 N 0 -379 34 -8 0 377 h
+13648 4166 N 0 -379 34 -9 0 379 h
+13682 4157 N 0 -380 34 -8 0 379 h
+13716 4148 N 0 -380 34 -9 0 380 h
+13750 4139 N 0 -381 34 -8 0 380 h
+13784 4130 N 0 -381 34 -9 0 381 h
+13818 4121 N 0 -382 34 -8 0 381 h
+13852 4112 N 0 -382 34 -9 0 382 h
+13886 4103 N 0 -383 34 -8 0 382 h
+13920 4094 N 0 -384 34 -8 0 383 h
+13954 4085 N 0 -384 34 -8 0 384 h
+13988 4077 N 0 -383 34 -9 0 384 h
+14022 4069 N 0 -384 34 -7 0 383 h
+14056 4061 N 0 -384 34 -8 0 384 h
+14090 4053 N 0 -384 34 -8 0 384 h
+14124 4045 N 0 -383 34 -9 0 384 h
+14158 4037 N 0 -384 34 -7 0 383 h
+14192 4029 N 0 -383 34 -8 0 384 h
+14226 4022 N 0 -383 34 -8 0 383 h
+14260 4014 N 0 -382 35 -8 0 383 h
+14295 4007 N 0 -382 34 -8 0 382 h
+14329 3999 N 0 -382 34 -7 0 382 h
+14363 3992 N 0 -382 34 -7 0 382 h
+14397 3985 N 0 -382 34 -8 0 382 h
+14431 3977 N 0 -382 34 -7 0 382 h
+14465 3970 N 0 -382 34 -6 0 382 h
+14499 3964 N 0 -383 34 -7 0 382 h
+14533 3956 N 0 -383 34 -7 0 383 h
+14567 3949 N 0 -382 34 -7 0 383 h
+14601 3943 N 0 -382 34 -6 0 382 h
+14635 3937 N 0 -381 34 -7 0 382 h
+14669 3931 N 0 -381 34 -6 0 381 h
+14703 3925 N 0 -381 34 -6 0 381 h
+14737 3919 N 0 -381 34 -6 0 381 h
+14771 3913 N 0 -381 34 -6 0 381 h
+14805 3907 N 0 -382 34 -5 0 381 h
+14839 3901 N 0 -381 34 -7 0 382 h
+14873 3895 N 0 -380 34 -6 0 381 h
+14907 3890 N 0 -380 34 -6 0 380 h
+14941 3884 N 0 -380 34 -6 0 380 h
+14975 3878 N 0 -381 34 -5 0 380 h
+15009 3872 N 0 -381 34 -5 0 381 h
+15043 3867 N 0 -381 34 -5 0 381 h
+15077 3862 N 0 -382 34 -5 0 381 h
+15111 3856 N 0 -381 34 -5 0 382 h
+15145 3852 N 0 -381 34 -5 0 381 h
+15179 3847 N 0 -381 34 -5 0 381 h
+15213 3842 N 0 -381 34 -5 0 381 h
+15247 3837 N 0 -381 35 -5 0 381 h
+15282 3832 N 0 -381 34 -5 0 381 h
+15316 3827 N 0 -381 34 -5 0 381 h
+15350 3822 N 0 -382 34 -4 0 381 h
+15384 3817 N 0 -382 34 -4 0 382 h
+15418 3813 N 0 -382 34 -4 0 382 h
+15452 3809 N 0 -382 34 -4 0 382 h
+15486 3805 N 0 -381 34 -5 0 382 h
+15520 3801 N 0 -381 34 -4 0 381 h
+15554 3797 N 0 -380 34 -4 0 381 h
+15588 3794 N 0 -381 34 -3 0 380 h
+15622 3790 N 0 -381 34 -3 0 381 h
+15656 3787 N 0 -381 34 -3 0 381 h
+15690 3784 N 0 -382 34 -3 0 381 h
+15724 3780 N 0 -382 34 -3 0 382 h
+15758 3777 N 0 -382 34 -2 0 382 h
+15792 3775 N 0 -382 34 -3 0 382 h
+15826 3772 N 0 -383 34 -2 0 382 h
+15860 3769 N 0 -383 34 -3 0 383 h
+15894 3766 N 0 -383 34 -2 0 383 h
+15928 3764 N 0 -384 34 -3 0 383 h
+15962 3760 N 0 -384 34 0 0 384 h
+15996 3760 N 0 -386 34 -1 0 384 h
+16030 3757 N 0 -386 34 -2 0 386 h
+16064 3755 N 0 -388 34 -1 0 386 h
+16098 3752 N 0 -389 34 -1 0 388 h
+16132 3750 N 0 -389 34 -1 0 389 h
+16166 3749 N 0 -390 34 -1 0 389 h
+16200 3747 N 0 -391 34 0 0 390 h
+16234 3746 N 0 -391 35 -2 0 391 h
+16269 3744 N 0 -392 34 0 0 391 h
+16303 3743 N 0 -394 34 0 0 392 h
+16337 3741 N 0 -396 34 1 0 394 h
+16371 3740 N 0 -398 34 0 0 396 h
+16405 3738 N 0 -400 34 1 0 398 h
+16439 3737 N 0 -402 34 0 0 400 h
+16473 3735 N 0 -404 34 2 0 402 h
+16507 3735 N 0 -406 34 1 0 404 h
+16541 3734 N 0 -406 34 0 0 406 h
+16575 3734 N 0 -410 34 3 0 406 h
+16609 3733 N 0 -411 34 2 0 410 h
+16643 3734 N 0 -413 34 1 0 411 h
+16677 3733 N 0 -416 34 3 0 413 h
+16711 3733 N 0 -420 34 3 0 416 h
+16745 3732 N 0 -424 34 3 0 420 h
+16779 3731 N 0 -427 34 2 0 424 h
+16813 3730 N 0 -428 34 1 0 427 h
+16847 3730 N 0 -433 34 4 0 428 h
+16881 3729 N 0 -436 34 3 0 433 h
+16915 3729 N 0 -440 34 4 0 436 h
+16949 3729 N 0 -442 34 3 0 440 h
+16983 3730 N 0 -444 34 3 0 442 h
+17017 3731 N 0 -448 34 4 0 444 h
+17051 3731 N 0 -451 34 3 0 448 h
+17085 3731 N 0 -457 34 5 0 451 h
+17119 3730 N 0 -459 34 2 0 457 h
+17153 3730 N 0 -465 34 6 0 459 h
+17187 3730 N 0 -467 34 3 0 465 h
+17221 3731 N 0 -472 35 5 0 467 h
+17256 3731 N 0 -476 34 5 0 472 h
+17290 3732 N 0 -483 34 6 0 476 h
+17324 3731 N 0 -488 34 6 0 483 h
+17358 3732 N 0 -491 34 5 0 488 h
+17392 3734 N 0 -498 34 6 0 491 h
+17426 3733 N 0 -500 34 5 0 498 h
+17460 3736 N 0 -505 34 6 0 500 h
+17494 3737 N 0 -509 34 6 0 505 h
+17528 3739 N 0 -515 34 7 0 509 h
+17562 3740 N 0 -520 34 6 0 515 h
+17596 3741 N 0 -524 34 6 0 520 h
+17630 3743 N 0 -529 34 6 0 524 h
+17664 3744 N 0 -533 34 7 0 529 h
+17698 3747 N 0 -539 34 7 0 533 h
+17732 3748 N 0 -545 34 8 0 539 h
+17766 3750 N 0 -553 34 10 0 545 h
+17800 3752 N 0 -561 34 10 0 553 h
+17834 3754 N 0 -566 34 9 0 561 h
+17868 3758 N 0 -570 34 7 0 566 h
+17902 3761 N 0 -579 34 10 0 570 h
+17936 3762 N 0 -585 34 8 0 579 h
+17970 3764 N 0 -591 34 10 0 585 h
+18004 3768 N 0 -598 34 9 0 591 h
+18038 3770 N 0 -606 34 10 0 598 h
+18072 3772 N 0 -612 34 9 0 606 h
+18106 3775 N 0 -618 34 9 0 612 h
+18140 3778 N 0 -625 34 11 0 618 h
+18174 3782 N 0 -634 34 10 0 625 h
+18208 3783 N 0 -641 35 10 0 634 h
+18243 3786 N 0 -650 34 12 0 641 h
+18277 3789 N 0 -659 34 13 0 650 h
+18311 3793 N 0 -667 34 12 0 659 h
+18345 3797 N 0 -676 34 11 0 667 h
+18379 3799 N 0 -685 34 13 0 676 h
+18413 3803 N 0 -694 34 13 0 685 h
+18447 3807 N 0 -702 34 12 0 694 h
+18481 3811 N 0 -713 34 14 0 702 h
+18515 3814 N 0 -723 34 13 0 713 h
+18549 3817 N 0 -732 34 14 0 723 h
+18583 3822 N 0 -741 34 13 0 732 h
+18617 3826 N 0 -754 34 16 0 741 h
+18651 3829 N 0 -764 34 13 0 754 h
+18685 3832 N 0 -775 34 15 0 764 h
+% End plot #1
+% Begin plot #2
+1.000 UL
+LTb
+0.78 0.60 0.60 C 0 7314 N 0 -499 34 7 0 504 h
+34 7326 N 0 -493 34 7 0 499 h
+68 7339 N 0 -484 34 5 0 493 h
+102 7353 N 0 -477 34 6 0 484 h
+136 7366 N 0 -472 34 6 0 477 h
+170 7377 N 0 -467 34 8 0 472 h
+204 7390 N 0 -463 34 6 0 467 h
+238 7400 N 0 -457 34 5 0 463 h
+272 7411 N 0 -453 34 6 0 457 h
+306 7421 N 0 -450 34 6 0 453 h
+340 7430 N 0 -444 34 5 0 450 h
+374 7441 N 0 -439 34 6 0 444 h
+408 7452 N 0 -433 34 4 0 439 h
+442 7462 N 0 -427 34 6 0 433 h
+476 7474 N 0 -422 35 4 0 427 h
+511 7483 N 0 -415 34 3 0 422 h
+545 7493 N 0 -410 34 5 0 415 h
+579 7503 N 0 -405 34 3 0 410 h
+613 7511 N 0 -400 34 4 0 405 h
+647 7520 N 0 -394 34 4 0 400 h
+681 7530 N 0 -390 34 4 0 394 h
+715 7538 N 0 -385 34 4 0 390 h
+749 7547 N 0 -380 34 4 0 385 h
+783 7556 N 0 -375 34 3 0 380 h
+817 7564 N 0 -370 34 2 0 375 h
+851 7571 N 0 -368 34 5 0 370 h
+885 7578 N 0 -361 34 2 0 368 h
+919 7587 N 0 -354 34 1 0 361 h
+953 7595 N 0 -350 34 3 0 354 h
+987 7602 N 0 -347 34 4 0 350 h
+1021 7609 N 0 -344 34 4 0 347 h
+1055 7616 N 0 -339 34 3 0 344 h
+1089 7624 N 0 -336 34 3 0 339 h
+1123 7630 N 0 -334 34 4 0 336 h
+1157 7636 N 0 -329 34 1 0 334 h
+1191 7642 N 0 -326 34 3 0 329 h
+1225 7648 N 0 -322 34 1 0 326 h
+1259 7653 N 0 -319 34 2 0 322 h
+1293 7658 N 0 -315 34 2 0 319 h
+1327 7664 N 0 -313 34 2 0 315 h
+1361 7668 N 0 -310 34 2 0 313 h
+1395 7673 N 0 -307 34 2 0 310 h
+1429 7678 N 0 -305 34 2 0 307 h
+1463 7682 N 0 -303 35 1 0 305 h
+1498 7685 N 0 -301 34 2 0 303 h
+1532 7689 N 0 -299 34 1 0 301 h
+1566 7692 N 0 -297 34 1 0 299 h
+1600 7695 N 0 -294 34 1 0 297 h
+1634 7699 N 0 -293 34 2 0 294 h
+1668 7702 N 0 -291 34 1 0 293 h
+1702 7705 N 0 -288 34 1 0 291 h
+1736 7709 N 0 -288 34 2 0 288 h
+1770 7711 N 0 -284 34 -1 0 288 h
+1804 7714 N 0 -284 34 1 0 284 h
+1838 7715 N 0 -282 34 1 0 284 h
+1872 7718 N 0 -281 34 0 0 282 h
+1906 7719 N 0 -280 34 1 0 281 h
+1940 7721 N 0 -279 34 0 0 280 h
+1974 7722 N 0 -277 34 0 0 279 h
+2008 7724 N 0 -275 34 -1 0 277 h
+2042 7725 N 0 -275 34 1 0 275 h
+2076 7726 N 0 -273 34 -1 0 275 h
+2110 7727 N 0 -272 34 0 0 273 h
+2144 7728 N 0 -271 34 -1 0 272 h
+2178 7728 N 0 -271 34 1 0 271 h
+2212 7729 N 0 -271 34 -1 0 271 h
+2246 7728 N 0 -270 34 -1 0 271 h
+2280 7728 N 0 -269 34 -1 0 270 h
+2314 7728 N 0 -268 34 -1 0 269 h
+2348 7728 N 0 -268 34 -1 0 268 h
+2382 7727 N 0 -269 34 -1 0 268 h
+2416 7725 N 0 -268 34 -1 0 269 h
+2450 7725 N 0 -269 35 -1 0 268 h
+2485 7723 N 0 -267 34 -2 0 269 h
+2519 7723 N 0 -267 34 -1 0 267 h
+2553 7722 N 0 -266 34 -2 0 267 h
+2587 7721 N 0 -266 34 -1 0 266 h
+2621 7720 N 0 -266 34 -2 0 266 h
+2655 7718 N 0 -265 34 -2 0 266 h
+2689 7717 N 0 -266 34 -2 0 265 h
+2723 7714 N 0 -266 34 -2 0 266 h
+2757 7712 N 0 -265 34 -3 0 266 h
+2791 7710 N 0 -264 34 -3 0 265 h
+2825 7708 N 0 -265 34 -1 0 264 h
+2859 7706 N 0 -264 34 -4 0 265 h
+2893 7703 N 0 -264 34 -3 0 264 h
+2927 7700 N 0 -263 34 -3 0 264 h
+2961 7698 N 0 -264 34 -3 0 263 h
+2995 7694 N 0 -263 34 -3 0 264 h
+3029 7692 N 0 -263 34 -3 0 263 h
+3063 7689 N 0 -263 34 -3 0 263 h
+3097 7686 N 0 -264 34 -2 0 263 h
+3131 7683 N 0 -264 34 -4 0 264 h
+3165 7679 N 0 -265 34 -3 0 264 h
+3199 7675 N 0 -264 34 -4 0 265 h
+3233 7672 N 0 -263 34 -4 0 264 h
+3267 7669 N 0 -264 34 -4 0 263 h
+3301 7664 N 0 -263 34 -4 0 264 h
+3335 7661 N 0 -262 34 -5 0 263 h
+3369 7657 N 0 -262 34 -4 0 262 h
+3403 7653 N 0 -262 34 -5 0 262 h
+3437 7648 N 0 -262 35 -5 0 262 h
+3472 7643 N 0 -263 34 -4 0 262 h
+3506 7638 N 0 -263 34 -5 0 263 h
+3540 7633 N 0 -264 34 -4 0 263 h
+3574 7628 N 0 -264 34 -5 0 264 h
+3608 7623 N 0 -265 34 -4 0 264 h
+3642 7618 N 0 -265 34 -5 0 265 h
+3676 7613 N 0 -266 34 -5 0 265 h
+3710 7607 N 0 -265 34 -6 0 266 h
+3744 7602 N 0 -264 34 -6 0 265 h
+3778 7597 N 0 -264 34 -5 0 264 h
+3812 7592 N 0 -264 34 -6 0 264 h
+3846 7586 N 0 -263 34 -6 0 264 h
+3880 7581 N 0 -263 34 -6 0 263 h
+3914 7575 N 0 -263 34 -6 0 263 h
+3948 7569 N 0 -263 34 -6 0 263 h
+3982 7563 N 0 -263 34 -6 0 263 h
+4016 7557 N 0 -263 34 -6 0 263 h
+4050 7551 N 0 -264 34 -6 0 263 h
+4084 7544 N 0 -263 34 -7 0 264 h
+4118 7538 N 0 -262 34 -7 0 263 h
+4152 7532 N 0 -262 34 -7 0 262 h
+4186 7525 N 0 -263 34 -6 0 262 h
+4220 7518 N 0 -263 34 -7 0 263 h
+4254 7511 N 0 -263 34 -7 0 263 h
+4288 7504 N 0 -263 34 -7 0 263 h
+4322 7497 N 0 -263 34 -7 0 263 h
+4356 7490 N 0 -263 34 -7 0 263 h
+4390 7483 N 0 -264 34 -7 0 263 h
+4424 7475 N 0 -263 35 -8 0 264 h
+4459 7468 N 0 -263 34 -7 0 263 h
+4493 7461 N 0 -263 34 -8 0 263 h
+4527 7453 N 0 -263 34 -7 0 263 h
+4561 7446 N 0 -262 34 -8 0 263 h
+4595 7439 N 0 -263 34 -7 0 262 h
+4629 7431 N 0 -262 34 -9 0 263 h
+4663 7423 N 0 -262 34 -8 0 262 h
+4697 7415 N 0 -262 34 -8 0 262 h
+4731 7407 N 0 -262 34 -8 0 262 h
+4765 7399 N 0 -261 34 -9 0 262 h
+4799 7391 N 0 -262 34 -8 0 261 h
+4833 7382 N 0 -262 34 -9 0 262 h
+4867 7373 N 0 -262 34 -8 0 262 h
+4901 7365 N 0 -261 34 -9 0 262 h
+4935 7357 N 0 -261 34 -9 0 261 h
+4969 7348 N 0 -262 34 -8 0 261 h
+5003 7339 N 0 -260 34 -10 0 262 h
+5037 7331 N 0 -260 34 -9 0 260 h
+5071 7322 N 0 -259 34 -9 0 260 h
+5105 7314 N 0 -260 34 -9 0 259 h
+5139 7304 N 0 -259 34 -10 0 260 h
+5173 7295 N 0 -259 34 -9 0 259 h
+5207 7286 N 0 -258 34 -10 0 259 h
+5241 7277 N 0 -257 34 -10 0 258 h
+5275 7268 N 0 -258 34 -9 0 257 h
+5309 7258 N 0 -257 34 -10 0 258 h
+5343 7249 N 0 -256 34 -10 0 257 h
+5377 7240 N 0 -257 34 -9 0 256 h
+5411 7230 N 0 -256 35 -10 0 257 h
+5446 7221 N 0 -255 34 -11 0 256 h
+5480 7211 N 0 -255 34 -10 0 255 h
+5514 7201 N 0 -254 34 -10 0 255 h
+5548 7192 N 0 -254 34 -10 0 254 h
+5582 7182 N 0 -253 34 -11 0 254 h
+5616 7172 N 0 -251 34 -11 0 253 h
+5650 7163 N 0 -251 34 -10 0 251 h
+5684 7153 N 0 -250 34 -11 0 251 h
+5718 7143 N 0 -250 34 -10 0 250 h
+5752 7133 N 0 -249 34 -11 0 250 h
+5786 7123 N 0 -249 34 -11 0 249 h
+5820 7112 N 0 -248 34 -11 0 249 h
+5854 7102 N 0 -247 34 -11 0 248 h
+5888 7092 N 0 -247 34 -11 0 247 h
+5922 7081 N 0 -245 34 -12 0 247 h
+5956 7071 N 0 -244 34 -11 0 245 h
+5990 7061 N 0 -243 34 -12 0 244 h
+6024 7050 N 0 -242 34 -11 0 243 h
+6058 7040 N 0 -240 34 -12 0 242 h
+6092 7030 N 0 -240 34 -11 0 240 h
+6126 7019 N 0 -238 34 -12 0 240 h
+6160 7009 N 0 -237 34 -12 0 238 h
+6194 6998 N 0 -237 34 -11 0 237 h
+6228 6987 N 0 -236 34 -12 0 237 h
+6262 6976 N 0 -236 34 -11 0 236 h
+6296 6965 N 0 -234 34 -13 0 236 h
+6330 6954 N 0 -233 34 -12 0 234 h
+6364 6943 N 0 -232 34 -12 0 233 h
+6398 6932 N 0 -231 35 -12 0 232 h
+6433 6921 N 0 -230 34 -12 0 231 h
+6467 6910 N 0 -229 34 -12 0 230 h
+6501 6899 N 0 -228 34 -13 0 229 h
+6535 6887 N 0 -226 34 -12 0 228 h
+6569 6877 N 0 -225 34 -13 0 226 h
+6603 6865 N 0 -224 34 -12 0 225 h
+6637 6854 N 0 -223 34 -13 0 224 h
+6671 6842 N 0 -222 34 -12 0 223 h
+6705 6831 N 0 -221 34 -13 0 222 h
+6739 6819 N 0 -221 34 -12 0 221 h
+6773 6807 N 0 -219 34 -13 0 221 h
+6807 6796 N 0 -219 34 -12 0 219 h
+6841 6784 N 0 -218 34 -13 0 219 h
+6875 6772 N 0 -217 34 -13 0 218 h
+6909 6760 N 0 -215 34 -13 0 217 h
+6943 6749 N 0 -214 34 -13 0 215 h
+6977 6737 N 0 -214 34 -12 0 214 h
+7011 6725 N 0 -213 34 -13 0 214 h
+7045 6713 N 0 -212 34 -13 0 213 h
+7079 6701 N 0 -211 34 -13 0 212 h
+7113 6689 N 0 -210 34 -13 0 211 h
+7147 6677 N 0 -208 34 -14 0 210 h
+7181 6665 N 0 -207 34 -13 0 208 h
+7215 6653 N 0 -206 34 -13 0 207 h
+7249 6641 N 0 -205 34 -13 0 206 h
+7283 6629 N 0 -204 34 -13 0 205 h
+7317 6617 N 0 -204 34 -13 0 204 h
+7351 6604 N 0 -202 34 -14 0 204 h
+7385 6592 N 0 -201 35 -13 0 202 h
+7420 6580 N 0 -199 34 -14 0 201 h
+7454 6568 N 0 -199 34 -13 0 199 h
+7488 6555 N 0 -197 34 -14 0 199 h
+7522 6543 N 0 -196 34 -14 0 197 h
+7556 6530 N 0 -195 34 -13 0 196 h
+7590 6518 N 0 -193 34 -14 0 195 h
+7624 6506 N 0 -193 34 -13 0 193 h
+7658 6493 N 0 -193 34 -13 0 193 h
+7692 6480 N 0 -192 34 -14 0 193 h
+7726 6467 N 0 -191 34 -13 0 192 h
+7760 6455 N 0 -190 34 -14 0 191 h
+7794 6442 N 0 -190 34 -13 0 190 h
+7828 6429 N 0 -189 34 -14 0 190 h
+7862 6416 N 0 -189 34 -13 0 189 h
+7896 6403 N 0 -188 34 -14 0 189 h
+7930 6390 N 0 -188 34 -14 0 188 h
+7964 6376 N 0 -187 34 -14 0 188 h
+7998 6363 N 0 -187 34 -13 0 187 h
+8032 6350 N 0 -185 34 -15 0 187 h
+8066 6337 N 0 -185 34 -13 0 185 h
+8100 6324 N 0 -184 34 -14 0 185 h
+8134 6311 N 0 -182 34 -15 0 184 h
+8168 6298 N 0 -182 34 -14 0 182 h
+8202 6284 N 0 -181 34 -14 0 182 h
+8236 6271 N 0 -181 34 -13 0 181 h
+8270 6258 N 0 -181 34 -14 0 181 h
+8304 6244 N 0 -180 34 -14 0 181 h
+8338 6231 N 0 -180 34 -14 0 180 h
+8372 6217 N 0 -178 35 -15 0 180 h
+8407 6204 N 0 -178 34 -14 0 178 h
+8441 6190 N 0 -177 34 -14 0 178 h
+8475 6177 N 0 -176 34 -14 0 177 h
+8509 6164 N 0 -175 34 -15 0 176 h
+8543 6150 N 0 -175 34 -14 0 175 h
+8577 6136 N 0 -174 34 -14 0 175 h
+8611 6123 N 0 -174 34 -14 0 174 h
+8645 6109 N 0 -173 34 -14 0 174 h
+8679 6096 N 0 -173 34 -14 0 173 h
+8713 6082 N 0 -174 34 -13 0 173 h
+8747 6068 N 0 -173 34 -14 0 174 h
+8781 6055 N 0 -171 34 -15 0 173 h
+8815 6042 N 0 -170 34 -14 0 171 h
+8849 6029 N 0 -170 34 -14 0 170 h
+8883 6015 N 0 -171 34 -13 0 170 h
+8917 6001 N 0 -171 34 -14 0 171 h
+8951 5987 N 0 -171 34 -14 0 171 h
+8985 5973 N 0 -169 34 -15 0 171 h
+9019 5960 N 0 -169 34 -14 0 169 h
+9053 5946 N 0 -169 34 -14 0 169 h
+9087 5932 N 0 -169 34 -14 0 169 h
+9121 5918 N 0 -169 34 -14 0 169 h
+9155 5904 N 0 -169 34 -14 0 169 h
+9189 5890 N 0 -169 34 -14 0 169 h
+9223 5876 N 0 -167 34 -15 0 169 h
+9257 5863 N 0 -168 34 -13 0 167 h
+9291 5849 N 0 -168 34 -14 0 168 h
+9325 5835 N 0 -168 35 -14 0 168 h
+9360 5821 N 0 -168 34 -14 0 168 h
+9394 5807 N 0 -167 34 -14 0 168 h
+9428 5794 N 0 -168 34 -14 0 167 h
+9462 5779 N 0 -168 34 -14 0 168 h
+9496 5765 N 0 -167 34 -14 0 168 h
+9530 5752 N 0 -168 34 -13 0 167 h
+9564 5738 N 0 -168 34 -14 0 168 h
+9598 5724 N 0 -167 34 -15 0 168 h
+9632 5710 N 0 -169 34 -13 0 167 h
+9666 5695 N 0 -168 34 -14 0 169 h
+9700 5682 N 0 -169 34 -13 0 168 h
+9734 5668 N 0 -169 34 -14 0 169 h
+9768 5654 N 0 -169 34 -14 0 169 h
+9802 5640 N 0 -169 34 -14 0 169 h
+9836 5626 N 0 -169 34 -14 0 169 h
+9870 5612 N 0 -170 34 -13 0 169 h
+9904 5598 N 0 -170 34 -14 0 170 h
+9938 5584 N 0 -170 34 -14 0 170 h
+9972 5570 N 0 -170 34 -13 0 170 h
+10006 5557 N 0 -171 34 -14 0 170 h
+10040 5542 N 0 -171 34 -13 0 171 h
+10074 5529 N 0 -171 34 -14 0 171 h
+10108 5515 N 0 -172 34 -13 0 171 h
+10142 5501 N 0 -172 34 -14 0 172 h
+10176 5487 N 0 -173 34 -13 0 172 h
+10210 5473 N 0 -173 34 -14 0 173 h
+10244 5459 N 0 -174 34 -13 0 173 h
+10278 5445 N 0 -175 34 -13 0 174 h
+10312 5431 N 0 -176 35 -13 0 175 h
+10347 5417 N 0 -175 34 -14 0 176 h
+10381 5404 N 0 -176 34 -13 0 175 h
+10415 5390 N 0 -177 34 -13 0 176 h
+10449 5376 N 0 -177 34 -14 0 177 h
+10483 5362 N 0 -177 34 -13 0 177 h
+10517 5349 N 0 -177 34 -14 0 177 h
+10551 5335 N 0 -178 34 -13 0 177 h
+10585 5321 N 0 -180 34 -12 0 178 h
+10619 5307 N 0 -180 34 -13 0 180 h
+10653 5294 N 0 -180 34 -14 0 180 h
+10687 5280 N 0 -182 34 -13 0 180 h
+10721 5265 N 0 -183 34 -13 0 182 h
+10755 5251 N 0 -184 34 -13 0 183 h
+10789 5237 N 0 -186 34 -12 0 184 h
+10823 5223 N 0 -186 34 -13 0 186 h
+10857 5210 N 0 -187 34 -13 0 186 h
+10891 5196 N 0 -188 34 -13 0 187 h
+10925 5182 N 0 -188 34 -13 0 188 h
+10959 5169 N 0 -190 34 -12 0 188 h
+10993 5155 N 0 -190 34 -13 0 190 h
+11027 5142 N 0 -192 34 -12 0 190 h
+11061 5128 N 0 -192 34 -13 0 192 h
+11095 5115 N 0 -193 34 -13 0 192 h
+11129 5101 N 0 -193 34 -13 0 193 h
+11163 5088 N 0 -194 34 -13 0 193 h
+11197 5074 N 0 -195 34 -12 0 194 h
+11231 5061 N 0 -197 34 -12 0 195 h
+11265 5047 N 0 -199 34 -12 0 197 h
+11299 5033 N 0 -199 35 -13 0 199 h
+11334 5020 N 0 -199 34 -13 0 199 h
+11368 5007 N 0 -200 34 -12 0 199 h
+11402 4994 N 0 -202 34 -12 0 200 h
+11436 4980 N 0 -201 34 -13 0 202 h
+11470 4968 N 0 -203 34 -12 0 201 h
+11504 4954 N 0 -204 34 -12 0 203 h
+11538 4941 N 0 -204 34 -13 0 204 h
+11572 4928 N 0 -205 34 -12 0 204 h
+11606 4915 N 0 -206 34 -12 0 205 h
+11640 4902 N 0 -208 34 -12 0 206 h
+11674 4888 N 0 -210 34 -11 0 208 h
+11708 4875 N 0 -211 34 -12 0 210 h
+11742 4862 N 0 -212 34 -12 0 211 h
+11776 4849 N 0 -214 34 -12 0 212 h
+11810 4835 N 0 -213 34 -13 0 214 h
+11844 4823 N 0 -215 34 -11 0 213 h
+11878 4810 N 0 -216 34 -12 0 215 h
+11912 4797 N 0 -217 34 -11 0 216 h
+11946 4785 N 0 -218 34 -12 0 217 h
+11980 4772 N 0 -219 34 -11 0 218 h
+12014 4760 N 0 -220 34 -12 0 219 h
+12048 4747 N 0 -221 34 -11 0 220 h
+12082 4735 N 0 -222 34 -12 0 221 h
+12116 4722 N 0 -223 34 -11 0 222 h
+12150 4710 N 0 -224 34 -11 0 223 h
+12184 4698 N 0 -224 34 -12 0 224 h
+12218 4686 N 0 -226 34 -11 0 224 h
+12252 4673 N 0 -227 34 -11 0 226 h
+12286 4661 N 0 -227 35 -12 0 227 h
+12321 4649 N 0 -228 34 -11 0 227 h
+12355 4637 N 0 -228 34 -11 0 228 h
+12389 4626 N 0 -230 34 -11 0 228 h
+12423 4613 N 0 -231 34 -11 0 230 h
+12457 4601 N 0 -232 34 -10 0 231 h
+12491 4590 N 0 -233 34 -11 0 232 h
+12525 4578 N 0 -233 34 -11 0 233 h
+12559 4567 N 0 -234 34 -11 0 233 h
+12593 4555 N 0 -234 34 -11 0 234 h
+12627 4544 N 0 -235 34 -11 0 234 h
+12661 4532 N 0 -235 34 -11 0 235 h
+12695 4521 N 0 -237 34 -10 0 235 h
+12729 4509 N 0 -237 34 -11 0 237 h
+12763 4498 N 0 -237 34 -11 0 237 h
+12797 4487 N 0 -239 34 -10 0 237 h
+12831 4475 N 0 -238 34 -11 0 239 h
+12865 4465 N 0 -239 34 -10 0 238 h
+12899 4454 N 0 -240 34 -10 0 239 h
+12933 4443 N 0 -241 34 -10 0 240 h
+12967 4432 N 0 -241 34 -11 0 241 h
+13001 4421 N 0 -242 34 -10 0 241 h
+13035 4410 N 0 -242 34 -10 0 242 h
+13069 4400 N 0 -243 34 -10 0 242 h
+13103 4389 N 0 -243 34 -10 0 243 h
+13137 4379 N 0 -244 34 -10 0 243 h
+13171 4368 N 0 -244 34 -10 0 244 h
+13205 4358 N 0 -245 34 -10 0 244 h
+13239 4347 N 0 -246 34 -9 0 245 h
+13273 4337 N 0 -246 35 -10 0 246 h
+13308 4327 N 0 -247 34 -9 0 246 h
+13342 4317 N 0 -246 34 -10 0 247 h
+13376 4308 N 0 -247 34 -9 0 246 h
+13410 4298 N 0 -247 34 -10 0 247 h
+13444 4288 N 0 -247 34 -9 0 247 h
+13478 4279 N 0 -248 34 -9 0 247 h
+13512 4269 N 0 -248 34 -9 0 248 h
+13546 4260 N 0 -248 34 -9 0 248 h
+13580 4251 N 0 -248 34 -9 0 248 h
+13614 4242 N 0 -248 34 -9 0 248 h
+13648 4233 N 0 -248 34 -9 0 248 h
+13682 4224 N 0 -249 34 -8 0 248 h
+13716 4215 N 0 -249 34 -9 0 249 h
+13750 4206 N 0 -250 34 -9 0 249 h
+13784 4196 N 0 -250 34 -8 0 250 h
+13818 4188 N 0 -250 34 -9 0 250 h
+13852 4179 N 0 -251 34 -8 0 250 h
+13886 4170 N 0 -252 34 -8 0 251 h
+13920 4161 N 0 -251 34 -9 0 252 h
+13954 4153 N 0 -251 34 -8 0 251 h
+13988 4145 N 0 -252 34 -8 0 251 h
+14022 4136 N 0 -251 34 -8 0 252 h
+14056 4129 N 0 -251 34 -8 0 251 h
+14090 4121 N 0 -250 34 -9 0 251 h
+14124 4113 N 0 -251 34 -7 0 250 h
+14158 4105 N 0 -251 34 -8 0 251 h
+14192 4097 N 0 -252 34 -7 0 251 h
+14226 4089 N 0 -251 34 -8 0 252 h
+14260 4082 N 0 -252 35 -7 0 251 h
+14295 4074 N 0 -251 34 -8 0 252 h
+14329 4067 N 0 -253 34 -6 0 251 h
+14363 4059 N 0 -253 34 -7 0 253 h
+14397 4052 N 0 -253 34 -7 0 253 h
+14431 4045 N 0 -253 34 -7 0 253 h
+14465 4038 N 0 -252 34 -8 0 253 h
+14499 4031 N 0 -252 34 -6 0 252 h
+14533 4025 N 0 -252 34 -7 0 252 h
+14567 4018 N 0 -253 34 -6 0 252 h
+14601 4011 N 0 -253 34 -7 0 253 h
+14635 4004 N 0 -254 34 -6 0 253 h
+14669 3997 N 0 -253 34 -7 0 254 h
+14703 3991 N 0 -253 34 -6 0 253 h
+14737 3985 N 0 -253 34 -7 0 253 h
+14771 3978 N 0 -253 34 -6 0 253 h
+14805 3972 N 0 -253 34 -6 0 253 h
+14839 3966 N 0 -254 34 -5 0 253 h
+14873 3960 N 0 -254 34 -6 0 254 h
+14907 3954 N 0 -254 34 -5 0 254 h
+14941 3949 N 0 -254 34 -6 0 254 h
+14975 3943 N 0 -255 34 -5 0 254 h
+15009 3937 N 0 -254 34 -6 0 255 h
+15043 3932 N 0 -254 34 -5 0 254 h
+15077 3927 N 0 -254 34 -5 0 254 h
+15111 3922 N 0 -253 34 -5 0 254 h
+15145 3918 N 0 -254 34 -4 0 253 h
+15179 3913 N 0 -253 34 -6 0 254 h
+15213 3908 N 0 -253 34 -5 0 253 h
+15247 3903 N 0 -253 35 -4 0 253 h
+15282 3899 N 0 -254 34 -4 0 253 h
+15316 3894 N 0 -253 34 -5 0 254 h
+15350 3890 N 0 -253 34 -4 0 253 h
+15384 3886 N 0 -253 34 -4 0 253 h
+15418 3882 N 0 -253 34 -4 0 253 h
+15452 3878 N 0 -254 34 -3 0 253 h
+15486 3874 N 0 -253 34 -5 0 254 h
+15520 3870 N 0 -252 34 -4 0 253 h
+15554 3867 N 0 -253 34 -3 0 252 h
+15588 3863 N 0 -252 34 -4 0 253 h
+15622 3860 N 0 -253 34 -3 0 252 h
+15656 3856 N 0 -252 34 -4 0 253 h
+15690 3853 N 0 -253 34 -3 0 252 h
+15724 3849 N 0 -252 34 -3 0 253 h
+15758 3847 N 0 -254 34 -2 0 252 h
+15792 3843 N 0 -254 34 -3 0 254 h
+15826 3840 N 0 -254 34 -3 0 254 h
+15860 3837 N 0 -255 34 -2 0 254 h
+15894 3834 N 0 -254 34 -3 0 255 h
+15928 3832 N 0 -254 34 -3 0 254 h
+15962 3829 N 0 -255 34 -1 0 254 h
+15996 3827 N 0 -255 34 -2 0 255 h
+16030 3825 N 0 -255 34 -2 0 255 h
+16064 3823 N 0 -254 34 -2 0 255 h
+16098 3822 N 0 -255 34 -1 0 254 h
+16132 3820 N 0 -254 34 -2 0 255 h
+16166 3819 N 0 -256 34 0 0 254 h
+16200 3817 N 0 -256 34 -1 0 256 h
+16234 3816 N 0 -257 35 -1 0 256 h
+16269 3814 N 0 -259 34 0 0 257 h
+16303 3812 N 0 -260 34 0 0 259 h
+16337 3811 N 0 -260 34 -1 0 260 h
+16371 3810 N 0 -259 34 -1 0 260 h
+16405 3810 N 0 -259 34 0 0 259 h
+16439 3810 N 0 -260 34 0 0 259 h
+16473 3809 N 0 -262 34 1 0 260 h
+16507 3808 N 0 -263 34 0 0 262 h
+16541 3807 N 0 -265 34 1 0 263 h
+16575 3806 N 0 -267 34 1 0 265 h
+16609 3805 N 0 -269 34 1 0 267 h
+16643 3804 N 0 -271 34 2 0 269 h
+16677 3804 N 0 -272 34 1 0 271 h
+16711 3804 N 0 -273 34 1 0 272 h
+16745 3804 N 0 -276 34 2 0 273 h
+16779 3803 N 0 -277 34 1 0 276 h
+16813 3803 N 0 -280 34 3 0 277 h
+16847 3803 N 0 -281 34 2 0 280 h
+16881 3804 N 0 -282 34 2 0 281 h
+16915 3805 N 0 -283 34 1 0 282 h
+16949 3805 N 0 -286 34 3 0 283 h
+16983 3805 N 0 -288 34 3 0 286 h
+17017 3806 N 0 -289 34 2 0 288 h
+17051 3807 N 0 -291 34 2 0 289 h
+17085 3807 N 0 -294 34 4 0 291 h
+17119 3808 N 0 -295 34 3 0 294 h
+17153 3810 N 0 -298 34 3 0 295 h
+17187 3810 N 0 -300 34 4 0 298 h
+17221 3812 N 0 -303 35 5 0 300 h
+17256 3814 N 0 -307 34 5 0 303 h
+17290 3815 N 0 -309 34 4 0 307 h
+17324 3817 N 0 -313 34 5 0 309 h
+17358 3818 N 0 -318 34 7 0 313 h
+17392 3820 N 0 -320 34 4 0 318 h
+17426 3822 N 0 -322 34 4 0 320 h
+17460 3824 N 0 -327 34 6 0 322 h
+17494 3825 N 0 -330 34 6 0 327 h
+17528 3828 N 0 -334 34 6 0 330 h
+17562 3830 N 0 -337 34 5 0 334 h
+17596 3832 N 0 -341 34 6 0 337 h
+17630 3834 N 0 -345 34 6 0 341 h
+17664 3836 N 0 -349 34 8 0 345 h
+17698 3840 N 0 -355 34 7 0 349 h
+17732 3841 N 0 -357 34 6 0 355 h
+17766 3845 N 0 -361 34 7 0 357 h
+17800 3848 N 0 -365 34 7 0 361 h
+17834 3851 N 0 -370 34 8 0 365 h
+17868 3854 N 0 -373 34 7 0 370 h
+17902 3858 N 0 -378 34 8 0 373 h
+17936 3861 N 0 -383 34 9 0 378 h
+17970 3865 N 0 -389 34 10 0 383 h
+18004 3869 N 0 -395 34 9 0 389 h
+18038 3872 N 0 -399 34 8 0 395 h
+18072 3876 N 0 -405 34 9 0 399 h
+18106 3879 N 0 -410 34 9 0 405 h
+18140 3883 N 0 -415 34 9 0 410 h
+18174 3887 N 0 -423 34 11 0 415 h
+18208 3890 N 0 -431 35 11 0 423 h
+18243 3893 N 0 -437 34 11 0 431 h
+18277 3898 N 0 -444 34 11 0 437 h
+18311 3902 N 0 -449 34 9 0 444 h
+18345 3906 N 0 -456 34 12 0 449 h
+18379 3911 N 0 -462 34 11 0 456 h
+18413 3916 N 0 -468 34 11 0 462 h
+18447 3921 N 0 -474 34 11 0 468 h
+18481 3926 N 0 -478 34 11 0 474 h
+18515 3933 N 0 -484 34 13 0 478 h
+18549 3940 N 0 -490 34 12 0 484 h
+18583 3946 N 0 -498 34 12 0 490 h
+18617 3950 N 0 -505 34 13 0 498 h
+18651 3956 N 0 -511 34 13 0 505 h
+18685 3963 N 0 -519 34 13 0 511 h
+% End plot #2
+% Begin plot #3
+1.000 UL
+LTb
+0.73 0.49 0.49 C 0 7410 N 0 -309 34 7 0 313 h
+34 7421 N 0 -306 34 8 0 309 h
+68 7432 N 0 -302 34 8 0 306 h
+102 7444 N 0 -298 34 7 0 302 h
+136 7455 N 0 -294 34 7 0 298 h
+170 7466 N 0 -289 34 6 0 294 h
+204 7477 N 0 -284 34 7 0 289 h
+238 7489 N 0 -281 34 7 0 284 h
+272 7499 N 0 -277 34 7 0 281 h
+306 7510 N 0 -273 34 6 0 277 h
+340 7520 N 0 -269 34 6 0 273 h
+374 7530 N 0 -268 34 7 0 269 h
+408 7538 N 0 -264 34 6 0 268 h
+442 7548 N 0 -260 34 5 0 264 h
+476 7557 N 0 -257 35 5 0 260 h
+511 7565 N 0 -254 34 5 0 257 h
+545 7573 N 0 -249 34 5 0 254 h
+579 7583 N 0 -245 34 5 0 249 h
+613 7592 N 0 -244 34 5 0 245 h
+647 7598 N 0 -240 34 4 0 244 h
+681 7606 N 0 -237 34 6 0 240 h
+715 7615 N 0 -235 34 5 0 237 h
+749 7622 N 0 -232 34 5 0 235 h
+783 7630 N 0 -230 34 5 0 232 h
+817 7637 N 0 -229 34 6 0 230 h
+851 7644 N 0 -225 34 3 0 229 h
+885 7651 N 0 -222 34 4 0 225 h
+919 7658 N 0 -219 34 4 0 222 h
+953 7665 N 0 -218 34 4 0 219 h
+987 7670 N 0 -216 34 4 0 218 h
+1021 7676 N 0 -214 34 4 0 216 h
+1055 7682 N 0 -212 34 3 0 214 h
+1089 7687 N 0 -211 34 4 0 212 h
+1123 7692 N 0 -211 34 5 0 211 h
+1157 7697 N 0 -208 34 2 0 211 h
+1191 7702 N 0 -207 34 4 0 208 h
+1225 7707 N 0 -205 34 3 0 207 h
+1259 7712 N 0 -204 34 3 0 205 h
+1293 7716 N 0 -204 34 3 0 204 h
+1327 7719 N 0 -201 34 2 0 204 h
+1361 7724 N 0 -199 34 2 0 201 h
+1395 7728 N 0 -198 34 3 0 199 h
+1429 7732 N 0 -196 34 1 0 198 h
+1463 7735 N 0 -194 35 2 0 196 h
+1498 7739 N 0 -194 34 3 0 194 h
+1532 7742 N 0 -193 34 2 0 194 h
+1566 7745 N 0 -190 34 1 0 193 h
+1600 7749 N 0 -189 34 2 0 190 h
+1634 7752 N 0 -188 34 1 0 189 h
+1668 7754 N 0 -186 34 1 0 188 h
+1702 7757 N 0 -185 34 1 0 186 h
+1736 7759 N 0 -182 34 0 0 185 h
+1770 7762 N 0 -182 34 2 0 182 h
+1804 7764 N 0 -179 34 0 0 182 h
+1838 7767 N 0 -178 34 1 0 179 h
+1872 7769 N 0 -178 34 1 0 178 h
+1906 7770 N 0 -178 34 1 0 178 h
+1940 7771 N 0 -176 34 -1 0 178 h
+1974 7772 N 0 -174 34 0 0 176 h
+2008 7774 N 0 -174 34 1 0 174 h
+2042 7775 N 0 -173 34 0 0 174 h
+2076 7776 N 0 -173 34 0 0 173 h
+2110 7776 N 0 -174 34 1 0 173 h
+2144 7776 N 0 -172 34 -1 0 174 h
+2178 7777 N 0 -172 34 0 0 172 h
+2212 7777 N 0 -172 34 -1 0 172 h
+2246 7776 N 0 -171 34 -1 0 172 h
+2280 7776 N 0 -169 34 -1 0 171 h
+2314 7777 N 0 -170 34 0 0 169 h
+2348 7776 N 0 -167 34 -2 0 170 h
+2382 7777 N 0 -167 34 -1 0 167 h
+2416 7776 N 0 -167 34 -1 0 167 h
+2450 7775 N 0 -164 35 -2 0 167 h
+2485 7776 N 0 -164 34 -1 0 164 h
+2519 7775 N 0 -164 34 -1 0 164 h
+2553 7774 N 0 -164 34 -2 0 164 h
+2587 7772 N 0 -162 34 -2 0 164 h
+2621 7772 N 0 -163 34 -1 0 162 h
+2655 7770 N 0 -162 34 -3 0 163 h
+2689 7768 N 0 -163 34 -1 0 162 h
+2723 7766 N 0 -163 34 -3 0 163 h
+2757 7763 N 0 -163 34 -2 0 163 h
+2791 7761 N 0 -162 34 -3 0 163 h
+2825 7759 N 0 -163 34 -2 0 162 h
+2859 7756 N 0 -163 34 -2 0 163 h
+2893 7754 N 0 -163 34 -3 0 163 h
+2927 7751 N 0 -164 34 -2 0 163 h
+2961 7748 N 0 -164 34 -3 0 164 h
+2995 7745 N 0 -165 34 -2 0 164 h
+3029 7742 N 0 -165 34 -4 0 165 h
+3063 7738 N 0 -165 34 -3 0 165 h
+3097 7735 N 0 -165 34 -3 0 165 h
+3131 7732 N 0 -166 34 -3 0 165 h
+3165 7728 N 0 -165 34 -4 0 166 h
+3199 7725 N 0 -165 34 -4 0 165 h
+3233 7721 N 0 -166 34 -3 0 165 h
+3267 7717 N 0 -166 34 -4 0 166 h
+3301 7713 N 0 -165 34 -4 0 166 h
+3335 7710 N 0 -165 34 -4 0 165 h
+3369 7706 N 0 -164 34 -5 0 165 h
+3403 7702 N 0 -165 34 -4 0 164 h
+3437 7697 N 0 -165 35 -4 0 165 h
+3472 7693 N 0 -165 34 -5 0 165 h
+3506 7688 N 0 -165 34 -5 0 165 h
+3540 7683 N 0 -166 34 -4 0 165 h
+3574 7678 N 0 -167 34 -5 0 166 h
+3608 7672 N 0 -167 34 -4 0 167 h
+3642 7668 N 0 -167 34 -6 0 167 h
+3676 7662 N 0 -167 34 -5 0 167 h
+3710 7657 N 0 -167 34 -5 0 167 h
+3744 7652 N 0 -168 34 -5 0 167 h
+3778 7646 N 0 -167 34 -6 0 168 h
+3812 7641 N 0 -167 34 -6 0 167 h
+3846 7635 N 0 -168 34 -5 0 167 h
+3880 7629 N 0 -167 34 -6 0 168 h
+3914 7624 N 0 -168 34 -6 0 167 h
+3948 7617 N 0 -167 34 -7 0 168 h
+3982 7611 N 0 -167 34 -6 0 167 h
+4016 7605 N 0 -167 34 -6 0 167 h
+4050 7599 N 0 -166 34 -7 0 167 h
+4084 7593 N 0 -167 34 -6 0 166 h
+4118 7586 N 0 -167 34 -6 0 167 h
+4152 7580 N 0 -167 34 -7 0 167 h
+4186 7573 N 0 -166 34 -7 0 167 h
+4220 7567 N 0 -166 34 -7 0 166 h
+4254 7560 N 0 -166 34 -7 0 166 h
+4288 7553 N 0 -165 34 -7 0 166 h
+4322 7547 N 0 -165 34 -7 0 165 h
+4356 7540 N 0 -166 34 -7 0 165 h
+4390 7532 N 0 -166 34 -7 0 166 h
+4424 7525 N 0 -165 35 -8 0 166 h
+4459 7518 N 0 -166 34 -7 0 165 h
+4493 7510 N 0 -166 34 -8 0 166 h
+4527 7502 N 0 -165 34 -8 0 166 h
+4561 7495 N 0 -165 34 -8 0 165 h
+4595 7487 N 0 -166 34 -7 0 165 h
+4629 7479 N 0 -166 34 -8 0 166 h
+4663 7471 N 0 -166 34 -9 0 166 h
+4697 7462 N 0 -166 34 -8 0 166 h
+4731 7454 N 0 -166 34 -8 0 166 h
+4765 7446 N 0 -166 34 -8 0 166 h
+4799 7438 N 0 -166 34 -9 0 166 h
+4833 7429 N 0 -166 34 -8 0 166 h
+4867 7421 N 0 -166 34 -9 0 166 h
+4901 7412 N 0 -166 34 -8 0 166 h
+4935 7404 N 0 -165 34 -10 0 166 h
+4969 7395 N 0 -166 34 -8 0 165 h
+5003 7386 N 0 -165 34 -10 0 166 h
+5037 7377 N 0 -165 34 -8 0 165 h
+5071 7369 N 0 -164 34 -10 0 165 h
+5105 7360 N 0 -164 34 -9 0 164 h
+5139 7351 N 0 -164 34 -9 0 164 h
+5173 7342 N 0 -164 34 -9 0 164 h
+5207 7333 N 0 -163 34 -10 0 164 h
+5241 7324 N 0 -163 34 -9 0 163 h
+5275 7315 N 0 -162 34 -10 0 163 h
+5309 7306 N 0 -163 34 -9 0 162 h
+5343 7296 N 0 -162 34 -10 0 163 h
+5377 7287 N 0 -162 34 -10 0 162 h
+5411 7277 N 0 -161 35 -11 0 162 h
+5446 7267 N 0 -160 34 -10 0 161 h
+5480 7258 N 0 -160 34 -9 0 160 h
+5514 7249 N 0 -159 34 -11 0 160 h
+5548 7239 N 0 -159 34 -10 0 159 h
+5582 7229 N 0 -158 34 -11 0 159 h
+5616 7219 N 0 -158 34 -10 0 158 h
+5650 7209 N 0 -158 34 -10 0 158 h
+5684 7199 N 0 -157 34 -11 0 158 h
+5718 7189 N 0 -157 34 -10 0 157 h
+5752 7179 N 0 -156 34 -11 0 157 h
+5786 7169 N 0 -155 34 -11 0 156 h
+5820 7159 N 0 -155 34 -11 0 155 h
+5854 7148 N 0 -154 34 -11 0 155 h
+5888 7138 N 0 -155 34 -10 0 154 h
+5922 7127 N 0 -153 34 -12 0 155 h
+5956 7117 N 0 -153 34 -11 0 153 h
+5990 7106 N 0 -153 34 -11 0 153 h
+6024 7095 N 0 -152 34 -11 0 153 h
+6058 7085 N 0 -152 34 -11 0 152 h
+6092 7074 N 0 -151 34 -12 0 152 h
+6126 7063 N 0 -151 34 -11 0 151 h
+6160 7052 N 0 -150 34 -12 0 151 h
+6194 7041 N 0 -150 34 -11 0 150 h
+6228 7030 N 0 -149 34 -11 0 150 h
+6262 7020 N 0 -148 34 -12 0 149 h
+6296 7009 N 0 -147 34 -12 0 148 h
+6330 6998 N 0 -147 34 -12 0 147 h
+6364 6986 N 0 -146 34 -12 0 147 h
+6398 6975 N 0 -145 35 -12 0 146 h
+6433 6964 N 0 -145 34 -12 0 145 h
+6467 6952 N 0 -144 34 -12 0 145 h
+6501 6941 N 0 -143 34 -12 0 144 h
+6535 6930 N 0 -142 34 -12 0 143 h
+6569 6919 N 0 -142 34 -12 0 142 h
+6603 6907 N 0 -142 34 -12 0 142 h
+6637 6895 N 0 -142 34 -12 0 142 h
+6671 6883 N 0 -142 34 -12 0 142 h
+6705 6871 N 0 -140 34 -13 0 142 h
+6739 6860 N 0 -140 34 -12 0 140 h
+6773 6848 N 0 -140 34 -12 0 140 h
+6807 6836 N 0 -139 34 -13 0 140 h
+6841 6824 N 0 -139 34 -12 0 139 h
+6875 6812 N 0 -138 34 -13 0 139 h
+6909 6800 N 0 -137 34 -13 0 138 h
+6943 6788 N 0 -137 34 -12 0 137 h
+6977 6776 N 0 -137 34 -13 0 137 h
+7011 6763 N 0 -136 34 -13 0 137 h
+7045 6751 N 0 -135 34 -13 0 136 h
+7079 6739 N 0 -135 34 -13 0 135 h
+7113 6726 N 0 -134 34 -13 0 135 h
+7147 6714 N 0 -134 34 -13 0 134 h
+7181 6701 N 0 -134 34 -12 0 134 h
+7215 6689 N 0 -133 34 -13 0 134 h
+7249 6677 N 0 -132 34 -14 0 133 h
+7283 6664 N 0 -131 34 -13 0 132 h
+7317 6652 N 0 -131 34 -12 0 131 h
+7351 6640 N 0 -130 34 -14 0 131 h
+7385 6627 N 0 -130 35 -13 0 130 h
+7420 6614 N 0 -129 34 -13 0 130 h
+7454 6602 N 0 -129 34 -13 0 129 h
+7488 6589 N 0 -128 34 -14 0 129 h
+7522 6576 N 0 -127 34 -13 0 128 h
+7556 6564 N 0 -127 34 -13 0 127 h
+7590 6551 N 0 -127 34 -13 0 127 h
+7624 6538 N 0 -127 34 -13 0 127 h
+7658 6525 N 0 -126 34 -14 0 127 h
+7692 6512 N 0 -126 34 -13 0 126 h
+7726 6499 N 0 -124 34 -14 0 126 h
+7760 6487 N 0 -124 34 -13 0 124 h
+7794 6474 N 0 -123 34 -14 0 124 h
+7828 6461 N 0 -122 34 -14 0 123 h
+7862 6448 N 0 -122 34 -13 0 122 h
+7896 6435 N 0 -121 34 -14 0 122 h
+7930 6422 N 0 -121 34 -13 0 121 h
+7964 6409 N 0 -120 34 -14 0 121 h
+7998 6396 N 0 -119 34 -14 0 120 h
+8032 6383 N 0 -119 34 -13 0 119 h
+8066 6370 N 0 -118 34 -14 0 119 h
+8100 6357 N 0 -118 34 -14 0 118 h
+8134 6343 N 0 -117 34 -14 0 118 h
+8168 6330 N 0 -117 34 -13 0 117 h
+8202 6317 N 0 -117 34 -14 0 117 h
+8236 6303 N 0 -116 34 -14 0 117 h
+8270 6290 N 0 -115 34 -14 0 116 h
+8304 6277 N 0 -114 34 -14 0 115 h
+8338 6264 N 0 -114 34 -14 0 114 h
+8372 6250 N 0 -114 35 -13 0 114 h
+8407 6237 N 0 -114 34 -14 0 114 h
+8441 6223 N 0 -112 34 -15 0 114 h
+8475 6210 N 0 -111 34 -14 0 112 h
+8509 6197 N 0 -110 34 -14 0 111 h
+8543 6184 N 0 -110 34 -14 0 110 h
+8577 6170 N 0 -109 34 -14 0 110 h
+8611 6157 N 0 -108 34 -15 0 109 h
+8645 6143 N 0 -107 34 -14 0 108 h
+8679 6130 N 0 -107 34 -14 0 107 h
+8713 6116 N 0 -107 34 -14 0 107 h
+8747 6102 N 0 -106 34 -14 0 107 h
+8781 6089 N 0 -106 34 -14 0 106 h
+8815 6075 N 0 -105 34 -14 0 106 h
+8849 6062 N 0 -104 34 -14 0 105 h
+8883 6049 N 0 -103 34 -15 0 104 h
+8917 6035 N 0 -103 34 -14 0 103 h
+8951 6021 N 0 -103 34 -13 0 103 h
+8985 6008 N 0 -102 34 -15 0 103 h
+9019 5994 N 0 -102 34 -14 0 102 h
+9053 5980 N 0 -102 34 -14 0 102 h
+9087 5966 N 0 -101 34 -14 0 102 h
+9121 5953 N 0 -101 34 -14 0 101 h
+9155 5939 N 0 -101 34 -14 0 101 h
+9189 5925 N 0 -101 34 -14 0 101 h
+9223 5911 N 0 -101 34 -13 0 101 h
+9257 5898 N 0 -101 34 -14 0 101 h
+9291 5884 N 0 -101 34 -14 0 101 h
+9325 5870 N 0 -101 35 -14 0 101 h
+9360 5856 N 0 -100 34 -14 0 101 h
+9394 5843 N 0 -101 34 -14 0 100 h
+9428 5828 N 0 -101 34 -14 0 101 h
+9462 5814 N 0 -101 34 -14 0 101 h
+9496 5800 N 0 -101 34 -14 0 101 h
+9530 5786 N 0 -102 34 -13 0 101 h
+9564 5772 N 0 -102 34 -14 0 102 h
+9598 5758 N 0 -103 34 -14 0 102 h
+9632 5743 N 0 -104 34 -13 0 103 h
+9666 5729 N 0 -104 34 -14 0 104 h
+9700 5715 N 0 -105 34 -14 0 104 h
+9734 5700 N 0 -106 34 -13 0 105 h
+9768 5686 N 0 -105 34 -14 0 106 h
+9802 5673 N 0 -105 34 -14 0 105 h
+9836 5659 N 0 -106 34 -13 0 105 h
+9870 5645 N 0 -106 34 -14 0 106 h
+9904 5631 N 0 -106 34 -14 0 106 h
+9938 5617 N 0 -106 34 -14 0 106 h
+9972 5603 N 0 -107 34 -13 0 106 h
+10006 5589 N 0 -107 34 -14 0 107 h
+10040 5575 N 0 -107 34 -14 0 107 h
+10074 5561 N 0 -107 34 -14 0 107 h
+10108 5547 N 0 -108 34 -13 0 107 h
+10142 5533 N 0 -107 34 -14 0 108 h
+10176 5520 N 0 -109 34 -13 0 107 h
+10210 5505 N 0 -109 34 -14 0 109 h
+10244 5491 N 0 -110 34 -13 0 109 h
+10278 5477 N 0 -110 34 -14 0 110 h
+10312 5463 N 0 -111 35 -13 0 110 h
+10347 5449 N 0 -110 34 -14 0 111 h
+10381 5436 N 0 -111 34 -13 0 110 h
+10415 5422 N 0 -112 34 -13 0 111 h
+10449 5408 N 0 -113 34 -13 0 112 h
+10483 5394 N 0 -113 34 -14 0 113 h
+10517 5380 N 0 -113 34 -14 0 113 h
+10551 5366 N 0 -114 34 -13 0 113 h
+10585 5352 N 0 -114 34 -13 0 114 h
+10619 5339 N 0 -115 34 -13 0 114 h
+10653 5325 N 0 -116 34 -13 0 115 h
+10687 5311 N 0 -116 34 -14 0 116 h
+10721 5297 N 0 -117 34 -13 0 116 h
+10755 5283 N 0 -117 34 -13 0 117 h
+10789 5270 N 0 -117 34 -13 0 117 h
+10823 5257 N 0 -118 34 -13 0 117 h
+10857 5243 N 0 -118 34 -13 0 118 h
+10891 5230 N 0 -119 34 -13 0 118 h
+10925 5216 N 0 -120 34 -13 0 119 h
+10959 5202 N 0 -120 34 -13 0 120 h
+10993 5189 N 0 -121 34 -13 0 120 h
+11027 5175 N 0 -122 34 -12 0 121 h
+11061 5162 N 0 -122 34 -13 0 122 h
+11095 5149 N 0 -123 34 -13 0 122 h
+11129 5135 N 0 -123 34 -13 0 123 h
+11163 5122 N 0 -124 34 -13 0 123 h
+11197 5108 N 0 -125 34 -12 0 124 h
+11231 5095 N 0 -125 34 -13 0 125 h
+11265 5082 N 0 -126 34 -12 0 125 h
+11299 5069 N 0 -126 35 -13 0 126 h
+11334 5056 N 0 -127 34 -12 0 126 h
+11368 5043 N 0 -127 34 -13 0 127 h
+11402 5030 N 0 -127 34 -13 0 127 h
+11436 5017 N 0 -128 34 -12 0 127 h
+11470 5004 N 0 -128 34 -13 0 128 h
+11504 4991 N 0 -129 34 -12 0 128 h
+11538 4978 N 0 -129 34 -12 0 129 h
+11572 4966 N 0 -130 34 -12 0 129 h
+11606 4953 N 0 -130 34 -13 0 130 h
+11640 4940 N 0 -131 34 -12 0 130 h
+11674 4927 N 0 -131 34 -12 0 131 h
+11708 4915 N 0 -132 34 -12 0 131 h
+11742 4902 N 0 -133 34 -12 0 132 h
+11776 4889 N 0 -133 34 -12 0 133 h
+11810 4877 N 0 -134 34 -12 0 133 h
+11844 4864 N 0 -135 34 -12 0 134 h
+11878 4851 N 0 -136 34 -12 0 135 h
+11912 4838 N 0 -136 34 -12 0 136 h
+11946 4826 N 0 -137 34 -12 0 136 h
+11980 4813 N 0 -137 34 -12 0 137 h
+12014 4801 N 0 -138 34 -12 0 137 h
+12048 4788 N 0 -138 34 -11 0 138 h
+12082 4777 N 0 -138 34 -12 0 138 h
+12116 4765 N 0 -139 34 -11 0 138 h
+12150 4753 N 0 -139 34 -12 0 139 h
+12184 4741 N 0 -140 34 -11 0 139 h
+12218 4729 N 0 -140 34 -12 0 140 h
+12252 4717 N 0 -141 34 -11 0 140 h
+12286 4705 N 0 -141 35 -12 0 141 h
+12321 4693 N 0 -142 34 -11 0 141 h
+12355 4681 N 0 -142 34 -12 0 142 h
+12389 4669 N 0 -143 34 -11 0 142 h
+12423 4657 N 0 -143 34 -11 0 143 h
+12457 4646 N 0 -143 34 -12 0 143 h
+12491 4634 N 0 -144 34 -11 0 143 h
+12525 4622 N 0 -145 34 -11 0 144 h
+12559 4610 N 0 -146 34 -10 0 145 h
+12593 4599 N 0 -146 34 -11 0 146 h
+12627 4588 N 0 -147 34 -11 0 146 h
+12661 4576 N 0 -148 34 -10 0 147 h
+12695 4565 N 0 -148 34 -11 0 148 h
+12729 4554 N 0 -150 34 -10 0 148 h
+12763 4542 N 0 -150 34 -11 0 150 h
+12797 4531 N 0 -151 34 -10 0 150 h
+12831 4520 N 0 -152 34 -10 0 151 h
+12865 4509 N 0 -152 34 -11 0 152 h
+12899 4498 N 0 -152 34 -10 0 152 h
+12933 4488 N 0 -152 34 -11 0 152 h
+12967 4477 N 0 -153 34 -10 0 152 h
+13001 4466 N 0 -153 34 -10 0 153 h
+13035 4456 N 0 -153 34 -11 0 153 h
+13069 4445 N 0 -153 34 -10 0 153 h
+13103 4435 N 0 -153 34 -10 0 153 h
+13137 4425 N 0 -155 34 -9 0 153 h
+13171 4414 N 0 -155 34 -10 0 155 h
+13205 4404 N 0 -155 34 -10 0 155 h
+13239 4394 N 0 -156 34 -9 0 155 h
+13273 4384 N 0 -156 35 -10 0 156 h
+13308 4374 N 0 -157 34 -9 0 156 h
+13342 4364 N 0 -156 34 -10 0 157 h
+13376 4355 N 0 -157 34 -9 0 156 h
+13410 4345 N 0 -158 34 -9 0 157 h
+13444 4335 N 0 -159 34 -9 0 158 h
+13478 4325 N 0 -158 34 -10 0 159 h
+13512 4316 N 0 -158 34 -9 0 158 h
+13546 4307 N 0 -160 34 -8 0 158 h
+13580 4297 N 0 -160 34 -9 0 160 h
+13614 4288 N 0 -160 34 -9 0 160 h
+13648 4279 N 0 -160 34 -10 0 160 h
+13682 4269 N 0 -161 34 -8 0 160 h
+13716 4260 N 0 -161 34 -9 0 161 h
+13750 4251 N 0 -161 34 -8 0 161 h
+13784 4243 N 0 -161 34 -9 0 161 h
+13818 4234 N 0 -161 34 -8 0 161 h
+13852 4226 N 0 -162 34 -8 0 161 h
+13886 4217 N 0 -161 34 -9 0 162 h
+13920 4209 N 0 -162 34 -8 0 161 h
+13954 4200 N 0 -162 34 -8 0 162 h
+13988 4192 N 0 -162 34 -8 0 162 h
+14022 4184 N 0 -161 34 -9 0 162 h
+14056 4176 N 0 -162 34 -7 0 161 h
+14090 4168 N 0 -163 34 -7 0 162 h
+14124 4160 N 0 -163 34 -8 0 163 h
+14158 4152 N 0 -162 34 -8 0 163 h
+14192 4145 N 0 -162 34 -8 0 162 h
+14226 4137 N 0 -162 34 -7 0 162 h
+14260 4130 N 0 -163 35 -7 0 162 h
+14295 4122 N 0 -163 34 -7 0 163 h
+14329 4115 N 0 -162 34 -8 0 163 h
+14363 4108 N 0 -161 34 -8 0 162 h
+14397 4101 N 0 -161 34 -7 0 161 h
+14431 4094 N 0 -161 34 -7 0 161 h
+14465 4087 N 0 -161 34 -7 0 161 h
+14499 4080 N 0 -161 34 -7 0 161 h
+14533 4073 N 0 -161 34 -7 0 161 h
+14567 4066 N 0 -160 34 -7 0 161 h
+14601 4060 N 0 -160 34 -7 0 160 h
+14635 4053 N 0 -161 34 -6 0 160 h
+14669 4046 N 0 -160 34 -7 0 161 h
+14703 4040 N 0 -160 34 -6 0 160 h
+14737 4034 N 0 -160 34 -7 0 160 h
+14771 4027 N 0 -160 34 -6 0 160 h
+14805 4021 N 0 -160 34 -6 0 160 h
+14839 4015 N 0 -159 34 -6 0 160 h
+14873 4010 N 0 -159 34 -6 0 159 h
+14907 4004 N 0 -158 34 -6 0 159 h
+14941 3999 N 0 -158 34 -5 0 158 h
+14975 3994 N 0 -159 34 -5 0 158 h
+15009 3988 N 0 -158 34 -6 0 159 h
+15043 3983 N 0 -158 34 -6 0 158 h
+15077 3977 N 0 -157 34 -6 0 158 h
+15111 3972 N 0 -157 34 -5 0 157 h
+15145 3967 N 0 -156 34 -6 0 157 h
+15179 3962 N 0 -155 34 -5 0 156 h
+15213 3958 N 0 -155 34 -5 0 155 h
+15247 3953 N 0 -155 35 -4 0 155 h
+15282 3949 N 0 -155 34 -4 0 155 h
+15316 3945 N 0 -155 34 -4 0 155 h
+15350 3941 N 0 -155 34 -4 0 155 h
+15384 3937 N 0 -154 34 -5 0 155 h
+15418 3933 N 0 -153 34 -5 0 154 h
+15452 3929 N 0 -152 34 -4 0 153 h
+15486 3926 N 0 -152 34 -4 0 152 h
+15520 3922 N 0 -153 34 -3 0 152 h
+15554 3918 N 0 -153 34 -3 0 153 h
+15588 3915 N 0 -153 34 -4 0 153 h
+15622 3911 N 0 -154 34 -3 0 153 h
+15656 3907 N 0 -153 34 -4 0 154 h
+15690 3904 N 0 -153 34 -3 0 153 h
+15724 3901 N 0 -154 34 -3 0 153 h
+15758 3897 N 0 -154 34 -3 0 154 h
+15792 3894 N 0 -153 34 -3 0 154 h
+15826 3892 N 0 -154 34 -2 0 153 h
+15860 3889 N 0 -155 34 -2 0 154 h
+15894 3886 N 0 -154 34 -3 0 155 h
+15928 3884 N 0 -156 34 -1 0 154 h
+15962 3881 N 0 -156 34 -2 0 156 h
+15996 3879 N 0 -158 34 -1 0 156 h
+16030 3876 N 0 -158 34 -2 0 158 h
+16064 3874 N 0 -158 34 -2 0 158 h
+16098 3872 N 0 -157 34 -2 0 158 h
+16132 3871 N 0 -159 34 -1 0 157 h
+16166 3868 N 0 -160 34 -1 0 159 h
+16200 3866 N 0 -161 34 -1 0 160 h
+16234 3864 N 0 -161 35 -2 0 161 h
+16269 3862 N 0 -163 34 0 0 161 h
+16303 3860 N 0 -162 34 -1 0 163 h
+16337 3860 N 0 -162 34 0 0 162 h
+16371 3860 N 0 -162 34 -1 0 162 h
+16405 3859 N 0 -164 34 1 0 162 h
+16439 3858 N 0 -164 34 -1 0 164 h
+16473 3857 N 0 -165 34 0 0 164 h
+16507 3856 N 0 -166 34 0 0 165 h
+16541 3855 N 0 -167 34 1 0 166 h
+16575 3855 N 0 -168 34 0 0 167 h
+16609 3854 N 0 -169 34 1 0 168 h
+16643 3854 N 0 -170 34 0 0 169 h
+16677 3853 N 0 -172 34 3 0 170 h
+16711 3854 N 0 -172 34 0 0 172 h
+16745 3854 N 0 -173 34 1 0 172 h
+16779 3854 N 0 -174 34 1 0 173 h
+16813 3854 N 0 -175 34 2 0 174 h
+16847 3855 N 0 -177 34 2 0 175 h
+16881 3855 N 0 -177 34 1 0 177 h
+16915 3856 N 0 -180 34 3 0 177 h
+16949 3856 N 0 -179 34 1 0 180 h
+16983 3858 N 0 -180 34 2 0 179 h
+17017 3859 N 0 -180 34 2 0 180 h
+17051 3861 N 0 -180 34 2 0 180 h
+17085 3863 N 0 -183 34 3 0 180 h
+17119 3863 N 0 -184 34 4 0 183 h
+17153 3866 N 0 -186 34 2 0 184 h
+17187 3866 N 0 -188 34 3 0 186 h
+17221 3867 N 0 -191 35 5 0 188 h
+17256 3869 N 0 -193 34 4 0 191 h
+17290 3871 N 0 -197 34 5 0 193 h
+17324 3872 N 0 -199 34 4 0 197 h
+17358 3874 N 0 -201 34 4 0 199 h
+17392 3876 N 0 -203 34 5 0 201 h
+17426 3879 N 0 -204 34 3 0 203 h
+17460 3881 N 0 -207 34 6 0 204 h
+17494 3884 N 0 -210 34 6 0 207 h
+17528 3887 N 0 -211 34 5 0 210 h
+17562 3891 N 0 -213 34 4 0 211 h
+17596 3893 N 0 -215 34 6 0 213 h
+17630 3897 N 0 -218 34 6 0 215 h
+17664 3900 N 0 -223 34 7 0 218 h
+17698 3902 N 0 -225 34 6 0 223 h
+17732 3906 N 0 -226 34 6 0 225 h
+17766 3911 N 0 -231 34 7 0 226 h
+17800 3913 N 0 -234 34 7 0 231 h
+17834 3917 N 0 -236 34 6 0 234 h
+17868 3921 N 0 -238 34 7 0 236 h
+17902 3926 N 0 -241 34 7 0 238 h
+17936 3930 N 0 -246 34 8 0 241 h
+17970 3933 N 0 -250 34 8 0 246 h
+18004 3937 N 0 -251 34 7 0 250 h
+18038 3943 N 0 -255 34 8 0 251 h
+18072 3947 N 0 -257 34 8 0 255 h
+18106 3953 N 0 -262 34 10 0 257 h
+18140 3958 N 0 -266 34 9 0 262 h
+18174 3963 N 0 -271 34 9 0 266 h
+18208 3967 N 0 -274 35 9 0 271 h
+18243 3973 N 0 -277 34 9 0 274 h
+18277 3979 N 0 -281 34 10 0 277 h
+18311 3985 N 0 -286 34 10 0 281 h
+18345 3990 N 0 -287 34 9 0 286 h
+18379 3998 N 0 -290 34 10 0 287 h
+18413 4005 N 0 -294 34 10 0 290 h
+18447 4011 N 0 -297 34 10 0 294 h
+18481 4018 N 0 -302 34 11 0 297 h
+18515 4024 N 0 -306 34 10 0 302 h
+18549 4030 N 0 -312 34 12 0 306 h
+18583 4036 N 0 -315 34 10 0 312 h
+18617 4043 N 0 -319 34 11 0 315 h
+18651 4050 N 0 -324 34 11 0 319 h
+18685 4056 N 0 -328 34 11 0 324 h
+% End plot #3
+% Begin plot #4
+1.000 UL
+LTb
+0.64 0.31 0.31 C 0 7493 N 0 -155 34 9 0 156 h
+34 7503 N 0 -153 34 7 0 155 h
+68 7512 N 0 -151 34 9 0 153 h
+102 7523 N 0 -149 34 8 0 151 h
+136 7533 N 0 -147 34 8 0 149 h
+170 7543 N 0 -146 34 7 0 147 h
+204 7551 N 0 -142 34 7 0 146 h
+238 7562 N 0 -141 34 8 0 142 h
+272 7571 N 0 -139 34 8 0 141 h
+306 7581 N 0 -137 34 7 0 139 h
+340 7590 N 0 -134 34 6 0 137 h
+374 7599 N 0 -133 34 7 0 134 h
+408 7607 N 0 -131 34 6 0 133 h
+442 7615 N 0 -129 34 7 0 131 h
+476 7624 N 0 -128 35 6 0 129 h
+511 7631 N 0 -126 34 6 0 128 h
+545 7639 N 0 -125 34 7 0 126 h
+579 7647 N 0 -124 34 6 0 125 h
+613 7654 N 0 -121 34 5 0 124 h
+647 7662 N 0 -120 34 6 0 121 h
+681 7669 N 0 -118 34 5 0 120 h
+715 7676 N 0 -117 34 6 0 118 h
+749 7683 N 0 -116 34 6 0 117 h
+783 7690 N 0 -115 34 5 0 116 h
+817 7696 N 0 -114 34 5 0 115 h
+851 7702 N 0 -113 34 5 0 114 h
+885 7708 N 0 -111 34 4 0 113 h
+919 7714 N 0 -109 34 4 0 111 h
+953 7720 N 0 -108 34 5 0 109 h
+987 7726 N 0 -107 34 4 0 108 h
+1021 7731 N 0 -104 34 3 0 107 h
+1055 7737 N 0 -103 34 4 0 104 h
+1089 7742 N 0 -101 34 3 0 103 h
+1123 7747 N 0 -101 34 4 0 101 h
+1157 7751 N 0 -99 34 3 0 101 h
+1191 7756 N 0 -99 34 4 0 99 h
+1225 7760 N 0 -99 34 3 0 99 h
+1259 7763 N 0 -99 34 4 0 99 h
+1293 7767 N 0 -97 34 2 0 99 h
+1327 7771 N 0 -96 34 3 0 97 h
+1361 7775 N 0 -96 34 4 0 96 h
+1395 7779 N 0 -94 34 2 0 96 h
+1429 7783 N 0 -94 34 3 0 94 h
+1463 7786 N 0 -95 35 4 0 94 h
+1498 7789 N 0 -94 34 2 0 95 h
+1532 7792 N 0 -95 34 3 0 94 h
+1566 7794 N 0 -94 34 2 0 95 h
+1600 7797 N 0 -94 34 2 0 94 h
+1634 7799 N 0 -93 34 2 0 94 h
+1668 7802 N 0 -92 34 1 0 93 h
+1702 7804 N 0 -92 34 2 0 92 h
+1736 7806 N 0 -92 34 2 0 92 h
+1770 7808 N 0 -92 34 1 0 92 h
+1804 7809 N 0 -91 34 1 0 92 h
+1838 7811 N 0 -90 34 1 0 91 h
+1872 7813 N 0 -88 34 0 0 90 h
+1906 7815 N 0 -88 34 2 0 88 h
+1940 7817 N 0 -87 34 0 0 88 h
+1974 7818 N 0 -85 34 0 0 87 h
+2008 7820 N 0 -85 34 0 0 85 h
+2042 7820 N 0 -83 34 0 0 85 h
+2076 7822 N 0 -83 34 1 0 83 h
+2110 7823 N 0 -82 34 0 0 83 h
+2144 7824 N 0 -83 34 0 0 82 h
+2178 7823 N 0 -83 34 -1 0 83 h
+2212 7822 N 0 -83 34 0 0 83 h
+2246 7822 N 0 -81 34 0 0 83 h
+2280 7824 N 0 -80 34 -1 0 81 h
+2314 7824 N 0 -81 34 0 0 80 h
+2348 7823 N 0 -81 34 -1 0 81 h
+2382 7822 N 0 -81 34 -1 0 81 h
+2416 7821 N 0 -80 34 -2 0 81 h
+2450 7820 N 0 -80 35 -1 0 80 h
+2485 7819 N 0 -80 34 -1 0 80 h
+2519 7818 N 0 -81 34 -1 0 80 h
+2553 7816 N 0 -80 34 -2 0 81 h
+2587 7815 N 0 -80 34 -2 0 80 h
+2621 7813 N 0 -80 34 -2 0 80 h
+2655 7811 N 0 -80 34 -2 0 80 h
+2689 7809 N 0 -81 34 -1 0 80 h
+2723 7807 N 0 -81 34 -2 0 81 h
+2757 7805 N 0 -80 34 -3 0 81 h
+2791 7803 N 0 -81 34 -2 0 80 h
+2825 7800 N 0 -81 34 -2 0 81 h
+2859 7798 N 0 -80 34 -3 0 81 h
+2893 7796 N 0 -80 34 -3 0 80 h
+2927 7793 N 0 -79 34 -3 0 80 h
+2961 7791 N 0 -78 34 -3 0 79 h
+2995 7789 N 0 -79 34 -3 0 78 h
+3029 7785 N 0 -79 34 -3 0 79 h
+3063 7782 N 0 -80 34 -3 0 79 h
+3097 7778 N 0 -79 34 -4 0 80 h
+3131 7775 N 0 -79 34 -4 0 79 h
+3165 7771 N 0 -80 34 -3 0 79 h
+3199 7767 N 0 -81 34 -3 0 80 h
+3233 7763 N 0 -80 34 -4 0 81 h
+3267 7760 N 0 -81 34 -4 0 80 h
+3301 7755 N 0 -80 34 -5 0 81 h
+3335 7751 N 0 -80 34 -4 0 80 h
+3369 7747 N 0 -80 34 -4 0 80 h
+3403 7743 N 0 -81 34 -4 0 80 h
+3437 7738 N 0 -81 35 -4 0 81 h
+3472 7734 N 0 -80 34 -6 0 81 h
+3506 7729 N 0 -80 34 -4 0 80 h
+3540 7725 N 0 -80 34 -5 0 80 h
+3574 7720 N 0 -80 34 -5 0 80 h
+3608 7715 N 0 -80 34 -5 0 80 h
+3642 7710 N 0 -80 34 -5 0 80 h
+3676 7705 N 0 -80 34 -6 0 80 h
+3710 7699 N 0 -81 34 -5 0 80 h
+3744 7693 N 0 -81 34 -5 0 81 h
+3778 7688 N 0 -81 34 -6 0 81 h
+3812 7682 N 0 -81 34 -5 0 81 h
+3846 7677 N 0 -81 34 -6 0 81 h
+3880 7671 N 0 -80 34 -7 0 81 h
+3914 7665 N 0 -80 34 -5 0 80 h
+3948 7660 N 0 -82 34 -5 0 80 h
+3982 7653 N 0 -81 34 -7 0 82 h
+4016 7647 N 0 -80 34 -7 0 81 h
+4050 7641 N 0 -80 34 -6 0 80 h
+4084 7635 N 0 -80 34 -6 0 80 h
+4118 7629 N 0 -81 34 -6 0 80 h
+4152 7622 N 0 -80 34 -7 0 81 h
+4186 7616 N 0 -80 34 -7 0 80 h
+4220 7609 N 0 -80 34 -7 0 80 h
+4254 7602 N 0 -80 34 -7 0 80 h
+4288 7595 N 0 -80 34 -7 0 80 h
+4322 7588 N 0 -81 34 -6 0 80 h
+4356 7581 N 0 -81 34 -7 0 81 h
+4390 7574 N 0 -80 34 -8 0 81 h
+4424 7567 N 0 -81 35 -6 0 80 h
+4459 7560 N 0 -81 34 -8 0 81 h
+4493 7552 N 0 -80 34 -8 0 81 h
+4527 7545 N 0 -81 34 -7 0 80 h
+4561 7537 N 0 -80 34 -8 0 81 h
+4595 7530 N 0 -81 34 -7 0 80 h
+4629 7522 N 0 -81 34 -9 0 81 h
+4663 7513 N 0 -81 34 -8 0 81 h
+4697 7505 N 0 -81 34 -8 0 81 h
+4731 7497 N 0 -80 34 -9 0 81 h
+4765 7489 N 0 -80 34 -8 0 80 h
+4799 7481 N 0 -81 34 -8 0 80 h
+4833 7472 N 0 -81 34 -8 0 81 h
+4867 7464 N 0 -80 34 -9 0 81 h
+4901 7456 N 0 -80 34 -9 0 80 h
+4935 7447 N 0 -79 34 -9 0 80 h
+4969 7439 N 0 -80 34 -8 0 79 h
+5003 7430 N 0 -79 34 -10 0 80 h
+5037 7421 N 0 -78 34 -9 0 79 h
+5071 7413 N 0 -78 34 -9 0 78 h
+5105 7404 N 0 -78 34 -9 0 78 h
+5139 7395 N 0 -77 34 -10 0 78 h
+5173 7386 N 0 -77 34 -9 0 77 h
+5207 7377 N 0 -77 34 -9 0 77 h
+5241 7368 N 0 -76 34 -10 0 77 h
+5275 7359 N 0 -77 34 -9 0 76 h
+5309 7349 N 0 -77 34 -10 0 77 h
+5343 7339 N 0 -77 34 -9 0 77 h
+5377 7330 N 0 -77 34 -10 0 77 h
+5411 7320 N 0 -76 35 -10 0 77 h
+5446 7311 N 0 -77 34 -9 0 76 h
+5480 7301 N 0 -77 34 -10 0 77 h
+5514 7291 N 0 -76 34 -11 0 77 h
+5548 7281 N 0 -76 34 -10 0 76 h
+5582 7271 N 0 -76 34 -10 0 76 h
+5616 7261 N 0 -76 34 -10 0 76 h
+5650 7251 N 0 -77 34 -10 0 76 h
+5684 7240 N 0 -77 34 -10 0 77 h
+5718 7230 N 0 -76 34 -11 0 77 h
+5752 7220 N 0 -77 34 -10 0 76 h
+5786 7209 N 0 -76 34 -11 0 77 h
+5820 7199 N 0 -75 34 -11 0 76 h
+5854 7189 N 0 -75 34 -11 0 75 h
+5888 7178 N 0 -76 34 -10 0 75 h
+5922 7167 N 0 -75 34 -11 0 76 h
+5956 7157 N 0 -75 34 -11 0 75 h
+5990 7146 N 0 -76 34 -10 0 75 h
+6024 7135 N 0 -76 34 -11 0 76 h
+6058 7124 N 0 -76 34 -11 0 76 h
+6092 7113 N 0 -77 34 -11 0 76 h
+6126 7101 N 0 -77 34 -11 0 77 h
+6160 7090 N 0 -76 34 -12 0 77 h
+6194 7079 N 0 -76 34 -11 0 76 h
+6228 7068 N 0 -76 34 -12 0 76 h
+6262 7056 N 0 -76 34 -11 0 76 h
+6296 7045 N 0 -76 34 -11 0 76 h
+6330 7034 N 0 -75 34 -12 0 76 h
+6364 7023 N 0 -76 34 -11 0 75 h
+6398 7011 N 0 -76 35 -12 0 76 h
+6433 6999 N 0 -75 34 -12 0 76 h
+6467 6988 N 0 -75 34 -12 0 75 h
+6501 6976 N 0 -76 34 -11 0 75 h
+6535 6964 N 0 -75 34 -13 0 76 h
+6569 6952 N 0 -74 34 -12 0 75 h
+6603 6941 N 0 -75 34 -11 0 74 h
+6637 6929 N 0 -75 34 -12 0 75 h
+6671 6917 N 0 -75 34 -12 0 75 h
+6705 6905 N 0 -75 34 -12 0 75 h
+6739 6893 N 0 -73 34 -13 0 75 h
+6773 6882 N 0 -73 34 -12 0 73 h
+6807 6870 N 0 -73 34 -12 0 73 h
+6841 6858 N 0 -72 34 -13 0 73 h
+6875 6846 N 0 -72 34 -12 0 72 h
+6909 6834 N 0 -72 34 -13 0 72 h
+6943 6821 N 0 -71 34 -13 0 72 h
+6977 6809 N 0 -71 34 -12 0 71 h
+7011 6797 N 0 -70 34 -13 0 71 h
+7045 6785 N 0 -71 34 -12 0 70 h
+7079 6772 N 0 -70 34 -13 0 71 h
+7113 6760 N 0 -69 34 -13 0 70 h
+7147 6748 N 0 -70 34 -12 0 69 h
+7181 6735 N 0 -69 34 -13 0 70 h
+7215 6723 N 0 -69 34 -13 0 69 h
+7249 6710 N 0 -69 34 -13 0 69 h
+7283 6697 N 0 -68 34 -13 0 69 h
+7317 6685 N 0 -68 34 -13 0 68 h
+7351 6672 N 0 -68 34 -13 0 68 h
+7385 6659 N 0 -67 35 -13 0 68 h
+7420 6647 N 0 -68 34 -12 0 67 h
+7454 6634 N 0 -66 34 -14 0 68 h
+7488 6622 N 0 -66 34 -13 0 66 h
+7522 6609 N 0 -66 34 -13 0 66 h
+7556 6596 N 0 -65 34 -14 0 66 h
+7590 6583 N 0 -65 34 -13 0 65 h
+7624 6570 N 0 -65 34 -13 0 65 h
+7658 6557 N 0 -64 34 -13 0 65 h
+7692 6545 N 0 -63 34 -14 0 64 h
+7726 6532 N 0 -62 34 -14 0 63 h
+7760 6519 N 0 -62 34 -13 0 62 h
+7794 6506 N 0 -61 34 -14 0 62 h
+7828 6493 N 0 -62 34 -13 0 61 h
+7862 6479 N 0 -61 34 -14 0 62 h
+7896 6466 N 0 -61 34 -13 0 61 h
+7930 6453 N 0 -60 34 -14 0 61 h
+7964 6440 N 0 -60 34 -13 0 60 h
+7998 6427 N 0 -59 34 -14 0 60 h
+8032 6414 N 0 -59 34 -14 0 59 h
+8066 6400 N 0 -59 34 -13 0 59 h
+8100 6387 N 0 -59 34 -14 0 59 h
+8134 6373 N 0 -58 34 -14 0 59 h
+8168 6360 N 0 -57 34 -14 0 58 h
+8202 6347 N 0 -58 34 -13 0 57 h
+8236 6333 N 0 -57 34 -14 0 58 h
+8270 6320 N 0 -57 34 -14 0 57 h
+8304 6306 N 0 -56 34 -14 0 57 h
+8338 6293 N 0 -56 34 -14 0 56 h
+8372 6279 N 0 -56 35 -13 0 56 h
+8407 6266 N 0 -56 34 -14 0 56 h
+8441 6252 N 0 -55 34 -14 0 56 h
+8475 6239 N 0 -55 34 -14 0 55 h
+8509 6225 N 0 -54 34 -14 0 55 h
+8543 6212 N 0 -53 34 -14 0 54 h
+8577 6199 N 0 -54 34 -13 0 53 h
+8611 6185 N 0 -53 34 -14 0 54 h
+8645 6172 N 0 -53 34 -14 0 53 h
+8679 6158 N 0 -53 34 -14 0 53 h
+8713 6144 N 0 -52 34 -14 0 53 h
+8747 6131 N 0 -52 34 -14 0 52 h
+8781 6117 N 0 -52 34 -14 0 52 h
+8815 6103 N 0 -51 34 -14 0 52 h
+8849 6090 N 0 -52 34 -13 0 51 h
+8883 6076 N 0 -52 34 -14 0 52 h
+8917 6062 N 0 -52 34 -14 0 52 h
+8951 6048 N 0 -51 34 -14 0 52 h
+8985 6035 N 0 -51 34 -14 0 51 h
+9019 6021 N 0 -51 34 -14 0 51 h
+9053 6007 N 0 -51 34 -14 0 51 h
+9087 5993 N 0 -52 34 -13 0 51 h
+9121 5979 N 0 -52 34 -14 0 52 h
+9155 5965 N 0 -52 34 -14 0 52 h
+9189 5951 N 0 -52 34 -14 0 52 h
+9223 5937 N 0 -50 34 -15 0 52 h
+9257 5924 N 0 -50 34 -14 0 50 h
+9291 5910 N 0 -50 34 -14 0 50 h
+9325 5896 N 0 -50 35 -14 0 50 h
+9360 5882 N 0 -50 34 -13 0 50 h
+9394 5869 N 0 -50 34 -14 0 50 h
+9428 5855 N 0 -50 34 -14 0 50 h
+9462 5841 N 0 -50 34 -14 0 50 h
+9496 5827 N 0 -50 34 -14 0 50 h
+9530 5813 N 0 -51 34 -13 0 50 h
+9564 5799 N 0 -51 34 -14 0 51 h
+9598 5785 N 0 -51 34 -14 0 51 h
+9632 5771 N 0 -52 34 -13 0 51 h
+9666 5757 N 0 -52 34 -14 0 52 h
+9700 5743 N 0 -51 34 -14 0 52 h
+9734 5730 N 0 -51 34 -14 0 51 h
+9768 5716 N 0 -51 34 -14 0 51 h
+9802 5702 N 0 -51 34 -14 0 51 h
+9836 5688 N 0 -51 34 -14 0 51 h
+9870 5674 N 0 -53 34 -13 0 51 h
+9904 5659 N 0 -52 34 -14 0 53 h
+9938 5646 N 0 -53 34 -14 0 52 h
+9972 5631 N 0 -54 34 -13 0 53 h
+10006 5617 N 0 -54 34 -14 0 54 h
+10040 5603 N 0 -54 34 -13 0 54 h
+10074 5590 N 0 -54 34 -14 0 54 h
+10108 5576 N 0 -54 34 -14 0 54 h
+10142 5562 N 0 -54 34 -14 0 54 h
+10176 5548 N 0 -54 34 -14 0 54 h
+10210 5534 N 0 -55 34 -13 0 54 h
+10244 5520 N 0 -54 34 -14 0 55 h
+10278 5507 N 0 -56 34 -13 0 54 h
+10312 5492 N 0 -55 35 -14 0 56 h
+10347 5479 N 0 -56 34 -13 0 55 h
+10381 5465 N 0 -56 34 -14 0 56 h
+10415 5451 N 0 -56 34 -14 0 56 h
+10449 5437 N 0 -56 34 -14 0 56 h
+10483 5423 N 0 -56 34 -13 0 56 h
+10517 5410 N 0 -56 34 -14 0 56 h
+10551 5396 N 0 -57 34 -13 0 56 h
+10585 5382 N 0 -57 34 -13 0 57 h
+10619 5369 N 0 -57 34 -14 0 57 h
+10653 5355 N 0 -57 34 -13 0 57 h
+10687 5342 N 0 -57 34 -14 0 57 h
+10721 5328 N 0 -58 34 -13 0 57 h
+10755 5314 N 0 -57 34 -14 0 58 h
+10789 5301 N 0 -58 34 -13 0 57 h
+10823 5287 N 0 -58 34 -13 0 58 h
+10857 5274 N 0 -59 34 -13 0 58 h
+10891 5260 N 0 -59 34 -13 0 59 h
+10925 5247 N 0 -59 34 -13 0 59 h
+10959 5234 N 0 -59 34 -13 0 59 h
+10993 5221 N 0 -60 34 -13 0 59 h
+11027 5207 N 0 -60 34 -13 0 60 h
+11061 5194 N 0 -60 34 -13 0 60 h
+11095 5181 N 0 -61 34 -13 0 60 h
+11129 5167 N 0 -61 34 -13 0 61 h
+11163 5154 N 0 -61 34 -13 0 61 h
+11197 5141 N 0 -62 34 -12 0 61 h
+11231 5128 N 0 -62 34 -13 0 62 h
+11265 5115 N 0 -62 34 -13 0 62 h
+11299 5102 N 0 -62 35 -13 0 62 h
+11334 5089 N 0 -62 34 -13 0 62 h
+11368 5076 N 0 -63 34 -13 0 62 h
+11402 5062 N 0 -63 34 -13 0 63 h
+11436 5049 N 0 -63 34 -12 0 63 h
+11470 5037 N 0 -63 34 -13 0 63 h
+11504 5024 N 0 -64 34 -12 0 63 h
+11538 5011 N 0 -64 34 -13 0 64 h
+11572 4998 N 0 -64 34 -13 0 64 h
+11606 4985 N 0 -64 34 -12 0 64 h
+11640 4973 N 0 -65 34 -12 0 64 h
+11674 4960 N 0 -65 34 -13 0 65 h
+11708 4947 N 0 -65 34 -12 0 65 h
+11742 4935 N 0 -65 34 -12 0 65 h
+11776 4923 N 0 -64 34 -13 0 65 h
+11810 4911 N 0 -64 34 -12 0 64 h
+11844 4899 N 0 -65 34 -12 0 64 h
+11878 4886 N 0 -65 34 -12 0 65 h
+11912 4874 N 0 -67 34 -11 0 65 h
+11946 4861 N 0 -68 34 -12 0 67 h
+11980 4848 N 0 -67 34 -13 0 68 h
+12014 4836 N 0 -67 34 -12 0 67 h
+12048 4824 N 0 -67 34 -12 0 67 h
+12082 4812 N 0 -67 34 -12 0 67 h
+12116 4800 N 0 -68 34 -11 0 67 h
+12150 4788 N 0 -68 34 -12 0 68 h
+12184 4776 N 0 -68 34 -12 0 68 h
+12218 4764 N 0 -69 34 -11 0 68 h
+12252 4752 N 0 -70 34 -11 0 69 h
+12286 4740 N 0 -69 35 -12 0 70 h
+12321 4729 N 0 -70 34 -11 0 69 h
+12355 4717 N 0 -71 34 -11 0 70 h
+12389 4705 N 0 -72 34 -11 0 71 h
+12423 4693 N 0 -71 34 -12 0 72 h
+12457 4682 N 0 -72 34 -11 0 71 h
+12491 4670 N 0 -70 34 -12 0 72 h
+12525 4660 N 0 -70 34 -11 0 70 h
+12559 4649 N 0 -71 34 -11 0 70 h
+12593 4637 N 0 -71 34 -11 0 71 h
+12627 4626 N 0 -71 34 -11 0 71 h
+12661 4615 N 0 -72 34 -11 0 71 h
+12695 4603 N 0 -72 34 -11 0 72 h
+12729 4592 N 0 -73 34 -10 0 72 h
+12763 4581 N 0 -73 34 -11 0 73 h
+12797 4570 N 0 -74 34 -10 0 73 h
+12831 4559 N 0 -74 34 -11 0 74 h
+12865 4548 N 0 -74 34 -10 0 74 h
+12899 4538 N 0 -74 34 -11 0 74 h
+12933 4527 N 0 -74 34 -10 0 74 h
+12967 4517 N 0 -74 34 -10 0 74 h
+13001 4507 N 0 -74 34 -11 0 74 h
+13035 4496 N 0 -74 34 -10 0 74 h
+13069 4486 N 0 -76 34 -9 0 74 h
+13103 4475 N 0 -76 34 -10 0 76 h
+13137 4465 N 0 -77 34 -10 0 76 h
+13171 4454 N 0 -77 34 -10 0 77 h
+13205 4444 N 0 -77 34 -10 0 77 h
+13239 4434 N 0 -77 34 -10 0 77 h
+13273 4424 N 0 -76 35 -10 0 77 h
+13308 4415 N 0 -76 34 -10 0 76 h
+13342 4405 N 0 -76 34 -9 0 76 h
+13376 4396 N 0 -77 34 -9 0 76 h
+13410 4386 N 0 -76 34 -10 0 77 h
+13444 4377 N 0 -77 34 -9 0 76 h
+13478 4367 N 0 -76 34 -10 0 77 h
+13512 4358 N 0 -77 34 -9 0 76 h
+13546 4348 N 0 -77 34 -9 0 77 h
+13580 4339 N 0 -77 34 -9 0 77 h
+13614 4330 N 0 -77 34 -9 0 77 h
+13648 4321 N 0 -78 34 -8 0 77 h
+13682 4312 N 0 -78 34 -9 0 78 h
+13716 4303 N 0 -78 34 -9 0 78 h
+13750 4294 N 0 -77 34 -9 0 78 h
+13784 4286 N 0 -78 34 -8 0 77 h
+13818 4277 N 0 -78 34 -9 0 78 h
+13852 4268 N 0 -78 34 -9 0 78 h
+13886 4259 N 0 -78 34 -8 0 78 h
+13920 4251 N 0 -78 34 -8 0 78 h
+13954 4243 N 0 -78 34 -9 0 78 h
+13988 4234 N 0 -78 34 -8 0 78 h
+14022 4226 N 0 -77 34 -9 0 78 h
+14056 4218 N 0 -77 34 -8 0 77 h
+14090 4210 N 0 -77 34 -8 0 77 h
+14124 4202 N 0 -77 34 -7 0 77 h
+14158 4195 N 0 -77 34 -8 0 77 h
+14192 4187 N 0 -77 34 -8 0 77 h
+14226 4179 N 0 -77 34 -8 0 77 h
+14260 4171 N 0 -77 35 -7 0 77 h
+14295 4164 N 0 -77 34 -8 0 77 h
+14329 4156 N 0 -77 34 -7 0 77 h
+14363 4149 N 0 -77 34 -7 0 77 h
+14397 4142 N 0 -78 34 -7 0 77 h
+14431 4134 N 0 -78 34 -7 0 78 h
+14465 4127 N 0 -77 34 -7 0 78 h
+14499 4121 N 0 -77 34 -7 0 77 h
+14533 4114 N 0 -78 34 -6 0 77 h
+14567 4107 N 0 -78 34 -7 0 78 h
+14601 4100 N 0 -77 34 -7 0 78 h
+14635 4094 N 0 -78 34 -6 0 77 h
+14669 4087 N 0 -78 34 -6 0 78 h
+14703 4081 N 0 -78 34 -6 0 78 h
+14737 4075 N 0 -79 34 -6 0 78 h
+14771 4068 N 0 -78 34 -6 0 79 h
+14805 4063 N 0 -79 34 -5 0 78 h
+14839 4057 N 0 -78 34 -7 0 79 h
+14873 4051 N 0 -78 34 -6 0 78 h
+14907 4045 N 0 -79 34 -5 0 78 h
+14941 4039 N 0 -79 34 -5 0 79 h
+14975 4034 N 0 -79 34 -6 0 79 h
+15009 4028 N 0 -79 34 -5 0 79 h
+15043 4023 N 0 -78 34 -6 0 79 h
+15077 4018 N 0 -78 34 -4 0 78 h
+15111 4014 N 0 -77 34 -6 0 78 h
+15145 4009 N 0 -77 34 -5 0 77 h
+15179 4004 N 0 -78 34 -4 0 77 h
+15213 3999 N 0 -78 34 -5 0 78 h
+15247 3994 N 0 -77 35 -5 0 78 h
+15282 3990 N 0 -78 34 -4 0 77 h
+15316 3985 N 0 -77 34 -5 0 78 h
+15350 3981 N 0 -77 34 -4 0 77 h
+15384 3977 N 0 -78 34 -4 0 77 h
+15418 3972 N 0 -78 34 -4 0 78 h
+15452 3968 N 0 -77 34 -4 0 78 h
+15486 3965 N 0 -78 34 -3 0 77 h
+15520 3961 N 0 -79 34 -4 0 78 h
+15554 3956 N 0 -78 34 -4 0 79 h
+15588 3953 N 0 -78 34 -4 0 78 h
+15622 3949 N 0 -78 34 -4 0 78 h
+15656 3945 N 0 -78 34 -3 0 78 h
+15690 3942 N 0 -78 34 -3 0 78 h
+15724 3939 N 0 -78 34 -3 0 78 h
+15758 3936 N 0 -78 34 -3 0 78 h
+15792 3933 N 0 -78 34 -3 0 78 h
+15826 3930 N 0 -78 34 -3 0 78 h
+15860 3927 N 0 -78 34 -2 0 78 h
+15894 3925 N 0 -78 34 -3 0 78 h
+15928 3922 N 0 -77 34 -3 0 78 h
+15962 3920 N 0 -77 34 -2 0 77 h
+15996 3918 N 0 -78 34 -2 0 77 h
+16030 3915 N 0 -78 34 -2 0 78 h
+16064 3913 N 0 -78 34 -2 0 78 h
+16098 3911 N 0 -78 34 -2 0 78 h
+16132 3909 N 0 -77 34 -2 0 78 h
+16166 3908 N 0 -77 34 -1 0 77 h
+16200 3907 N 0 -77 34 -1 0 77 h
+16234 3906 N 0 -78 35 -1 0 77 h
+16269 3904 N 0 -79 34 0 0 78 h
+16303 3903 N 0 -78 34 -2 0 79 h
+16337 3902 N 0 -78 34 -1 0 78 h
+16371 3901 N 0 -79 34 -1 0 78 h
+16405 3899 N 0 -78 34 -1 0 79 h
+16439 3899 N 0 -78 34 0 0 78 h
+16473 3899 N 0 -78 34 0 0 78 h
+16507 3899 N 0 -79 34 0 0 78 h
+16541 3898 N 0 -80 34 0 0 79 h
+16575 3897 N 0 -81 34 1 0 80 h
+16609 3897 N 0 -82 34 1 0 81 h
+16643 3897 N 0 -81 34 -1 0 82 h
+16677 3897 N 0 -82 34 1 0 81 h
+16711 3897 N 0 -83 34 1 0 82 h
+16745 3897 N 0 -82 34 0 0 83 h
+16779 3898 N 0 -83 34 1 0 82 h
+16813 3898 N 0 -84 34 2 0 83 h
+16847 3899 N 0 -86 34 2 0 84 h
+16881 3899 N 0 -87 34 2 0 86 h
+16915 3900 N 0 -87 34 1 0 87 h
+16949 3901 N 0 -88 34 2 0 87 h
+16983 3902 N 0 -90 34 3 0 88 h
+17017 3903 N 0 -91 34 2 0 90 h
+17051 3904 N 0 -91 34 3 0 91 h
+17085 3907 N 0 -92 34 3 0 91 h
+17119 3909 N 0 -93 34 3 0 92 h
+17153 3911 N 0 -93 34 2 0 93 h
+17187 3913 N 0 -93 34 3 0 93 h
+17221 3916 N 0 -94 35 3 0 93 h
+17256 3918 N 0 -95 34 3 0 94 h
+17290 3920 N 0 -95 34 3 0 95 h
+17324 3923 N 0 -95 34 3 0 95 h
+17358 3926 N 0 -96 34 4 0 95 h
+17392 3929 N 0 -98 34 4 0 96 h
+17426 3931 N 0 -99 34 4 0 98 h
+17460 3934 N 0 -99 34 4 0 99 h
+17494 3938 N 0 -101 34 5 0 99 h
+17528 3941 N 0 -104 34 5 0 101 h
+17562 3943 N 0 -106 34 5 0 104 h
+17596 3946 N 0 -106 34 4 0 106 h
+17630 3950 N 0 -108 34 6 0 106 h
+17664 3954 N 0 -108 34 5 0 108 h
+17698 3959 N 0 -111 34 6 0 108 h
+17732 3962 N 0 -111 34 5 0 111 h
+17766 3967 N 0 -113 34 6 0 111 h
+17800 3971 N 0 -114 34 6 0 113 h
+17834 3976 N 0 -115 34 6 0 114 h
+17868 3981 N 0 -116 34 6 0 115 h
+17902 3986 N 0 -117 34 6 0 116 h
+17936 3991 N 0 -118 34 7 0 117 h
+17970 3997 N 0 -119 34 6 0 118 h
+18004 4002 N 0 -120 34 7 0 119 h
+18038 4008 N 0 -121 34 7 0 120 h
+18072 4014 N 0 -122 34 7 0 121 h
+18106 4020 N 0 -123 34 7 0 122 h
+18140 4026 N 0 -125 34 8 0 123 h
+18174 4032 N 0 -127 34 7 0 125 h
+18208 4037 N 0 -128 35 8 0 127 h
+18243 4044 N 0 -128 34 7 0 128 h
+18277 4051 N 0 -130 34 9 0 128 h
+18311 4058 N 0 -132 34 8 0 130 h
+18345 4064 N 0 -133 34 8 0 132 h
+18379 4071 N 0 -136 34 9 0 133 h
+18413 4077 N 0 -139 34 10 0 136 h
+18447 4084 N 0 -141 34 9 0 139 h
+18481 4091 N 0 -144 34 11 0 141 h
+18515 4099 N 0 -147 34 10 0 144 h
+18549 4106 N 0 -150 34 10 0 147 h
+18583 4113 N 0 -153 34 11 0 150 h
+18617 4121 N 0 -156 34 11 0 153 h
+18651 4129 N 0 -157 34 9 0 156 h
+18685 4137 N 0 -160 34 12 0 157 h
+% End plot #4
+% Begin plot #5
+2.000 UL
+LTb
+0.56 0.15 0.15 C 0 7570 M
+34 11 V
+34 9 V
+34 9 V
+34 9 V
+34 8 V
+34 8 V
+34 9 V
+34 9 V
+34 9 V
+34 9 V
+34 8 V
+34 8 V
+34 8 V
+34 7 V
+35 8 V
+34 7 V
+34 7 V
+34 7 V
+34 7 V
+34 6 V
+34 6 V
+34 5 V
+34 6 V
+34 4 V
+34 6 V
+34 5 V
+34 6 V
+34 4 V
+34 5 V
+34 5 V
+34 4 V
+34 5 V
+34 5 V
+34 4 V
+34 4 V
+34 5 V
+34 3 V
+34 5 V
+34 3 V
+34 3 V
+34 4 V
+34 3 V
+34 3 V
+35 2 V
+34 4 V
+34 3 V
+34 2 V
+34 2 V
+34 1 V
+34 2 V
+34 2 V
+34 2 V
+34 1 V
+34 2 V
+34 1 V
+34 2 V
+34 1 V
+34 1 V
+34 0 V
+34 0 V
+34 1 V
+34 1 V
+34 0 V
+34 0 V
+34 -1 V
+34 0 V
+34 -1 V
+34 -1 V
+34 0 V
+34 -1 V
+34 -1 V
+34 -1 V
+35 -1 V
+34 -1 V
+34 -1 V
+34 -1 V
+34 -2 V
+34 -2 V
+34 -1 V
+34 -2 V
+34 -3 V
+34 -2 V
+34 -2 V
+34 -2 V
+34 -2 V
+34 -3 V
+34 -3 V
+34 -2 V
+34 -3 V
+34 -3 V
+34 -4 V
+34 -3 V
+34 -4 V
+34 -4 V
+34 -3 V
+34 -5 V
+34 -4 V
+34 -5 V
+34 -4 V
+34 -5 V
+34 -5 V
+35 -4 V
+34 -4 V
+34 -5 V
+stroke 3540 7765 M
+34 -5 V
+34 -5 V
+34 -5 V
+34 -5 V
+34 -5 V
+34 -6 V
+34 -6 V
+34 -5 V
+34 -5 V
+34 -6 V
+34 -5 V
+34 -6 V
+34 -6 V
+34 -6 V
+34 -6 V
+34 -7 V
+34 -6 V
+34 -7 V
+34 -7 V
+34 -6 V
+34 -7 V
+34 -7 V
+34 -6 V
+34 -7 V
+34 -8 V
+34 -7 V
+35 -8 V
+34 -7 V
+34 -8 V
+34 -8 V
+34 -8 V
+34 -7 V
+34 -8 V
+34 -8 V
+34 -8 V
+34 -8 V
+34 -8 V
+34 -9 V
+34 -8 V
+34 -8 V
+34 -9 V
+34 -9 V
+34 -8 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -10 V
+34 -9 V
+34 -9 V
+34 -10 V
+34 -9 V
+34 -10 V
+35 -9 V
+34 -10 V
+34 -10 V
+34 -10 V
+34 -10 V
+34 -10 V
+34 -10 V
+34 -10 V
+34 -10 V
+34 -11 V
+34 -10 V
+34 -11 V
+34 -10 V
+34 -11 V
+34 -11 V
+34 -10 V
+34 -11 V
+34 -11 V
+34 -11 V
+34 -11 V
+34 -11 V
+34 -11 V
+34 -12 V
+34 -11 V
+34 -11 V
+34 -11 V
+34 -12 V
+34 -11 V
+34 -12 V
+35 -11 V
+34 -12 V
+34 -12 V
+34 -11 V
+34 -12 V
+34 -12 V
+34 -12 V
+34 -12 V
+34 -12 V
+34 -12 V
+34 -11 V
+34 -12 V
+34 -13 V
+34 -12 V
+34 -13 V
+34 -12 V
+34 -13 V
+34 -12 V
+34 -12 V
+34 -13 V
+stroke 7079 6810 M
+34 -12 V
+34 -12 V
+34 -12 V
+34 -13 V
+34 -13 V
+34 -12 V
+34 -13 V
+34 -13 V
+34 -13 V
+35 -13 V
+34 -13 V
+34 -13 V
+34 -13 V
+34 -13 V
+34 -14 V
+34 -12 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -13 V
+34 -13 V
+34 -14 V
+34 -13 V
+34 -13 V
+34 -14 V
+34 -13 V
+34 -13 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -13 V
+34 -13 V
+34 -14 V
+34 -13 V
+34 -15 V
+35 -13 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -13 V
+35 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -14 V
+35 -13 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -13 V
+stroke 10619 5399 M
+34 -14 V
+34 -13 V
+34 -14 V
+34 -14 V
+34 -14 V
+34 -13 V
+34 -13 V
+34 -14 V
+34 -13 V
+34 -14 V
+34 -13 V
+34 -13 V
+34 -13 V
+34 -14 V
+34 -13 V
+34 -13 V
+34 -13 V
+34 -13 V
+34 -13 V
+34 -13 V
+35 -14 V
+34 -12 V
+34 -12 V
+34 -13 V
+34 -13 V
+34 -13 V
+34 -13 V
+34 -12 V
+34 -13 V
+34 -13 V
+34 -12 V
+34 -13 V
+34 -12 V
+34 -13 V
+34 -12 V
+34 -13 V
+34 -12 V
+34 -13 V
+34 -12 V
+34 -12 V
+34 -12 V
+34 -12 V
+34 -11 V
+34 -12 V
+34 -12 V
+34 -12 V
+34 -11 V
+34 -12 V
+34 -12 V
+35 -11 V
+34 -12 V
+34 -12 V
+34 -11 V
+34 -11 V
+34 -12 V
+34 -11 V
+34 -12 V
+34 -11 V
+34 -12 V
+34 -11 V
+34 -11 V
+34 -10 V
+34 -11 V
+34 -11 V
+34 -11 V
+34 -10 V
+34 -11 V
+34 -11 V
+34 -11 V
+34 -10 V
+34 -11 V
+34 -10 V
+34 -10 V
+34 -10 V
+34 -10 V
+34 -10 V
+34 -10 V
+34 -10 V
+35 -10 V
+34 -9 V
+34 -10 V
+34 -10 V
+34 -9 V
+34 -9 V
+34 -10 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -9 V
+34 -8 V
+34 -9 V
+34 -8 V
+34 -8 V
+34 -8 V
+34 -8 V
+34 -8 V
+34 -8 V
+34 -8 V
+34 -8 V
+stroke 14158 4231 M
+34 -7 V
+34 -8 V
+34 -7 V
+35 -8 V
+34 -7 V
+34 -7 V
+34 -7 V
+34 -8 V
+34 -6 V
+34 -7 V
+34 -7 V
+34 -6 V
+34 -7 V
+34 -7 V
+34 -7 V
+34 -5 V
+34 -6 V
+34 -6 V
+34 -6 V
+34 -5 V
+34 -7 V
+34 -5 V
+34 -5 V
+34 -6 V
+34 -6 V
+34 -5 V
+34 -5 V
+34 -6 V
+34 -5 V
+34 -4 V
+34 -5 V
+34 -5 V
+35 -5 V
+34 -5 V
+34 -4 V
+34 -4 V
+34 -5 V
+34 -4 V
+34 -3 V
+34 -5 V
+34 -5 V
+34 -2 V
+34 -4 V
+34 -3 V
+34 -2 V
+34 -3 V
+34 -3 V
+34 -2 V
+34 -4 V
+34 -3 V
+34 -3 V
+34 -2 V
+34 -2 V
+34 -3 V
+34 -2 V
+34 -2 V
+34 -2 V
+34 -2 V
+34 -3 V
+34 -2 V
+34 -1 V
+35 -1 V
+34 -1 V
+34 -1 V
+34 -1 V
+34 -1 V
+34 -1 V
+34 -1 V
+34 1 V
+34 0 V
+34 -1 V
+34 0 V
+34 0 V
+34 1 V
+34 0 V
+34 2 V
+34 0 V
+34 1 V
+34 1 V
+34 2 V
+34 1 V
+34 1 V
+34 2 V
+34 1 V
+34 1 V
+34 3 V
+34 2 V
+34 2 V
+34 3 V
+34 3 V
+35 3 V
+34 3 V
+34 3 V
+34 3 V
+34 3 V
+34 4 V
+34 3 V
+34 3 V
+34 4 V
+34 5 V
+34 2 V
+34 5 V
+34 5 V
+34 5 V
+stroke 17698 4013 M
+34 4 V
+34 6 V
+34 5 V
+34 5 V
+34 5 V
+34 6 V
+34 5 V
+34 6 V
+34 8 V
+34 6 V
+34 7 V
+34 6 V
+34 7 V
+34 6 V
+34 5 V
+35 8 V
+34 8 V
+34 7 V
+34 7 V
+34 9 V
+34 8 V
+34 9 V
+34 8 V
+34 8 V
+34 9 V
+34 8 V
+34 10 V
+34 9 V
+34 9 V
+34 9 V
+% End plot #5
+% Begin plot #6
+4.000 UP
+stroke
+1.000 UL
+LTb
+1.00 1.00 1.00 C 851 7319 CircleF
+2553 8113 CircleF
+4254 8180 CircleF
+5956 7018 CircleF
+7658 6493 CircleF
+9360 6307 CircleF
+11061 5171 CircleF
+12763 4208 CircleF
+14465 3814 CircleF
+16166 4256 CircleF
+17868 4043 CircleF
+% End plot #6
+% Begin plot #7
+3.000 UP
+1.000 UL
+LTb
+0.00 0.00 0.00 C 851 7319 CircleF
+2553 8113 CircleF
+4254 8180 CircleF
+5956 7018 CircleF
+7658 6493 CircleF
+9360 6307 CircleF
+11061 5171 CircleF
+12763 4208 CircleF
+14465 3814 CircleF
+16166 4256 CircleF
+17868 4043 CircleF
+% End plot #7
+2.000 UL
+LTb
+LCb setrgbcolor
+1.000 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+stroke
+grestore
+end
+showpage
+%%Trailer
+%%DocumentFonts: Times-Roman

@@ -1,0 +1,152 @@
+#!/bin/bash
+
+light="#DCBCBC"
+light_highlight="#C79999"
+mid="#B97C7C"
+mid_highlight="#A25050"
+dark="#8F2727"
+dark_highlight="#7C0000"
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'ribbons.eps'
+
+set border 0
+
+set lmargin screen 0
+set bmargin screen 0
+set rmargin screen 1
+set tmargin screen 1
+
+set title ""
+
+set xlabel 'x'
+set format x ''
+set xtics nomirror scale 0
+set xrange[-11:11]
+
+set ytics nomirror scale 0
+set format y ''
+set ylabel 'y'
+set yrange[-40:40]
+
+set datafile separator ','
+
+plot \
+"cred.csv" using 1:2:10 with filledcurves lt 1 lc rgb '$light' notitle, \
+"cred.csv" using 1:3:9 with filledcurves lt 1 lc rgb '$light_highlight' notitle, \
+"cred.csv" using 1:4:8 with filledcurves lt 1 lc rgb '$mid' notitle, \
+"cred.csv" using 1:5:7 with filledcurves lt 1 lc rgb '$mid_highlight' notitle, \
+"cred.csv" using 1:6 with line lt 1 lw 2 lc rgb '$dark' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'overlay_ribbons.eps'
+
+set border 0
+
+set lmargin screen 0
+set bmargin screen 0
+set rmargin screen 1
+set tmargin screen 1
+
+set title ""
+
+set xlabel 'x'
+set format x ''
+set xtics nomirror scale 0
+set xrange[-11:11]
+
+set ytics nomirror scale 0
+set format y ''
+set ylabel 'y'
+set yrange[-40:40]
+
+set datafile separator ','
+
+plot \
+"cred.csv" using 1:2:10 with filledcurves lt 1 lc rgb '$light' notitle, \
+"cred.csv" using 1:3:9 with filledcurves lt 1 lc rgb '$light_highlight' notitle, \
+"cred.csv" using 1:4:8 with filledcurves lt 1 lc rgb '$mid' notitle, \
+"cred.csv" using 1:5:7 with filledcurves lt 1 lc rgb '$mid_highlight' notitle, \
+"cred.csv" using 1:6 with line lt 1 lw 2 lc rgb '$dark' notitle, \
+'data.csv' u 1:2 w p pt 7 ps 4 lc rgb "white" notitle, \
+'data.csv' u 1:2 w p pt 7 ps 3 lc rgb "black" notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'prior_ribbons.eps'
+
+set border 0
+
+set lmargin screen 0
+set bmargin screen 0
+set rmargin screen 1
+set tmargin screen 1
+
+set title ""
+
+set xlabel 'x'
+set format x ''
+set xtics nomirror scale 0
+set xrange[-11:11]
+
+set ytics nomirror scale 0
+set format y ''
+set ylabel 'y'
+set yrange[-75:75]
+
+set datafile separator ','
+
+plot \
+"cred_prior.csv" using 1:2:10 with filledcurves lt 1 lc rgb '$light' notitle, \
+"cred_prior.csv" using 1:3:9 with filledcurves lt 1 lc rgb '$light_highlight' notitle, \
+"cred_prior.csv" using 1:4:8 with filledcurves lt 1 lc rgb '$mid' notitle, \
+"cred_prior.csv" using 1:5:7 with filledcurves lt 1 lc rgb '$mid_highlight' notitle, \
+"cred_prior.csv" using 1:6 with line lt 1 lw 2 lc rgb '$dark' notitle
+
+END
+
+gnuplot << END
+
+set terminal postscript enhanced eps color font 'Times-Roman, 35' size 13, 8
+set output 'post_ribbons.eps'
+
+set border 0
+
+set lmargin screen 0
+set bmargin screen 0
+set rmargin screen 1
+set tmargin screen 1
+
+set title ""
+
+set xlabel 'x'
+set format x ''
+set xtics nomirror scale 0
+set xrange[-11:11]
+
+set ytics nomirror scale 0
+set format y ''
+set ylabel 'y'
+set yrange[-75:75]
+
+set datafile separator ','
+
+plot \
+"cred.csv" using 1:2:10 with filledcurves lt 1 lc rgb '$light' notitle, \
+"cred.csv" using 1:3:9 with filledcurves lt 1 lc rgb '$light_highlight' notitle, \
+"cred.csv" using 1:4:8 with filledcurves lt 1 lc rgb '$mid' notitle, \
+"cred.csv" using 1:5:7 with filledcurves lt 1 lc rgb '$mid_highlight' notitle, \
+"cred.csv" using 1:6 with line lt 1 lw 2 lc rgb '$dark' notitle, \
+'data.csv' u 1:2 w p pt 7 ps 4 lc rgb "white" notitle, \
+'data.csv' u 1:2 w p pt 7 ps 3 lc rgb "black" notitle
+
+END
