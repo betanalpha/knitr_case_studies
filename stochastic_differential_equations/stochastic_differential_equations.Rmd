@@ -187,7 +187,8 @@ over the states at a finite set of times.  The similarity to
 [gaussian processes](https://betanalpha.github.io/assets/case_studies/gaussian_processes.html)
 here is no coincidence; gaussian processes are special case of stochastic
 processes and many gaussian process have not only useful kernel representations
-but also useful stochastic differential equation representations.
+but also useful stochastic differential equation representations 
+[@LindgrenEtAl:2021].
 
 In either case we never actually work with that infinite-dimensional model
 directly.  Instead we only ever consider the marginalization to a finite number
@@ -219,7 +220,7 @@ $$
 x_{n - 1} + f(x_{n - 1}, t_{n - 1}) \cdot (t_{n} - t_{n - 1}),
 g(x_{n - 1}, t_{n - 1}) \cdot \sqrt{ t_{n} - t_{n - 1} } \right).
 $$
-We can interprete this approximation as a first-order Euler approximation to
+We can interpret this approximation as a first-order Euler approximation to
 the deterministic evolution,
 $$
 \xi_{n} \approx x_{n - 1} + f(x_{n - 1}, t_{n - 1}) \cdot (t_{n} - t_{n - 1}),
@@ -707,7 +708,7 @@ $\tau$, and $\gamma$ we first have to construct the full posterior distribution
 and then marginalize,
 $$
 \begin{align*}
-\pi(\mu, \gamma, \tau \mid y_{1}, \ldots, y_{K}).
+\pi(\mu, \gamma, \tau \mid y_{1}, \ldots, y_{K})
 &=
 \int \prod_{n = 0}^{N} \mathrm{d} x_{n} \,
 \pi(x_{1}, \ldots, x_{N}, x_{0}, \mu, \gamma, \tau
@@ -979,6 +980,56 @@ That said quantifying the accuracy of the Euler-Maruyama approximation, and how
 finely we need to discretize the time intervals between observed states, is a
 much more subtle and challenging problem when we can't compare to the exact
 model.
+
+# Alternative Computational Methods
+
+In this introduction I have considered only Monte Carlo and Markov chain Monte 
+Carlo methods for quantifying the prior and posterior distributions induced by a
+a stochastic differential equation model, but there are a variety of other 
+computational methods that can be useful in certain circumstances.  
+
+For example if we are interested not in the full posterior distribution,
+$$
+\pi(x_{0}, x_{1}, \ldots, x_{N}, \mu, \gamma, \tau
+\mid \tilde{y}_{1}, \ldots, \tilde{y}_{K}),
+$$
+but only the marginal posterior distribution,
+$$
+\pi(\mu, \gamma, \tau \mid y_{1}, \ldots, y_{K})
+=
+\int \prod_{n = 0}^{N} \mathrm{d} x_{n} \,
+\pi(x_{1}, \ldots, x_{N}, x_{0}, \mu, \gamma, \tau
+\mid \tilde{y}_{1}, \ldots, \tilde{y}_{K}),
+$$
+then we might consider methods that approximately quantify that marginal 
+distribution directly, such as the Iterated Nested Laplace Approximation 
+[@LindgrenEtAl:2021].  The accuracy of these methods, however, can depend 
+strongly on the details of the stochastic differential equation model and the 
+shape of the realized likelihood function.
+
+Similarly in some cases we might be able to analyze all of the observations
+together but only sequentially, for example when observations are streamed in 
+time and discarded when the next observation arrives.  In this case our 
+inferential challenge is quantifying not the posterior distribution over the
+observations all at once but rather the sequence of posterior distributions that
+incorporate each observation only one at a time,
+$$
+\pi(x_{0}, x_{1}, \ldots, x_{N}, \mu, \gamma, \tau
+\mid \tilde{y}_{1}, \ldots, \tilde{y}_{k + 1})
+\propto
+\pi(\tilde{y}_{k + 1} \mid x_{n(k + 1)})
+\cdot
+\pi(x_{0}, x_{1}, \ldots, x_{N}, \mu, \gamma, \tau
+\mid \tilde{y}_{1}, \ldots, \tilde{y}_{k}).
+$$
+Approximately updating only certain posterior expectation values in this way is 
+often referred to as _smoothing_ or _filtering_.  
+
+Quantifying every sequential posterior distribution is typically more 
+computationally demanding then quantifying the single full posterior 
+distribution.  When streaming inferences are needed, however, methods like
+_Sequential Monte Carlo_ may yield sufficiently accurate sequential posterior 
+quantifications [@DoucetEtAl:2001].
 
 # Conclusion
 
