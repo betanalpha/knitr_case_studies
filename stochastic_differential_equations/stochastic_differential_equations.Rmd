@@ -156,12 +156,13 @@ $$
 \pi(x_{t} \mid x_{t'}) \equiv p(x, t; x', t').
 $$
 Formally this conditional probability density function is implicitly defined by
-the _Fokker-Plank_ partial differential equation,
+the _Fokker-Planck_ partial differential equation,
 $$
 \frac{ \partial}{\partial t} p(x, t; x', t')
 =
 - \frac{ \partial}{\partial x} \left( p(x, t; x', t') \cdot f(x, t) \right)
-+ \frac{ \partial^{2}}{\partial x^{2}} \left( p(x, t; x', t')\cdot g(x, t) \right).
++ \frac{1}{2} 
+\frac{ \partial^{2}}{\partial x^{2}} \left( p(x, t; x', t')\cdot g(x, t) \right)
 $$
 with initial value
 $$
@@ -186,7 +187,7 @@ which we can then marginalize to a finite-dimensional probability distribution
 over the states at a finite set of times.  The similarity to
 [gaussian processes](https://betanalpha.github.io/assets/case_studies/gaussian_processes.html)
 here is no coincidence; gaussian processes are special case of stochastic
-processes and many gaussian process have not only useful kernel representations
+processes.  Many gaussian process have not only useful kernel representations
 but also useful stochastic differential equation representations 
 [@LindgrenEtAl:2021].
 
@@ -201,7 +202,7 @@ $$
 
 ## Numerical Integration of Stochastic Differential Equations
 
-While the Fokker-Plank equation formally defines the conditional probability
+While the Fokker-Planck equation formally defines the conditional probability
 density functions that specifies the probabilistic evolution of a stochastic
 differential equation, in practice we can rarely solve for that probabilistic
 evolution in closed form.
@@ -321,7 +322,7 @@ these perturbations almost all of the trajectories that can be realized from
 this process are continuous but not differentiable.
 
 A huge benefit of the mean-reverting Ornstein–Uhlenbeck process is that the
-corresponding Fokker-Plank equation can be solved in closed form to give an
+corresponding Fokker-Planck equation can be solved in closed form to give an
 exact description of the probabilistic evolution from a fixed initial point,
 $$
 \pi(x_{t} \mid x_{t'})
@@ -407,7 +408,7 @@ $N + 1$ total times.
 Fixing the initial condition $x_{0}$ allows us to evolve to the $N$ states that
 follow in time.  If we also fix the Ornstein-Uhlenbeck parameters $\mu$,
 $\gamma$, and $\tau$ then we can use the conditional density function derived
-from the Fokker-Plank equation to construct a joint density function for all of
+from the Fokker-Planck equation to construct a joint density function for all of
 the following states,
 $$
 \begin{align*}
@@ -1050,6 +1051,8 @@ to moderate our expectations for how generally practical stochastic differential
 equation models might actually be.
 
 # Acknowledgements
+
+I thank Sam Power for helpful comments.
 
 A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
 Abhinav Katoch, Adam Bartonicek, Adam Fleischhacker, Adam Golinski,
