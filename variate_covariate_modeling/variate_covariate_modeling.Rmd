@@ -357,9 +357,9 @@ make predictions for the unobserved variate $y$.
 In most cases not every component of the model configuration space will inform
 both the conditional variate model and the marginal covariate model.  A more
 realistic picture arises when we decompose the model configuration space into
-component parameters that influence just the conditional covariate model,
-$\eta$, component parameters that influence just the marginal covariate model,
-$\gamma$, and component parameters that influence both, $\psi$,
+component parameters that influence just the conditional variate model, $\eta$,
+component parameters that influence just the marginal covariate model, $\gamma$,
+and component parameters that influence both, $\psi$,
 $$
 \theta = (\eta, \gamma, \psi).
 $$
@@ -1091,9 +1091,9 @@ If only the first observation is complete then we can construct a predictive
 distribution for the unobserved variate $y_{2}$,
 $$
 \begin{align*}
-\pi(y_{2} \mid \tilde{y}_{1}, \tilde{x}_{1}, \tilde{x}_{1})
+\pi(y_{2} \mid \tilde{y}_{1}, \tilde{x}_{1}, \tilde{x}_{2})
 &\propto
-\pi(\tilde{y}_{1}, \tilde{x}_{1}, y_{2}, \tilde{x}_{1})
+\pi(\tilde{y}_{1}, \tilde{x}_{1}, y_{2}, \tilde{x}_{2})
 \\
 &\propto
 \int \mathrm{d} \eta \, \mathrm{d} \gamma_{1} \, \mathrm{d} \gamma_{2} \,
@@ -1391,7 +1391,7 @@ marginal covariate model the conditional variate model is left to inform both
 $\eta$ and $\psi_{1}$ alone.  This results in artificially increased
 uncertainties that not only limit inferential precision but also can obstruct
 accurate posterior computation.  Secondly if we apply the configuration of
-the conditional covariate model from the first observation to predictions of
+the conditional variate model from the first observation to predictions of
 the missing $y_{2}$ in the second observation then subsequent predictions will
 suffer from strong errors unless $\psi_{2}$ happens to be very close to
 $\psi_{1}$.
@@ -1880,7 +1880,7 @@ distributions for an interval of covariate inputs at the same time to
 communicate a more comprehensive picture of the functional behavior.
 
 For example we can interpolate a single sequence of sampled function values
-$\theta_{i}(x_{n})$ along a fine grid of covariate inputs $x_{n]$} to visualize
+$\theta_{i}(x_{n})$ along a fine grid of covariate inputs $x_{n}$ to visualize
 a single realization of the functional behavior.
 
 <center>
@@ -1989,9 +1989,9 @@ knitr::include_graphics("figures/prior_post/prior_post.png")
 
 ## Conditional Validation
 
-Without confounding parameters the marginal variate model doesn't affect
+Without confounding parameters the marginal covariate model doesn't affect
 posterior inferences or predictions.  In these very special cases we can ignore
-the marginal variate model entirely, with all our limited modeling effort
+the marginal covariate model entirely, with all our limited modeling effort
 focused on the development of a useful conditional variate model.
 
 Simulation of complete observations, however, does depend on the marginal
@@ -2364,13 +2364,13 @@ Worse, these indirect implementations are often interpreted with a particular
 narratively generative structure where some phenomenological system evolves
 deterministically before the final state is corrupted in the observation.  When
 this narratively generative interpretation is unintended, especially when the
-conditional covariate model itself is not meant to be narratively generative or
+conditional variate model itself is not meant to be narratively generative or
 potential confounding behavior is being ignored, this default interpretation of
 the indirect implementation will facilitate misunderstanding and misuse of the
 model.
 
 Because of the mathematical and interpretational limitations of these
-indirect notations I strongly prefer to specify conditional covariate models
+indirect notations I strongly prefer to specify conditional variate models
 directly as a probability density function and avoid any ambiguity in the
 structure of the model or its intended meaning.
 
@@ -2556,7 +2556,7 @@ non-treatment observations will be influenced both by the intervention and the
 varying marginal covariate behavior.  Under certain circumstances re-weighting
 the non-treatment observations so that the empirical covariate distribution
 matches the empirical covariate distribution in the treatment observations will
-eliminate the influence of the confounding behavior in expectation so that 
+eliminate the influence of the confounding behavior in expectation so that
 standard estimators for $\beta_{T}$ and $\beta_{NT}$ remain unbiased.
 
 Another method for working with confounding behavior is the do-calculus
@@ -2576,7 +2576,7 @@ One of the huge advantages of flexible modeling tools like Stan is that we are
 not forced into any default assumptions for the conditional variate model or
 marginal covariate model.  Consequently we don't need to appeal to methods that
 try to compensate for poor assumptions.  We can build a model that captures the
-variate and covariate behaviors in all of the contexts of interest; the 
+variate and covariate behaviors in all of the contexts of interest; the
 resulting posterior will automatically incorporate all of the complex
 inferential interactions when we condition on any observed data.  Well-behaved
 posterior inferences for quantities like the average conditional effect result
@@ -2806,7 +2806,7 @@ plot_marginal("mu1", forward_full_samples, mu1, c(-4.5, -3.5))
 plot_marginal("tau1", forward_full_samples, tau1, c(0.5, 1.5))
 
 plot.new()
- 
+
 plot_marginal("mu2", forward_full_samples, mu2, c(1, 3))
 plot_marginal("tau2", forward_full_samples, tau2, c(2, 4))
 
@@ -3042,7 +3042,7 @@ Despite the increased complexity there do not appear to be any fitting issues.
 ```{r, warning=FALSE, message=FALSE}
 fit <- stan(file='stan_programs/fit_reverse_full.stan',
             data=data, seed=5838299, refresh=1000)
-        
+       
 util$check_all_diagnostics(fit)
 ```
 
@@ -3203,7 +3203,7 @@ util$check_all_diagnostics(fit)
 ```
 
 Although we've dropped the marginal covariate model, inferences of the
-parameters from the first observation are reasonably accurate.  Note, however, 
+parameters from the first observation are reasonably accurate.  Note, however,
 that they are much more uncertain than the inferences informed by the full
 reverse model because the covariates no longer provide information beyond their
 covariation with the variates.
@@ -3316,7 +3316,7 @@ stan_rdump(c("N2", "x2", "y2"), file="data/sin2_missing.data.R")
 ```
 
 ### First Measurement
-  
+ 
 The first data set consists of a complete and incomplete observation.
 
 ```{r}
@@ -3470,7 +3470,7 @@ plot_marginal_quantiles <- function(grid, f_samples, xlab, xlim, ylab, ylim,
         col = c_mid, border = NA)
   polygon(c(grid, rev(grid)), c(cred[4,], rev(cred[6,])),
         col = c_mid_highlight, border = NA)
-    
+   
   lines(grid, cred[5,], col=c_dark, lwd=2)
 
   points(x_obs, y_obs, pch=16, cex=1.00, col="white")
@@ -3923,7 +3923,7 @@ recorded.
 Even if the designed experiment avoids confounders this realization of the
 experiment does not.  Different configurations of the conditional variate model
 will lead to different selections and hence different marginal covariate models.
-More importantly different marginal covariate behavior will be associated with 
+More importantly different marginal covariate behavior will be associated with
 different covariation behavior.
 
 We can model this phenomenon by taking $\lambda = \gamma \, \omega$ for some
@@ -3987,7 +3987,7 @@ plot_marginal_quantiles(data$x_grid, samples$f1_grid,
                         xlab="Time", xlim=c(0, 10),
                         ylab="Location Function", ylim=c(-3.5, 3.5),
                         data$x1, data$y1)
-                    
+                   
 plot_realizations(data$x_grid, samples$f2_grid,
                   xlab="Time", xlim=c(0, 10),
                   ylab="Location Function", ylim=c(-3.5, 3.5),
@@ -4496,7 +4496,7 @@ toxic substance.  This implies the conditional variate model
 $$
 p(y \mid x, \alpha) = \text{Bernoulli}(y \mid 1 - e^{\alpha \, x})
 $$
-for the binary variate.  
+for the binary variate. 
 
 To complicate matters some individuals have also been given an experimental
 treatment that influences the susceptibility,
@@ -4633,7 +4633,7 @@ $$
 \hat{p} =
 \frac{n_{\text{infected}}}{n_{\text{infected}} + n_{\text{not infected}}},
 $$
-in exposure bins.  Here gray rectangles indicate exposure bins with no counts 
+in exposure bins.  Here gray rectangles indicate exposure bins with no counts
 and hence ill-defined empirical probabilities.
 
 <details>
