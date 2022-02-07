@@ -1,5 +1,5 @@
 ---
-title: "Survivor Modeling"
+title: "Outwit, Outlast, Outmodel"
 author: "Michael Betancourt"
 date: "January 2022"
 bibliography: survival_modeling.bib
@@ -274,6 +274,7 @@ $$
 \\
 & \quad\quad \cdot
 \mathbb{P}_{\pi} [ \text{occurrence before }t ].
+\\
 &= \quad \;\,
 \pi(\text{event occurs at }t \mid \text{no occurrence before }t )
 \\
@@ -464,9 +465,9 @@ We can also explicitly invert the survival function which allows us to exactly
 simulate event times,
 $$
 \begin{align*}
-p &= \text{uniform}(0, 1)
+\tilde{p} &\sim \text{uniform}(0, 1)
 \\
-t &= S^{-1}(p) = - \frac{ \log p }{ \gamma }.
+t &= S^{-1}(\tilde{p}) = - \frac{ \log \tilde{p} }{ \gamma }.
 \end{align*}
 $$
 
@@ -844,9 +845,11 @@ Additionally we can explicitly invert the survival function here as well,
 allowing us to exactly simulate event times,
 $$
 \begin{align*}
-p &= \text{uniform}(0, 1)
+\tilde{p} &\sim \text{uniform}(0, 1)
 \\
-t &= S^{-1}(p) = - \sigma \, \left(- \log p \right)^{ \frac{1}{\alpha} }.
+t 
+&= S^{-1}(\tilde{p}) 
+= - \sigma \, \left(- \log \tilde{p} \right)^{ \frac{1}{\alpha} }.
 \end{align*}
 $$
 
@@ -1342,7 +1345,7 @@ $$
 \begin{align*}
 p_{i} &= S(t_{i - 1}) - S(t_{i})
 \\
-\sum_{i = 1}^{N} p_{i} = 1.
+\sum_{i = 1}^{I} p_{i} &= 1.
 \end{align*}
 $$
 This allows us to directly sample the interval counts,
@@ -2158,10 +2161,29 @@ par(mar = c(5, 2, 3, 2))
 par(mfrow=c(1, 2))
 
 plot_marginal("gamma1", surv_samples, gamma1, c(0, 1))
-plot_marginal("gamma2", surv_samples, gamma2, c(0, 1))
+plot_marginal("gamma2", surv_samples, gamma2, c(0, 1.5))
 ```
 
-Moreover the posterior retrodictive checks demonstrate no systematic deviation
+The shoulder in these marginal posterior distributions is a consequence of an
+inherent multiplicative degeneracy between $\gamma_{1}$ and $\gamma_{2}$.  The
+larger $\gamma_{1}$ the more quickly the precursor event will tend to occur; in
+order to fit the observed event times the subsequent events will then have to
+take longer, resulting in a smaller $\gamma_{2}$.  Likewise if the precursor
+events take longer then the subsequent events will have to occur more quickly in 
+order to maintain consistency with the observations.
+
+```{r}
+par(mar = c(5, 4, 3, 2))
+par(mfrow=c(1, 1))
+
+plot(surv_samples$gamma1, surv_samples$gamma2, pch=16, cex=1, 
+     col=c_dark, main="",
+     xlab="gamma1", xlim=c(0, 1), ylab="gamma2", ylim=c(0, 1.5))
+points(gamma1, gamma2, pch=16, cex=1.5, col="white")
+points(gamma1, gamma2, pch=16, cex=1.0, col="black")
+```
+
+Regardless the posterior retrodictive checks demonstrate no systematic deviation
 between the model retrodictions and the observed data.
 
 ```{r}
@@ -2233,7 +2255,7 @@ $$
 \exp \left( - \gamma_{1} \cdot t_{2} \right)
 \frac{1 -  \exp \left( - (\gamma_{2} - \gamma_{1}) \cdot t_{2} \right) }
 { \gamma_{2} - \gamma_{1} },
-& | \gamma_{1} - \gamma_{2} | \cdot t_{2} < \epsilon
+& ( \gamma_{1} - \gamma_{2} ) \cdot t_{2} < \epsilon
 \\
 \gamma_{1} \cdot \gamma_{2} \cdot
 \exp \left( - \gamma_{2} \cdot t_{2} \right) \cdot t_{2},
@@ -2243,7 +2265,7 @@ $$
 \exp \left( - \gamma_{2} \cdot t_{2} \right)
 \frac{1 -  \exp \left( - (\gamma_{1} - \gamma_{2}) \cdot t_{2} \right) }
 { \gamma_{1} - \gamma_{2} },
-& | \gamma_{1} - \gamma_{2} | \cdot t_{2} > \epsilon
+& ( \gamma_{1} - \gamma_{2} ) \cdot t_{2} > \epsilon
 \end{array}
 \right.
 $$
@@ -2261,7 +2283,7 @@ $$
 &
 \\
 - \log \left( \gamma_{2} - \gamma_{1} \right),
-&| \gamma_{1} - \gamma_{2} | \cdot t_{2} < \epsilon
+&( \gamma_{1} - \gamma_{2} ) \cdot t_{2} < \epsilon
 \\
 &
 \\
@@ -2279,7 +2301,7 @@ $$
 &
 \\
 - \log \left( \gamma_{1} - \gamma_{2} \right),
-&| \gamma_{1} - \gamma_{2} | \cdot t_{2} > \epsilon
+&( \gamma_{1} - \gamma_{2} ) \cdot t_{2} > \epsilon
 \end{array}
 \right. .
 $$
@@ -2302,8 +2324,8 @@ diagnostics are clean.
 util$check_all_diagnostics(fit)
 ```
 
-As before the marginal posterior distributions concentrate around the exact
-constant hazards.
+As expected the behavior of the marginal posterior distributions is equivalent
+to that of our initial fit.
 
 ```{r}
 surv_samples = extract(fit)
