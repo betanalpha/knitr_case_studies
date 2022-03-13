@@ -2590,7 +2590,7 @@ parameters {
 model {
   mu ~ normal(0, 1);
   log_sigma ~ ???;
-  y ~ normal(mu, log_sigma);
+  y ~ normal(mu, exp(log_sigma));
 }
 ```
 
