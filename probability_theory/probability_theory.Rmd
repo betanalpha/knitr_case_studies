@@ -51,7 +51,7 @@ confuse the reader, but rather a consequence of the fact that we cannot
 explicitly construct abstract probability distributions in any meaningful sense.
 Instead we must utilize problem-specific _representations_ of abstract
 probability distributions which means that concrete examples will have to wait
-until we introduce these representations in Section 3.
+until we introduce these representations in Section 4.
 
 # Setting A Foundation {#sec:foundation}
 
@@ -533,7 +533,7 @@ $$
 >
 \mathbb{P}_{\pi} [ \cup_{n = 1}^{N} \mathfrak{A}_{n} ],
 $$
-even when $\mathfrak{A}_{n} \cap \mathfrak{A}_{m} = 0, n \ne m$.  We can also
+even when $\mathfrak{A}_{n} \cap \mathfrak{A}_{m} = \emptyset, n \ne m$.  We can also
 combine a finite number of different non-constructible subsets to achieve
 _super-additivity_,
 $$
@@ -569,7 +569,7 @@ $$
 \sum_{n = 1}^{\infty} \mathbb{P}_{\pi} [ A_{n} ],
 $$
 $$
-A_{n} \cap A_{m} = 0, \, n \ne m.
+A_{n} \cap A_{m} = \emptyset, \, n \ne m.
 $$
 
 The more familiar rules of probability theory can all be derived from these
@@ -1590,7 +1590,7 @@ plot_norm_probs(mu, sigma, -8, B1_min)
 plot_norm_probs(mu, sigma, B1_max, 8)
 ```
 
-We can compute it using the cumulative probability function,
+We can compute it using the cumulative distribution function,
 ```{r}
 (1 - pnorm(B1_max, mu, sigma)) + pnorm(B1_min, mu, sigma)
 ```
