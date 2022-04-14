@@ -7,13 +7,13 @@ data {
 }
 
 parameters {
-  // Horseshoe parameters
+  // Laplace parameters
   vector[K] theta;
   real<lower=0> tau;
 }
 
 model {
-  // Horseshoe prior model
+  // Laplace prior model
   theta ~ double_exponential(0, tau);
   tau ~ normal(0, 10);
 
