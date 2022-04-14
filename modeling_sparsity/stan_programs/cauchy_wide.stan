@@ -7,12 +7,12 @@ data {
 }
 
 parameters {
-  // Horseshoe parameters
+  // Cauchy parameters
   vector[K] theta;
 }
 
 model {
-  // Horseshoe prior model
+  // Cauchy prior model
   theta ~ cauchy(0, 10);
 
   // Observational model

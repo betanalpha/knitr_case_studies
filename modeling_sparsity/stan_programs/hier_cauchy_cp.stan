@@ -7,13 +7,13 @@ data {
 }
 
 parameters {
-  // Horseshoe parameters
+  // Cauchy parameters
   vector[K] theta;
   real<lower=0> tau;
 }
 
 model {
-  // Horseshoe prior model
+  // Cauchy prior model
   theta ~ cauchy(0, tau);
   tau ~ normal(0, 10);
 
