@@ -1,0 +1,136 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{light_teal}{RGB}{107, 142, 142}
+\definecolor{mid_teal}{RGB}{72, 117, 117}
+\definecolor{dark_teal}{RGB}{29, 79, 79}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function ribbon(\x) {
+    if \x <= -1.5 then { return 0; } else {
+      if \x >= 1.5 then { return 0; } else {
+        return sqrt(1 + \x * \x + \x * \x * \x * \x);
+      };
+    };
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=1.0]
+
+  \begin{scope}[shift={(0, 0)}]
+    \draw[white] (-5, -3) rectangle (5, 3.75);
+    
+    \node[align=center] at (0, 3.25) { Ribbon Plot };
+    
+    \pgfmathsetmacro{\xo}{0};
+    \fill[gray70, opacity=0.33] (\xo - 2, -0.5) rectangle (\xo + 2, 0.5);
+    
+    \foreach \a/\b/\c [count=\n] in {0.031/0.009/0.059, -0.342/0.005/-0.035, 
+                                     0.106/0.040/0.023, 0.110/-0.168/-0.080, 
+                                     -0.074/0.017/0.035, -0.380/0.034/-0.034, 
+                                     -0.404/-0.040/0.025, 0.168/0.115/0.004, 
+                                     0.067/-0.084/0.055, -0.159/0.062/0.076, 
+                                     0.339/-0.182/0.036, -0.056/-0.066/-0.063, 
+                                     -0.011/-0.060/-0.030, 0.064/0.115/0.092, 
+                                     0.279/-0.106/-0.041, 0.025/0.075/-0.008, 
+                                     0.201/-0.086/0.001, 0.029/-0.054/-0.013, 
+                                     0.009/0.041/-0.016, -0.067/0.095/-0.131, 
+                                     -0.082/0.127/-0.026, -0.082/-0.225/-0.097, 
+                                     0.011/0.003/0.037, -0.055/0.062/-0.012,
+                                     0.018/-0.110/0.042} {
+        \pgfmathsetmacro{\prop}{4 * \n};
+        \colorlet{custom}{dark!\prop!white};
+        \draw[domain={-3:3}, smooth, samples=300, line width=1, variable=\x, color=custom] 
+          plot ({\x},{\a + \b * \x + \c * \x * \x});
+    }
+    
+    \draw[gray70, dashed, line width=1] (\xo + 2, -2) -- (\xo + 2, 2);
+    \draw[gray70, dashed, line width=1] (\xo, -2) -- (\xo, 2);
+    \draw[gray70, dashed, line width=1] (\xo - 2, -2) -- (\xo - 2, 2);
+    \node[gray70] at (\xo, 2.35) { $x_{0}$ };
+    \node[gray70] at (\xo - 2, 2.35) { $x_{0} - \delta x$ };
+    \node[gray70] at (\xo + 2, 2.35) { $x_{0} + \delta x$ };
+
+    \draw[gray60, dashed, line width=1] (-3, -0.5) -- (3, -0.5);    
+    \draw[gray60, dashed, line width=1] (-3, 0) -- (3, 0);
+    \draw[gray60, dashed, line width=1] (-3, 0.5) -- (3, 0.5);
+    
+    \node[gray60, anchor=west] at (3.1, -0.5) { $-\delta f$ };    
+    \node[gray60, anchor=west] at (3.1, 0)  { $\quad 0$ };
+    \node[gray60, anchor=west] at (3.1, 0.5)  { $+\delta f$ };
+     
+    \draw [->, >=stealth, line width=1.25] (-3.00, -2.015) -- +(0, 4);
+    \draw [->, >=stealth, line width=1.25] (-3.015, -2.00) -- +(6, 0);
+    
+    \node at (-4, 0) { $f(x)$ };
+    \node at (0, -2.5) { $x$ };
+  \end{scope}
+
+  \begin{scope}[shift={(10, 0)}]
+    \draw[white] (-5, -3) rectangle (5, 3.75);
+    
+    \node[align=center] at (0, 3.25) { Marginal Quantile Plot };
+    
+    \pgfmathsetmacro{\deltaf}{0.5};
+    \pgfmathsetmacro{\deltax}{2};
+    \pgfmathsetmacro{\xo}{0};
+        
+    \foreach \p [count=\n] in {1.2815516, 0.8416212, 0.5244005, 0.2533471} {
+        \pgfmathsetmacro{\prop}{20 + 15 * \n};
+        \colorlet{custom}{dark!\prop!white};
+        \fill[domain={-3.01:3.01}, smooth, samples=300, line width=1, variable=\x, color=custom] 
+          plot ({\x},{\p * \deltaf * ribbon(\x / \deltax)});
+        \fill[domain={-3.1:3.1}, smooth, samples=300, line width=1, variable=\x, color=custom] 
+          plot ({\x},{-\p * \deltaf * ribbon(\x / \deltax)});
+    }
+    
+    \fill[white] (2.95, -2) rectangle (3.05, 2);
+    
+    \draw[dark, line width=2] (-3, 0) -- (2.95, 0);
+    
+    \draw[gray70, dashed, line width=1] (\xo + 2, -2) -- (\xo + 2, 2);
+    \draw[gray70, dashed, line width=1] (\xo, -2) -- (\xo, 2);
+    \draw[gray70, dashed, line width=1] (\xo - 2, -2) -- (\xo - 2, 2);
+    \node[gray70] at (\xo, 2.35) { $x_{0}$ };
+    \node[gray70] at (\xo - 2, 2.35) { $x_{0} - \delta x$ };
+    \node[gray70] at (\xo + 2, 2.35) { $x_{0} + \delta x$ };
+
+    \draw[gray60, dashed, line width=1] (-3, -0.5) -- (3, -0.5);    
+    \draw[gray60, dashed, line width=1] (-3, 0) -- (3, 0);
+    \draw[gray60, dashed, line width=1] (-3, 0.5) -- (3, 0.5);
+    
+    \node[gray60, anchor=west] at (3.1, -0.5) { $-\delta f$ };    
+    \node[gray60, anchor=west] at (3.1, 0)  { $\quad 0$ };
+    \node[gray60, anchor=west] at (3.1, 0.5)  { $+\delta f$ };
+        
+    \draw [->, >=stealth, line width=1.25] (-3.00, -2.015) -- +(0, 4);
+    \draw [->, >=stealth, line width=1.25] (-3.015, -2.00) -- +(6, 0);
+    
+    \node at (-4, 0) { $f_{*} \pi(\mu \mid x)$ };
+    \node at (0, -2.5) { $x$ };
+  \end{scope}
+  
+\end{tikzpicture}
+
+\end{document}  

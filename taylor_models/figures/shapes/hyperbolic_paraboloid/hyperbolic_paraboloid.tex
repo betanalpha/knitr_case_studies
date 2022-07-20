@@ -1,0 +1,182 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{darkteal}{RGB}{29, 79, 79}
+\definecolor{darkolive}{RGB}{97, 123, 45}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function x(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %  
+    return \xb;
+  };
+  function y(\x, \y, \z, \theta, \phi) {
+    \xa = +cos(\theta) * \x + sin(\theta) * \z;
+    \ya = \y;
+    \za = -sin(\theta) * \x + cos(\theta) * \z;
+    %
+    \xb = \xa;
+    \yb = +cos(\phi) * \ya + sin(\phi) * \za;
+    %\zb = -sin(\phi) * \ya + cos(\phi) * \za;
+    %   
+    return \yb;
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=1]
+  
+\pgfmathsetmacro{\theta}{25}
+\pgfmathsetmacro{\phi}{25}
+  
+\pgfmathsetmacro{\delta}{3}
+
+\begin{scope}[shift={(0, 0)}]
+  \draw[white] (-6, -5) rectangle (5, 6);
+
+  \draw [<->, >=stealth, line width=1]    
+      ({x(-\delta, -1.0 * \delta, -\delta, \theta, \phi)}, 
+       {y(-\delta, -1.0 * \delta, -\delta, \theta, \phi)})
+   -- ({x(-\delta, +1.5 * \delta, -\delta, \theta, \phi)}, 
+       {y(-\delta, +1.5 * \delta, -\delta, \theta, \phi)});
+  \node at ({x(-\delta, \delta, -\delta, \theta, \phi)}, 
+            {y(-\delta, \delta, -\delta, \theta, \phi) + 1.75}) { $\mu = f(x_{1}, x_{2})$ };
+  
+  \draw [->, >=stealth, line width=1]    
+      ({x(-\delta, 0, -\delta, \theta, \phi)}, 
+       {y(-\delta, 0, -\delta, \theta, \phi)})
+   -- ({x(-\delta, 0, 1.1 * \delta, \theta, \phi)}, 
+       {y(-\delta, 0, 1.1 * \delta, \theta, \phi)});
+  \node at ({x(-\delta, 0, 1.1 * \delta, \theta, \phi) - 0.5}, 
+            {y(-\delta, 0, 1.1 * \delta, \theta, \phi) + 0.25}) { $x_{2}$ };
+  
+  
+  \foreach \y in {-0.0025, -0.005, ..., -0.175} {
+    \pgfmathsetmacro{\prop}{-50 * \y)};
+    \colorlet{custom}{darkteal!\prop!white};
+    \draw[domain={-\delta:\y / \delta}, smooth, samples=125, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+  }
+  
+  \foreach \y in {-0.175, -0.185, ..., -0.5} {
+    \pgfmathsetmacro{\prop}{-50 * \y)};
+    \colorlet{custom}{darkteal!\prop!white};
+    \draw[domain={-\delta:\y / \delta}, smooth, samples=20, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+  }
+
+  \foreach \y in {-0.5, -0.525, ..., -3} {
+    \pgfmathsetmacro{\prop}{-50 * \y)};
+    \colorlet{custom}{darkteal!\prop!white};
+    \draw[domain={-\delta:\y / \delta}, smooth, samples=20, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+  }
+  
+  \draw [color=white, line width=1.25]    
+      ({x(-\delta, 0, 0, \theta, \phi)}, {y(-\delta, 0, 0, \theta, \phi)})
+   -- ({x(+\delta, 0, 0, \theta, \phi)}, {y(+\delta, 0, 0, \theta, \phi)});
+  
+  \draw [color=white, line width=1.25]    
+      ({x(0, 0, -\delta, \theta, \phi)}, {y(0, 0, -\delta, \theta, \phi)})
+   -- ({x(0, 0, +\delta, \theta, \phi)}, {y(0, 0, +\delta, \theta, \phi)});
+  
+  
+  \foreach \y in {0.0025, 0.005, ..., 0.175} {
+    \pgfmathsetmacro{\prop}{50 * \y)};
+    \colorlet{custom}{dark!\prop!white};
+    \draw[domain={\y / \delta:\delta}, smooth, samples=125, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+    \draw[domain={-\delta:-\y / \delta}, smooth, samples=125, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+  }
+
+  \foreach \y in {0.175, 0.185, ..., 0.5} {
+    \pgfmathsetmacro{\prop}{50 * \y)};
+    \colorlet{custom}{dark!\prop!white};
+    \draw[domain={\y / \delta:\delta}, smooth, samples=20, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+    \draw[domain={-\delta:-\y / \delta}, smooth, samples=20, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+  }
+  
+  \foreach \y in {0.5, 0.525, ..., 3} {
+    \pgfmathsetmacro{\prop}{50 * \y)};
+    \colorlet{custom}{dark!\prop!white};
+    \draw[domain={\y / \delta:\delta}, smooth, samples=20, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+    \draw[domain={-\delta:-\y / \delta}, smooth, samples=20, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+  }
+  
+  \foreach \y in {-0.0025, -0.005, ..., -0.175} {
+    \pgfmathsetmacro{\prop}{-50 * \y)};
+    \colorlet{custom}{darkteal!\prop!white};
+    \draw[domain={(-\y / \delta):\delta}, smooth, samples=125, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+  }
+
+  \foreach \y in {-0.175, -0.185, ..., -0.5} {
+    \pgfmathsetmacro{\prop}{-50 * \y)};
+    \colorlet{custom}{darkteal!\prop!white};
+    \draw[domain={(-\y / \delta):\delta}, smooth, samples=20, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+  }
+  
+  \foreach \y in {-0.5, -0.525, ..., -3} {
+    \pgfmathsetmacro{\prop}{-50 * \y)};
+    \colorlet{custom}{darkteal!\prop!white};
+    \draw[domain={(-\y / \delta):\delta}, smooth, samples=20, line width=1, variable=\x, color=custom] 
+      plot ({x(\x, \y, \y / \x, \theta, \phi)}, 
+            {y(\x, \y, \y / \x, \theta, \phi)});
+  }
+
+  \draw [->, >=stealth, line width=1]    
+       ({x(-\delta, 0, -\delta, \theta, \phi)}, 
+        {y(-\delta, 0, -\delta, \theta, \phi)})
+    -- ({x(1.5 * \delta, 0, -\delta, \theta, \phi)}, 
+        {y(1.5 * \delta, 0, -\delta, \theta, \phi)});
+  \node at ({x(1.5 * \delta, 0, -\delta, \theta, \phi) + 0.35}, 
+            {y(1.5 * \delta, 0, -\delta, \theta, \phi) - 0.10}) { $x_{1}$ };
+
+
+\end{scope}
+  
+\end{tikzpicture}
+
+\end{document}  

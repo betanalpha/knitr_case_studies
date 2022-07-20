@@ -1,0 +1,95 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{light_teal}{RGB}{107, 142, 142}
+\definecolor{mid_teal}{RGB}{72, 117, 117}
+\definecolor{dark_teal}{RGB}{29, 79, 79}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function f(\x) {
+    return (\x * \x * \x - 2 * \x) / (1 + 0.25 * \x * \x);
+  };
+  function dfdx(\x) {
+    return   (0.25 * \x * \x * \x * \x + 3.5 * \x * \x - 2) 
+           / ((1 + 0.25 * \x * \x) * (1 + 0.25 * \x * \x));
+  };
+  function df2dx2(\x) {
+    return 2 * \x * (-0.25 * \x * \x + 3) * (1 + 0.5)
+           / ((1 + 0.25 * \x * \x) * (1 + 0.25 * \x * \x) * (1 + 0.25 * \x * \x));
+  };
+  function normal(\x) {
+    return exp(-0.5 * \x * \x);
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=1.0]
+
+   \pgfmathsetmacro{\ys}{0.31};
+  
+  \begin{scope}[shift={(9, 0)}]
+    \draw[white] (-4.25, -3) rectangle (4.25, 3.25);
+    
+    \pgfmathsetmacro{\xo}{0.0};
+        
+    \fill[color=gray80, opacity=0.33] (\xo - 0.5, -2) rectangle (\xo + 0.5, 2);
+    \draw[gray70, dashed, line width=1.5] (\xo, -2) -- (\xo, 2);
+    \node[gray70] at (\xo, 2.35) { $x_{0}$ };
+    
+    \draw[domain={-3:3}, smooth, samples=150, line width=1.25, variable=\x, color=dark] 
+      plot ({\x},{\ys * f(\x)});
+    \node[dark] at (2.3, 1.8) { $f(x)$ };
+        
+    \pgfmathsetmacro{\fo}{f(\xo)};
+    \pgfmathsetmacro{\dfdxo}{dfdx(\xo)};
+
+    \draw[domain={-3:3}, smooth, samples=150, line width=1.25, variable=\x, color=light] 
+      plot ({\x},{\ys * (\fo + \dfdxo * (\x - \xo))});
+    \node[light] at (2.5, -0.85) { $f_{1}(x; x_{0})$ };
+     
+    \foreach \a/\b [count=\n] in {0.098/0.954, 0.141/0.995, 0.101/0.981, 0.114/0.916, 0.127/0.901, 
+                                  0.157/0.946, 0.234/0.973, 0.174/0.909, 0.114/0.997, 0.186/0.900} {
+       \pgfmathsetmacro{\prop}{10 + 8 * \n};
+       \colorlet{custom}{dark_teal!\prop!white};
+      \draw[domain={-3:3}, smooth, samples=10, line width=1.25, variable=\x, color=custom] 
+      plot ({\x},{\ys * (\a +\b * \x)});
+    }
+    \node[dark_teal, align=center] at (2.7, 0.15) { Inferred\\Lines };
+    
+    \foreach \x/\y in {-0.166/0.508, -0.681/1.040, -0.955/1.027, -2.068/-2.712, 0.488/-1.140, 
+                       -2.052/-2.084, -1.020/0.915, -1.485/-0.246, -2.960/-6.149, -1.493/-0.243, 
+                       -1.862/-1.379, 0.010/0.295, -0.463/0.816, -0.031/-0.125, -0.397/1.092, 
+                       0.446/-1.001, 0.286/-0.546, 0.336/-0.491, -0.501/1.184, 0.806/-0.623} {
+       \fill[black] (\x, \ys * \y) circle(0.05);
+    }
+    
+    \draw [->, >=stealth, line width=1.25] (-3.00, -2.015) -- +(0, 4);
+    \draw [->, >=stealth, line width=1.25] (-3.015, -2.00) -- +(6, 0);
+    
+    \node at (-3.5, 0) { $y$ };
+    \node at (0, -2.5) { $x$ };
+  \end{scope}
+  
+\end{tikzpicture}
+
+\end{document}  

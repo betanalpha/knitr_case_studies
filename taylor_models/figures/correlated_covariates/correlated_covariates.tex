@@ -1,0 +1,49 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+\usepackage{pgfmath}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{light_teal}{RGB}{107, 142, 142}
+\definecolor{mid_teal}{RGB}{72, 117, 117}
+\definecolor{dark_teal}{RGB}{29, 79, 79}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=1.0]
+
+  \begin{scope}[shift={(8.5, 6.75)}]
+    \draw[white] (-4.25, -3.25) rectangle (4.25, 5.25);
+    
+    
+    \foreach \xa/\xb in {2.015/3.829, 0.352/0.215, -1.037/0.335, 0.049/-0.744, 1.397/2.345, 1.193/1.421, -2.051/3.846, 0.644/0.764, -2.252/5.817, -0.181/0.409, -0.005/0.540, 0.811/-0.068, -0.331/-0.278, 0.426/-0.488, 0.004/-0.990, 1.007/1.528, 0.492/-0.223, 1.304/1.316, -0.016/-0.509, 0.925/1.389, -0.922/1.296, 0.207/-0.087, -1.004/1.156, -2.035/3.282, 0.464/-0.059, 1.095/0.647, 0.704/0.951, -1.002/1.169, 0.504/0.155, 0.242/0.050, -1.121/1.344, 2.127/4.014, 2.266/5.678, -1.636/3.049, 0.759/-0.345, -1.218/1.478, 0.125/-0.115, -0.423/-0.249, -1.121/1.400, -0.417/0.095, -0.100/-0.083, 1.963/3.118, 0.586/0.434, 0.615/-0.049, 0.257/-0.305, 0.511/-0.146, -0.111/-1.700, -0.256/-1.256, -0.202/0.460, -1.513/2.877} {
+       \fill[black] (\xa, 0.6 * \xb - 0.25) circle(0.05);
+    }
+     
+    \draw [->, >=stealth, line width=1.25] (-3.00, -2.015) -- +(0, 6.25);
+    \draw [->, >=stealth, line width=1.25] (-3.015, -2.00) -- +(6.25, 0);
+    
+    \node at (-3.5, 1.125) { $x_{2}$ };
+    \node at (0, -2.5) { $x_{1}$ };
+  \end{scope}
+  
+  
+\end{tikzpicture}
+
+\end{document}  
