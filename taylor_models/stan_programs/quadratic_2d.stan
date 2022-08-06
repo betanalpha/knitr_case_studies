@@ -23,11 +23,11 @@ parameters {
 }
 
 transformed parameters {
-  vector[N] f = alpha + deltaX * beta1;
+  vector[N] mu = alpha + deltaX * beta1;
   {
     matrix[2, 2] beta2 = [ [beta2_d[1], beta2_o], [beta2_o, beta2_d[2]] ];
     for (n in 1:N) {
-      f[n] = f[n] + deltaX[n] * beta2 * deltaX[n]';
+      mu[n] = mu[n] + deltaX[n] * beta2 * deltaX[n]';
     }
   }
 }
@@ -41,12 +41,12 @@ model {
   sigma ~ normal(0, 5);
 
   // Vectorized observation model
-  y ~ normal(f, sigma);
+  y ~ normal(mu, sigma);
 }
 
 // Simulate a full observation from the current value of the parameters
 generated quantities {
-  real y_pred[N] = normal_rng(f, sigma);
+  real y_pred[N] = normal_rng(mu, sigma);
   real det_beta2;
   vector[2] x_star;
   {

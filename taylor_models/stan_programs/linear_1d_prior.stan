@@ -18,8 +18,8 @@ model {
 }
 
 generated quantities {
-  real f_grid[N_grid];
+  real mu_grid[N_grid];
   for (n in 1:N_grid) {
-    f_grid[n] = alpha + beta * (x_grid[n] - x0);
+    mu_grid[n] = alpha + beta * (x_grid[n] - x0);
   }
 }

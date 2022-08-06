@@ -31,7 +31,7 @@ model {
 }
 
 generated quantities {
-  vector[N] f = alpha + deltaX * beta1;
+  vector[N] mu = alpha + deltaX * beta1;
   {
     matrix[M, M] beta2;
     for (m1 in 1:M) {
@@ -44,7 +44,7 @@ generated quantities {
     }
     
     for (n in 1:N) {
-      f[n] = f[n] + deltaX[n] * beta2 * deltaX[n]';
+      mu[n] = mu[n] + deltaX[n] * beta2 * deltaX[n]';
     }
   }
 }

@@ -99,7 +99,7 @@ f(x_{0})
 + \frac{ \mathrm{d} f }{ \mathrm{d} x } (x_{0}) \,
 + (x - x_{0})
 + \frac{1}{2} \frac{ \mathrm{d}^{2} f }{ \mathrm{d} x^{2} } (x_{0}) \,
-+ (x - x_{0})^{2}
+  (x - x_{0})^{2}
 + \ldots.
 \end{align*}
 $$
@@ -222,10 +222,10 @@ order.
 
 For example a small neighborhood $U$ constrains how far any local input
 $x \in U$ can be from the given base point $x_{0}$.  This constraint then limits
-how large the perturbations $x - x_{0}$ can be, and hence the large the powers
-$(x - x_{0})^{i}$ from which Taylor approximations are constructed can be.
-Generally the smaller the neighborhood the more quickly these powers will decay
-and the smaller the Taylor remainder will be across $U$.  In other words
+how large the perturbations $x - x_{0}$ can be, and hence how the large the 
+powers $(x - x_{0})^{i}$ from which Taylor approximations are constructed can
+be.  Generally the smaller the neighborhood the more quickly these powers will
+decay and the smaller the Taylor remainder will be across $U$.  In other words
 shrinking the local neighborhood, and extrapolating functional behavior from
 $x_{0}$ less aggressively, ensures that an $I$th order Taylor approximation
 $f_{I}(x; x_{0})$ will better approximate $f(x)$.
@@ -239,7 +239,7 @@ knitr::include_graphics("figures/zoom/zoom.png")
 </center>
 
 At the same time the faster the higher-order derivatives across $U$ decay the
-smaller the the more accurate a given Taylor approximation will be; the
+smaller and the more accurate a given Taylor approximation will be; the
 _flatter_ $f$ is across $U$ the better each $f_{I}(x; x_{0})$ will approximate
 $f(x)$.  Equivalently the flatter the exact function is the more aggressively
 we can extrapolate functional behavior from $x_{0}$, and the larger of a local
@@ -263,22 +263,22 @@ knitr::include_graphics("figures/order/order.png")
 #### Two Is Better Than One {-}
 
 Taylor approximations generalize to multi-dimensional functions quite naturally
-once we account for all of the partial derivative information that informs how 
-to extrapolate functional behavior from the base point in _any_ direction. The 
-main challenge in implementing multidimensional Taylor approximations is 
+once we account for all of the partial derivative information that informs how
+to extrapolate functional behavior from the base point in _any_ direction. The
+main challenge in implementing multidimensional Taylor approximations is
 organizing all of these partial derivatives.
 
 ### Basics
 #### Tell Me Why {-}
 
-Generalizing the discussion in the last section we now let the input space $X$ 
-be an $M$-dimensional product space with $M$ one-dimensional components.  In 
-other words each point $x \in X$ is now identified with $M$ component 
+Generalizing the discussion in the last section we now let the input space $X$
+be an $M$-dimensional product space with $M$ one-dimensional components.  In
+other words each point $x \in X$ is now identified with $M$ component
 variables,
 $$
 x = (x_{1}, \ldots, x_{m}, \ldots, x_{M}).
 $$
-For example a base point is defined by $M$ variables, one for each of the 
+For example a base point is defined by $M$ variables, one for each of the
 component directions,
 $$
 x_{0} = (x_{0, 1}, \ldots, x_{0, m}, \ldots, x_{0, M}).
@@ -296,13 +296,13 @@ information about $f$ is encoded in $M$ partial derivative functions,
 $$
 \frac{\partial f}{\partial x_{m}}(x),
 $$
-that quantify how the functional behavior changes along each component 
-direction.  These first-order partial derivatives are incorporated into a Taylor 
-approximation by multiplying each by the corresponding component perturbation 
+that quantify how the functional behavior changes along each component
+direction.  These first-order partial derivatives are incorporated into a Taylor
+approximation by multiplying each by the corresponding component perturbation
 and then summing the individual contributions together,
 $$
-f_{1}(x; x_{0}) 
-= 
+f_{1}(x; x_{0})
+=
 f(x_{0}) +
 \sum_{m = 1}^{M} \frac{\partial f}{\partial x_{m}}(x_{0}) \, (x_{m} - x_{0, m}).
 $$
@@ -310,8 +310,8 @@ $$
 Every time we go up one order we have to contend with a deluge of new partial
 derivatives; at $I$th order there are $M^{I}$ partial derivatives, although only
 $$
-{ M + I - 1 \choose I } 
-= 
+{ M + I - 1 \choose I }
+=
 \frac{ (M + I - 1)! }{ (M - 1)! \, I! }
 =
 \frac{ (M + I - 1) \cdot (M + I - 2) \cdots (M + 1) \cdot M }
@@ -330,7 +330,7 @@ $$
 $$
 Because of this symmetry there only $M \cdot (M + 1) / 2$ distinct partial
 derivative functions out of the $M^{2}$ nominal functions.  I will refer to the
-second-order partial derivatives with $m_{1} = m_{2}$ as _on-diagonal_ and those 
+second-order partial derivatives with $m_{1} = m_{2}$ as _on-diagonal_ and those
 with $m_{1} \ne m_{2}$ as _off-diagonal_.
 
 The second-order partial derivatives are incorporated into the multi-dimensional
@@ -338,8 +338,8 @@ Taylor approximation in a similar way, except that each partial derivative is
 matched not with one component perturbation but rather _two_,
 $$
 \begin{align*}
-f_{2}(x; x_{0}) 
-&= \quad 
+f_{2}(x; x_{0})
+&= \quad
 f(x_{0})
 \\
 & \quad +
@@ -352,7 +352,7 @@ f(x_{0})
 \end{align*}
 $$
 
-More generally the $I$-th order contribution to a Taylor approximation is given 
+More generally the $I$-th order contribution to a Taylor approximation is given
 by pairing each index with a corresponding component perturbation,
 $$
 \frac{1}{I!} \sum_{m_{1} = 1}^{M} \cdots \sum_{m_{i} = 1}^{M}
@@ -361,8 +361,8 @@ $$
 {\partial x_{m_{1}} \cdots \partial x_{m_{i}} \cdot \partial x_{m_{I}} }(x_{0})
 \, \prod_{i = 1}^{I} (x_{m_{i}} - x_{0, m_{i}}).
 $$
-The $I!$ factorial coefficient accounts for the over-counting that arises when 
-we sum over all of the partial derivatives and not just the distinct partial 
+The $I!$ factorial coefficient accounts for the over-counting that arises when
+we sum over all of the partial derivatives and not just the distinct partial
 derivatives.
 
 While the multi-dimensional case is conceptually straightforward, organizing
@@ -371,10 +371,10 @@ the partial derivatives and their symmetries can be quite the burden.
 ### Arrays Verses Tensors { #sec:array_vs_tensor }
 #### We Are Never Ever Getting Back Together {-}
 
-One way to facilitate the implementation of multi-dimensional Taylor 
-approximations is to organize all of the partial derivatives at a given order 
-into _arrays_.  In particular at the $I$th order we can organize the output of 
-the $M^{I}$ partial derivative functions into a rectangular $I$-dimensional 
+One way to facilitate the implementation of multi-dimensional Taylor
+approximations is to organize all of the partial derivatives at a given order
+into _arrays_.  In particular at the $I$th order we can organize the output of
+the $M^{I}$ partial derivative functions into a rectangular $I$-dimensional
 array with elements
 $$
 \mathcal{J}_{m_{1} \cdots m_{i} \cdots m_{I}} (x)
@@ -425,14 +425,14 @@ common operations in linear algebra.  For example the first-order term looks
 like the dot product of two vectors and the second-order term looks like a
 quadratic form of two vectors and a matrix.
 
-To make this similarity more explicit we might associate the one-dimensional 
+To make this similarity more explicit we might associate the one-dimensional
 arrays with vectors,
 $$
 \Delta \mathbf{x}
 =
 \begin{pmatrix}
-\Delta x_{1} \vphantom{x_{0}} \\ \ldots \\ 
-\Delta x_{m} \vphantom{x_{0}} \\ \ldots \\ 
+\Delta x_{1} \vphantom{x_{0}} \\ \ldots \\
+\Delta x_{m} \vphantom{x_{0}} \\ \ldots \\
 \Delta x_{M} \vphantom{x_{0}}
 \end{pmatrix}
 =
@@ -445,8 +445,8 @@ $$
 \mathbf{J}_{1}
 =
 \begin{pmatrix}
-\mathcal{J}_{1}(x_{0}) \vphantom{\frac{\partial f}{\partial x_{1}}} \\ \ldots \\ 
-\mathcal{J}_{m}(x_{0}) \vphantom{\frac{\partial f}{\partial x_{1}}} \\ \ldots \\ 
+\mathcal{J}_{1}(x_{0}) \vphantom{\frac{\partial f}{\partial x_{1}}} \\ \ldots \\
+\mathcal{J}_{m}(x_{0}) \vphantom{\frac{\partial f}{\partial x_{1}}} \\ \ldots \\
 \mathcal{J}_{M}(x_{0}) \vphantom{\frac{\partial f}{\partial x_{1}}}
 \end{pmatrix}
 =
@@ -462,10 +462,10 @@ $$
 \mathbf{J}_{2}
 &=
 \begin{pmatrix}
-\mathcal{J}_{11}(x_{0}) & 
+\mathcal{J}_{11}(x_{0}) &
 \ldots &
-\mathcal{J}_{1m'}(x_{0}) & 
-\ldots & 
+\mathcal{J}_{1m'}(x_{0}) &
+\ldots &
 \mathcal{J}_{1M}(x_{0}) \\
 \ldots & \ldots & \ldots & \ldots & \ldots \\
 \mathcal{J}_{m1}(x_{0}) & \ldots & \mathcal{J}_{mm'}(x_{0}) & \ldots & \mathcal{J}_{mM}(x_{0}) \\
@@ -517,24 +517,24 @@ f(x_{0})
 \frac{1}{2} \, \Delta \mathbf{x}^{T} \cdot \mathbf{J}_{2} \cdot \Delta \mathbf{x}.
 \end{align*}
 $$
-At higher-orders partial derivative arrays can be similarly be associated with 
-_tensors_ that maps multiple copies of the vector $\mathbf{x}$ to a single real 
+At higher-orders partial derivative arrays can be similarly be associated with
+_tensors_ that maps multiple copies of the vector $\mathbf{x}$ to a single real
 number.
 
 This linear-algebraic construction can drastically facilitate the implementation
 of multivariate Taylor approximations.  Instead of explicitly summing over each
 partial derivative evaluation at a given order we can gather them into arrays
-and then compute the overall contribution with tensor operations, many of which 
+and then compute the overall contribution with tensor operations, many of which
 are implemented in accessible software packages.
 
 That said we have to employ these associations with care because the Jacobian
-arrays _are not actually tensors_.  Importantly they do not transform like 
-tensors when the input space is transformed.  
+arrays _are not actually tensors_.  Importantly they do not transform like
+tensors when the input space is transformed. 
 
-If the Jacobian arrays were actually tensors then each term in a Taylor 
-approximation would be invariant under transformations of the input space.  For 
-example if $\Delta \mathbf{x}$, $\mathbf{J}_{1}$, and $\mathbf{J}_{2}$ were 
-transformed into $\Delta \mathbf{x'}$, $\mathbf{J'}_{1}$, and $\mathbf{J'}_{2}$ 
+If the Jacobian arrays were actually tensors then each term in a Taylor
+approximation would be invariant under transformations of the input space.  For
+example if $\Delta \mathbf{x}$, $\mathbf{J}_{1}$, and $\mathbf{J}_{2}$ were
+transformed into $\Delta \mathbf{x'}$, $\mathbf{J'}_{1}$, and $\mathbf{J'}_{2}$
 resepctively then we would always have
 $$
 \mathbf{x}^{T} \cdot \mathbf{J}_{1}
@@ -548,53 +548,53 @@ $$
 \frac{1}{2} \, \Delta \mathbf{x'}^{T} \cdot \mathbf{J'}_{2} \cdot \Delta \mathbf{x'}.
 $$
 
-Unfortunately this preservation of the individual terms in a Taylor 
-approximation isn't true.  In general transforming the input space _mixes_ the 
-individual contributions in complex ways so that while the entire Taylor 
-approximation is preserved the individual terms are not.  In particular we 
-cannot construct $\mathbf{J'}_{2}$ using $\mathbf{J}_{2}$ alone, as we would be 
+Unfortunately this preservation of the individual terms in a Taylor
+approximation isn't true.  In general transforming the input space _mixes_ the
+individual contributions in complex ways so that while the entire Taylor
+approximation is preserved the individual terms are not.  In particular we
+cannot construct $\mathbf{J'}_{2}$ using $\mathbf{J}_{2}$ alone, as we would be
 able to if these objects were proper matrices, and instead have to use both
 $\mathbf{J}_{2}$ _and_ $\mathbf{J}_{1}$.
 
 Formally Jacobian arrays are related to more complicated algebraic objects
 knowns as _jets_.  For an introduction to jets see for example @Betancourt:2018.
 
-Fortunately we don't need to learn about jets to take advantage of the 
-superficial relationship between Jacobian arrays and tensors in practice.  We 
-just have to make sure that _parameterization of the input space is fixed once 
-we associate Jacobian arrays with tensors_.  In other words we have to first
-fix the input space first before we fill up the Jacobian arrays with partial 
-derivative evaluations in that parameterization and then apply tensor operations 
-to those arrays.  Anytime we want to reparameterize the input space we have to 
-redo the _entire_ construction.  
+Fortunately we don't need to learn about jets to take advantage of the
+superficial relationship between Jacobian arrays and tensors in practice.  We
+just have to make sure that _parameterization of the input space is fixed once
+we associate Jacobian arrays with tensors_.  In other words we have to fix the
+input space first before we fill up the Jacobian arrays with partial derivative
+evaluations in that parameterization and then apply tensor operations to those
+arrays.  Anytime we want to reparameterize the input space we have to redo the
+_entire_ construction. 
 
-The relationship between Jacobian arrays and tensors is subtle but often 
-confused, but if we don't appreciate it enough then we put ourselves into a 
-precarious position where it's easy to implement multi-dimensional Taylor 
+The relationship between Jacobian arrays and tensors is subtle but often
+confused, but if we don't appreciate it enough then we put ourselves into a
+precarious position where it's easy to implement multi-dimensional Taylor
 approximations incorrectly.
 
 ### Polynomial Geometry
 #### No Body, No Crime {-}
 
-One nice feature of a Taylor approximation to functional behavior is that the 
-order directly informs the possible shapes or geometries within the local 
-neighborhood where the approximation is valid.  
+One nice feature of a Taylor approximation to functional behavior is that the
+order directly informs the possible shapes or geometries within the local
+neighborhood where the approximation is valid. 
 
-Before discussing these geometric possibilities, however, be warned that we will 
-be using the fragile association between Jacobian arrays and tensors, here 
-vectors and matrices, that we introduced in the previous section.  Consequently 
+Before discussing these geometric possibilities, however, be warned that we will
+be using the fragile association between Jacobian arrays and tensors, here
+vectors and matrices, that we introduced in the previous section.  Consequently
 the geometry of the functional behaviors will be best interpreted within a fixed
 parameterization of the input space.
 
-That said, let's consider a first-order Taylor approximation built up from 
+That said, let's consider a first-order Taylor approximation built up from
 linear algebra operations,
 $$
 f ( \Delta \mathbf{x} )
 = f(x_{0}) + \Delta \mathbf{x}^{T} \cdot \mathbf{J}_{1}.
 $$
-Geometrically the functional behaviors encapsulated in this approximation 
-correspond _planes_.  Each plane is fixed to the baseline functional behavior 
-$f(x_{0})$ with the $\mathbf{J}_{1}$ serving as slopes that orient the planes 
+Geometrically the functional behaviors encapsulated in this approximation
+correspond _planes_.  Each plane is fixed to the baseline functional behavior
+$f(x_{0})$ with the $\mathbf{J}_{1}$ serving as slopes that orient the planes
 around that point.
 
 <center>
@@ -607,10 +607,10 @@ knitr::include_graphics("figures/shapes/plane/plane.png")
 
 An immediate consequence of this geometric interpretation is that a first-order
 Taylor approximation will never exhibit any local minima or maxima within the
-local neighborhood.  Instead the extrema exist at infinity, far away from any 
+local neighborhood.  Instead the extrema exist at infinity, far away from any
 local neighborhood.
 
-We can verify this with a little bit of multivariable calculus.  If an finite
+We can verify this with a little bit of multivariable calculus.  If a finite
 extremum $\Delta \mathbf{x}^{*}$ exists then the gradient of the functional
 behavior will vanish there,
 $$
@@ -642,8 +642,8 @@ exhibits a much wider range of functional behaviors.  In addition to the planes
 of the first-order approximation this model also includes _paraboloids_ that
 curve around $f(x_{0})$.
 
-Unlike planes, however, paraboloids exhibit finite extrema.  To derive where 
-these finite extrema will be we can appeal to the vanishing gradient condition 
+Unlike planes, however, paraboloids exhibit finite extrema.  To derive where
+these finite extrema will be we can appeal to the vanishing gradient condition
 again,
 $$
 \begin{align*}
@@ -685,12 +685,12 @@ $$
 Otherwise the system is ill-posed and there will be an infinite number of
 extrema.
 
-Note that an extreme point is not guaranteed to fall within the local 
-environment where a Taylor approximation is defined.  If we extrapolate out to 
-the quadratic extrema then we might encounter higher-order behaviors in the 
+Note that an extreme point is not guaranteed to fall within the local
+environment where a Taylor approximation is defined.  If we extrapolate out to
+the quadratic extrema then we might encounter higher-order behaviors in the
 exact functional behavior that render the second-order Taylor approximation,
-and its implied extrema, inadequate.  In other words if an extrema falls outside 
-of the local neighborhood where a Taylor approximation has been validated then 
+and its implied extrema, inadequate.  In other words if an extrema falls outside
+of the local neighborhood where a Taylor approximation has been validated then
 we have to treat it with at least some suspicion.
 
 The precise shape of the parabolic behavior around a well-defined extrema will
@@ -702,13 +702,13 @@ $$
 \mathbf{J}_{2}.
 $$
 
-If $\mathbf{J}_{2}$ is positive-definite, and all of the eigenvalues of the 
-matrix are positive, then the functional behavior will curve upwards around the 
-extreme point; in other words $\Delta \mathbf{x}^{*}$ will be a minimum of the 
-functional behavior.  Likewise if $\mathbf{J}_{2}$ is negative-definite, and all 
-of the eigenvalues are negative, then $\Delta \mathbf{x}^{*}$ will correspond to 
+If $\mathbf{J}_{2}$ is positive-definite, and all of the eigenvalues of the
+matrix are positive, then the functional behavior will curve upwards around the
+extreme point; in other words $\Delta \mathbf{x}^{*}$ will be a minimum of the
+functional behavior.  Likewise if $\mathbf{J}_{2}$ is negative-definite, and all
+of the eigenvalues are negative, then $\Delta \mathbf{x}^{*}$ will correspond to
 a maximum.  In both cases the geometry of the functional behavior resembles a
-_bowl_ centered at the extrema, oriented right-side up if $\mathbf{J}_{2}$ is 
+_bowl_ centered at the extrema, oriented right-side up if $\mathbf{J}_{2}$ is
 positive-definite and upside-down if $\mathbf{J}_{2}$ is negative-definite.
 
 <center>
@@ -732,37 +732,37 @@ knitr::include_graphics("figures/shapes/hyperbolic_paraboloid/hyperbolic_parabol
 <br><br>
 </center>
 
-The geometric interpretability can be a powerful way to elicit domain expertise 
-about functional behavior within a local neighborhood, and hence motivate the 
-order of Taylor approximation needed in a given application.  For example if we 
+The geometric interpretability can be a powerful way to elicit domain expertise
+about functional behavior within a local neighborhood, and hence motivate the
+order of Taylor approximation needed in a given application.  For example if we
 know that the functional behavior exhibits an extreme point then we know that a
-first-order Taylor approximation will be inadequate and that we will need to 
-consider at least a second-order approximation.  Moreover any domain expertise 
-that places the extreme point within a local neighborhood will substantially 
-constrain the configuration of a second-order Taylor approximation, as will any 
-domain expertise about whether that extreme point is a maximum, minimum, or a 
+first-order Taylor approximation will be inadequate and that we will need to
+consider at least a second-order approximation.  Moreover any domain expertise
+that places the extreme point within a local neighborhood will substantially
+constrain the configuration of a second-order Taylor approximation, as will any
+domain expertise about whether that extreme point is a maximum, minimum, or a
 saddle point.
 
-That said, wielding this geometric intuition does become more difficult as we 
-consider higher-order Taylor approximation that incorporate more and more 
-complex functional behaviors.  For example if we go beyond second-order then 
-Taylor approximations can exhibit multiple, separated extrema, each of which can 
-exhibit bowl-like or saddle-like shapes independently from the others.  In 
-addition the behavior of these separate extrema don't cleanly map to individual 
-approximation parameters but rather weave together in intricate ways.  
-While leveraging whatever domain expertise we have into explicit constraints on 
-higher-order Taylor approximation configurations is more complicated, it can 
+That said, wielding this geometric intuition does become more difficult as we
+consider higher-order Taylor approximation that incorporate more and more
+complex functional behaviors.  For example if we go beyond second-order then
+Taylor approximations can exhibit multiple, separated extrema, each of which can
+exhibit bowl-like or saddle-like shapes independently from the others.  In
+addition the behavior of these separate extrema don't cleanly map to individual
+approximation parameters but rather weave together in intricate ways. 
+While leveraging whatever domain expertise we have into explicit constraints on
+higher-order Taylor approximation configurations is more complicated, it can
 still be accomplished with care.
 
 ## Baseline Dependence
 #### I Know Places {-}
 
-Mechanically the polynomial defined by a Taylor approximation can be evaluated 
-globally, mapping any input $x \in X$ to some output.  The connection of that 
+Mechanically the polynomial defined by a Taylor approximation can be evaluated
+globally, mapping any input $x \in X$ to some output.  The connection of that
 polynomial to the function being approximated, however, is restricted to the
-local neighborhood of inputs $U \subset X$ around the baseline point $x_{0}$.  
-In other words a Taylor approximation is not defined by a polynomial alone but 
-rather a polynomial associated with a base point and a surrounding local 
+local neighborhood of inputs $U \subset X$ around the baseline point $x_{0}$. 
+In other words a Taylor approximation is not defined by a polynomial alone but
+rather a polynomial associated with a base point and a surrounding local
 neighborhood.
 
 Even when the exact functional behavior being approximated is fixed, the
@@ -777,34 +777,34 @@ knitr::include_graphics("figures/neighborhoods/neighborhoods.png")
 <br><br>
 </center>
 
-The more non-linear the exact function is the more strongly the behavior of the 
+The more non-linear the exact function is the more strongly the behavior of the
 polynomials defined by Taylor approximations will vary with the baseline point.
 
-Extrapolating too far away from the baseline point strains the local nature of 
-a Taylor approximation.  Eventually a Taylor approximation will become so 
-inaccurate that it provides no useful information about the exact functional 
-behavior at those distant points.  Ultimately a single Taylor approximation may 
+Extrapolating too far away from the baseline point strains the local nature of
+a Taylor approximation.  Eventually a Taylor approximation will become so
+inaccurate that it provides no useful information about the exact functional
+behavior at those distant points.  Ultimately a single Taylor approximation may
 not be able to model functional behavior across multiple neighborhoods at the
-same time.  At some point we may have to consider introducing _multiple_ 
+same time.  At some point we may have to consider introducing _multiple_
 baselines $x_{0}$ and multiple Taylor approximation local to those baselines.
 
-In order to use Taylor approximations effectively in practice our first step 
-should always be defining the local neighborhood of relevant inputs at which we 
+In order to use Taylor approximations effectively in practice our first step
+should always be defining the local neighborhood of relevant inputs at which we
 will need to evaluate functional behavior.  Once we have defined this local
-neighborhood we can construct a sufficiently accurate Taylor approximation 
-within that local context.  Recovering from a poorly chosen baseline, far from 
-the inputs relevant to a given application, is both conceptually difficult and 
+neighborhood we can construct a sufficiently accurate Taylor approximation
+within that local context.  Recovering from a poorly chosen baseline, far from
+the inputs relevant to a given application, is both conceptually difficult and
 computationally expensive.
 
 ## Covariate Boundaries
 #### Exile {-}
 
-As we saw in [Section 1.1](#sec:onedime) an $I$-th order Taylor approximation 
-will be well-behaved within a local neighborhood only when the first to 
+As we saw in [Section 1.1](#sec:onedime) an $I$-th order Taylor approximation
+will be well-behaved within a local neighborhood only when the first to
 $I$th-order derivatives of the exact function $f$ are well-behaved in that
-neighborhood.  In particular the derivative evaluations have to not yield not
-only unique values but also finite values.  Unfortunately this can be a problem 
-for functions that are defined on only a subset of the input space.
+neighborhood.  In particular the derivative evaluations have to yield not only
+unique values but also finite values.  Unfortunately this can be a problem for
+functions that are defined on only a subset of the input space.
 
 Consider for example the function
 $$
@@ -814,9 +814,9 @@ f :\; &\mathbb{R}^{+}& &\rightarrow& \; &\mathbb{R}^{+}&
 &x& &\mapsto& &x^{-\alpha}&
 \end{alignat*}
 $$
-which is well-defined for only positive, real-valued inputs 
-$\mathbb{R}^{+} \subset \mathbb{R}$.  For $\alpha > 0$ the output of this 
-function diverges towards positive infinity as we approach the boundary $x = 0$ 
+which is well-defined for only positive, real-valued inputs
+$\mathbb{R}^{+} \subset \mathbb{R}$.  For $\alpha > 0$ the output of this
+function diverges towards positive infinity as we approach the boundary $x = 0$
 from positive inputs.
 
 <center>
@@ -841,7 +841,7 @@ knitr::include_graphics("figures/input_boundary/nominal/derivative/derivative.pn
 <br><br>
 </center>
 
-Higher-order derivatives alternate between diverging to positive and negative 
+Higher-order derivatives alternate between diverging to positive and negative
 infinity,
 $$
 \frac{ \mathrm{d}^{i} f }{ \mathrm{d} x^{i} }(x)
@@ -857,34 +857,34 @@ knitr::include_graphics("figures/input_boundary/nominal/derivatives/derivatives.
 <br><br>
 </center>
 
-Just past the boundary at small but negative inputs the function $f$ is 
-undefined.  The inconsistent values to the left and right of the boundary 
-implies that all of the derivatives are ill-defined at $x = 0$.  Consequently 
-we cannot construct Taylor approximations from a base points right on the 
-boundary $x_{0} = 0$.  
+Just past the boundary at small but negative inputs the function $f$ is
+undefined.  The inconsistent values to the left and right of the boundary
+imply that all of the derivatives are ill-defined at $x = 0$.  Consequently we
+cannot construct Taylor approximations from a base points right on the boundary
+$x_{0} = 0$. 
 
-Taylor approximations around base points at positive inputs near the boundary 
-will be ungainly at best.  For a fixed $x_{0}$ the magnitude of the derivative 
-evaluations $\mathrm{d}^{i} f / \mathrm{d} x^{i} \, (x_{0})$ will increase with 
-the order $i$.  At the same time the signs of these evaluations will oscillate, 
-leading to an awkward sequence of polynomial terms that poorly converges to the 
-exact function $f$.  
+Taylor approximations around base points at positive inputs near the boundary
+will be ungainly at best.  For a fixed $x_{0}$ the magnitude of the derivative
+evaluations $\mathrm{d}^{i} f / \mathrm{d} x^{i} \, (x_{0})$ will increase with
+the order $i$.  At the same time the signs of these evaluations will oscillate,
+leading to an awkward sequence of polynomial terms that poorly converges to the
+exact function $f$. 
 
-The only way to ensure that the final Taylor approximation reasonably 
-approximates $f$ is to narrow the local neighborhood enough that the 
+The only way to ensure that the final Taylor approximation reasonably
+approximates $f$ is to narrow the local neighborhood enough that the
 perturbations $(\Delta x)^{i}$ are small enough to ensure that the magnitudes
 $$
 \mathrm{d}^{i} f / \mathrm{d} x^{i} (x_{0}) \, (\Delta x)^{i}
 $$
-are reasonable enough for the Taylor approximation to be well-behaved.  In 
-practice these means that Taylor approximations will be limited to ever more 
+are reasonable enough for the Taylor approximation to be well-behaved.  In
+practice these means that Taylor approximations will be limited to ever more
 confined neighborhoods as we consider inputs closer and closer to the boundary.
 
 One way to avoid these boundary effects is to avoid the boundary entirely.
-In particular instead of trying to approximate the nominal, constrained function 
+In particular instead of trying to approximate the nominal, constrained function
 we can approximate a transformed, unconstrained function.
 
-Consider for example a fixed auxiliary function that maps from an unconstrained 
+Consider for example a fixed auxiliary function that maps from an unconstrained
 real space to the constrained input space of our function,
 $$
 \begin{alignat*}{6}
@@ -893,7 +893,7 @@ g :\; &\mathbb{R}& &\rightarrow& \; &\mathbb{R}^{+}&
 &z& &\mapsto& &g(z)&.
 \end{alignat*}
 $$
-The composition of this function with $f$ defines a completely unconstrained 
+The composition of this function with $f$ defines a completely unconstrained
 function,
 $$
 \begin{alignat*}{6}
@@ -904,20 +904,20 @@ f \circ g :\; &\mathbb{R}& &\rightarrow& \; &\mathbb{R}&
 $$
 without any boundaries that might frustrate Taylor approximations.
 
-In other words while the functional dependence on $x$ exhibits boundaries the 
-functional dependence on $z = g^{-1}(x)$ does not.  The unconstraining 
-transformation effectively exiles the problematic boundary to infinity where it 
-won't influence the behavior of Taylor approximations at more reasonable inputs.  
-At the same time the transformation tends to expand small neighborhoods near the 
-boundary into wider regions, decompressing the nominal functional behavior so 
+In other words while the functional dependence on $x$ exhibits boundaries the
+functional dependence on $z = g^{-1}(x)$ does not.  The unconstraining
+transformation effectively exiles the problematic boundary to infinity where it
+won't influence the behavior of Taylor approximations at more reasonable inputs. 
+At the same time the transformation tends to expand small neighborhoods near the
+boundary into wider regions, decompressing the nominal functional behavior so
 that it can be better resolved by Taylor approximations.
 
 Provided that the auxiliary function $g$ is completely known then modeling the
 composition $f \circ g$ with the inputs $g^{-1}(x)$ still effectively models the
-initial functional behavior $f$ with the inputs $x$.  The transformed input 
+initial functional behavior $f$ with the inputs $x$.  The transformed input
 space, however, provides more flexibility in how we can locally approximate that
 functional behavior.
- 
+
 One possible function to consider in our example is the exponential
 $$
 \begin{alignat*}{6}
@@ -955,7 +955,7 @@ $$
 (-\alpha)^{i} \, \exp(-\alpha \, z).
 $$
 These derivatives still oscillate in sign but now their magnitudes are much less
-extreme for reasonable input values, resulting in much better behaved Taylor 
+extreme for reasonable input values, resulting in much better behaved Taylor
 approximations.
 
 <center>
@@ -969,52 +969,52 @@ knitr::include_graphics("figures/input_boundary/transformed/transformed.png")
 # Taylor Regression Models
 #### Invisible String {-}
 
-As I discuss in my 
+As I discuss in my
 [variate-covariate modeling case study](https://betanalpha.github.io/assets/case_studies/variate_covariate_modeling.html)
-regression models, or more accurately _curve fitting_ models, are derived from 
-two key assumptions.  First we assume that here is no confounding behavior that 
+regression models, or more accurately _curve fitting_ models, are derived from
+two key assumptions.  First we assume that there is no confounding behavior that
 couples the conditional variate and marginal covariate models together,
 $$
 \pi(y, x, \theta, \phi, \gamma)
 =
 \pi(y \mid x, \theta, \phi) \, \pi(x \mid \gamma),
 $$
-so that we can ignore the marginal covariate model entirely when inferring the 
-covariation between $y$ and $x$ and using it to inform predictions of 
-incomplete observations.  Second we assume the remaining conditional variate 
-model can be characterized with probabilistic variation around a deterministic 
+so that we can ignore the marginal covariate model entirely when inferring the
+covariation between $y$ and $x$ and using it to inform predictions of
+incomplete observations.  Second we assume the remaining conditional variate
+model can be characterized with probabilistic variation around a deterministic
 function of the covariates,
 $$
 \pi(y \mid x, \theta, \phi) = \pi(y \mid \mu = f(x, \theta), \phi),
 $$
-where $\mu$ is a location parameter that configures the centrality of the 
-variate distribution and $\phi$ configures the probabilistic variation around 
+where $\mu$ is a location parameter that configures the centrality of the
+variate distribution and $\phi$ configures the probabilistic variation around
 that centrality.
 
 A particular regression model is then defined with the choice of a particular
 model for the probabilistic variation and location functional behavior.
-The theory of Taylor approximations that we developed in the previous section 
-provides a powerful method for modeling the location functional behavior within 
-a local neighborhood of input covariates.  Once we have identified the range of 
-covariate inputs of interest in an application we can model the location 
-function with an appropriate Taylor approximation to give a 
-_Taylor regression model_.  This approach provides an _interpretable_ 
-mathematical form for the centrality of the conditional variate model that, 
+The theory of Taylor approximations that we developed in the previous section
+provides a powerful method for modeling the location functional behavior within
+a local neighborhood of input covariates.  Once we have identified the range of
+covariate inputs of interest in an application we can model the location
+function with an appropriate Taylor approximation to give a
+_Taylor regression model_.  This approach provides an _interpretable_
+mathematical form for the centrality of the conditional variate model that,
 amongst other benefits, facilitates principled prior modeling.
 
 In this section we'll review the foundations of Taylor regression modeling and
-its practical implementation with a special emphasis on how many popular 
+its practical implementation with a special emphasis on how many popular
 heuristics can be be given a more formal motivation.
 
 ## Parameter Interpretation
 #### The Story of Us {-}
 
-A classic one-dimensional linear model of a location function is characterized 
+A classic one-dimensional linear model of a location function is characterized
 by an _intercept_ $\alpha$ and a _slope_ $\beta$,
 $$
 f(x) = \alpha + \beta \, x.
 $$
-On the other hand a one-dimensional, first-order Taylor approximation to a 
+On the other hand a one-dimensional, first-order Taylor approximation to a
 general location function $f$ around the baseline $x_{0}$ is given by
 $$
 \begin{align*}
@@ -1041,17 +1041,17 @@ $$
 $$
 
 In other words the Taylor approximation provides a concrete interpretation of
-the intercept and slope in terms the location functional behavior at $x_{0}$. 
-Instead of working out how to infer the abstract parameters $\alpha$ and $\beta$ 
-we can consider inference of the explicit local behaviors $f(x_{0}), 
+the intercept and slope in terms the location functional behavior at $x_{0}$.
+Instead of working out how to infer the abstract parameters $\alpha$ and $\beta$
+we can consider inference of the explicit local behaviors $f(x_{0})$,
 $\mathrm{d} f / \mathrm{d} x (x_{0})$, and $\mathrm{d} f / \mathrm{d} x(x_{0})$.
-Critically this interpretation depends the chosen baseline; changing $x_{0}$ 
-changes the structure of the Taylor approximation and hence its association to 
+Critically this interpretation depends on the chosen baseline; changing $x_{0}$
+changes the structure of the Taylor approximation and hence its association to
 a linear model.
 
 Higher-order Taylor approximations introduce higher-order powers of the input
-covariate which we can rearrange into an interpretable polynomial that 
-generalizes the linear covariate model.  For example a second-order Taylor 
+covariate which we can rearrange into an interpretable polynomial that
+generalizes the linear covariate model.  For example a second-order Taylor
 approximation can be written as
 $$
 \begin{align*}
@@ -1060,7 +1060,7 @@ f_{2}(x; x_{0})
 f(x_{0})
 + \frac{ \mathrm{d} f }{ \mathrm{d} x }(x_{0}) \, (x - x_{0})
 + \frac{1}{2} \frac{ \mathrm{d}^{2} f }{ \mathrm{d} x^{2} }(x_{0}) \,
-+ (x - x_{0})^{2}
+  (x - x_{0})^{2}
 \\
 &= \quad
 \underbrace{ f(x_{0})
@@ -1079,34 +1079,34 @@ f(x_{0})
 \end{align*}
 $$
 I will refer to $\beta_{1}$ as a _first-order slope_ and $\beta_{2}$ as a
-_second-order slope_.  Similarly higher-order differential terms can associate 
-with higher-order slopes.  We'll come back to motivate this nomenclature more 
+_second-order slope_.  Similarly higher-order differential terms can associate
+with higher-order slopes.  We'll come back to motivate this nomenclature more
 precisely in [Section 2.3](#sec:impl).
 
 An immediate annoyance with this approach is the polynomial coefficients, and
-ultimately the parameters in our model, are associated with a mixture of 
-function and derivative evaluations.  For example in a first-order Taylor 
-approximation the effective intercept is given by contributions from the 
-function and its first-order derivative evaluated at the baseline; likewise the 
+ultimately the parameters in our model, are associated with a mixture of
+function and derivative evaluations.  For example in a first-order Taylor
+approximation the effective intercept is given by contributions from the
+function and its first-order derivative evaluated at the baseline; likewise the
 intercept in a second-order Taylor approximation mixes evaluations of the
 function, its first-order derivative, _and_ it's second-order derivative.  In
-order to build a principled prior model for the location function parameters we 
-have to be able to reason about not just these individual behaviors but also how 
+order to build a principled prior model for the location function parameters we
+have to be able to reason about not just these individual behaviors but also how
 they are woven together to form the final polynomial.
 
-Fortunately there is a straightforward way to isolate these different 
-contributions and clean up the interpretation of the local location function 
-model.  The key is to work with not the covariates directly but rather with 
-their deviations from the chosen baseline.  Following our general Taylor 
+Fortunately there is a straightforward way to isolate these different
+contributions and clean up the interpretation of the local location function
+model.  The key is to work with not the covariates directly but rather with
+their deviations from the chosen baseline.  Following our general Taylor
 approximation terminology I will refer to these _centered_ covariates,
 $$
 \Delta x = x - x_{0},
 $$
 as covariate _perturbations_.
 
-Working with covariate perturbations not only integrates the implicit baseline 
-dependence of a Taylor approximation but also decouples the various orders of 
-derivates in the interpretation of the intercept and slopes.  For example with 
+Working with covariate perturbations not only integrates the implicit baseline
+dependence of a Taylor approximation but also decouples the various orders of
+derivates in the interpretation of the intercept and slopes.  For example with
 covariate perturbations a first-order Taylor approximation becomes
 $$
 \begin{align*}
@@ -1138,7 +1138,7 @@ f(x_{0}) \; + \frac{ \mathrm{d} f }{ \mathrm{d} x }(x_{0}) \, (x - x_{0})
   (x - x_{0})^{2}
 \\
 &=
-f(x_{0}) \; + \frac{ \mathrm{d} f }{ \mathrm{d} x }(x_{0}) \, \Delta x 
+f(x_{0}) \; + \frac{ \mathrm{d} f }{ \mathrm{d} x }(x_{0}) \, \Delta x
 \hspace{8.5mm}
 + \frac{1}{2} \frac{ \mathrm{d}^{2} f }{ \mathrm{d} x^{2} }(x_{0}) \,
 \\
@@ -1153,10 +1153,10 @@ f(x_{0}) \; + \frac{ \mathrm{d} f }{ \mathrm{d} x }(x_{0}) \, \Delta x
 \end{align*}
 $$
 Each parameter in the location function model is associated with a unique
-derivative, drastically simplifying their interpretation and hence our ability 
+derivative, drastically simplifying their interpretation and hence our ability
 to reason about the parameter behaviors.
 
-Multi-dimensional Taylor approximations invoke multiple partial derivatives at 
+Multi-dimensional Taylor approximations invoke multiple partial derivatives at
 each order which then correspond to multiple component slopes,
 $$
 \begin{align*}
@@ -1171,7 +1171,7 @@ $$
 In other words centering the covariates allows us to directly match the slopes
 to the Jacobian arrays.
 
-Following the discussion in [Section 1.2.2](#sec:array_vs_tensor) we can further 
+Following the discussion in [Section 1.2.2](#sec:array_vs_tensor) we can further
 associate these component slopes with tensors,
 $$
 \begin{align*}
@@ -1182,34 +1182,34 @@ f(x)
 &= \alpha + \boldsymbol{\beta}^{T} \, \Delta \mathbf{x},
 \end{align*}
 $$
-provided that keep the parameterization of the covariate space fixed.
+provided that we keep the parameterization of the covariate space fixed.
 
 ## Local Scope { #sec:local_dependence }
 #### A Place in This World {-}
 
-A Taylor approximation accurately reconstructs the exact functional behavior 
+A Taylor approximation accurately reconstructs the exact functional behavior
 only in some local neighborhood around the baseline input $x_{0}$.  In the
-regression context a Taylor approximation can capture only the local behavior of 
+regression context a Taylor approximation can capture only the local behavior of
 a general location function in some neighborhood of a baseline covariate
-configuration.  Consequently a Taylor approximation provides the basis of a 
+configuration.  Consequently a Taylor approximation provides the basis of a
 useful regression model only if _all_ covariate configurations of interest
 concentrate within this local neighborhood.  This includes the values of the
-covariates in any complete observations from which we can infer conditional 
-variate model behavior and the those in any incomplete observations which we are 
+covariates in any complete observations from which we can infer conditional
+variate model behavior and the those in any incomplete observations which we are
 interested in completing with variate predictions.
 
-In other words a Taylor regression model will be adequate only if all of the 
-marginal covariate models of interest concentrate in the neighborhood where the 
-Taylor approximation error is negligible.  While the assumption of a regression 
-model promises that we don't need to explicitly build marginal covariates models 
+In other words a Taylor regression model will be adequate only if all of the
+marginal covariate models of interest concentrate in the neighborhood where the
+Taylor approximation error is negligible.  While the assumption of a regression
+model promises that we don't need to explicitly build marginal covariates models
 in order to predict missing variates, the assumption of a Taylor regression
-model requires that consider at least the qualitative features of the relevant 
-marginal covariate models to ensure that a Taylor approximation will be 
-sufficient to transfer inferences from complete observations to predictive 
+model requires that consider at least the qualitative features of the relevant
+marginal covariate models to ensure that a Taylor approximation will be
+sufficient to transfer inferences from complete observations to predictive
 completions of incomplete observations.
 
-For example if the distribution of covariates from complete observations leaks 
-outside of the local neighborhood of a Taylor approximation then the growing 
+For example if the distribution of covariates from complete observations leaks
+outside of the local neighborhood of a Taylor approximation then the growing
 approximation error can render any inferences meaningless.
 
 <center>
@@ -1220,11 +1220,11 @@ knitr::include_graphics("figures/bad_inputs/bad_inputs.png")
 <br><br>
 </center>
 
-Polynomial configurations consistent with complete observations that aren't 
-contained within the local neighborhood will be skewed away from a proper Taylor 
-approximation.  More generally if the Taylor approximation error is too large 
-across the observed covariates then the the model parameters will no longer 
-be interpretable local differential structure at the baseline.
+Polynomial configurations consistent with complete observations that aren't
+contained within the local neighborhood will be skewed away from a proper Taylor
+approximation.  More generally if the Taylor approximation error is too large
+across the observed covariates then the the model parameters will no longer
+be interpretable as the local differential structure at the baseline.
 
 <center>
 <br>
@@ -1234,10 +1234,10 @@ knitr::include_graphics("figures/bad_fit/bad_fit.png")
 <br><br>
 </center>
 
-Having the covariates from just complete observations concentrate within the 
-local neighborhood, however, doesn't guarantee the utility of a Taylor 
-regression model. If the covariates from incomplete observations concentrates in 
-a _different_ neighborhood than covariates from complete observations then the 
+Having the covariates from just complete observations concentrate within the
+local neighborhood, however, doesn't guarantee the utility of a Taylor
+regression model. If the covariates from incomplete observations concentrate in
+a _different_ neighborhood than covariates from complete observations then the
 functional behavior local to each neighborhood will also be different.
 
 <center>
@@ -1248,8 +1248,8 @@ knitr::include_graphics("figures/bad_prediction/bad_prediction.png")
 <br><br>
 </center>
 
-In this case the location functional behaviors inferred from complete 
-observations will poorly generalize to variate predictions for incomplete 
+In this case the location functional behaviors inferred from complete
+observations will poorly generalize to variate predictions for incomplete
 observations.
 
 <center>
@@ -1260,15 +1260,15 @@ knitr::include_graphics("figures/bad_extrapolation/bad_extrapolation.png")
 <br><br>
 </center>
 
-Ultimately the baseline dependence of Taylor approximations can introduce a 
-subtle coupling the between the local behavior of the conditional variate model 
-and the marginal covariate model.  In other words even if there is negligible 
-confounding between the exact conditional variate model and the marginal 
-covariate model, the _approximate_ behavior of the conditional variate model can 
+Ultimately the baseline dependence of Taylor approximations can introduce a
+subtle coupling the between the local behavior of the conditional variate model
+and the marginal covariate model.  In other words even if there is negligible
+confounding between the exact conditional variate model and the marginal
+covariate model, the _approximate_ behavior of the conditional variate model can
 be effectively confounded with the marginal covariate behavior!
 
 Only when the marginal covariate distributions for _both_ the complete and
-incomplete observations concentrate within the same local neighborhood can a 
+incomplete observations concentrate within the same local neighborhood can a
 single Taylor approximation be adequate for both inference and prediction tasks.
 
 <center>
@@ -1279,21 +1279,21 @@ knitr::include_graphics("figures/good_prediction/good_prediction.png")
 <br><br>
 </center>
 
-This point cannot be overemphasized -- the decoupling of an exact conditional 
-variate model and marginal covariate model does not imply that 
-_local approximations_ to the conditional variate model will also be decoupled 
-from the the marginal covariate model because the marginal covariate behavior 
-defines the necessary scope of those local approximations.   The lack of 
-confounding will be preserved only when all marginal covariate behaviors 
-concentrate within the scope of a single local approximation.  In order to 
+This point cannot be overemphasized -- the decoupling of an exact conditional
+variate model and marginal covariate model does not imply that
+_local approximations_ to the conditional variate model will also be decoupled
+from the the marginal covariate model because the marginal covariate behavior
+defines the necessary scope of those local approximations.   The lack of
+confounding will be preserved only when all marginal covariate behaviors
+concentrate within the scope of a single local approximation.  In order to
 verify this we have to mindful of the behavior of _all_ potential covariate
-observations of interest and, if not model that behavior outright, at least 
+observations of interest and, if not model that behavior outright, at least
 consider its basic properties.
 
-Finally the locality of Taylor approximations introduced one last practical  
-limitation.  Within any local neighborhood an _infinite_ number of exact 
-functions will share the same Taylor approximations to any given order.  Only 
-when we look at covariate inputs outside of that local neighborhood will those 
+Finally the locality of Taylor approximations introduced one last practical 
+limitation.  Within any local neighborhood an _infinite_ number of exact
+functions will share the same Taylor approximations to any given order.  Only
+when we look at covariate inputs outside of that local neighborhood will those
 locally equivalent functions begin to diverge and distinguish themselves.
 
 <center>
@@ -1304,25 +1304,25 @@ knitr::include_graphics("figures/extrapolations/extrapolations.png")
 <br><br>
 </center>
 
-Consequently quantifying the local functional behavior will _never_ be able to 
-provide guidance on how to extrapolate beyond that local neighborhood.  By their 
+Consequently quantifying the local functional behavior will _never_ be able to
+provide guidance on how to extrapolate beyond that local neighborhood.  By their
 very construction Taylor regression models cannot discriminate between data
 generating processes that manifest in the same local behavior.  Without that
-discrimination we have only meager information about how our inferences might 
+discrimination we have only meager information about how our inferences might
 generalize to more global circumstances.
 
 ## Efficient Implementations { #sec:impl }
 #### How You Get the Girl {-}
 
-The most effective implementation of Taylor regression models typically takes 
-advantage of the linear algebraic operations that we discussed in 
+The most effective implementation of Taylor regression models typically takes
+advantage of the linear algebraic operations that we discussed in
 [Section 1.2.2](#sec:array_vs_tensor).
 
 ### First-Order Implementations
 #### Style {-}
 
-Consider, for example, a regression model utilizing a first-order Taylor 
-approximation.  When the input covariate space is fixed we can organize the 
+Consider, for example, a regression model utilizing a first-order Taylor
+approximation.  When the input covariate space is fixed we can organize the
 slopes into an array and manipulate that array as if it were a vector,
 $$
 f_{1}( \mathbf{x}; \mathbf{x}_{0} )
@@ -1330,10 +1330,10 @@ f_{1}( \mathbf{x}; \mathbf{x}_{0} )
 $$
 
 In most applications we will need to evaluate the functional behavior at
-multiple covariate configurations, 
+multiple covariate configurations,
 $$
-\{ \tilde{\mathbf{x}}_{1}, \ldots, 
-   \tilde{\mathbf{x}}_{n}, \ldots, 
+\{ \tilde{\mathbf{x}}_{1}, \ldots,
+   \tilde{\mathbf{x}}_{n}, \ldots,
    \tilde{\mathbf{x}}_{N} \},
 $$
 which requires repeated evaluations of the Taylor approximation,
@@ -1355,8 +1355,8 @@ f_{1}(\tilde{\mathbf{x}}_{N}; \mathbf{x}_{0})
 \end{matrix}
 $$
 
-Conveniently these repeated vector-vector products can be manipulated into a 
-single matrix-vector product by treating each evaluation as elements of a 
+Conveniently these repeated vector-vector products can be manipulated into a
+single matrix-vector product by treating each evaluation as elements of a
 vector,
 $$
 \begin{pmatrix}
@@ -1399,14 +1399,14 @@ $$
 \mathbf{f}
 =
 \begin{pmatrix}
-f_{1}(\tilde{\mathbf{x}}_{1}; \mathbf{x}_{0}) \\ \ldots \\ 
-f_{1}(\tilde{\mathbf{x}}_{n}; \mathbf{x}_{0}) \\ \ldots \\ 
+f_{1}(\tilde{\mathbf{x}}_{1}; \mathbf{x}_{0}) \\ \ldots \\
+f_{1}(\tilde{\mathbf{x}}_{n}; \mathbf{x}_{0}) \\ \ldots \\
 f_{1}(\tilde{\mathbf{x}}_{N}; \mathbf{x}_{0})
 \end{pmatrix}
 $$
 is a vector of function outputs,
 $$
-\alpha \, \mathbf{1} 
+\alpha \, \mathbf{1}
 =
 \alpha \,
 \begin{pmatrix}
@@ -1445,13 +1445,13 @@ is a matrix of the covariate perturbations for each observation.  This matrix
 is often referred to as the _design matrix_ for the given observations.
 
 In other words once we've organized all of the covariate perturbations into a
-matrix, with one row for each component observation and one column for each 
-component covariate, we can evaluate all of the first-order Taylor approximation 
+matrix, with one row for each component observation and one column for each
+component covariate, we can evaluate all of the first-order Taylor approximation
 evaluations with a single matrix-vector product and vector-vector sum.
 
 We can push this organization even further by _expanding_ our notation of the
-input covariate space, and hence the design matrix.  In particular let's append 
-the covariate space with a constant component, $x_{n, M + 1} = 1$ so that the 
+input covariate space, and hence the design matrix.  In particular let's append
+the covariate space with a constant component, $x_{n, M + 1} = 1$ so that the
 expanded design $M + 1$ by $N$ matrix becomes
 $$
 \mathbf{Z}
@@ -1459,17 +1459,17 @@ $$
 \begin{pmatrix} \mathbf{1} & \mathbf{X}\end{pmatrix}
 =
 \begin{pmatrix}
-1 & 
+1 &
 \Delta \tilde{x}_{1, 1} & \ldots &
 \Delta \tilde{x}_{1, m} & \ldots &
 \Delta \tilde{x}_{1, M} \\
 \ldots \\
-1 & 
+1 &
 \Delta \tilde{x}_{n, 1} & \ldots &
 \Delta \tilde{x}_{n, m} & \ldots &
 \Delta \tilde{x}_{n, M} \\
 \ldots \\
-1 & 
+1 &
 \Delta \tilde{x}_{N, 1} & \ldots &
 \Delta \tilde{x}_{N, m} & \ldots &
 \Delta \tilde{x}_{N, M}\\
@@ -1499,9 +1499,9 @@ $$
 $$
 
 If we identify this added component with the intercept, $\beta_{0} = \alpha$,
-then this single matrix-vector product exactly recovers the ensemble of 
-first-order Taylor approximation evaluations that we constructed above.  With 
-the ready availability of efficient matrix-vector multiplication software this 
+then this single matrix-vector product exactly recovers the ensemble of
+first-order Taylor approximation evaluations that we constructed above.  With
+the ready availability of efficient matrix-vector multiplication software this
 implementation of a first-order Taylor approximation is particularly
 convenient in practice.  Because we aggregate all of the parameters into a
 single vector I will refer to this as an _amalgamated_ implementation.
@@ -1510,14 +1510,14 @@ single vector I will refer to this as an _amalgamated_ implementation.
 #### Tied Together with a Smile {-}
 
 At first glance it might seem like this compact implementation is applicable to
-only first-order Taylor approximations.  Higher-order Taylor approximations, 
-after all, apply _nonlinear_ operations to the covariate perturbations that 
-can't immediately be represented with a single matrix-vector product.  That said 
-there is a subtle way to manipulate these non-linear contributions into a linear 
+only first-order Taylor approximations.  Higher-order Taylor approximations,
+after all, apply _nonlinear_ operations to the covariate perturbations that
+can't immediately be represented with a single matrix-vector product.  That said
+there is a subtle way to manipulate these non-linear contributions into a linear
 form if we continue to expand our notion of the input space.
 
-Consider, for example, a second-order Taylor approximation.  Assuming that the 
-parameterization of the covariate space is fixed we can implement an evaluation 
+Consider, for example, a second-order Taylor approximation.  Assuming that the
+parameterization of the covariate space is fixed we can implement an evaluation
 of this model with an inner product and quadratic form,
 $$
 f_{2}(\mathbf{x}; \mathbf{x}_{0})
@@ -1528,15 +1528,15 @@ f_{2}(\mathbf{x}; \mathbf{x}_{0})
 +
 \Delta \mathbf{x}^{T} \cdot \boldsymbol{\beta}_{2} \cdot \Delta \mathbf{x}.
 $$
-As we saw above the first two terms can manipulated into one big matrix-vector 
+As we saw above the first two terms can manipulated into one big matrix-vector
 product.  What about the quadratic form,
 $$
 \Delta \mathbf{x}^{T} \cdot \boldsymbol{\beta}_{2} \cdot \Delta \mathbf{x}?
 $$
 
-While the quadratic form is not linear in the nominal covariate perturbations 
-$\Delta \mathbf{x}$ it is linear with respect to certain _transformations_ of 
-those perturbations.  To see how let's expand the quadratic form into two 
+While the quadratic form is not linear in the nominal covariate perturbations
+$\Delta \mathbf{x}$ it is linear with respect to certain _transformations_ of
+those perturbations.  To see how let's expand the quadratic form into two
 terms,
 $$
 \begin{align*}
@@ -1555,11 +1555,11 @@ $$
 \sum_{m = 1}^{M} \beta_{2, mm} \, \Delta x_{m}^{2}
 +
 \sum_{m_{1} = 1}^{M} \sum_{m_{2} = 1}^{m_{1} - 1}
-\beta_{2, m_{1} m_{2}} \, 
+\beta_{2, m_{1} m_{2}} \,
 2 \, \Delta x_{m_{1}} \, \Delta x_{m_{2}}.
 \end{align*}
 $$
-In the last step we have taken advantage of the symmetry of the second-order 
+In the last step we have taken advantage of the symmetry of the second-order
 slopes, $\beta_{2, m_{1} m_{2}} = \beta_{2, m_{2} m_{1}}$.
 
 The _diagonal_ contributions in the first term are already amenable to a
@@ -1567,8 +1567,8 @@ matrix-vector product.  If we define the $M$-dimensional vectors
 $$
 \boldsymbol{\beta}_{2d} =
 \begin{pmatrix}
-\beta_{2, 11} \\ \ldots \\ 
-\beta_{2, mm} \\ \ldots \\ 
+\beta_{2, 11} \\ \ldots \\
+\beta_{2, mm} \\ \ldots \\
 \beta_{2, MM}
 \end{pmatrix}
 $$
@@ -1587,15 +1587,15 @@ $$
 $$
 
 Although it might not be as obvious we can apply the same approach to the second
-term as well.  Here we need $M \, (M - 1) / 2$-dimensional vectors that collect 
+term as well.  Here we need $M \, (M - 1) / 2$-dimensional vectors that collect
 all of the _off-diagonal_ terms together,
 $$
 \boldsymbol{\beta}_{2o} =
 \begin{pmatrix}
-\beta_{2, 21} \\ \ldots \\ 
-\beta_{2, m_{1} 1} \\ \ldots \\ 
-\beta_{2, m_{1} (m_{1} - 1)} \\ \ldots \\ 
-\beta_{2, M m_{2}} \\ \ldots \\ 
+\beta_{2, 21} \\ \ldots \\
+\beta_{2, m_{1} 1} \\ \ldots \\
+\beta_{2, m_{1} (m_{1} - 1)} \\ \ldots \\
+\beta_{2, M m_{2}} \\ \ldots \\
 \beta_{2, M (M - 1)}
 \end{pmatrix}
 $$
@@ -1618,7 +1618,7 @@ $$
 \left( \Delta^{2}_{o} \mathbf{x} \right)^{T} \cdot \boldsymbol{\beta}_{2o}.
 $$
 
-To evaluate the quadratic term across repeated observations we can construct a 
+To evaluate the quadratic term across repeated observations we can construct a
 second-order design matrix,
 $$
 \mathbf{X}_{2}
@@ -1652,7 +1652,7 @@ $$
 \end{pmatrix}
 \\
 &=
-\mathbf{X}_{2d} \cdot \boldsymbol{\beta}_{2d} + 
+\mathbf{X}_{2d} \cdot \boldsymbol{\beta}_{2d} +
 \mathbf{X}_{2o} \cdot \boldsymbol{\beta}_{2o}
 \\
 &=
@@ -1661,8 +1661,8 @@ $$
 \end{align*}
 $$
 
-Once we can implement the quadratic evaluations with a single matrix-vector 
-product we can pack evaluations of the entire second-order Taylor approximation 
+Once we can implement the quadratic evaluations with a single matrix-vector
+product we can pack evaluations of the entire second-order Taylor approximation
 into a single, amalgamated matrix-vector product.  We start by constructing an
 amalgamated design matrix,
 $$
@@ -1676,17 +1676,17 @@ $$
 1 &
 \Delta \mathbf{x}_{1}^{T} &
 \left( \Delta^{2}_{d} \tilde{\mathbf{x}}_{1} \right)^{T} &
-\left( \Delta^{2}_{d} \tilde{\mathbf{x}}_{1} \right)^{T} \\
+\left( \Delta^{2}_{o} \tilde{\mathbf{x}}_{1} \right)^{T} \\
 \ldots & \ldots & \ldots & \ldots \\
 1 &
 \Delta \mathbf{x}_{n}^{T} &
 \left( \Delta^{2}_{d} \tilde{\mathbf{x}}_{n} \right)^{T} &
-\left( \Delta^{2}_{d} \tilde{\mathbf{x}}_{n} \right)^{T} \\
+\left( \Delta^{2}_{o} \tilde{\mathbf{x}}_{n} \right)^{T} \\
 \ldots & \ldots & \ldots & \ldots \\
 1 &
 \Delta \mathbf{x}_{N}^{T} &
 \left( \Delta^{2}_{d} \tilde{\mathbf{x}}_{N} \right)^{T} &
-\left( \Delta^{2}_{d} \tilde{\mathbf{x}}_{N} \right)^{T}
+\left( \Delta^{2}_{o} \tilde{\mathbf{x}}_{N} \right)^{T}
 \end{pmatrix}
 $$
 and amalgamated slope vector,
@@ -1714,17 +1714,17 @@ $$
 \end{align*}
 $$
 
-With a bit of mathematical logistics the higher-degree polynomial evaluations 
+With a bit of mathematical logistics the higher-degree polynomial evaluations
 from higher-order Taylor approximations can be implemented in a similar fashion.
 With an $M$-dimensional covariate space there will be $M$ diagonal perturbations
 and
 $$
-{ M + I - 1 \choose I } - M 
+{ M + I - 1 \choose I } - M
 $$
-off-diagonal perturbations at $I$-th order, and the same number of corresponding 
-$I$-order slopes.  Appending these higher-order perturbations to the initial 
-design matrix and the corresponding higher-order slopes to the initial slope 
-vector organizes the repeated evaluations of teh entire $I$-th order Taylor 
+off-diagonal perturbations at $I$-th order, and the same number of corresponding
+$I$-order slopes.  Appending these higher-order perturbations to the initial
+design matrix and the corresponding higher-order slopes to the initial slope
+vector organizes the repeated evaluations of the entire $I$-th order Taylor
 approximation evaluation into a single matrix-vector product.
 
 ### Linear Verses Linearized Models
@@ -1732,21 +1732,21 @@ approximation evaluation into a single matrix-vector product.
 
 This organization can be helpful for implementing Taylor approximation models,
 especially if higher-order tensor operations like quadratic form evaluations are
-not readily available.  Indeed many statistical software packages were 
-historically limited to matrix-vector products and divisions such that the 
-_only_ location function models that could be efficiently implemented had to be 
+not readily available.  Indeed many statistical software packages were
+historically limited to matrix-vector products and divisions such that the
+_only_ location function models that could be efficiently implemented had to be
 of this form.
 
 Because of this there is a tradition of manipulating models into matrix-vector
-products so that they can be implemented in common software packages.  Examples 
-include splines, gaussian processes, and even some survival models.  For a 
-particular example consider modeling a one-dimensional location function as the 
+products so that they can be implemented in common software packages.  Examples
+include splines, gaussian processes, and even some survival models.  For a
+particular example consider modeling a one-dimensional location function as the
 sum of a line and a sinusoidal function,
 $$
 f(x) = f_{0} + \beta \, x + A \, \sin(\omega \, x + \phi).
 $$
-If the frequency $\omega$ and $\phi$ are known, so that only the baseline value 
-$f_{0}$, the slope $\beta$, and the amplitude $A$ need to be inferred, then we 
+If the frequency $\omega$ and $\phi$ are known, so that only the baseline value
+$f_{0}$, the slope $\beta$, and the amplitude $A$ need to be inferred, then we
 can introduce a new covariate
 $$
 z = \sin(\omega \, x + \phi)
@@ -1765,87 +1765,87 @@ $$
 Repeated evaluations of this model can be then be implemented with a single
 matrix-vector product as described above.
 
-That said if the $\omega$ and $\phi$ are not known exactly, and need to be 
+That said if the $\omega$ and $\phi$ are not known exactly, and need to be
 inferred along with $f_{0}$, $\beta$, and $A$, then the definition of $z$ will
 vary along with the configuration of the model and we will no longer be able to
-massage the sinusoidal function into this linear form.  The opportunities for 
-matrix-vector implementations are circumstantial, and a reliance on them can 
+massage the sinusoidal function into this linear form.  The opportunities for
+matrix-vector implementations are circumstantial, and a reliance on them can
 stifle modeling flexibility.
 
-Models of functional behavior that can be manipulated into a matrix-vector 
+Models of functional behavior that can be manipulated into a matrix-vector
 product like this may not be linear in the _covariates_, but they are linear in
-the _parameters_.  In much many fields this latter notion of linearity is
-prioritized so that the term "linear model" refers to _any_ regression model 
-that can be implemented with a single product of a fixed matrix and a vector of
-parameters, regardless of how that matrix is constructed.
+the _parameters_.  In many fields this latter notion of linearity is prioritized
+so that the term "linear model" refers to _any_ regression model that can be 
+mplemented with a single product of a fixed matrix and a vector of parameters,
+regardless of how that matrix is constructed.
 
 To avoid any confusion I will maintain this common, mechanistic definition of a
-linear model and use other terminology when discussing models that are linear in 
-the covariates, such as first-order Taylor approximations.  For example I often 
-refer to first-order Taylor approximations as _linearized_ models, with the past 
-participle emphasizing that we are extracting the linear part of a more general 
+linear model and use other terminology when discussing models that are linear in
+the covariates, such as first-order Taylor approximations.  For example I often
+refer to first-order Taylor approximations as _linearized_ models, with the past
+participle emphasizing that we are extracting the linear part of a more general
 functional behavior.
 
 When a location function model _happens_ to have the right form, exploiting a
-matrix-vector product implementation can be very effective.  That said I do not 
-recommend starting with a linear model abstraction.  One reason is that, while 
-linear models do encapsulate a surprisingly large number of functional behavior 
-models, they do still limit the breadth of possible models.  This can lead to 
-awkward analysis constraints, especially when developing bespoke models from 
+matrix-vector product implementation can be very effective.  That said I do not
+recommend starting with a linear model abstraction.  One reason is that, while
+linear models do encapsulate a surprisingly large number of functional behavior
+models, they do still limit the breadth of possible models.  This can lead to
+awkward analysis constraints, especially when developing bespoke models from
 domain expertise.
 
-Another is that the encapsulation of the covariate dependencies into an 
-amalgamated design matrix obscures the relationship between the function outputs 
-and the elementary covariate inputs.  For example in the sinusoidal example 
-above we would never be able to reconstruct the original oscillating functional 
-model if were were given only the amalgamated design matrix with covariates $x$ 
+Another is that the encapsulation of the covariate dependencies into an
+amalgamated design matrix obscures the relationship between the function outputs
+and the elementary covariate inputs.  For example in the sinusoidal example
+above we would never be able to reconstruct the original oscillating functional
+model if were were given only the amalgamated design matrix with covariates $x$
 and $z$.  The obfuscated relationships frustrate our ability to properly
-interpret the underlying functional model which then limits principled prior 
+interpret the underlying functional model which then limits principled prior
 modeling and model critique.
 
-The frustration of meaningful prior modeling is especially concerning.  While 
-all of the parameters in an amalgamated slope vector have the same mechanistic 
+The frustration of meaningful prior modeling is especially concerning.  While
+all of the parameters in an amalgamated slope vector have the same mechanistic
 structure they will in general have very different interpretations, and hence
-different component prior models will be appropriate for each.  A single 
-component prior model applied uniformly across all of the slopes is highly 
-unlikely to correspond to actual domain expertise.  In practice we can implement 
-a non-uniform prior model by extracting different segments of the amalgamated 
-slope vector, but this requires us to tear apart the amalgamation and 
-compromise the elegance of the linear model.  This may not even be possible in 
-software packages that don't expose the individual elements of the 
+different component prior models will be appropriate for each.  A single
+component prior model applied uniformly across all of the slopes is highly
+unlikely to correspond to actual domain expertise.  In practice we can implement
+a non-uniform prior model by extracting different segments of the amalgamated
+slope vector, but this requires us to tear apart the amalgamation and
+compromise the elegance of the linear model.  This may not even be possible in
+software packages that don't expose the individual elements of the
 amalgamated slope vector.
 
 Ultimately I advocate for the development of a principled model for the location
 function behavior based on domain expertise before worrying about efficient
-implementations.  Once an appropriate model has been developed we can then look 
-for coincident opportunities to organize the function evaluations into 
-matrix-vector products instead forcing that structure when it is not 
-appropriate.  Fortunately modern probabilistic programming languages like Stan 
+implementations.  Once an appropriate model has been developed we can then look
+for coincident opportunities to organize the function evaluations into
+matrix-vector products instead forcing that structure when it is not
+appropriate.  Fortunately modern probabilistic programming languages like Stan
 facilitate both of these tasks.
 
 ## Prior Modeling
 #### Tolerate It {-}
 
-One of the most powerful features of Taylor approximation models is that their 
-interpretability provides a scaffolding across which we can translate our domain 
-expertise into building principled prior models.  In this section we discuss how 
-to build and analyze containment prior models for the parameters in Taylor 
+One of the most powerful features of Taylor approximation models is that their
+interpretability provides a scaffolding across which we can translate our domain
+expertise into building principled prior models.  In this section we discuss how
+to build and analyze containment prior models for the parameters in Taylor
 approximation models.
 
 ### Containment Prior Models
 #### Dancing with Our Hands Tied {-}
 
-Building prior models for polynomial functions is notoriously difficult. Because 
-the powers of the input covariate, and hence their contribution to the overall 
-output, are strongly correlated it is not obvious how to distribute domain 
-expertise across the individual coefficients.  Fortunately the local nature of 
-Taylor approximations, and the local interpretability of each parameter, eases 
+Building prior models for polynomial functions is notoriously difficult. Because
+the powers of the input covariate, and hence their contribution to the overall
+output, are strongly correlated it is not obvious how to distribute domain
+expertise across the individual coefficients.  Fortunately the local nature of
+Taylor approximations, and the local interpretability of each parameter, eases
 the challenge quite a bit.
 
-Following the recommendations in my 
+Following the recommendations in my
 [prior modeling case study](https://betanalpha.github.io/assets/case_studies/prior_modeling.html)
 we'll use _component containment prior models_.  Each component containment
-prior model softly constrains the configurations of one parameter within 
+prior model softly constrains the configurations of one parameter within
 elicited extremity thresholds using a normal density function.
 
 <center>
@@ -1856,33 +1856,33 @@ knitr::include_graphics("figures/containment_prior/containment_prior.png")
 <br><br>
 </center>
 
-When we use covariate perturbations each parameter in a Taylor approximation 
-model is directly connected to differential behavior of various orders at the 
-base point $x_{0}$.  Any domain expertise about this differential behavior can 
+When we use covariate perturbations each parameter in a Taylor approximation
+model is directly connected to differential behavior of various orders at the
+base point $x_{0}$.  Any domain expertise about this differential behavior can
 then be used to inform extremity thresholds for the corresponding parameters.
 
 For example the intercept is identified with the baseline functional behavior,
 $$
 \alpha = f(x_{0}).
 $$
-Knowledge that constraints the possible baseline outputs immediately informs a 
-principled prior model for the intercept.  Likewise the first-order slopes are 
+Knowledge that constraints the possible baseline outputs immediately informs a
+principled prior model for the intercept.  Likewise the first-order slopes are
 identified with first-order partial derivatives,
 $$
 \beta_{1, m} = \frac{ \partial f }{ \partial x_{m} }(x_{0}),
 $$
-so that any information about the differential change in the functional behavior 
+so that any information about the differential change in the functional behavior
 wtih respect to each component covariate informs a prior model for the
 first-order slopes.
 
 That said directly reasoning about differential information can be awkward,
-especially if we're not practiced in it.  Fortunately we can also isolate the 
-behavior of individual parameters by considering particular configurations of 
-the covariates.  In particular we can often extract useful domain expertise for 
-the various contributions to the functional behavior by reasoning about certain 
+especially if we're not practiced in it.  Fortunately we can also isolate the
+behavior of individual parameters by considering particular configurations of
+the covariates.  In particular we can often extract useful domain expertise for
+the various contributions to the functional behavior by reasoning about certain
 _hypothetical_ marginal covariate models.
 
-For example consider the hypothetical marginal covariate model that completely 
+For example consider the hypothetical marginal covariate model that completely
 concentrates at their baseline value,
 $$
 \pi(x) = \delta( \mathbf{x} - \mathbf{x}_{0})
@@ -1891,20 +1891,20 @@ or equivalently
 $$
 \pi(\Delta x) = \delta( \Delta x).
 $$
-For this singular distribution of covariates the function evaluations of any 
+For this singular distribution of covariates the function evaluations of any
 Taylor approximation are determined entirely by the intercept,
 $$
 f_{i}(x = x_{0}; x_{0}) = \alpha.
 $$
-As above any knowledge we have about the possible functional behaviors at 
+As above any knowledge we have about the possible functional behaviors at
 $x_{0}$ directly informs a component prior model for $\alpha$.
 
-To isolate higher-order contributions we have to consider hypothetical marginal 
-covariate models where all but one component covariate is restricted to their 
+To isolate higher-order contributions we have to consider hypothetical marginal
+covariate models where all but one component covariate is restricted to their
 baseline configurations,
 $$
 \begin{align*}
-\pi(x) 
+\pi(x)
 &=
 \pi(x_{1}, \ldots, x_{m}, \ldots, x_{M})
 \\
@@ -1916,50 +1916,50 @@ The behavior of a Taylor approximation under this hypothetical circumstance is
 then determined entirely by the exceptional covariate component,
 $$
 f_{i}(x; x_{0}) =
-\alpha 
-+ \Delta x_{m} \, \beta_{1, m} 
+\alpha
++ \Delta x_{m} \, \beta_{1, m}
 + \Delta x_{m}^{2} \, \beta_{2, mm}
 + \ldots.
 $$
 
-Because the powers $\Delta x_{m}^{i}$ are coupled this hypothetical doesn't 
+Because the powers $\Delta x_{m}^{i}$ are coupled this hypothetical doesn't
 isolate the contribution from a single term, and hence a single parameter.  The
-contribution from the individual terms, however, can then be reasoned about 
-_iteratively_.  After eliciting information about the baseline functional 
+contribution from the individual terms, however, can then be reasoned about
+_iteratively_.  After eliciting information about the baseline functional
 behavior we can consider the possible contributions from the first-order term,
 $$
 \begin{align*}
-f(0, \ldots, x_{m}, \ldots, 0) 
-&\approx 
+f(0, \ldots, x_{m}, \ldots, 0)
+&\approx
 \alpha + \Delta x_{m} \, \beta_{1, m}
 \\
-f(0, \ldots, x_{m}, \ldots, 0) - \alpha 
-&\approx 
+f(0, \ldots, x_{m}, \ldots, 0) - \alpha
+&\approx
 \Delta x_{m} \, \beta_{1, m}
 \\
-\frac{ f(0, \ldots, x_{m}, \ldots, 0) - \alpha }{ \Delta x_{m} } 
-&\approx 
+\frac{ f(0, \ldots, x_{m}, \ldots, 0) - \alpha }{ \Delta x_{m} }
+&\approx
 \beta_{1, m},
 \end{align*}
 $$
-Consequently we can elicit extremity thresholds for $\beta_{1, m}$ by 
+Consequently we can elicit extremity thresholds for $\beta_{1, m}$ by
 considering how the functional behavior might change _relative to the baseline
-behavior_ as $x_{m}$, and only $x_{m}$, is moved away from its baseline 
+behavior_ as $x_{m}$, and only $x_{m}$, is moved away from its baseline
 configuration.
 
-The characteristic values for $\Delta x_{m}$ is determined by the breadth of the 
+The characteristic values for $\Delta x_{m}$ is determined by the breadth of the
 hypothetical marginal covariate model, which then raises the question of what
-hypothetical breadths might be particularly informative to consider.  If we 
-leverage the local scope of a Taylor approximation then a natural choice is the 
+hypothetical breadths might be particularly informative to consider.  If we
+leverage the local scope of a Taylor approximation then a natural choice is the
 boundary of the local neighborhood where that approximation is well-behaved;
-if the width of the local neighborhood in the $m$th direction can be written 
+if the width of the local neighborhood in the $m$th direction can be written
 as
 $$
 \varpi_{m} U = [ x_{0, m} - \delta x_{m}, x_{0, m} + \delta x_{m} ]
-$$ 
+$$
 then a natural choice is $\delta x_{m}$.
 
-In other words we can focus our elicitation on bounding the reasonable 
+In other words we can focus our elicitation on bounding the reasonable
 functional behavior at the edge of the local neighborhood,
 $$
 \delta \beta_{1, m} = \frac{ \delta f }{ \delta x_{m} }.
@@ -1973,21 +1973,21 @@ knitr::include_graphics("figures/variation_bound/linear/linear.png")
 <br><br>
 </center>
 
-While this strategy can be a useful default keep in mind that it is not always 
+While this strategy can be a useful default keep in mind that it is not always
 the best choice.  In some cases smaller deviations within the local neighborhood
-can be more interpretable and hence more facilitating to domain expertise 
+can be more interpretable and hence more facilitating to domain expertise
 elicitation.
 
 The second-order contribution from the $m$th covariate follows by analyzing the
 residual behavior relative to the first-order Taylor approximation,
 $$
 \begin{align*}
-f(0, \ldots, x_{m}, \ldots, 0) 
+f(0, \ldots, x_{m}, \ldots, 0)
 &\approx
 \alpha + \Delta x_{m} \, \beta_{1, m} + \Delta x_{m}^{2} \, \beta_{2, mm}
 \\
-f(0, \ldots, x_{m}, \ldots, 0) - \alpha - \Delta x_{m} \, \beta_{1, m} 
-&\approx 
+f(0, \ldots, x_{m}, \ldots, 0) - \alpha - \Delta x_{m} \, \beta_{1, m}
+&\approx
 \Delta x_{m}^{2} \, \beta_{2, mm}
 \\
 \frac{ f(0, \ldots, x_{m}, \ldots, 0) - \alpha - \Delta x_{m} \, \beta_{1, m} }
@@ -2017,10 +2017,10 @@ often too demanding to be practical.  A more realistic choice is to use the
 same $\delta f$ for all contributions.
 
 One weakness of using the same functional variation $\delta f$ for all
-contributions, instead of eliciting separate variations for each contribution, 
-is that the effective variation for the entire function behavior, with all of 
-those convolved together, can be much stronger.  For example even if the first 
-and second-order contributions are softly bounded by $\delta f$ their sum will 
+contributions, instead of eliciting separate variations for each contribution,
+is that the effective variation for the entire function behavior, with all of
+those convolved together, can be much stronger.  For example even if the first
+and second-order contributions are softly bounded by $\delta f$ their sum will
 not be.
 
 <center>
@@ -2031,29 +2031,29 @@ knitr::include_graphics("figures/variation_bound/sum/sum.png")
 <br><br>
 </center>
 
-The aggregated variation from multiple terms might even be strong enough to 
-strongly conflict with our domain expertise.  In order to ensure that heuristics 
-like this perform well in a given application we have to explicitly investigate 
+The aggregated variation from multiple terms might even be strong enough to
+strongly conflict with our domain expertise.  In order to ensure that heuristics
+like this perform well in a given application we have to explicitly investigate
 that aggregate behavior with informative prior pushforward checks.
 
-Once we have elicited thresholds for one covariate component we can repeat for 
-the others.  At higher-orders we also have to consider the off-diagonal 
-contributions, which requires the consideration of multiple covariates at the 
+Once we have elicited thresholds for one covariate component we can repeat for
+the others.  At higher-orders we also have to consider the off-diagonal
+contributions, which requires the consideration of multiple covariates at the
 same time.  For example at second-order we would have
 $$
 \begin{align*}
-f(0, \ldots, x_{m}, \ldots, x_{m'} \ldots, 0) 
+f(0, \ldots, x_{m}, \ldots, x_{m'} \ldots, 0)
 &\approx
 \alpha
 + \Delta x_{m} \, \beta_{1, m} + \Delta x_{m'} \, \beta_{1, m'}
 + \Delta x_{m} \Delta x_{m'} \, \beta_{2, mm'}
 \\
-f(0, \ldots, x_{m}, \ldots, x_{m'} \ldots, 0) - \alpha 
+f(0, \ldots, x_{m}, \ldots, x_{m'} \ldots, 0) - \alpha
 - \Delta x_{m} \, \beta_{1, m} - \Delta x_{m'} \, \beta_{1, m'}
 &\approx
 \Delta x_{m} \Delta x_{m'} \, \beta_{2, mm'}
 \\
-\frac{   f(0, \ldots, x_{m}, \ldots, x_{m'} \ldots, 0) - \alpha 
+\frac{   f(0, \ldots, x_{m}, \ldots, x_{m'} \ldots, 0) - \alpha
        - \Delta x_{m} \, \beta_{1, m} - \Delta x_{m'} \, \beta_{1, m'} }
 { \Delta x_{m} \Delta x_{m'} }
 &\approx
@@ -2066,36 +2066,36 @@ $$
 $$
 
 Once we've set informative perturbations for each covariate, $\delta x_{m}$, and
-an appropriate variation in functional behavior, $\delta f$, then we can 
-systematically construct extremity thresholds, and hence component containment 
-prior models, for each slope in a Taylor approximation model.  We just have to 
-be careful that the component prior models for each parameter are sufficient to 
+an appropriate variation in functional behavior, $\delta f$, then we can
+systematically construct extremity thresholds, and hence component containment
+prior models, for each slope in a Taylor approximation model.  We just have to
+be careful that the component prior models for each parameter are sufficient to
 constrain the overall functional behavior.
 
 ### Prior Pushforward Checks { #sec:prior_checks }
-#### "Death by a Thousand Cuts" {-}
+#### Death by a Thousand Cuts {-}
 
-Regardless of how we construct a prior model for the parameters in a Taylor 
-approximation model we need to be careful that the prior model implies that 
-the full functional output are consistent with our domain expertise.  
-Fortunately we can investigate this consistency with a variety of prior 
+Regardless of how we construct a prior model for the parameters in a Taylor
+approximation model we need to be careful that the prior model implies that
+the full functional output are consistent with our domain expertise. 
+Fortunately we can investigate this consistency with a variety of prior
 pushforward checks.
 
 #### Marginal Checks
 
 If we have an explicit marginal covariate model then a natural object to
 investigate is the pushforward distribution of that covariate distribution along
-the Taylor approximation itself -- in other words the distribution of function 
+the Taylor approximation itself -- in other words the distribution of function
 outputs corresponding to the distribution of covariate inputs,
 $$
 f_{*} \pi( \mu )
 =
 \int \mathrm{d} \theta \, \mathrm{d} \theta \, \mathrm{d} x \,
-\pi(\theta) \, \pi(\gamma) \, \pi(x \mid \gamma) \, 
+\pi(\theta) \, \pi(\gamma) \, \pi(x \mid \gamma) \,
 \delta( \mu - f_{i}(x; x_{0}, \theta))).
 $$
-We can compare the tails of this pushforward distribution to elicited thresholds 
-for the output behavior to see if our prior model allows functional behavior 
+We can compare the tails of this pushforward distribution to elicited thresholds
+for the output behavior to see if our prior model allows functional behavior
 that is too extreme.
 
 <center>
@@ -2106,7 +2106,7 @@ knitr::include_graphics("figures/prior_pushforward/prior_pushforward.png")
 <br><br>
 </center>
 
-In practice we can readily visualize this pushforward distribution by 
+In practice we can readily visualize this pushforward distribution by
 histogramming simulated output values,
 $$
 \begin{align*}
@@ -2137,11 +2137,11 @@ The corresponding pushforward distribution then becomes
 $$
 f_{*} \pi( \mu )
 =
-\sum_{n = 1}^{N} \int \mathrm{d} \theta \, \pi(\theta) \, 
+\sum_{n = 1}^{N} \int \mathrm{d} \theta \, \pi(\theta) \,
 \delta( \mu - f_{i}(\tilde{x}_{n}; x_{0}, \theta))).
 $$
-Implementing this pushfoward distribution in practice is similar to above only 
-using the observed covariate values in place of values simulated from an 
+Implementing this pushfoward distribution in practice is similar to above only
+using the observed covariate values in place of values simulated from an
 explicit marginal covariate model,
 $$
 \begin{align*}
@@ -2157,19 +2157,19 @@ $$
 
 #### One-Dimensional Conditional Checks
 
-This pushforward check, however, quantifies only the _marginal_ outputs of the 
+This pushforward check, however, quantifies only the _marginal_ outputs of the
 Taylor approximation and not its shape.  In order to investigate the shapes
 allowed by a prior model we need to visualize the functional behavior
 _conditional_ on particular covariate inputs,
 $$
 f_{*} \pi( \mu \mid \tilde{x})
 =
-\int \mathrm{d} \theta \, \pi(\theta) \, 
+\int \mathrm{d} \theta \, \pi(\theta) \,
 \delta( \mu - f_{i}(\tilde{x}; x_{0}, \theta)).
 $$
 
-For one-dimensional covariate spaces this is straightforward.  We first 
-construct a covariate grid spanning reasonable input values and then simulate 
+For one-dimensional covariate spaces this is straightforward.  We first
+construct a covariate grid spanning reasonable input values and then simulate
 outputs at each grid points $\tilde{x}_{g}$,
 $$
 \begin{align*}
@@ -2178,8 +2178,9 @@ $$
 \tilde{\mu}_{s} &= f_{i}(\tilde{x}_{g}; x_{0}, \tilde{\theta}_{s}).
 \end{align*}
 $$
-The conditional pushforward distributions $f_{*} \pi( \mu | \tilde{x}_{g})$ can 
-then be visualized with, for example, ribbon plots or marginal quantile plots.
+The conditional pushforward distributions $f_{*} \pi( \mu | \tilde{x}_{g})$ can
+then be visualized with, for example, a spaghetti plot of realizations or a
+ribbon plot of marginal quantiles.
 
 <center>
 <br>
@@ -2189,21 +2190,21 @@ knitr::include_graphics("figures/prior_pushforward_cond_1d/prior_pushforward_con
 <br><br>
 </center>
 
-For a sufficiently fine grid of input covariate configurations these plots 
-effectively communicate the continuous dependence of the possible functional 
+For a sufficiently fine grid of input covariate configurations these plots
+effectively communicate the continuous dependence of the possible functional
 outputs for each covariate input.
 
 #### Multi-Dimensional Conditional Checks
 
-Unfortunately this prior check is not viable when the covariate space is 
-multi-dimensional because we cannot visualize how the possible function outputs 
-vary with each component covariate at the same time.  Moreover, without any 
+Unfortunately this prior check is not viable when the covariate space is
+multi-dimensional because we cannot visualize how the possible function outputs
+vary with each component covariate at the same time.  Moreover, without any
 other information we have no way to project that multi-dimensional input space
 into something one-dimensional that we can visualize.
 
 The key to investigating the shape of multi-dimensional functions is to take
-advantage of a marginal covariate model to isolate each component covariate one 
-at a time.  Given a marginal covariate model we can construct a conditional 
+advantage of a marginal covariate model to isolate each component covariate one
+at a time.  Given a marginal covariate model we can construct a conditional
 distribution for each component covariate,
 $$
 \begin{align*}
@@ -2215,26 +2216,26 @@ $$
 \pi(x_{1}, \ldots, x_{m - 1}, x_{m}, x_{m + 1}, \ldots, x_{M} \mid \gamma).
 \end{align*}
 $$
-For a given configuration of the conditioning component $\tilde{x}_{m}$ we can 
-then use this conditional distribution to marginalize out the remaining 
+For a given configuration of the conditioning component $\tilde{x}_{m}$ we can
+then use this conditional distribution to marginalize out the remaining
 components, and hence the possible function outputs,
 $$
 \begin{align*}
 f_{*} \pi(\mu \mid \tilde{x}_{m})
 &=
-\int \mathrm{d} \theta \, \mathrm{d} \gamma \, 
-\prod_{m' \ne m} \mathrm{d} x_{m'} \, 
+\int \mathrm{d} \theta \, \mathrm{d} \gamma \,
+\prod_{m' \ne m} \mathrm{d} x_{m'} \,
 \pi(\theta) \, \pi(\gamma) \, \pi(x_{\setminus m} \mid x_{m} \mid \gamma)
 \\
 & \hspace{8mm}
-\cdot \delta( \mu - f_{i}(x_{1}, \ldots, x_{m - 1}, \tilde{x}_{m}, 
+\cdot \delta( \mu - f_{i}(x_{1}, \ldots, x_{m - 1}, \tilde{x}_{m},
                     x_{m + 1}, \ldots, x_{M}; x_{0} \theta)).
 \end{align*}
 $$
 Repeating this for each covariate allows us to visualize the marginal functional
 behavior along each component of the total covariate space.
 
-Given an explicit conditional variate model we can implement this check by 
+Given an explicit conditional variate model we can implement this check by
 histogramming simulated output values for each $\tilde{x}_{m}$ of interest,
 $$
 \begin{align*}
@@ -2242,50 +2243,50 @@ $$
 \\
 \tilde{\gamma}_{s} &\sim \pi(\gamma)
 \\
-\{ \tilde{x}_{1, s}, \ldots, \tilde{x}_{m - 1, s}, 
+\{ \tilde{x}_{1, s}, \ldots, \tilde{x}_{m - 1, s},
    \tilde{x}_{m + 1, s}, \ldots, \tilde{x}_{M} \}
 & \sim \pi(x_{\setminus m} \mid \tilde{x}_{m} \mid \tilde{\gamma}_{s})
 \\
-\tilde{\mu}_{s} &= 
-f_{i}(\tilde{x}_{1, s}, \ldots, \tilde{x}_{m - 1, s}, \tilde{x}_{m}, 
+\tilde{\mu}_{s} &=
+f_{i}(\tilde{x}_{1, s}, \ldots, \tilde{x}_{m - 1, s}, \tilde{x}_{m},
       \tilde{x}_{m + 1, s}, \ldots, \tilde{x}_{M}; x_{0}, \tilde{\theta}_{s}).
 \end{align*}
 $$
 
 If we do not have an explicit conditional variate model at hand then we can
-once again appeal to the empirical distribution implicit in an ensemble of 
-observations.  The main limitation of this approach is that we will no longer 
+once again appeal to the empirical distribution implicit in an ensemble of
+observations.  The main limitation of this approach is that we will no longer
 be able to condition on arbitrary values of a component covariate.
 
-In order to construct conditional distributions compatible with an empirical 
-distribution of covariates we need to condition not on single points but rather 
+In order to construct conditional distributions compatible with an empirical
+distribution of covariates we need to condition not on single points but rather
 entire _intervals_,
 $$
 I[x_{L, m}, x_{U, m}] =
 \{ x_{m} \mid x_{L, m} < x_{m} < x_{U, m} \}.
 $$
-Given an explicit marginal covariate model the conditional distribution of 
-functional behavior given an interval in the $m$th component covariate is given 
+Given an explicit marginal covariate model the conditional distribution of
+functional behavior given an interval in the $m$th component covariate is given
 by
 $$
 \begin{align*}
 f_{*} \pi(\mu \mid I[x_{L, m}, x_{U, m}] )
 &=
 \int \mathrm{d} \theta \, \prod_{m' \ne m} \mathrm{d} x_{m'} \,
-\pi(\theta) \, \pi(x) 
+\pi(\theta) \, \pi(x)
 \\
 & \hspace{8mm}
 \cdot \mathbb{I}[ x_{L, m} < x_{m} < x_{U, m} ] \,
 \delta( \mu - f_{i}(x; x_{0}, \theta)).
 \end{align*}
 $$
-The corresponding conditional distribution for an empirical distribution of 
+The corresponding conditional distribution for an empirical distribution of
 covariates is given by
 $$
 \begin{align*}
 f_{*} \pi(\mu \mid I[x_{L, m}, x_{U, m}] )
 &=
-\sum_{n = 1}^{N} 
+\sum_{n = 1}^{N}
 \int \mathrm{d} \theta \, \pi(\theta)
 \\
 & \hspace{13mm}
@@ -2294,8 +2295,8 @@ f_{*} \pi(\mu \mid I[x_{L, m}, x_{U, m}] )
 \end{align*}
 $$
 
-My preferred summary function for visualizing this conditional behavior is built 
-up from medians within each interval.  We start by partitioning the conditioning 
+My preferred summary function for visualizing this conditional behavior is built
+up from medians within each interval.  We start by partitioning the conditioning
 component $x_{m}$ into $B$ bins separated by the $B + 1$ points,
 $$
 \xi_{1} < x_{2} < \ldots < \xi_{b} < \ldots < \xi_{B} < \xi_{B + 1}.
@@ -2309,7 +2310,7 @@ knitr::include_graphics("figures/prior_pushforward_cond_nd/1/1.png")
 <br><br>
 </center>
 
-Given a simulated configuration of the Taylor approximation we can then 
+Given a simulated configuration of the Taylor approximation we can then
 evaluate the function outputs at all of the observed covariates,
 $$
 \begin{align*}
@@ -2340,9 +2341,9 @@ that fall into each bin.
 knitr::include_graphics("figures/prior_pushforward_cond_nd/3/3.png")
 ```
 <br><br>
-</center> 
+</center>
 
-Repeating this for multiple prior samples of the functional behavior gives an 
+Repeating this for multiple prior samples of the functional behavior gives an
 ensemble of bin medians.
 
 <center>
@@ -2353,7 +2354,7 @@ knitr::include_graphics("figures/prior_pushforward_cond_nd/4/4.png")
 <br><br>
 </center>
 
-Finally we can summarize the ditribution of medians in each bin with empirical 
+Finally we can summarize the ditribution of medians in each bin with empirical
 quantile bands.
 
 <center>
@@ -2371,43 +2372,43 @@ checks that visualizes a wealth of information about the consequences of our
 chosen prior model.
 
 While these bin median prior pushforward checks took some time to derive, they
-are relatively straightforward to implement programmatically.  Once we have 
+are relatively straightforward to implement programmatically.  Once we have
 code that automatically constructs and visualizes the quantile bands for each
-bin we can quickly analyze the shape of the functional behavior encoded in a 
+bin we can quickly analyze the shape of the functional behavior encoded in a
 prior model along any direction in the covariate space.
 
-Finally while appealing to an empirical distribution of observed covariates is 
-natural in many cases, we shouldn't overlook our ability to use _any_ marginal 
-covariate model in the analysis of a prior model.  Even if we don't want to 
-model the observed covariates we can always consider hypothetical marginal 
-covariate models are exhibit certain features of interest, for example 
+Finally while appealing to an empirical distribution of observed covariates is
+natural in many cases, we shouldn't overlook our ability to use _any_ marginal
+covariate model in the analysis of a prior model.  Even if we don't want to
+model the observed covariates we can always consider hypothetical marginal
+covariate models are exhibit certain features of interest, for example
 extrapolations beyond the scope of any observed covariates.
 
 ### Standardization
 #### Delicate {-}
 
-One of the most common heuristics suggested for the application of linear models 
-is the _standardization_ of the variates and covariates.  Standardization of a 
-one-dimensional variable with respect to some distribution introduces a 
-translation and scaling so that the component mean becomes zero and the 
-component variance becomes one.  Consequently in order to implement a 
-standardization we need to first define a marginal covariate model.  Notice the 
-emerging pattern -- while regression models can ignore the marginal covariate 
-behavior in theory at least some qualitative assumptions about the marginal 
+One of the most common heuristics suggested for the application of linear models
+is the _standardization_ of the variates and covariates.  Standardization of a
+one-dimensional variable with respect to some distribution introduces a
+translation and scaling so that the component mean becomes zero and the
+component variance becomes one.  Consequently in order to implement a
+standardization we need to first define a marginal covariate model.  Notice the
+emerging pattern -- while regression models can ignore the marginal covariate
+behavior in theory at least some qualitative assumptions about the marginal
 covariate model are needed to implement regression models in practice.
 
-To reduce the modeling burden standardization is often based not on some 
-explicit marginal covariate model but rather on an implicit empirical 
+To reduce the modeling burden standardization is often based not on some
+explicit marginal covariate model but rather on an implicit empirical
 distribution defined by an ensemble of observations.  If
 $$
 \hat{\mu}_{y} = \frac{1}{N} \sum_{n = 1}^{N} \tilde{y}_{n}
 $$
 and
 $$
-\hat{\sigma}_{y} = \sqrt{ \frac{1}{N} 
+\hat{\sigma}_{y} = \sqrt{ \frac{1}{N}
 \sum_{n = 1}^{N} (\tilde{y}_{n} - \hat{\mu}_{y})^{2} }
 $$
-are the empirical mean and empirical standard deviation of the variates 
+are the empirical mean and empirical standard deviation of the variates
 respectively then we can define empirically standardized variates as
 $$
 \tilde{y'}_{n} = \frac{ \tilde{y}_{n} - \hat{\mu}_{y} }{ \hat{\sigma}_{y} }.
@@ -2418,60 +2419,60 @@ $$
 $$
 and
 $$
-\hat{\sigma}_{x_{m}} = \sqrt{ \frac{1}{N} 
+\hat{\sigma}_{x_{m}} = \sqrt{ \frac{1}{N}
 \sum_{n = 1}^{N} (\tilde{x}_{n, m} - \hat{\mu}_{x_{m}})^{2} }
 $$
 are the empirical mean and empirical standard deviation of the $m$th component
 covariate then the empirically standardized component covariate becomes
 $$
-\tilde{x'}_{n, m} = 
+\tilde{x'}_{n, m} =
 \frac{ \tilde{x}_{n, m} - \hat{\mu}_{x_{m}} }{ \hat{\sigma}_{x_{m}} }.
 $$
 
-Mathematically standardization is just a reparameterization of the observational 
-space, mapping the variate and covariates into equivalent variables with 
-different units.  In other words standardization is only a _superficial_ 
-transformation; if the parameters of the model are reparameterized at the same 
-time then the model, and any inferences and predictions derived from it, will be 
+Mathematically standardization is just a reparameterization of the observational
+space, mapping the variate and covariates into equivalent variables with
+different units.  In other words standardization is only a _superficial_
+transformation; if the parameters of the model are reparameterized at the same
+time then the model, and any inferences and predictions derived from it, will be
 exactly the same.  Critically because standardization is a _linear_
-transformation Jacobian arrays, and linear algebra implementations of Taylor 
+transformation Jacobian arrays, and linear algebra implementations of Taylor
 approximations, are actually preserved.
 
-Standardization will change the model, however, when the parameters are _not_ 
-reparameterized along with the observational space.  This might happen in 
-practice, for example, when the implementation of a model is hidden behind a 
-software implementation and not accessible to a user.  In this case users would 
-be able to freely process the observed variates and covariates before passing 
-them to the software, but they would not be able to easily configure how the 
-software will consume those inputs.  
+Standardization will change the model, however, when the parameters are _not_
+reparameterized along with the observational space.  This might happen in
+practice, for example, when the implementation of a model is hidden behind a
+software implementation and not accessible to a user.  In this case users would
+be able to freely process the observed variates and covariates before passing
+them to the software, but they would not be able to easily configure how the
+software will consume those inputs. 
 
-For instance the regularization of parameters in inferential methods, such as 
-component prior models in Bayesian methods or component penalty functions in a 
-frequentist estimator methods, may by hardcoded or not clearly exposed for user 
+For instance the regularization of parameters in inferential methods, such as
+component prior models in Bayesian methods or component penalty functions in a
+frequentist estimator methods, may by hardcoded or not clearly exposed for user
 configuration.  Here standardization effectively changes the behavior of the
 default regularization, implicitly providing users with some control over the
 behavior of the software.
 
 For example the empirical centering introduces an implicit baseline, and hence
-a local scope to a polynomial regression model.  Centering the variates can be 
-interpreted as a crude attempt to remove the baseline functional behavior so 
-that the intercept will be closer to zero.  Likewise centering the covariates 
-transforms them into relative perturbations around the component empirical 
-means.  In both cases parameters defined relative to the empirical baselines 
-might be more compatible with zero values, and hence amenable to default 
-component prior models that concentrate around zero or component penalty 
+a local scope to a polynomial regression model.  Centering the variates can be
+interpreted as a crude attempt to remove the baseline functional behavior so
+that the intercept will be closer to zero.  Likewise centering the covariates
+transforms them into relative perturbations around the component empirical
+means.  In both cases parameters defined relative to the empirical baselines
+might be more compatible with zero values, and hence amenable to default
+component prior models that concentrate around zero or component penalty
 functions that are minimized at zero.
 
-At the same time the empirical scaling approximately homogenizes the variation 
-of the variates and covariates.  If we use the breadth of the observed 
-covariates to define the local neighborhood for a Taylor approximation then the 
-empirical scaling of the covariates can be interpreted as crudely transforming 
+At the same time the empirical scaling approximately homogenizes the variation
+of the variates and covariates.  If we use the breadth of the observed
+covariates to define the local neighborhood for a Taylor approximation then the
+empirical scaling of the covariates can be interpreted as crudely transforming
 the local neighborhood to a standard width in each covariate direction.
 
 Critically such scalings immediately change the interpretation of the extremity
 thresholds on which containment prior models are built.  If $\delta f$ is an
 appropriate threshold for variation in functional behavior given a component
-perturbation $\delta x_{m}$ then under an empirical scaling the corresponding 
+perturbation $\delta x_{m}$ then under an empirical scaling the corresponding
 slope threshold becomes
 $$
 \begin{align*}
@@ -2484,21 +2485,21 @@ $$
 \frac{ \hat{\sigma}_{x_{m}} }{ \delta x_{m} }.
 \end{align*}
 $$
-If both $\delta f / \hat{\sigma}_{f}$ and $\delta x_{m} / \hat{\sigma}_{x_{m}}$ 
-are close to unity then $\delta f' / \delta x'_{m}$ becomes reasonably 
-well-approximated by $1$, or at least well-bounded by $10$, which are common 
+If both $\delta f / \hat{\sigma}_{f}$ and $\delta x_{m} / \hat{\sigma}_{x_{m}}$
+are close to unity then $\delta f' / \delta x'_{m}$ becomes reasonably
+well-approximated by $1$, or at least well-bounded by $10$, which are common
 default regularization scales.
 
-Ultimately the common recommendation of empirical standardization implicitly 
-assumes that this heuristic transforms the input data so that the default 
-configuration of statistical methods implemented in software packages better 
-conforms to our actual domain expertise.  Unfortunately there is no guarantee 
-that empirical standardization will actually have this effect, and these 
+Ultimately the common recommendation of empirical standardization implicitly
+assumes that this heuristic transforms the input data so that the default
+configuration of statistical methods implemented in software packages better
+conforms to our actual domain expertise.  Unfortunately there is no guarantee
+that empirical standardization will actually have this effect, and these
 transformations can just as easily modify the software configuration to be less
-compatible with our domain expertise.  Consequently these heuristics should be 
+compatible with our domain expertise.  Consequently these heuristics should be
 considered fragile at best.
 
-For example the most interpretable covariate baseline may not be near the 
+For example the most interpretable covariate baseline may not be near the
 empirical mean of the observed covariates, especially if the distribution of
 covariates is skewed or multimodal.  In this case centering around an empirical
 baseline can will Taylor approximation models into irrelevant neighborhoods.
@@ -2509,36 +2510,36 @@ covariates, for example, then we would need to consider larger neighborhoods
 than the one implicitly defined by the empirical standard deviations.
 
 In other words if the empirical distribution of the covariates doesn't
-reasonably approximate a meaningful marginal covariate model, or at least a 
-hypothetical one that encodes the domain expertise needed to inform principled 
+reasonably approximate a meaningful marginal covariate model, or at least a
+hypothetical one that encodes the domain expertise needed to inform principled
 regularizations, then empirical standardization will lead to poor results.
 
-One practical difficulty with empirical standardization is maintaining 
-consistency across multiple data sets.  The inferences and predictions informed 
-by a regression model fit to empirically standardized data will be applicable 
-only to other data sets that have been processed with _the exact same 
-transformations_.  In particular if we don't store the empirical means and 
-standard deviations from that initial data set and apply them to the empirical 
-standardization of all future data sets then the interpretation of the model and 
-its inferences will vary across those data sets.  We cannot achieve 
-self-consistent results by empirically standardizing each data set to itself!  
+One practical difficulty with empirical standardization is maintaining
+consistency across multiple data sets.  The inferences and predictions informed
+by a regression model fit to empirically standardized data will be applicable
+only to other data sets that have been processed with _the exact same
+transformations_.  In particular if we don't store the empirical means and
+standard deviations from that initial data set and apply them to the empirical
+standardization of all future data sets then the interpretation of the model and
+its inferences will vary across those data sets.  We cannot achieve
+self-consistent results by empirically standardizing each data set to itself! 
 
-This is an especially easy mistake to make when empirical standardization is 
-implemented automatically in software.  Another hazard of automated empirical 
-standardization is that it makes it easy to ignore the behavior of observed 
-covariates and, for example, overlook when incomplete observations fall outside 
-of the scope of a Taylor approximation model.  Automated empirical 
-standardization is particularly dangerous if a user has introduced redundant 
-covariates to implement a polynomial model in linear modeling software, as 
-described in [Section 2.3.2](#sec:high_order_impl).  Empirically 
-standardizing the elementary component covariates and the derived component 
-covariates independently will effectively convolve the contributions from each 
+This is an especially easy mistake to make when empirical standardization is
+implemented automatically in software.  Another hazard of automated empirical
+standardization is that it makes it easy to ignore the behavior of observed
+covariates and, for example, overlook when incomplete observations fall outside
+of the scope of a Taylor approximation model.  Automated empirical
+standardization is particularly dangerous if a user has introduced redundant
+covariates to implement a polynomial model in linear modeling software, as
+described in [Section 2.3.2](#sec:high_order_impl).  Empirically
+standardizing the elementary component covariates and the derived component
+covariates independently will effectively convolve the contributions from each
 term in the polynomial.
 
 When empirical standardization is the _only_ way to configure a regression model
-then it can be a valuable tool in spite of its fragility.  That said, with 
-modern probabilistic programming tools like Stan we are no longer limited to 
-models implemented behind impenetrable black boxes.  By developing regression 
+then it can be a valuable tool in spite of its fragility.  That said, with
+modern probabilistic programming tools like Stan we are no longer limited to
+models implemented behind impenetrable black boxes.  By developing regression
 models from the ground up we have full control of their structure in which case
 explicitly incorporating meaningful covariate baselines and local neighborhoods
 is not only possible but also straightforward.
@@ -2548,41 +2549,41 @@ standardization when building regression models, especially those based on
 Taylor approximations to a general location function.  Taking the time to elicit
 meaningful baselines and neighborhoods not only affords more principled prior
 models but also forces us to confront the limitations of a given Taylor
-approximation and be better prepared to apply these models only when 
+approximation and be better prepared to apply these models only when
 appropriate.
 
 ## Posterior Retrodictive Checks
 #### I Forgot That You Existed {-}
 
-As we saw in [Section 2.2](#sec:local_dependence) a Taylor approximation 
-provides an interpretable model of local functional behavior only when the 
-approximation error is small.  When a Taylor approximation is too rigid the 
+As we saw in [Section 2.2](#sec:local_dependence) a Taylor approximation
+provides an interpretable model of local functional behavior only when the
+approximation error is small.  When a Taylor approximation is too rigid the
 configurations compatible with observed data will appear contorted relative to
 elicited domain expertise.  In particular a prior model based on the local
-interpretability of a Taylor approximation will provide useful constraints only 
+interpretability of a Taylor approximation will provide useful constraints only
 when the Taylor approximation is sufficiently accurate.
 
 Because we don't know what the exact location functional behavior is in practice
-we can't quantify the error of a Taylor approximation directly.  We can, 
-however, look for the empirical consequences of an inadequate Taylor 
+we can't quantify the error of a Taylor approximation directly.  We can,
+however, look for the empirical consequences of an inadequate Taylor
 approximation with some carefully designed posterior retrodictive checks.
-One benefit of these posterior retrodictive checks is that they will allow us 
-to build Taylor approximation models iteratively, starting with the lowest 
-viable order and then expanding to include contributions from successively 
+One benefit of these posterior retrodictive checks is that they will allow us
+to build Taylor approximation models iteratively, starting with the lowest
+viable order and then expanding to include contributions from successively
 higher orders until we have achieved an adequate fit to the observed data.
 
-Fortunately our design of useful summary statistics for these posterior 
-retrodictive checks doesn't have to start from scratch.  We have already 
-developed ways to examine the marginal and conditional aspects of local 
+Fortunately our design of useful summary statistics for these posterior
+retrodictive checks doesn't have to start from scratch.  We have already
+developed ways to examine the marginal and conditional aspects of local
 functional behavior in our construction of [prior checks](#sec:prior_checks).
 Here we'll extent the summary functions developed for prior pushforward checks
-to incorporate the probabilistic scatter of variates around the location 
+to incorporate the probabilistic scatter of variates around the location
 function.
 
-For the marginal behavior of the variates can be isolated with a histogram 
-summary statistic.  Once we've chosen appropriate bins across the variate space 
-we count how many observations fall into each bin.  Given an explicit marginal 
-covariance model we can generate posterior predictive simulations for input to 
+For the marginal behavior of the variates can be isolated with a histogram
+summary statistic.  Once we've chosen appropriate bins across the variate space
+we count how many observations fall into each bin.  Given an explicit marginal
+covariance model we can generate posterior predictive simulations for input to
 this summary statistic as
 $$
 \begin{align*}
@@ -2599,7 +2600,7 @@ $$
 \tilde{y}_{s} &\sim \pi(y \mid \tilde{\mu}_{s}, \tilde{\phi}_{s}).
 \end{align*}
 $$
-Without an explicit marginal covariate model we can instead consider the 
+Without an explicit marginal covariate model we can instead consider the
 empirical distribution defined by an ensemble of observed covariate values,
 $$
 \begin{align*}
@@ -2620,8 +2621,8 @@ $$
 \tilde{y}_{sN} &\sim \pi(y \mid \tilde{\mu}_{sN}, \tilde{\phi}_{s}).
 \end{align*}
 $$
-In either case the posterior predictive distribution of histogram counts is 
-readily visualized with quantile bands in each bin which allows for a direct 
+In either case the posterior predictive distribution of histogram counts is
+readily visualized with quantile bands in each bin which allows for a direct
 comparison to the observed data.
 
 <center>
@@ -2632,16 +2633,16 @@ knitr::include_graphics("figures/post_retro_marginal/post_retro_marginal.png")
 <br><br>
 </center>
 
-Systematic deviations between the observed variate histogram and the posterior 
-predictive variate histograms indicates either that our model for the 
-probabilistic variation around the location function is inadequate, or that the 
-model for the location function itself is adequate.  In order to disentangle 
-these possibilities we have to isolate the adequacy of the local location 
-function model.  This requires summary statistics that capture the covariation 
+Systematic deviations between the observed variate histogram and the posterior
+predictive variate histograms indicates either that our model for the
+probabilistic variation around the location function is inadequate, or that the
+model for the location function itself is adequate.  In order to disentangle
+these possibilities we have to isolate the adequacy of the local location
+function model.  This requires summary statistics that capture the covariation
 between the variates and the covariates.
 
-As with our prior checks when the covariate space is one-dimensional this 
-conditional investigation can be achieved by visualizing how the variate 
+As with our prior checks when the covariate space is one-dimensional this
+conditional investigation can be achieved by visualizing how the variate
 behavior changes along a grid of covariate inputs, $\tilde{x}_{g}$,
 $$
 \begin{align*}
@@ -2654,7 +2655,7 @@ $$
 \tilde{y}_{s} &= \pi(\tilde{\mu}_{s} \mid \phi).
 \end{align*}
 $$
-These posterior predictive simulations can be visually summarized with marginal 
+These posterior predictive simulations can be visually summarized with marginal
 quantile plots across the grid.
 
 <center>
@@ -2665,17 +2666,17 @@ knitr::include_graphics("figures/post_cond_1d/post_cond_1d.png")
 <br><br>
 </center>
 
-For one-dimensional covariate spaces these two posterior retrodictive checks 
-allow us to quickly isolate potential problems.  When the Taylor approximation 
-isn't sufficiently accurate then we will see tension in both the marginal 
-and conditional checks.  The shape of the residual deviations in the conditional 
-check directly informs the functional behavior missing from our model, and hence 
+For one-dimensional covariate spaces these two posterior retrodictive checks
+allow us to quickly isolate potential problems.  When the Taylor approximation
+isn't sufficiently accurate then we will see tension in both the marginal
+and conditional checks.  The shape of the residual deviations in the conditional
+check directly informs the functional behavior missing from our model, and hence
 productive steps towards a better model.
 
-For example the discrepancies in both marginal and conditional checks here 
-suggests that the Taylor approximation is the source of the model inadequacy.  
-In particular the sudden positive deviations at large inputs and sudden negative 
-deviations at small inputs that manifests in the conditional check suggests that 
+For example the discrepancies in both marginal and conditional checks here
+suggests that the Taylor approximation is the source of the model inadequacy. 
+In particular the sudden positive deviations at large inputs and sudden negative
+deviations at small inputs that manifests in the conditional check suggests that
 the Taylor approximation is missing a cubic component.
 
 <center>
@@ -2686,9 +2687,9 @@ knitr::include_graphics("figures/1d_check_bad_1/1d_check_bad_1.png")
 <br><br>
 </center>
 
-On the other hand the lack of systematic discrepancy in the conditional check 
-here suggests that the probabilistic variation model is more suspect than the 
-location function model.  For example the excess of large variates is consistent 
+On the other hand the lack of systematic discrepancy in the conditional check
+here suggests that the probabilistic variation model is more suspect than the
+location function model.  For example the excess of large variates is consistent
 with a heavy-tailed variation model.
 
 <center>
@@ -2700,7 +2701,7 @@ knitr::include_graphics("figures/1d_check_bad_2/1d_check_bad_2.png")
 </center>
 
 Only when both checks exhibit agreement between the observed data and the
-posterior predictive distribution should we be comfortable with the suitability 
+posterior predictive distribution should we be comfortable with the suitability
 of our model.
 
 <center>
@@ -2711,16 +2712,16 @@ knitr::include_graphics("figures/1d_check_good/1d_check_good.png")
 <br><br>
 </center>
 
-Higher-dimensional covariate spaces complicate these retrodictive investigations 
-for the same reason they complicated our previous prior analysis -- we can't 
-visualize the dependence of the covariates on all of the covariate dimensions 
-at the same time.  Fortunately we can appeal to the same resolution that we 
-developed for prior checks and use an explicit marginal covariate model or 
-implicit empirical covariate distribution to project the covariation to one 
+Higher-dimensional covariate spaces complicate these retrodictive investigations
+for the same reason they complicated our previous prior analysis -- we can't
+visualize the dependence of the covariates on all of the covariate dimensions
+at the same time.  Fortunately we can appeal to the same resolution that we
+developed for prior checks and use an explicit marginal covariate model or
+implicit empirical covariate distribution to project the covariation to one
 covariate dimension at a time.
 
-In particular once we've chosen a component covariate and binned its values we 
-can use a sequence of bin medians as a summary statistic to isolate the marginal 
+In particular once we've chosen a component covariate and binned its values we
+can use a sequence of bin medians as a summary statistic to isolate the marginal
 correlation of the variates on that component covariate.
 
 <center>
@@ -2731,9 +2732,9 @@ knitr::include_graphics("figures/post_retro_cond_nd/post_retro_cond_nd.png")
 <br><br>
 </center>
 
-One subtle side effect of this approach is that correlation between the 
-individual component covariates in the covariate distribution used can 
-introduce unexpected conditional behaviors.  In particular the correlation can 
+One subtle side effect of this approach is that correlation between the
+individual component covariates in the covariate distribution used can
+introduce unexpected conditional behaviors.  In particular the correlation can
 bias the variate behavior in each bin beyond what is expected from the assumed
 Taylor approximation alone.  Consequently the binned medians will not always
 follow the shapes of a given location function model.
@@ -2741,13 +2742,13 @@ follow the shapes of a given location function model.
 To understand this behavior better let's consider a first-order Taylor
 approximation model with a two-dimensional covariate space,
 $$
-\pi(y \mid \Delta x_{1}, \Delta x_{2}, 
+\pi(y \mid \Delta x_{1}, \Delta x_{2},
 \alpha, \beta_{1, 1}, \beta_{1, 2}, \sigma ) =
 \text{normal}(y \mid  \alpha
                     + \beta_{1, 1} \, \Delta x_{1}
                     + \beta_{1, 2} \, \Delta x_{2}, \sigma).
 $$
-Moreover let's assume that the observed covariate perturbations $\Delta x_{1}$ 
+Moreover let's assume that the observed covariate perturbations $\Delta x_{1}$
 and $(\Delta x_{2})^{2}$ are strongly correlated.
 
 <center>
@@ -2758,35 +2759,35 @@ knitr::include_graphics("figures/correlated_covariates/correlated_covariates.png
 <br><br>
 </center>
 
-If we fix the first component covariate perturbation to the value 
+If we fix the first component covariate perturbation to the value
 $\Delta \tilde{x}_{1}$ then the conditional mean of the variates becomes
 $$
 \begin{align*}
-\mathbb{M}[y \mid \Delta \tilde{x}_{1}, 
-                  \alpha, \beta_{1, 1}, \beta_{1, 2}, \sigma ] 
-&= 
+\mathbb{M}[y \mid \Delta \tilde{x}_{1},
+                  \alpha, \beta_{1, 1}, \beta_{1, 2}, \sigma ]
+&=
 \int \mathrm{d} \Delta x_{2}
 \pi(y \mid x_{1}, x_{2}, \alpha, \beta_{1, 1}, \beta_{1, 2}, \sigma )
 \, \pi(\Delta x_{2} \mid \Delta \tilde{x}_{1}) \, y
 \\
-&= 
-\alpha 
-+ \beta_{1, 1} \, \Delta \tilde{x}_{1} 
-+ \beta_{1, 2} \, 
-\int \mathrm{d} \Delta x_{2} \, 
+&=
+\alpha
++ \beta_{1, 1} \, \Delta \tilde{x}_{1}
++ \beta_{1, 2} \,
+\int \mathrm{d} \Delta x_{2} \,
 \pi(\Delta x_{2} \mid \Delta \tilde{x}_{1}) \, \Delta x_{2}
 \\
-&= 
-\alpha 
-+ \beta_{1, 1} \, \Delta \tilde{x}_{1} 
+&=
+\alpha
++ \beta_{1, 1} \, \Delta \tilde{x}_{1}
 + \beta_{1, 2} \, \mathbb{M}[ \Delta x_{2} \mid \Delta x_{1} ].
 \end{align*}
 $$
 
-When the covariate perturbations are correlated then the conditional covariate 
-mean $\mathbb{M}[ \Delta x_{2} \mid \Delta x_{1} ]$ will exhibit a nontrivial 
-dependence on $\Delta x_{1}$.  This in turn can bias the conditional variate 
-mean away from the linear dependence that we might have naively expected from 
+When the covariate perturbations are correlated then the conditional covariate
+mean $\mathbb{M}[ \Delta x_{2} \mid \Delta x_{1} ]$ will exhibit a nontrivial
+dependence on $\Delta x_{1}$.  This in turn can bias the conditional variate
+mean away from the linear dependence that we might have naively expected from
 the first two terms.
 
 <center>
@@ -2797,18 +2798,18 @@ knitr::include_graphics("figures/post_retro_cond_nd_bias/nominal/nominal.png")
 <br><br>
 </center>
 
-One consequence of this potential bias is we cannot determine whether a 
-first-order Taylor approximation will be sufficient just by examining the 
+One consequence of this potential bias is we cannot determine whether a
+first-order Taylor approximation will be sufficient just by examining the
 linearity of the observed bin medians!
 
-Fortunately this bias affects the observed data and the posterior predictive 
-simulations in the same way.  Even though the bin medians might not conform to 
-our naive expectations _comparisons_ between them, and hence our posterior 
-retrodictive checks, will still be meaningful.  In particular systematic 
+Fortunately this bias affects the observed data and the posterior predictive
+simulations in the same way.  Even though the bin medians might not conform to
+our naive expectations _comparisons_ between them, and hence our posterior
+retrodictive checks, will still be meaningful.  In particular systematic
 behavior in the _residuals_ will still inform any missing model structure
 because the bias cancels exactly.
 
-When the linear Taylor approximation is adequate then the posterior retrodictive 
+When the linear Taylor approximation is adequate then the posterior retrodictive
 residuals won't exhibit any systematic behavior.
 
 <center>
@@ -2819,8 +2820,8 @@ knitr::include_graphics("figures/post_retro_cond_nd_bias/residual_good/residual_
 <br><br>
 </center>
 
-On the other hand when the true local functional behavior has a nontrivial 
-quadratic contribution then we should see a quadratic trend in the posterior 
+On the other hand when the true local functional behavior has a nontrivial
+quadratic contribution then we should see a quadratic trend in the posterior
 retrodictive residuals.
 
 <center>
@@ -2831,8 +2832,8 @@ knitr::include_graphics("figures/post_retro_cond_nd_bias/residual_bad/residual_b
 <br><br>
 </center>
 
-A routine of always plotting the posterior retrodictive residuals is a powerful 
-way to avoid being mislead by the artifacts of correlated covariates. 
+A routine of always plotting the posterior retrodictive residuals is a powerful
+way to avoid being mislead by the artifacts of correlated covariates.
 
 # Demonstrations
 #### Look What You Made Me Do {-}
@@ -3023,7 +3024,7 @@ plot(xs, alpha + beta * (xs - x0) - ys, type="l", lwd=2, col=c_light,
     xlab="x", xlim=c(-3, 3), ylab="Approximation Error", ylim=c(-7, 7))
 abline(v=x0, col="gray")
 abline(h=x0, col="gray")
-   
+  
 rect(x0 - 3 * tau1, -7, x0 + 3 * tau1, 7, col=c("#BBBBBB44"), border=FALSE)
 abline(v=x0 - 3 * tau1, col=c("#BBBBBB"), lty=1, lw=2)
 abline(v=x0,            col=c("#BBBBBB"), lty=1, lw=2)
@@ -3091,7 +3092,7 @@ plot(xs, alpha + beta * (xs - x0) - ys, type="l", lwd=2, col=c_light,
     xlab="x", xlim=c(-3, 3), ylab="Approximation Error", ylim=c(-7, 7))
 abline(v=x0, col="gray")
 abline(h=0, col="gray")
-   
+  
 rect(x0 - 3 * tau1, -7, x0 + 3 * tau1, 7, col=c("#BBBBBB44"), border=FALSE)
 abline(v=x0 - 3 * tau1, col=c("#BBBBBB"), lty=1, lw=2)
 abline(v=x0,            col=c("#BBBBBB"), lty=1, lw=2)
@@ -3157,7 +3158,7 @@ plot(xs, alpha + beta * (xs - x0) - ys, type="l", lwd=2, col=c_light,
     xlab="x", xlim=c(-3, 3), ylab="Approximation Error", ylim=c(-7, 7))
 abline(v=x0, col="gray")
 abline(h=0, col="gray")
-   
+  
 rect(x0 - 3 * tau1, -7, x0 + 3 * tau1, 7, col=c("#BBBBBB44"), border=FALSE)
 abline(v=x0 - 3 * tau1, col=c("#BBBBBB"), lty=1, lw=2)
 abline(v=x0,            col=c("#BBBBBB"), lty=1, lw=2)
@@ -3330,12 +3331,12 @@ plot_marginal_quantiles <- function(t, x, name, xname, yname, xlim, ylim=c(-3, 7
 ```{r}
 par(mfrow=c(2, 1), mar=c(5, 5, 2, 1))
 
-plot_realizations(x_grid, samples$f_grid,
+plot_realizations(x_grid, samples$mu_grid,
                   "Prior Realizations",
                   "x", "mu", c(-3.5, 3.5), c(-15, 15))
 abline(v=x0, lwd=2, col="grey", lty=3)
 
-plot_marginal_quantiles(x_grid, samples$f_grid,
+plot_marginal_quantiles(x_grid, samples$mu_grid,
                         "Prior Marginal Quantiles",
                         "x", "mu", c(-3.5, 3.5), c(-15, 15))
 abline(v=x0, lwd=2, col="grey", lty=3)
@@ -3509,7 +3510,7 @@ structures.  For example when analyzing the variate behavior we might consider
 a histogram summary statistic as we discussed above.
 
 <details>
-<summary>Click for definition of `plot_realizations`</summary>
+<summary>Click for definition of `marginal_variate_retro`</summary>
 ```{r}
 marginal_variate_retro <- function(obs, pred, bin_min, bin_max, B) {
   if (is.na(bin_min)) bin_min <- min(pred)
@@ -3566,7 +3567,7 @@ the covariate grid.
 ```{r}
 par(mfrow=c(1, 1), mar=c(5, 5, 2, 1))
 
-plot_realizations(data$x_grid, samples$f_grid,
+plot_realizations(data$x_grid, samples$mu_grid,
                   "Posterior Realizations",
                   "x", "y", c(-3.5, 3.5), c(-7, 7))
 
@@ -3585,7 +3586,7 @@ text(-1.5, -5.5, "Exact Functional Behavior", col=c_dark_teal)
 ```
 
 ```{r}
-plot_marginal_quantiles(data$x_grid, samples$f_grid,
+plot_marginal_quantiles(data$x_grid, samples$mu_grid,
                         "Posterior Marginal Quantiles",
                         "x", "y", c(-3.5, 3.5), c(-7, 7))
 
@@ -3616,7 +3617,7 @@ the probabilistic variation of the variates.
 ```{r}
 par(mfrow=c(1, 2))
 
-plot_realizations(data$x_grid, samples$f_grid,
+plot_realizations(data$x_grid, samples$mu_grid,
                   "Posterior Realizations",
                   "x", "y", c(-0.6, 0.6), c(-1.5, 1.5))
 
@@ -3629,7 +3630,7 @@ lines(data$x_grid, fs(data$x_grid), lwd=2, col=c_dark_teal)
 points(data$x, data$y, pch=16, cex=1.0, col="white")
 points(data$x, data$y, pch=16, cex=0.75, col="black")
 
-plot_marginal_quantiles(data$x_grid, samples$f_grid,
+plot_marginal_quantiles(data$x_grid, samples$mu_grid,
                         "Posterior Marginal Quantiles",
                         "x", "y", c(-0.6, 0.6), c(-1.5, 1.5))
 
@@ -3690,12 +3691,12 @@ $x = -3.5$.
 ```{r}
 par(mfrow=c(2, 1), mar=c(5, 5, 2, 1))
 
-plot_realizations(x_grid, samples$f_grid,
+plot_realizations(x_grid, samples$mu_grid,
                   "Prior Realizations",
                   "x", "y", c(-3.5, 3.5), c(-15, 15))
 abline(v=x0, lwd=2, col="grey", lty=3)
 
-plot_marginal_quantiles(x_grid, samples$f_grid,
+plot_marginal_quantiles(x_grid, samples$mu_grid,
                         "Prior Marginal Quantiles",
                         "x", "y", c(-3.5, 3.5), c(-15, 15))
 abline(v=x0, lwd=2, col="grey", lty=3)
@@ -3799,7 +3800,7 @@ To more directly compare our inferences to the exact location function and its
 linearization we investigate the location function realizations.
 
 ```{r}
-plot_realizations(data$x_grid, samples$f_grid, "Posterior Realizations",
+plot_realizations(data$x_grid, samples$mu_grid, "Posterior Realizations",
                   "x", "y", c(-3.5, 3.5), c(-28, 7))
 
 lines(data$x_grid, alpha + beta * (data$x_grid - x0), lwd=4, col="white")
@@ -3817,7 +3818,7 @@ text(-2.25, 3, "Exact Functional Behavior", col=c_dark_teal)
 ```
 
 ```{r}
-plot_marginal_quantiles(data$x_grid, samples$f_grid, "Posterior Marginal Quantiles",
+plot_marginal_quantiles(data$x_grid, samples$mu_grid, "Posterior Marginal Quantiles",
                         "x", "y", c(-3.5, 3.5), c(-28, 7))
 
 lines(data$x_grid, alpha + beta * (data$x_grid - x0), lwd=4, col="white")
@@ -3840,7 +3841,7 @@ don't become substantial until we reach the tails of the covariate distribution.
 ```{r}
 par(mfrow=c(1, 2))
 
-plot_realizations(data$x_grid, samples$f_grid,
+plot_realizations(data$x_grid, samples$mu_grid,
                   "Posterior Realizations",
                   "x", "y", c(1.5, 3.5), c(-2, 8))
 
@@ -3853,7 +3854,7 @@ lines(data$x_grid, fs(data$x_grid), lwd=2, col=c_dark_teal)
 points(data$x, data$y, pch=16, cex=1.0, col="white")
 points(data$x, data$y, pch=16, cex=0.75, col="black")
 
-plot_marginal_quantiles(data$x_grid, samples$f_grid,
+plot_marginal_quantiles(data$x_grid, samples$mu_grid,
                         "Posterior Marginal Quantiles",
                         "x", "y", c(1.5, 3.5), c(-2, 8))
 
@@ -3888,12 +3889,12 @@ samples = extract(fit)
 ```{r}
 par(mfrow=c(2, 1), mar=c(5, 5, 2, 1))
 
-plot_realizations(x_grid, samples$f_grid,
+plot_realizations(x_grid, samples$mu_grid,
                   "Prior Realizations",
                   "x", "y", c(-3.5, 3.5), c(-15, 15))
 abline(v=x0, lwd=2, col="grey", lty=3)
 
-plot_marginal_quantiles(x_grid, samples$f_grid,
+plot_marginal_quantiles(x_grid, samples$mu_grid,
                         "Prior Marginal Quantiles",
                         "x", "y", c(-3.5, 3.5), c(-15, 15))
 abline(v=x0, lwd=2, col="grey", lty=3)
@@ -4014,7 +4015,7 @@ local first-order Taylor approximation.
 ```{r}
 par(mfrow=c(1, 1), mar=c(5, 5, 3, 1))
 
-plot_realizations(data$x_grid, samples1$f_grid,
+plot_realizations(data$x_grid, samples1$mu_grid,
                   "Posterior Realizations", "x", "y",
                   c(-1.75, 0), c(-1, 2))
 
@@ -4060,12 +4061,12 @@ wide range of possible quadratic contributions.
 ```{r}
 par(mfrow=c(2, 1), mar=c(5, 5, 2, 1))
 
-plot_realizations(x_grid, samples$f_grid,
+plot_realizations(x_grid, samples$mu_grid,
                   "Prior Realizations",
                   "x", "y", c(-3.5, 3.5), c(-15, 15))
 abline(v=x0, lwd=2, col="grey", lty=3)
 
-plot_marginal_quantiles(x_grid, samples$f_grid,
+plot_marginal_quantiles(x_grid, samples$mu_grid,
                         "Prior Marginal Quantiles",
                         "x", "y", c(-3.5, 3.5), c(-15, 15))
 abline(v=x0, lwd=2, col="grey", lty=3)
@@ -4139,7 +4140,7 @@ plot_marginal_comp <- function(values1, values2, name,
        main=title, xlab=name, xlim=display_xlims,
        ylab="", yaxt='n', ylim=display_ylims,
        col=c_light, border=c_light_highlight)
-  
+ 
   hist(values2, breaks=breaks, prob=T, add=T,
        col=c_dark, border=c_dark_highlight)
 }
@@ -4199,7 +4200,7 @@ functional behavior from the former to the exact functional behavior.
 ```{r}
 par(mfrow=c(1, 1))
 
-plot_realizations(data$x_grid, samples2$f_grid,
+plot_realizations(data$x_grid, samples2$mu_grid,
                   "Posterior Realizations",
                   "x", "y", c(-3.5, 3.5), c(-28, 7))
 
@@ -4219,7 +4220,7 @@ text(0.5, 5, "Exact Functional Behavior", col=c_dark_teal)
 ```
 
 ```{r}
-plot_marginal_quantiles(data$x_grid, samples2$f_grid,
+plot_marginal_quantiles(data$x_grid, samples2$mu_grid,
                         "Posterior Marginal Quantiles",
                         "x", "y", c(-3.5, 3.5), c(-28, 7))
 
@@ -4243,7 +4244,7 @@ approximation is able to accurately reconstruct the local functional behavior.
 ```{r}
 par(mfrow=c(1, 2))
 
-plot_realizations(data$x_grid, samples2$f_grid,
+plot_realizations(data$x_grid, samples2$mu_grid,
                   "Posterior Realizations",
                   "x", "y", c(-2, 0), c(-2, 2))
 
@@ -4257,7 +4258,7 @@ lines(data$x_grid, fs(data$x_grid), lwd=2, col=c_dark_teal)
 points(data$x, data$y, pch=16, cex=1.0, col="white")
 points(data$x, data$y, pch=16, cex=0.75, col="black")
 
-plot_marginal_quantiles(data$x_grid, samples2$f_grid,
+plot_marginal_quantiles(data$x_grid, samples2$mu_grid,
                         "Posterior Marginal Quantiles",
                         "x", "y", c(-2, 0), c(-2, 2))
 
@@ -4301,12 +4302,12 @@ and weaker the further away we move from the baseline $x_{0}$.
 ```{r}
 par(mfrow=c(2, 1), mar=c(5, 5, 2, 1))
 
-plot_realizations(x_grid, samples$f_grid,
+plot_realizations(x_grid, samples$mu_grid,
                   "Prior Realizations",
                   "x", "y", c(-3.5, 3.5), c(-15, 15))
 abline(v=x0, lwd=2, col="grey", lty=3)
 
-plot_marginal_quantiles(x_grid, samples$f_grid,
+plot_marginal_quantiles(x_grid, samples$mu_grid,
                         "Prior Marginal Quantiles",
                         "x", "y", c(-3.5, 3.5), c(-15, 15))
 abline(v=x0, lwd=2, col="grey", lty=3)
@@ -4533,7 +4534,7 @@ the exact functional behavior.
 ```{r}
 par(mfrow=c(1, 1), mar = c(5, 5, 2, 1))
 
-plot_realizations(data$x_grid, samples$f_grid,
+plot_realizations(data$x_grid, samples$mu_grid,
                   "Posterior Realizations",
                   "x", "y", c(-3.5, 3.5), c(-14, 21))
 
@@ -4554,7 +4555,7 @@ text(2, -8, "Inferred\nFunctional Behavior", col=c_dark)
 text(-1.25, -6, "Exact Functional Behavior", col=c_dark_teal)
 
 ```{r}
-plot_marginal_quantiles(data$x_grid, samples$f_grid,
+plot_marginal_quantiles(data$x_grid, samples$mu_grid,
                         "Posterior Marginal Quantiles",
                         "x", "y", c(-3.5, 3.5), c(-14, 21))
 
@@ -4888,7 +4889,7 @@ the empirical covariate distribution with a distribution of location function
 output histograms.
 
 <details>
-<summary>Click for definition of `marginal_mu`</summary>
+<summary>Click for definition of `marginal_location`</summary>
 ```{r}
 marginal_location <- function(f, bin_min, bin_max, B) {
   if (is.na(bin_min)) bin_min <- min(f)
@@ -4907,7 +4908,7 @@ marginal_location <- function(f, bin_min, bin_max, B) {
   pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9, n]))
 
   plot(1, type="n", main="",
-       xlim=c(bin_min, bin_max), xlab="f",
+       xlim=c(bin_min, bin_max), xlab="mu",
        ylim=c(min(cred[1,]), max(cred[9,])), ylab="Counts")
 
   polygon(c(xs, rev(xs)), c(pad_cred[1,], rev(pad_cred[9,])),
@@ -4925,7 +4926,7 @@ marginal_location <- function(f, bin_min, bin_max, B) {
 
 ```{r}
 par(mfrow=c(1, 1), mar = c(5, 5, 3, 1))
-marginal_location(samples$f, -200, 200, 25)
+marginal_location(samples$mu, -200, 200, 25)
 ```
 
 Similarly we can visualize the shape of the location function behavior with
@@ -4935,7 +4936,7 @@ discussed in the main text.
 <details>
 <summary>Click for definition of `conditional_location`</summary>
 ```{r}
-conditional_location <- function(obs_covar, f, name, bin_min, bin_max, B) {
+conditional_location <- function(obs_covar, x_name, f, y_name, bin_min, bin_max, B) {
   breaks <- seq(bin_min, bin_max, (bin_max - bin_min) / B)
   idx <- rep(1:B, each=2)
   xs <- sapply(1:length(idx), function(b)
@@ -4948,7 +4949,7 @@ conditional_location <- function(obs_covar, f, name, bin_min, bin_max, B) {
 
   for (b in 1:B) {
     bin_idx <- which(breaks[b] <= obs_covar & obs_covar < breaks[b + 1])
-  
+ 
     if (length(bin_idx)) {
       bin_f_medians <- sapply(1:S, function(s) median(f[s, bin_idx]))
       cred[,b] <- quantile(bin_f_medians, probs=probs)
@@ -4966,8 +4967,8 @@ conditional_location <- function(obs_covar, f, name, bin_min, bin_max, B) {
   pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9, n]))
 
   plot(1, type="n", main="",
-       xlim=c(bin_min, bin_max), xlab=name,
-       ylim=c(ymin, ymax), ylab="y")
+       xlim=c(bin_min, bin_max), xlab=x_name,
+       ylim=c(ymin, ymax), ylab=y_name)
 
   polygon(c(xs, rev(xs)), c(pad_cred[1,], rev(pad_cred[9,])),
           col = c_light, border = NA)
@@ -4992,11 +4993,11 @@ conditional_location <- function(obs_covar, f, name, bin_min, bin_max, B) {
 ```{r}
 par(mfrow=c(1, 3), mar = c(5, 5, 2, 1))
 
-conditional_location(data$X[,1], samples$f, "x1", -7, 11, 20)
+conditional_location(data$X[,1], "x1", samples$mu, "mu", -7, 11, 20)
 abline(v=data$x0[1], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,2], samples$f, "x2", -7, 11, 20)
+conditional_location(data$X[,2], "x2", samples$mu, "mu", -7, 11, 20)
 abline(v=data$x0[2], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,3], samples$f, "x3", -7, 11, 20)
+conditional_location(data$X[,3], "x3", samples$mu, "mu", -7, 11, 20)
 abline(v=data$x0[3], lwd=2, col="grey", lty=3)
 ```
 
@@ -5074,7 +5075,7 @@ statistic.
 <summary>Click for definition of `conditional_variate_retro`</summary>
 ```{r}
 conditional_variate_retro <- function(obs_var, obs_covar, pred_var,
-                                      name, bin_min, bin_max, B) {
+                                      x_name, bin_min, bin_max, B) {
   breaks <- seq(bin_min, bin_max, (bin_max - bin_min) / B)
   idx <- rep(1:B, each=2)
   xs <- sapply(1:length(idx), function(b)
@@ -5088,7 +5089,7 @@ conditional_variate_retro <- function(obs_var, obs_covar, pred_var,
 
   for (b in 1:B) {
     bin_idx <- which(breaks[b] <= obs_covar & obs_covar < breaks[b + 1])
-  
+ 
     if (length(bin_idx)) {
       obs_var_medians[b] <- median(obs_var[bin_idx])
       bin_pred_medians <- sapply(1:S, function(s) median(pred_var[s, bin_idx]))
@@ -5097,8 +5098,8 @@ conditional_variate_retro <- function(obs_var, obs_covar, pred_var,
   }
 
   # Compute graphical bounds before replacing NAs with zeros
-  ymin <- min(cred[1,], na.rm=T)
-  ymax <- max(cred[9,], na.rm=T)
+  ymin <- min(min(cred[1,], na.rm=T), min(obs_var_medians, na.rm=T))
+  ymax <- max(max(cred[9,], na.rm=T), max(obs_var_medians, na.rm=T))
 
   for (b in 1:B) {
     if ( is.na(cred[1, b]) ) cred[,b] = rep(0, length(probs))
@@ -5107,7 +5108,7 @@ conditional_variate_retro <- function(obs_var, obs_covar, pred_var,
   pad_cred <- do.call(cbind, lapply(idx, function(n) cred[1:9, n]))
 
   plot(1, type="n", main="",
-       xlim=c(bin_min, bin_max), xlab=name,
+       xlim=c(bin_min, bin_max), xlab=x_name,
        ylim=c(ymin, ymax), ylab="y_pred - y_obs")
 
   polygon(c(xs, rev(xs)), c(pad_cred[1,], rev(pad_cred[9,])),
@@ -5124,11 +5125,11 @@ conditional_variate_retro <- function(obs_var, obs_covar, pred_var,
       lines(xs[(2 * b - 1):(2 * b)],
             pad_cred[5,(2 * b - 1):(2 * b)],
             col=c_dark, lwd=2)
-          
+         
       lines(xs[(2 * b - 1):(2 * b)],
             c(obs_var_medians[b], obs_var_medians[b]),
             col="white", lwd=3)
-                
+               
       lines(xs[(2 * b - 1):(2 * b)],
             c(obs_var_medians[b], obs_var_medians[b]),
             col="black", lwd=2)
@@ -5172,7 +5173,7 @@ conditional_variate_retro_residual <- function(obs_var, obs_covar, pred_var,
 
   for (b in 1:B) {
     bin_idx <- which(breaks[b] <= obs_covar & obs_covar < breaks[b + 1])
-  
+ 
     if (length(bin_idx)) {
       bin_pred_medians <- sapply(1:S, function(s) median(pred_var[s, bin_idx]))
       cred[,b] <- quantile(bin_pred_medians, probs=probs) - median(obs_var[bin_idx])
@@ -5420,16 +5421,16 @@ first-order model.
 
 ```{r}
 par(mfrow=c(1, 1), mar = c(5, 5, 3, 1))
-marginal_location(samples$f, -200, 200, 25)
+marginal_location(samples$mu, -200, 200, 25)
 
 ```{r}
 par(mfrow=c(1, 3), mar = c(5, 5, 2, 1))
 
-conditional_location(data$X[,1], samples$f, "x1", -6, 9, 20)
+conditional_location(data$X[,1], "x1", samples$mu, "mu", -6, 9, 20)
 abline(v=data$x0[1], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,2], samples$f, "x2", -6, 9, 20)
+conditional_location(data$X[,2], "x2", samples$mu, "mu", -6, 9, 20)
 abline(v=data$x0[2], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,3], samples$f, "x3", -6, 9, 20)
+conditional_location(data$X[,3], "x3", samples$mu, "mu", -6, 9, 20)
 abline(v=data$x0[3], lwd=2, col="grey", lty=3)
 ```
 
@@ -5691,19 +5692,19 @@ behavior.
 
 ```{r}
 par(mfrow=c(1, 1), mar = c(5, 5, 3, 1))
-marginal_location(samples$f, -200, 200, 25)
+marginal_location(samples$mu, -200, 200, 25)
 ```
 
 ```{r}
 par(mfrow=c(1, 3), mar = c(5, 5, 2, 1))
 
-conditional_location(data$X[,1], samples$f, "x1", -8, 8, 20)
+conditional_location(data$X[,1], "x1", samples$mu, "mu", -8, 8, 20)
 abline(v=data$x0[1], lwd=2, col="grey", lty=3)
 
-conditional_location(data$X[,2], samples$f, "x2", -8, 8, 20)
+conditional_location(data$X[,2], "x2", samples$mu, "mu", -8, 8, 20)
 abline(v=data$x0[2], lwd=2, col="grey", lty=3)
 
-conditional_location(data$X[,3], samples$f, "x3", -8, 8, 20)
+conditional_location(data$X[,3], "x3", samples$mu, "mu", -8, 8, 20)
 abline(v=data$x0[3], lwd=2, col="grey", lty=3)
 ```
 
@@ -5888,17 +5889,17 @@ samples = extract(fit)
 
 ```{r}
 par(mfrow=c(1, 1), mar = c(5, 5, 3, 1))
-marginal_location(samples$f, -200, 200, 25)
+marginal_location(samples$mu, -200, 200, 25)
 ```
 
 ```{r}
 par(mfrow=c(1, 3), mar = c(5, 5, 2, 1))
 
-conditional_location(data$X[,1], samples$f, "x1", -9, 9, 20)
+conditional_location(data$X[,1], "x1", samples$mu, "mu", -9, 9, 20)
 abline(v=data$x0[1], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,2], samples$f, "x2", -9, 9, 20)
+conditional_location(data$X[,2], "x2", samples$mu, "mu", -9, 9, 20)
 abline(v=data$x0[2], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,3], samples$f, "x3", -9, 9, 20)
+conditional_location(data$X[,3], "x3", samples$mu, "mu", -9, 9, 20)
 abline(v=data$x0[3], lwd=2, col="grey", lty=3)
 ```
 
@@ -5960,17 +5961,17 @@ samples = extract(fit)
 
 ```{r}
 par(mfrow=c(1, 1), mar = c(5, 5, 3, 1))
-marginal_location(samples$f, -300, 300, 25)
+marginal_location(samples$mu, -300, 300, 25)
 ```
 
 ```{r}
 par(mfrow=c(1, 3), mar = c(5, 5, 2, 1))
 
-conditional_location(data$X[,1], samples$f, "x1", -9, 9, 20)
+conditional_location(data$X[,1], "x1", samples$mu, "mu", -9, 9, 20)
 abline(v=data$x0[1], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,2], samples$f, "x2", -9, 9, 20)
+conditional_location(data$X[,2], "x2", samples$mu, "mu", -9, 9, 20)
 abline(v=data$x0[2], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,3], samples$f, "x3", -9, 9, 20)
+conditional_location(data$X[,3], "x3", samples$mu, "mu", -9, 9, 20)
 abline(v=data$x0[3], lwd=2, col="grey", lty=3)
 ```
 
@@ -6730,7 +6731,7 @@ contour(x1, x2, exact_f_evals, nlevels=50,
         xlab="x1", xlim=c(-20, 20),
         ylab="x2", ylim=c(-20, 20),
         drawlabels = FALSE, col = c_dark, lwd = 2)
-      
+     
 points(x_star[1], x_star[2], pch=18, cex=1.25, col=c_dark_teal)
 ```
 
@@ -7335,7 +7336,7 @@ abline(v=0.5 * d2fdx2(data1$x0)[1, 2], lwd=2, col="black")
 
 While inferences for the quadratic contributions are weak they do provide
 guidance on where to search next.  A few of the posterior extremum samples are
-maxima with locations scattered around the covariate space, but most are 
+maxima with locations scattered around the covariate space, but most are
 minima or saddle points very close to the true minimum.
 
 ```{r}
@@ -7384,7 +7385,7 @@ points(samples$x_star[, 1][max_idx], samples$x_star[, 2][max_idx],
 
 points(x_star[1], x_star[2], pch=18, cex=2.0, col="white")
 points(x_star[1], x_star[2], pch=18, cex=1.25, col=c_dark_teal)
-     
+    
 # Saddle Points
 contour(x1, x2, exact_f_evals, nlevels=25,
         main="Location Function (Saddle Points)",
@@ -8144,7 +8145,7 @@ points(samples4$x_star[, 1][min_idx], samples4$x_star[, 2][min_idx],
 plot(data4$X[,1], data4$X[,2], pch=16, cex=0.5, col="black",
      main="Updated Search (Maxima)",
      xlab="x1", xlim=c(-30, 10), ylab="x2", ylim=c(-5, 30))
-   
+  
 max_idx <- samples4$det_beta2 > 0 & samples4$beta2_d[, 1] < 0
 points(samples4$x_star[, 1][max_idx], samples4$x_star[, 2][max_idx],
        pch=18, cex=0.75, col=c_mid_teal)
@@ -8153,7 +8154,7 @@ points(samples4$x_star[, 1][max_idx], samples4$x_star[, 2][max_idx],
 plot(data4$X[,1], data4$X[,2], pch=16, cex=0.5, col="black",
      main="Updated Search (Saddle Points)",
      xlab="x1", xlim=c(-30, 10), ylab="x2", ylim=c(-5, 30))
-   
+  
 sdl_idx <- samples4$det_beta2 < 0
 points(samples4$x_star[, 1][sdl_idx], samples4$x_star[, 2][sdl_idx],
       pch=18, cex=0.75, col=c_light)
@@ -8591,17 +8592,17 @@ samples = extract(fit)
 
 ```{r}
 par(mfrow=c(1, 1), mar = c(5, 5, 3, 1))
-marginal_location(samples$f, -1000, 7000, 50)
+marginal_location(samples$mu, -1000, 7000, 50)
 ```
 
 ```{r}
 par(mfrow=c(1, 3), mar = c(5, 5, 2, 1))
 
-conditional_location(data$X[,1], samples$f, "Temp (oF)", 65, 95, 20)
+conditional_location(data$X[,1], "Temp (oF)", samples$mu, "mu", 65, 95, 20)
 abline(v=data$x0[1], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,2], samples$f, "Price (c$)", 250, 350, 20)
+conditional_location(data$X[,2], "Price (c$)", samples$mu, "mu", 250, 350, 20)
 abline(v=data$x0[2], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,3], samples$f, "Bookings", 200, 2200, 20)
+conditional_location(data$X[,3], "Bookings", samples$mu, "mu", 200, 2200, 20)
 abline(v=data$x0[3], lwd=2, col="grey", lty=3)
 ```
 
@@ -8728,22 +8729,22 @@ samples = extract(fit)
 
 Even with the relatively strong containment on the second-order slopes the
 resulting functional behavior is much more variable than before.  In particular
-the prior probability of negative sales is much higher, perhaps bordering on 
+the prior probability of negative sales is much higher, perhaps bordering on
 concern.
 
 ```{r}
 par(mfrow=c(1, 1), mar = c(5, 5, 3, 1))
-marginal_location(samples$f, -3000, 9000, 50)
+marginal_location(samples$mu, -3000, 9000, 50)
 ```
 
 ```{r}
 par(mfrow=c(1, 3), mar = c(5, 5, 2, 1))
 
-conditional_location(data$X[,1], samples$f, "Temp (oF)", 65, 95, 20)
+conditional_location(data$X[,1], "Temp (oF)", samples$mu, "mu", 65, 95, 20)
 abline(v=data$x0[1], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,2], samples$f, "Price (c$)", 250, 350, 20)
+conditional_location(data$X[,2], "Price (c$)", samples$mu, "mu", 250, 350, 20)
 abline(v=data$x0[2], lwd=2, col="grey", lty=3)
-conditional_location(data$X[,3], samples$f, "Bookings", 200, 2200, 20)
+conditional_location(data$X[,3], "Bookings", samples$mu, "mu", 200, 2200, 20)
 abline(v=data$x0[3], lwd=2, col="grey", lty=3)
 ```
 
@@ -8926,22 +8927,22 @@ historical data to future circumstances.
 # Additional Topics
 #### So It Goes... {-}
 
-In this case study we have covered linear regression models in some depth, but 
-here there are still more considerations that, while they are not uncommon to 
-encounter in practice, we will not have the opportunity to cover thoroughly 
-here.  In this section I will briefly summarize some of these topics and in a 
+In this case study we have covered linear regression models in some depth, but
+here there are still more considerations that, while they are not uncommon to
+encounter in practice, we will not have the opportunity to cover thoroughly
+here.  In this section I will briefly summarize some of these topics and in a
 few cases link to more comprehensive discussions.
 
 ## Degeneracies From Collinearity
 #### Come Back... Be Here {-}
 
-Recall that a first-order Taylor approximation to the location function can be 
-interpreted as a plane oriented around the baseline input.  With enough complete 
-observations that plane will be _overdetermined_, and none of its configuration 
-will exactly intersect _every_ observed variate-covariate pair at the same time.  
-The consistent configurations of the plane will be limited to only those that 
-interpolate through all of the observations reasonably well.  This results in a 
-weakly degenerate likelihood function, and hence a well-behaved posterior 
+Recall that a first-order Taylor approximation to the location function can be
+interpreted as a plane oriented around the baseline input.  With enough complete
+observations that plane will be _overdetermined_, and none of its configuration
+will exactly intersect _every_ observed variate-covariate pair at the same time. 
+The consistent configurations of the plane will be limited to only those that
+interpolate through all of the observations reasonably well.  This results in a
+weakly degenerate likelihood function, and hence a well-behaved posterior
 distribution.
 
 <center>
@@ -8968,14 +8969,14 @@ knitr::include_graphics("figures/collinear_degen_bad/exact_fit/exact_fit.png")
 <br><br>
 </center>
 
-This circumstance where all of the observed variate-covariate pairs fall onto at 
-least one plane configuration is referred to as a _collinearity_.  The term is 
-also used more casually to refer to the resulting likelihood functions and 
+This circumstance where all of the observed variate-covariate pairs fall onto at
+least one plane configuration is referred to as a _collinearity_.  The term is
+also used more casually to refer to the resulting likelihood functions and
 posterior distributions.
 
-Because of the probabilistic scatter inherent to regression models the resulting 
-likelihood function will concentrate around the plane configurations that 
-perfectly accommodate all of the data.  This results a non-compact degeneracy 
+Because of the probabilistic scatter inherent to regression models the resulting
+likelihood function will concentrate around the plane configurations that
+perfectly accommodate all of the data.  This results a non-compact degeneracy
 between the intercept and slopes.
 
 <center>
@@ -8988,10 +8989,10 @@ knitr::include_graphics("figures/collinear_degen_bad/consistent_fit/consistent_f
 
 Discussions of collinearity often focus on the coupling of the the intercept and
 slope parameters, but collinearity also introduces a frustrating coupling
-between the configuration of the plane and the configuration of the 
-probabilistic scatter around that plane.  When the magnitude of the scatter is 
-large the plane parameters are more weakly informed by the observed data and the 
-likelihood function will extend out far from the subset of perfectly fitting 
+between the configuration of the plane and the configuration of the
+probabilistic scatter around that plane.  When the magnitude of the scatter is
+large the plane parameters are more weakly informed by the observed data and the
+likelihood function will extend out far from the subset of perfectly fitting
 configurations.  As the scatter is reduced, however, the likelihood function
 rapidly collapses towards those perfectly fitting configurations.
 
@@ -9003,7 +9004,7 @@ knitr::include_graphics("figures/collinear_degen_bad/collapse/collapse.png")
 <br><br>
 </center>
 
-This results in a pathological _funnel_ geometry that frustrates accurate 
+This results in a pathological _funnel_ geometry that frustrates accurate
 computation.
 
 <center>
@@ -9014,26 +9015,26 @@ knitr::include_graphics("figures/collinear_degen_bad/funnel/funnel.png")
 <br><br>
 </center>
 
-Analytically quantifying the geometry of collinear likelihood functions can be 
-done with some careful machinery from linear algebra.  I tackle this problem in 
-my 
+Analytically quantifying the geometry of collinear likelihood functions can be
+done with some careful machinery from linear algebra.  I tackle this problem in
+my
 [collinear regression case study](https://betanalpha.github.io/assets/case_studies/underdetermined_linear_regression.html).
 
 ## Degeneracies From Correlated Covariates
 #### I'm Only Me When I'm with You {-}
 
-The foundational assumption of negligible confounders implies that the behavior 
-of conditional variate model is completely independent of the behavior of the 
+The foundational assumption of negligible confounders implies that the behavior
+of conditional variate model is completely independent of the behavior of the
 marginal covariate model.  In particular it implies that the configuration of
-the location function that maps observed covariates into latent locations is 
-completely independent of the distribution of those inputs. 
+the location function that maps observed covariates into latent locations is
+completely independent of the distribution of those inputs.
 
-That said _inferences_ of that location functional behavior can be impacted by 
-the distribution of the covariates.  For example correlations between the 
-individual component covariates can induce strong degeneracies in the 
+That said _inferences_ of that location functional behavior can be impacted by
+the distribution of the covariates.  For example correlations between the
+individual component covariates can induce strong degeneracies in the
 configuration of a Taylor approximation model.
 
-To see how consider a two-dimensional covariate space and a marginal covariate 
+To see how consider a two-dimensional covariate space and a marginal covariate
 model where the two components $x_{1}$ and $x_{2}$ are perfectly correlated,
 $$
 \pi(x_{1}, x_{2}) = \pi(x_{1}) \, \delta( x_{1} - x_{2} ).
@@ -9042,13 +9043,13 @@ If the component baselines are also the same,
 $$
 x_{0, 1} = x_{0, 2}
 $$
-then each component covariate introduces an equivalent contribution to a 
+then each component covariate introduces an equivalent contribution to a
 first-order Taylor approximation,
 $$
 \begin{align*}
 f_{1}(x; x_{0})
 &=
-\alpha + 
+\alpha +
 \beta_{1, 1} \, (x_{1} - x_{0, 1}) + \beta_{1, 2} \, (x_{2} - x_{0, 2})
 \\
 &=
@@ -9060,170 +9061,172 @@ f_{1}(x; x_{0})
 ( \beta_{1, 1} + \beta_{1, 2} ) \, (x_{1} - x_{0, 1})
 \end{align*}
 $$
-Because of this the two slopes $\beta_{1, 1}$ and $\beta_{1, 2}$ will be 
+Because of this the two slopes $\beta_{1, 1}$ and $\beta_{1, 2}$ will be
 completely non-identified -- any configuration of the two with the same sum will
-yield an equivalent fit to any observations -- which results in degenerate 
+yield an equivalent fit to any observations -- which results in degenerate
 likelihood functions.
 
-In more realistic circumstances the distribution of the component covariates 
-is unlikely to be perfectly correlated, but sufficiently strongly correlations 
+In more realistic circumstances the distribution of the component covariates
+is unlikely to be perfectly correlated, but sufficiently strongly correlations
 can still introduce problematic inferential degeneracies.
 
-Conveniently we can reparameterize Taylor approximation models to accommodate 
+Conveniently we can reparameterize Taylor approximation models to accommodate
 these degeneracies and substantially improve the geometry of the realized
 likelihood function.  I discuss this _QR reparameterization_ in more detail in
-[its own case study](https://betanalpha.github.io/assets/case_studies/qr_regression.html), 
+[its own case study](https://betanalpha.github.io/assets/case_studies/qr_regression.html),
 although I warn the reader that the material is long overdue for an update.
 
 ## Hierarchical Regression Models
 #### Everything Has Changed {-}
 
-Another common consideration is heterogeneity in the configuration of a location 
-function in a regression model.  In particular once we've built a base 
+Another common consideration is heterogeneity in the configuration of a location
+function in a regression model.  In particular once we've built a base
 regression model we might ask if the location functional behavior systematically
 varies across different contexts.
 
 The difficulty with addressing this consideration is that functional behavior
-can vary in _many_ different ways.  Incorporating heterogeneity across 
-exchangeable circumstances requires more than just the assignment of a 
-one-dimensional hierarchical model -- we have to determine which behaviors might 
-vary, identify which parameters configure that behavior, and then construct an 
-hierarchical population model for all of those parameters that is compatible 
+can vary in _many_ different ways.  Incorporating heterogeneity across
+exchangeable circumstances requires more than just the assignment of a
+one-dimensional hierarchical model -- we have to determine which behaviors might
+vary, identify which parameters configure that behavior, and then construct an
+hierarchical population model for all of those parameters that is compatible
 with our domain expertise.
 
 Consider, for example, a first-order Taylor approximation model for the location
 function.  Could the intercept vary from one context to another?  What about the
-component slopes? If so _which_ component slopes could vary and which should be 
-fixed?  In constructing a meaningful population model we also have to consider 
+component slopes? If so _which_ component slopes could vary and which should be
+fixed?  In constructing a meaningful population model we also have to consider
 how the heterogeneities in each parameter might be coupled across circumstances.
 
 In my opinion the most productive way to approach hierarchical regression models
 is to consider not the individual parameters but the functional behavior itself,
-in particular what qualitative properties might be heterogeneous and in what 
-ways they might vary.  Once we've build up those qualitative possibilities we 
+in particular what qualitative properties might be heterogeneous and in what
+ways they might vary.  Once we've build up those qualitative possibilities we
 can then contemplate a compatible mathematical model.
 
 ## Feature Selection
 #### Should've Said No {-}
 
 In all of our discussions we have taken the covariate space as fixed.  In
-particularly heuristic regression models, however, there is often a question 
-of which component variables might meaningfully influence the location behavior 
-and hence be incorporated into the covariate space of the model.  Because this 
-question of _feature selection_ is so vague there is little opportunity for 
-theory to guide its answer.  
+particularly heuristic regression models, however, there is often a question
+of which component variables might meaningfully influence the location behavior
+and hence be incorporated into the covariate space of the model.  Because this
+question of _feature selection_ is so vague there is little opportunity for
+theory to guide its answer. 
 
-One approach is to treat different choices of covariate spaces as the basis for 
-different models in which case deciding between them becomes a 
+One approach is to treat different choices of covariate spaces as the basis for
+different models in which case deciding between them becomes a
 _model comparison_ problem.  To formalize this approach we would need explicitly
 define a utility function that defines the consequences of choosing one model
-over another.  
+over another. 
 
 Often people fall back to implicit predictive performance metrics, although as I
-discuss in my 
-[workflow case study](https://betanalpha.github.io/assets/case_studies/principled_bayesian_workflow.html#142_If_Everyone_Else_Jumped_Off_A_Bridge) 
-I find that these are too fragile to be useful for model comparison.  This is 
-especially true in the regression setting where exact predictive performance for 
-one distribution of covariates may not translate to predictive performance for 
+discuss in my
+[workflow case study](https://betanalpha.github.io/assets/case_studies/principled_bayesian_workflow.html#142_If_Everyone_Else_Jumped_Off_A_Bridge)
+I find that these are too fragile to be useful for model comparison.  This is
+especially true in the regression setting where exact predictive performance for
+one distribution of covariates may not translate to predictive performance for
 another.  Estimated predictive performance can be even more choatic.
 
 Another approach is to reframe the decision problem into an inferential one.
-Some functional models can be configured to be insensitive to some of the 
-component covariates which effectively culls them from the model.  For example 
-in a first-order Taylor approximation a component covariate will decouple from 
-the model inferences and predictions if the corresponding slope is close to 
-zero.  From this perspective we can build up understanding of which component 
+Some functional models can be configured to be insensitive to some of the
+component covariates which effectively culls them from the model.  For example
+in a first-order Taylor approximation a component covariate will decouple from
+the model inferences and predictions if the corresponding slope is close to
+zero.  From this perspective we can build up understanding of which component
 covariates are most important by analyzing posterior inferences.
 
-Ultimately I find that questions of feature selection are often a consequence 
-of overrelying on regression heuristics.  In my experience the only way to 
+Ultimately I find that questions of feature selection are often a consequence
+of overrelying on regression heuristics.  In my experience the only way to
 address these considerations productively is to step back from those heuristics,
-think more carefully about the underlying data generating processes, and allow 
+think more carefully about the underlying data generating processes, and allow
 that domain expertise guide possible resolutions.
 
 # Conclusion
 #### Long Story Short {-}
 
-The mathematical structure of regression models with polynomial location 
-functions is relatively simple, but that simplicity is deceiving.  Simple models 
-are often the most difficult to apply robustly in practice because that 
-simplicity is sufficient for extracting meaningful insights from observed data 
-in only particular circumstances.  We are left with the responsibility for 
-determining what those circumstances are and how to identify them in individual 
-analyses. 
+The mathematical structure of regression models with polynomial location
+functions is relatively simple, but that simplicity is deceiving.  Simple models
+are often the most difficult to apply robustly in practice because that
+simplicity is sufficient for extracting meaningful insights from observed data
+in only particular circumstances.  We are left with the responsibility for
+determining what those circumstances are and how to identify them in individual
+analyses.
 
-In the case of polynomial location models the theory of Taylor approximations 
-provides a powerful scaffolding that guides these tasks.  By providing an 
-explicit interpretation to polynomial models we can connect them to our domain 
+In the case of polynomial location models the theory of Taylor approximations
+provides a powerful scaffolding that guides these tasks.  By providing an
+explicit interpretation to polynomial models we can connect them to our domain
 expertise and incorporate them into our analyses in a principled way.
 
 That said this Taylor approximation perspective is not universally accepted,
-and some argue that linear location models are better motivated from other 
-criteria.  That said any time someone argues that a linear location function is 
-sufficient because "effects are small" they are implicitly appealing to Taylor 
-approximations, and it's only with a formal theory of local linear 
+and some argue that linear location models are better motivated from other
+criteria.  That said any time someone argues that a linear location function is
+sufficient because "effects are small" they are implicitly appealing to Taylor
+approximations, and it's only with a formal theory of local linear
 approximations that we can ground these heuristics into a robust methodology.
 
-Finally although we have focused on the application of Taylor approximations to 
+Finally although we have focused on the application of Taylor approximations to
 modeling the location function in regression models much of the methodology
-that we have developed in this case study can be applied whenever we want to 
-inject a deterministic dependence into a model.  For example we could use 
-Taylor approximations to model small variations in the probabilistic scatter 
+that we have developed in this case study can be applied whenever we want to
+inject a deterministic dependence into a model.  For example we could use
+Taylor approximations to model small variations in the probabilistic scatter
 of a regression model, or in non-regression models entirely.
 
 # Acknowledgements
 #### Someone Loves You {-}
 
-A very special thanks to everyone supporting me on Patreon: Aapeli Nevala, 
-Adam Bartonicek, Adam Fleischhacker, Adan, Adriano Yoshino, Alan Chang, 
-Alan O'Donnell, Alessandro Varacca, Alexander Bartik, Alexander Noll, 
-Alexander Rosteck, Anders Valind, Andrea Serafino, Andrew Mascioli, 
-Andrew Rouillard, Andrew Vigotsky, Angie_Hyunji Moon, Angus Williams, 
-Antoine Soubret, Ara Winter, asif zubair, Austin Rochford, Austin Rochford, 
-Avraham Adler, Ben Matthews, Ben Swallow, Benoit Essiambre, Bertrand Wilden, 
-Bo Schwartz Madsen, Brian Hartley, Bryan Yu, Brynjolfur Gauti Jónsson, 
-Cameron Smith, Camron, Canaan Breiss, Cat Shark, Charles Naylor, Chase Dwelle, 
-Chris Jones, Chris Zawora, Christopher Mehrvarzi, Chuck Carlson, Cole Monnahan, 
-Colin Carroll, Colin McAuliffe, Cruz, Damon Bayer, Dan Killian, dan mackinlay, 
-Dan Muck, Dan W Joyce, Dan Waxman, Dan Weitzenfeld, Daniel, 
-Daniel Edward Marthaler, Daniel Rowe, Darshan Pandit, Darthmaluus , 
-David Burdelski, David Galley, David Humeau, David Wurtz, dilsher singh dhillon, 
-Doug Rivers, Dr. Jobo, Dr. Omri Har Shemesh, Dylan Murphy, Ed Cashin, Ed Henry, 
-edith darin, Eric LaMotte, Erik Banek, Ero Carrera, Eugene O'Friel, Evan Cater, 
-Fabio Pereira, Fabio Zottele, Felipe González, Fergus Chadwick, Finn Lindgren, 
-Florian Wellmann, Francesco Corona, Francis, Geoff Rollins, George Ho, 
-Granville Matheson, Greg Sutcliffe, Guido Biele, Hamed Bastan-Hagh, Haonan Zhu, 
-Harrison Katz, Hector Munoz, Henri Wallen, Hugo Botha, Huib Meulenbelt, 
-Håkan Johansson, Ian , Ignacio Vera, Ilaria Prosdocimi, Isaac S, Isaac Vock, J, 
-J Michael Burgess, Ja Li, Jair Andrade, James McInerney, James Wade, JamesU, 
-Janek Berger, Jason Martin, Jason Pekos, Jeff Dotson, Jeff Helzner, 
-Jeff Stulberg, Jeffrey Erlich, Jesse Wolfhagen, Jessica Graves, Joe Wagner, 
-John Flournoy, Jon , Jonathan H. Morgan, Jonathan St-onge, Jonathon Vallejo, 
+I thank yureq, Tatsuo Okubo, and Jason Martin for helpful comments.
+
+A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
+Adam Bartonicek, Adam Fleischhacker, Adan, Adriano Yoshino, Alan Chang,
+Alan O'Donnell, Alessandro Varacca, Alexander Bartik, Alexander Noll,
+Alexander Rosteck, Anders Valind, Andrea Serafino, Andrew Mascioli,
+Andrew Rouillard, Andrew Vigotsky, Angie_Hyunji Moon, Angus Williams,
+Antoine Soubret, Ara Winter, asif zubair, Austin Rochford, Austin Rochford,
+Avraham Adler, Ben Matthews, Ben Swallow, Benoit Essiambre, Bertrand Wilden,
+Bo Schwartz Madsen, Brian Hartley, Bryan Yu, Brynjolfur Gauti Jónsson,
+Cameron Smith, Camron, Canaan Breiss, Cat Shark, Charles Naylor, Chase Dwelle,
+Chris Jones, Chris Zawora, Christopher Mehrvarzi, Chuck Carlson, Cole Monnahan,
+Colin Carroll, Colin McAuliffe, Cruz, Damon Bayer, Dan Killian, dan mackinlay,
+Dan Muck, Dan W Joyce, Dan Waxman, Dan Weitzenfeld, Daniel,
+Daniel Edward Marthaler, Daniel Rowe, Darshan Pandit, Darthmaluus ,
+David Burdelski, David Galley, David Humeau, David Wurtz, dilsher singh dhillon,
+Doug Rivers, Dr. Jobo, Dr. Omri Har Shemesh, Dylan Murphy, Ed Cashin, Ed Henry,
+edith darin, Eric LaMotte, Erik Banek, Ero Carrera, Eugene O'Friel, Evan Cater,
+Fabio Pereira, Fabio Zottele, Felipe González, Fergus Chadwick, Finn Lindgren,
+Florian Wellmann, Francesco Corona, Francis, Geoff Rollins, George Ho,
+Granville Matheson, Greg Sutcliffe, Guido Biele, Hamed Bastan-Hagh, Haonan Zhu,
+Harrison Katz, Hector Munoz, Henri Wallen, Hugo Botha, Huib Meulenbelt,
+Håkan Johansson, Ian , Ignacio Vera, Ilaria Prosdocimi, Isaac S, Isaac Vock, J,
+J Michael Burgess, Ja Li, Jair Andrade, James McInerney, James Wade, JamesU,
+Janek Berger, Jason Martin, Jason Pekos, Jeff Dotson, Jeff Helzner,
+Jeff Stulberg, Jeffrey Erlich, Jesse Wolfhagen, Jessica Graves, Joe Wagner,
+John Flournoy, Jon , Jonathan H. Morgan, Jonathan St-onge, Jonathon Vallejo,
 Joran Jongerling, Jose Pereira, Josh Weinstock, Joshua Duncan, Joshua Griffith,
-Josué Mendoza, Justin Bois, Karim Naguib, Karim Osman, Keith O'Rourke, 
-Kejia Shi, Kevin Foley, Kristian Gårdhus Wichmann, Kádár András, lizzie , 
-LOU ODETTE, Luiz Pessoa, Luke Hewitt, Luís F, Marc Dotson, 
-Marc Trunjer Kusk Nielsen, Marcel Lüthi, Marek Kwiatkowski, Mario Becerra, 
-Mark Donoghoe, Mark Worrall, Markus P., Martin Modrák, Marty, Matthew, 
-Matthew Hawthorne, Matthew Kay, Matthew T Stern, Matthieu LEROY, 
-Maurits van der Meer, Maxim Kesin, Melissa Wong, Merlin Noel Heidemanns, 
-Michael Colaresi, Michael DeWitt, Michael Dillon, Michael Lerner, Mick Cooney, 
-Mikael, Mike Lawrence, Márton Vaitkus, N Sanders, Name, Nathaniel Burbank, 
-Nic Fishman, Nicholas Clark, Nicholas Cowie, Nicholas Erskine, Nicholas Ursa, 
-Nick S, Nicolas Frisby, Octavio Medina, Ole Rogeberg, Oliver Crook, Olivier Ma, 
-Pablo León Villagrá, Patrick  Kelley, Patrick Boehnke, Pau Pereira Batlle, 
-Peter Smits, Pieter van den Berg , ptr, Putra Manggala, 
-Ramiro Barrantes Reynolds, Ravin Kumar, Raúl Peralta Lozada, Riccardo Fusaroli, 
-Richard Nerland, Robert Frost, Robert Goldman, Robert kohn, Robert Mitchell V, 
-Robin East, Robin Taylor, Rong Lu, Ross McCullough, Ryan Grossman, Ryan Wesslen, 
-Rémi , S Hong, Scott Block, Scott Brown, Sean Pinkney, Sean Wilson, Serena, 
-Seth Axen, shira, Simon Duane, Simon Lilburn, Srivatsa Srinath, sssz, Stan_user, 
-Stefan, Stephanie Fitzgerald, Stephen Lienhard, Steve Bertolani, Stone Chen, 
-Sus, Susan Holmes, Svilup, Sören Berg, Tagir Akhmetshin, Tao Ye, Tate Tunstall, 
-Tatsuo Okubo, Teresa Ortiz, Thiago  de Paula Oliveira, Thomas Kealy, 
-Thomas Lees, Thomas Vladeck, Tiago Cabaço, Tobychev , Tom Knowles, Tom McEwen, 
-Tomáš Frýda, Tony Wuersch, Virginia Fisher, Vitaly Druker, Vladimir Markov, 
-Wil Yegelwel, Will Farr, Will Kurt, Will Tudor-Evans, woejozney, yolhaj , yureq, 
+Josué Mendoza, Justin Bois, Karim Naguib, Karim Osman, Keith O'Rourke,
+Kejia Shi, Kevin Foley, Kristian Gårdhus Wichmann, Kádár András, lizzie ,
+LOU ODETTE, Luiz Pessoa, Luke Hewitt, Luís F, Marc Dotson,
+Marc Trunjer Kusk Nielsen, Marcel Lüthi, Marek Kwiatkowski, Mario Becerra,
+Mark Donoghoe, Mark Worrall, Markus P., Martin Modrák, Marty, Matthew,
+Matthew Hawthorne, Matthew Kay, Matthew T Stern, Matthieu LEROY,
+Maurits van der Meer, Maxim Kesin, Melissa Wong, Merlin Noel Heidemanns,
+Michael Colaresi, Michael DeWitt, Michael Dillon, Michael Lerner, Mick Cooney,
+Mikael, Mike Lawrence, Márton Vaitkus, N Sanders, Name, Nathaniel Burbank,
+Nic Fishman, Nicholas Clark, Nicholas Cowie, Nicholas Erskine, Nicholas Ursa,
+Nick S, Nicolas Frisby, Octavio Medina, Ole Rogeberg, Oliver Crook, Olivier Ma,
+Pablo León Villagrá, Patrick  Kelley, Patrick Boehnke, Pau Pereira Batlle,
+Peter Smits, Pieter van den Berg , ptr, Putra Manggala,
+Ramiro Barrantes Reynolds, Ravin Kumar, Raúl Peralta Lozada, Riccardo Fusaroli,
+Richard Nerland, Robert Frost, Robert Goldman, Robert kohn, Robert Mitchell V,
+Robin East, Robin Taylor, Rong Lu, Ross McCullough, Ryan Grossman, Ryan Wesslen,
+Rémi , S Hong, Scott Block, Scott Brown, Sean Pinkney, Sean Wilson, Serena,
+Seth Axen, shira, Simon Duane, Simon Lilburn, Srivatsa Srinath, sssz, Stan_user,
+Stefan, Stephanie Fitzgerald, Stephen Lienhard, Steve Bertolani, Stone Chen,
+Sus, Susan Holmes, Svilup, Sören Berg, Tagir Akhmetshin, Tao Ye, Tate Tunstall,
+Tatsuo Okubo, Teresa Ortiz, Thiago  de Paula Oliveira, Thomas Kealy,
+Thomas Lees, Thomas Vladeck, Tiago Cabaço, Tobychev , Tom Knowles, Tom McEwen,
+Tomáš Frýda, Tony Wuersch, Virginia Fisher, Vitaly Druker, Vladimir Markov,
+Wil Yegelwel, Will Farr, Will Kurt, Will Tudor-Evans, woejozney, yolhaj , yureq,
 Zach A, Zad Rafi, Zhengchen Cai, and Zwelithini Tunyiswa.
 
 # Appendix { -#sec:appendix }

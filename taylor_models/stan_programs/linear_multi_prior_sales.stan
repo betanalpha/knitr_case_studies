@@ -30,5 +30,5 @@ model {
 
 // Simulate a full observation from the current value of the parameters
 generated quantities {
-  vector[N] f = alpha + deltaX * beta;
+  vector[N] mu = alpha + deltaX * beta;
 }

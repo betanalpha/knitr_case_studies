@@ -27,14 +27,14 @@ model {
 
 generated quantities {
   real y_pred[N];
-  real f_grid[N_grid];
+  real mu_grid[N_grid];
   real y_pred_grid[N_grid];
   
   for (n in 1:N)
     y_pred[n] = student_t_rng(inv(nu_inv), alpha + beta * (x[n] - x0), sigma);
     
   for (n in 1:N_grid) {
-    f_grid[n] = alpha + beta * (x_grid[n] - x0);
-    y_pred_grid[n] = student_t_rng(inv(nu_inv), f_grid[n], sigma);
+    mu_grid[n] = alpha + beta * (x_grid[n] - x0);
+    y_pred_grid[n] = student_t_rng(inv(nu_inv), mu_grid[n], sigma);
   }
 }

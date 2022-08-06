@@ -22,11 +22,11 @@ model {
 }
 
 generated quantities {
-  real f_grid[N_grid];
+  real mu_grid[N_grid];
   for (n in 1:N_grid) {
-    f_grid[n] =   alpha 
-                + beta1 * (x_grid[n] - x0) 
-                + beta2 * pow(x_grid[n] - x0, 2.0)
-                + beta3 * pow(x_grid[n] - x0, 3.0);
+    mu_grid[n] =   alpha 
+                 + beta1 * (x_grid[n] - x0) 
+                 + beta2 * pow(x_grid[n] - x0, 2.0)
+                 + beta3 * pow(x_grid[n] - x0, 3.0);
   }
 }
