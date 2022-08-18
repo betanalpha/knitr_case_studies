@@ -97,7 +97,7 @@ f(x)
 &=
 f(x_{0})
 + \frac{ \mathrm{d} f }{ \mathrm{d} x } (x_{0}) \,
-+ (x - x_{0})
+  (x - x_{0})
 + \frac{1}{2} \frac{ \mathrm{d}^{2} f }{ \mathrm{d} x^{2} } (x_{0}) \,
   (x - x_{0})^{2}
 + \ldots.
@@ -222,7 +222,7 @@ order.
 
 For example a small neighborhood $U$ constrains how far any local input
 $x \in U$ can be from the given base point $x_{0}$.  This constraint then limits
-how large the perturbations $x - x_{0}$ can be, and hence how the large the 
+how large the perturbations $x - x_{0}$ can be, and hence how the large the
 powers $(x - x_{0})^{i}$ from which Taylor approximations are constructed can
 be.  Generally the smaller the neighborhood the more quickly these powers will
 decay and the smaller the Taylor remainder will be across $U$.  In other words
@@ -529,7 +529,7 @@ are implemented in accessible software packages.
 
 That said we have to employ these associations with care because the Jacobian
 arrays _are not actually tensors_.  Importantly they do not transform like
-tensors when the input space is transformed. 
+tensors when the input space is transformed.
 
 If the Jacobian arrays were actually tensors then each term in a Taylor
 approximation would be invariant under transformations of the input space.  For
@@ -566,7 +566,7 @@ we associate Jacobian arrays with tensors_.  In other words we have to fix the
 input space first before we fill up the Jacobian arrays with partial derivative
 evaluations in that parameterization and then apply tensor operations to those
 arrays.  Anytime we want to reparameterize the input space we have to redo the
-_entire_ construction. 
+_entire_ construction.
 
 The relationship between Jacobian arrays and tensors is subtle but often
 confused, but if we don't appreciate it enough then we put ourselves into a
@@ -578,7 +578,7 @@ approximations incorrectly.
 
 One nice feature of a Taylor approximation to functional behavior is that the
 order directly informs the possible shapes or geometries within the local
-neighborhood where the approximation is valid. 
+neighborhood where the approximation is valid.
 
 Before discussing these geometric possibilities, however, be warned that we will
 be using the fragile association between Jacobian arrays and tensors, here
@@ -749,7 +749,7 @@ complex functional behaviors.  For example if we go beyond second-order then
 Taylor approximations can exhibit multiple, separated extrema, each of which can
 exhibit bowl-like or saddle-like shapes independently from the others.  In
 addition the behavior of these separate extrema don't cleanly map to individual
-approximation parameters but rather weave together in intricate ways. 
+approximation parameters but rather weave together in intricate ways.
 While leveraging whatever domain expertise we have into explicit constraints on
 higher-order Taylor approximation configurations is more complicated, it can
 still be accomplished with care.
@@ -760,7 +760,7 @@ still be accomplished with care.
 Mechanically the polynomial defined by a Taylor approximation can be evaluated
 globally, mapping any input $x \in X$ to some output.  The connection of that
 polynomial to the function being approximated, however, is restricted to the
-local neighborhood of inputs $U \subset X$ around the baseline point $x_{0}$. 
+local neighborhood of inputs $U \subset X$ around the baseline point $x_{0}$.
 In other words a Taylor approximation is not defined by a polynomial alone but
 rather a polynomial associated with a base point and a surrounding local
 neighborhood.
@@ -861,14 +861,14 @@ Just past the boundary at small but negative inputs the function $f$ is
 undefined.  The inconsistent values to the left and right of the boundary
 imply that all of the derivatives are ill-defined at $x = 0$.  Consequently we
 cannot construct Taylor approximations from a base points right on the boundary
-$x_{0} = 0$. 
+$x_{0} = 0$.
 
 Taylor approximations around base points at positive inputs near the boundary
 will be ungainly at best.  For a fixed $x_{0}$ the magnitude of the derivative
 evaluations $\mathrm{d}^{i} f / \mathrm{d} x^{i} \, (x_{0})$ will increase with
 the order $i$.  At the same time the signs of these evaluations will oscillate,
 leading to an awkward sequence of polynomial terms that poorly converges to the
-exact function $f$. 
+exact function $f$.
 
 The only way to ensure that the final Taylor approximation reasonably
 approximates $f$ is to narrow the local neighborhood enough that the
@@ -907,7 +907,7 @@ without any boundaries that might frustrate Taylor approximations.
 In other words while the functional dependence on $x$ exhibits boundaries the
 functional dependence on $z = g^{-1}(x)$ does not.  The unconstraining
 transformation effectively exiles the problematic boundary to infinity where it
-won't influence the behavior of Taylor approximations at more reasonable inputs. 
+won't influence the behavior of Taylor approximations at more reasonable inputs.
 At the same time the transformation tends to expand small neighborhoods near the
 boundary into wider regions, decompressing the nominal functional behavior so
 that it can be better resolved by Taylor approximations.
@@ -1161,11 +1161,11 @@ each order which then correspond to multiple component slopes,
 $$
 \begin{align*}
 f_{1}(x; x_{0})
-&= f(x_{0}) + \sum_{i = 1}^{I} \frac{ \partial f }{ \partial x_{i} }(x_{0}) \,
-   (x_{i} - x_{0, i})
+&= f(x_{0}) + \sum_{m = 1}^{M} \frac{ \partial f }{ \partial x_{m} }(x_{0}) \,
+   (x_{m} - x_{0, m})
 \\
 f(x)
-&= \alpha \hspace{6.5mm} + \sum_{i = 1}^{I} \beta_{i} \, \Delta x_{i}.
+&= \alpha \hspace{6.5mm} + \sum_{m = 1}^{M} \beta_{m} \, \Delta x_{m}.
 \end{align*}
 $$
 In other words centering the covariates allows us to directly match the slopes
@@ -1176,7 +1176,7 @@ associate these component slopes with tensors,
 $$
 \begin{align*}
 f_{1}(x; x_{0})
-&= \alpha + \sum_{i = 1}^{I} \beta_{i} \, \Delta x_{i}
+&= \alpha + \sum_{m = 1}^{M} \beta_{m} \, \Delta x_{m}
 \\
 f(x)
 &= \alpha + \boldsymbol{\beta}^{T} \, \Delta \mathbf{x},
@@ -1290,7 +1290,7 @@ verify this we have to mindful of the behavior of _all_ potential covariate
 observations of interest and, if not model that behavior outright, at least
 consider its basic properties.
 
-Finally the locality of Taylor approximations introduced one last practical 
+Finally the locality of Taylor approximations introduced one last practical
 limitation.  Within any local neighborhood an _infinite_ number of exact
 functions will share the same Taylor approximations to any given order.  Only
 when we look at covariate inputs outside of that local neighborhood will those
@@ -1548,7 +1548,7 @@ $$
 &=
 \sum_{m = 1}^{M} \beta_{2, mm} \, \Delta x_{m}^{2}
 +
-\sum_{m_{1} = 1}^{M} \sum_{m_{2} = 1}^{M}
+\sum_{m_{1} = 1}^{M} \sum_{m_{2} \ne m_{1}}
 \beta_{2, m_{1} m_{2}} \, \Delta x_{m_{1}} \, \Delta x_{m_{2}},
 \\
 &=
@@ -1581,7 +1581,7 @@ $$
 $$
 then we can write
 $$
-\sum_{m = 1}^{M} \frac{1}{2} \, \beta_{2, mm} \, \Delta x_{m}^{2}
+\sum_{m = 1}^{M} \beta_{2, mm} \, \Delta x_{m}^{2}
 =
 \left( \Delta^{2}_{d} \mathbf{x} \right)^{T} \cdot \boldsymbol{\beta}_{2d}.
 $$
@@ -1612,8 +1612,8 @@ $$
 $$
 so that
 $$
-\sum_{i = 1}^{I} \sum_{j = 1}^{i - 1}
-\frac{1}{2} \, \beta_{2, ij} \, 2 \, \Delta x_{i} \, \Delta x_{j}
+\sum_{m_{1} = 1}^{M} \sum_{m_{2} = 1}^{m_{1} - 1}
+\beta_{2, m_{1} m_{2}} \, 2 \, \Delta x_{m_{1}} \, \Delta x_{m_{2}}
 =
 \left( \Delta^{2}_{o} \mathbf{x} \right)^{T} \cdot \boldsymbol{\beta}_{2o}.
 $$
@@ -1775,7 +1775,7 @@ stifle modeling flexibility.
 Models of functional behavior that can be manipulated into a matrix-vector
 product like this may not be linear in the _covariates_, but they are linear in
 the _parameters_.  In many fields this latter notion of linearity is prioritized
-so that the term "linear model" refers to _any_ regression model that can be 
+so that the term "linear model" refers to _any_ regression model that can be
 mplemented with a single product of a fixed matrix and a vector of parameters,
 regardless of how that matrix is constructed.
 
@@ -1959,8 +1959,9 @@ $$
 $$
 then a natural choice is $\delta x_{m}$.
 
-In other words we can focus our elicitation on bounding the reasonable
-functional behavior at the edge of the local neighborhood,
+In other words to constrain the reasonable variation in the $m$th slope
+$\delta \beta_{1, m}$ we can focus our elicitation on bounding the reasonable
+functional behavior at the edge of this local neighborhood, $\delta f$,
 $$
 \delta \beta_{1, m} = \frac{ \delta f }{ \delta x_{m} }.
 $$
@@ -2077,7 +2078,7 @@ constrain the overall functional behavior.
 
 Regardless of how we construct a prior model for the parameters in a Taylor
 approximation model we need to be careful that the prior model implies that
-the full functional output are consistent with our domain expertise. 
+the full functional output are consistent with our domain expertise.
 Fortunately we can investigate this consistency with a variety of prior
 pushforward checks.
 
@@ -2225,7 +2226,7 @@ f_{*} \pi(\mu \mid \tilde{x}_{m})
 &=
 \int \mathrm{d} \theta \, \mathrm{d} \gamma \,
 \prod_{m' \ne m} \mathrm{d} x_{m'} \,
-\pi(\theta) \, \pi(\gamma) \, \pi(x_{\setminus m} \mid x_{m} \mid \gamma)
+\pi(\theta) \, \pi(\gamma) \, \pi(x_{\setminus m} \mid x_{m}, \gamma)
 \\
 & \hspace{8mm}
 \cdot \delta( \mu - f_{i}(x_{1}, \ldots, x_{m - 1}, \tilde{x}_{m},
@@ -2245,7 +2246,7 @@ $$
 \\
 \{ \tilde{x}_{1, s}, \ldots, \tilde{x}_{m - 1, s},
    \tilde{x}_{m + 1, s}, \ldots, \tilde{x}_{M} \}
-& \sim \pi(x_{\setminus m} \mid \tilde{x}_{m} \mid \tilde{\gamma}_{s})
+& \sim \pi(x_{\setminus m} \mid \tilde{x}_{m}, \tilde{\gamma}_{s})
 \\
 \tilde{\mu}_{s} &=
 f_{i}(\tilde{x}_{1, s}, \ldots, \tilde{x}_{m - 1, s}, \tilde{x}_{m},
@@ -2377,6 +2378,12 @@ code that automatically constructs and visualizes the quantile bands for each
 bin we can quickly analyze the shape of the functional behavior encoded in a
 prior model along any direction in the covariate space.
 
+One subtly with this approach, however, is that correlations between the
+observed component covariates can bias these individual visualizations.  The
+more complex the interaction between the component covaraiates the more
+structured this bias can be.  We'll discuss this in more depth in
+[Section 2.5](#sec:retro).
+
 Finally while appealing to an empirical distribution of observed covariates is
 natural in many cases, we shouldn't overlook our ability to use _any_ marginal
 covariate model in the analysis of a prior model.  Even if we don't want to
@@ -2444,7 +2451,7 @@ practice, for example, when the implementation of a model is hidden behind a
 software implementation and not accessible to a user.  In this case users would
 be able to freely process the observed variates and covariates before passing
 them to the software, but they would not be able to easily configure how the
-software will consume those inputs. 
+software will consume those inputs.
 
 For instance the regularization of parameters in inferential methods, such as
 component prior models in Bayesian methods or component penalty functions in a
@@ -2522,7 +2529,7 @@ transformations_.  In particular if we don't store the empirical means and
 standard deviations from that initial data set and apply them to the empirical
 standardization of all future data sets then the interpretation of the model and
 its inferences will vary across those data sets.  We cannot achieve
-self-consistent results by empirically standardizing each data set to itself! 
+self-consistent results by empirically standardizing each data set to itself!
 
 This is an especially easy mistake to make when empirical standardization is
 implemented automatically in software.  Another hazard of automated empirical
@@ -2552,7 +2559,7 @@ models but also forces us to confront the limitations of a given Taylor
 approximation and be better prepared to apply these models only when
 appropriate.
 
-## Posterior Retrodictive Checks
+## Posterior Retrodictive Checks { #sec:retro }
 #### I Forgot That You Existed {-}
 
 As we saw in [Section 2.2](#sec:local_dependence) a Taylor approximation
@@ -2674,7 +2681,7 @@ check directly informs the functional behavior missing from our model, and hence
 productive steps towards a better model.
 
 For example the discrepancies in both marginal and conditional checks here
-suggests that the Taylor approximation is the source of the model inadequacy. 
+suggests that the Taylor approximation is the source of the model inadequacy.
 In particular the sudden positive deviations at large inputs and sudden negative
 deviations at small inputs that manifests in the conditional check suggests that
 the Taylor approximation is missing a cubic component.
@@ -3024,7 +3031,7 @@ plot(xs, alpha + beta * (xs - x0) - ys, type="l", lwd=2, col=c_light,
     xlab="x", xlim=c(-3, 3), ylab="Approximation Error", ylim=c(-7, 7))
 abline(v=x0, col="gray")
 abline(h=x0, col="gray")
-  
+ 
 rect(x0 - 3 * tau1, -7, x0 + 3 * tau1, 7, col=c("#BBBBBB44"), border=FALSE)
 abline(v=x0 - 3 * tau1, col=c("#BBBBBB"), lty=1, lw=2)
 abline(v=x0,            col=c("#BBBBBB"), lty=1, lw=2)
@@ -3092,7 +3099,7 @@ plot(xs, alpha + beta * (xs - x0) - ys, type="l", lwd=2, col=c_light,
     xlab="x", xlim=c(-3, 3), ylab="Approximation Error", ylim=c(-7, 7))
 abline(v=x0, col="gray")
 abline(h=0, col="gray")
-  
+ 
 rect(x0 - 3 * tau1, -7, x0 + 3 * tau1, 7, col=c("#BBBBBB44"), border=FALSE)
 abline(v=x0 - 3 * tau1, col=c("#BBBBBB"), lty=1, lw=2)
 abline(v=x0,            col=c("#BBBBBB"), lty=1, lw=2)
@@ -3158,7 +3165,7 @@ plot(xs, alpha + beta * (xs - x0) - ys, type="l", lwd=2, col=c_light,
     xlab="x", xlim=c(-3, 3), ylab="Approximation Error", ylim=c(-7, 7))
 abline(v=x0, col="gray")
 abline(h=0, col="gray")
-  
+ 
 rect(x0 - 3 * tau1, -7, x0 + 3 * tau1, 7, col=c("#BBBBBB44"), border=FALSE)
 abline(v=x0 - 3 * tau1, col=c("#BBBBBB"), lty=1, lw=2)
 abline(v=x0,            col=c("#BBBBBB"), lty=1, lw=2)
@@ -3209,10 +3216,10 @@ plot(xs, ys, type="l", lwd=2, col=c_dark,
 lines(xs, alpha + beta * (xs - x0), lwd=2, col=c_light)
 abline(v=x0, col="gray")
 
-points(x_in, y_in, pch=16, cex=1.5, col="white")
+points(x_in, y_in, pch=16, cex=1.0, col="white")
 points(x_in, y_in, pch=16, cex=1.2, col="black")
 
-points(x_out, y_out, pch=16, cex=1.5, col="white")
+points(x_out, y_out, pch=16, cex=1.0, col="white")
 points(x_out, y_out, pch=16, cex=1.2, col=c_mid_teal)
 ```
 
@@ -4140,7 +4147,7 @@ plot_marginal_comp <- function(values1, values2, name,
        main=title, xlab=name, xlim=display_xlims,
        ylab="", yaxt='n', ylim=display_ylims,
        col=c_light, border=c_light_highlight)
- 
+
   hist(values2, breaks=breaks, prob=T, add=T,
        col=c_dark, border=c_dark_highlight)
 }
@@ -4450,7 +4457,7 @@ text(-2.5, 10, cex=1.25, label="Complete\nObservations",
 text(4.5, 10, cex=1.25, label="Incomplete\nObservations",
      pos=4, srt=90, col=c_mid_teal)
 
-plot(data$x, data$y, pch=16, cex=1.5, col="white",
+plot(data$x, data$y, pch=16, cex=1.0, col="white",
      main="", xlim=c(-1, 3.5), xlab="x", ylim=c(-5, 5), ylab="y")
 points(data$x, data$y, pch=16, cex=1.2, col="black")
 
@@ -4526,10 +4533,25 @@ points(data$x, data$y, pch=16, cex=1.0, col="white")
 points(data$x, data$y, pch=16, cex=0.75, col="black")
 ```
 
-Unfortunately the validity of the inferred functional behavior starts to
-deteriorate as soon as we move beyond that local neighborhood.  By the time we
-reach the incomplete covariates the inferred functional behavior is far from
-the exact functional behavior.
+Unfortunately this retrodictive consistency doesn't generalized to _predictive_
+consistency.  Comparing the posterior predictive distribution to the held out
+observations gives a terrible posterior predictive check.
+
+```{r}
+plot_marginal_quantiles(data$x_grid, samples$y_pred_grid, "",
+                      "x", "y", c(-1, 3.5), c(-7, 7))
+
+points(data$x, data$y, pch=16, cex=1.0, col="white")
+points(data$x, data$y, pch=16, cex=0.75, col="black")
+
+points(data$x2, data$y2, pch=16, cex=1.0, col="white")
+points(data$x2, data$y2, pch=16, cex=0.75, col=c_mid_teal)
+```
+
+The problem is that the validity of the inferred functional behavior starts to
+deteriorate as soon as we move beyond the local neighborhood of the complete
+observations.  By the time we reach the incomplete covariates the inferred 
+functional behavior is far from the exact functional behavior.
 
 ```{r}
 par(mfrow=c(1, 1), mar = c(5, 5, 2, 1))
@@ -4583,21 +4605,9 @@ enough to transfer inferences from one neighborhood of inputs to another.
 
 If the complete and incomplete covariate distributions don't overlap then we
 should default to questioning how well inferences from a Taylor regression model
-might generalize.  The only way to evaluate that generalization performance is
-to acquire complete observations from the external covariate distribution.  In
-this case we can complement our conditional posterior retrodicive check with a
-conditional posterior _predictive_ check to demonstrate the problems.
-
-```{r}
-plot_marginal_quantiles(data$x_grid, samples$y_pred_grid, "",
-                        "x", "y", c(-1, 3.5), c(-7, 7))
-
-points(data$x, data$y, pch=16, cex=1.0, col="white")
-points(data$x, data$y, pch=16, cex=0.75, col="black")
-
-points(data$x2, data$y2, pch=16, cex=1.0, col="white")
-points(data$x2, data$y2, pch=16, cex=0.75, col=c_mid_teal)
-```
+might generalize.  The only way to formally evaluate that generalization 
+performance is to acquire complete observations from the external covariate 
+distribution.
 
 ### Improving A Poor Variation Model
 
@@ -4626,7 +4636,7 @@ par(mfrow=c(1, 2), mar = c(5, 5, 2, 1))
 
 plot_line_hist(data$x, 0.75, 1.25, 0.05, "x")
 
-plot(data$x, data$y, pch=16, cex=1.5, col="white",
+plot(data$x, data$y, pch=16, cex=1.0, col="white",
      main="", xlim=c(0.75, 1.25), xlab="x", ylim=c(-1.75, 0), ylab="y")
 points(data$x, data$y, pch=16, cex=1.2, col="black")
 
@@ -4748,7 +4758,7 @@ plot_marginal(samples$beta, "beta", c(-2, 4))
 abline(v=dfdxs(x0), lwd=4, col="white")
 abline(v=dfdxs(x0), lwd=2, col="black")
 
-plot_marginal(1 / samples$nu_inv, "nu", c(0, 3))
+plot_marginal(1 / samples$nu_inv, "nu", c(0, 5))
 abline(v=2, lwd=4, col="white")
 abline(v=2, lwd=2, col="black")
 
@@ -4949,7 +4959,7 @@ conditional_location <- function(obs_covar, x_name, f, y_name, bin_min, bin_max,
 
   for (b in 1:B) {
     bin_idx <- which(breaks[b] <= obs_covar & obs_covar < breaks[b + 1])
- 
+
     if (length(bin_idx)) {
       bin_f_medians <- sapply(1:S, function(s) median(f[s, bin_idx]))
       cred[,b] <- quantile(bin_f_medians, probs=probs)
@@ -5089,7 +5099,7 @@ conditional_variate_retro <- function(obs_var, obs_covar, pred_var,
 
   for (b in 1:B) {
     bin_idx <- which(breaks[b] <= obs_covar & obs_covar < breaks[b + 1])
- 
+
     if (length(bin_idx)) {
       obs_var_medians[b] <- median(obs_var[bin_idx])
       bin_pred_medians <- sapply(1:S, function(s) median(pred_var[s, bin_idx]))
@@ -5109,7 +5119,7 @@ conditional_variate_retro <- function(obs_var, obs_covar, pred_var,
 
   plot(1, type="n", main="",
        xlim=c(bin_min, bin_max), xlab=x_name,
-       ylim=c(ymin, ymax), ylab="y_pred - y_obs")
+       ylim=c(ymin, ymax), ylab="y")
 
   polygon(c(xs, rev(xs)), c(pad_cred[1,], rev(pad_cred[9,])),
           col = c_light, border = NA)
@@ -5125,11 +5135,11 @@ conditional_variate_retro <- function(obs_var, obs_covar, pred_var,
       lines(xs[(2 * b - 1):(2 * b)],
             pad_cred[5,(2 * b - 1):(2 * b)],
             col=c_dark, lwd=2)
-         
+        
       lines(xs[(2 * b - 1):(2 * b)],
             c(obs_var_medians[b], obs_var_medians[b]),
             col="white", lwd=3)
-               
+              
       lines(xs[(2 * b - 1):(2 * b)],
             c(obs_var_medians[b], obs_var_medians[b]),
             col="black", lwd=2)
@@ -5173,7 +5183,7 @@ conditional_variate_retro_residual <- function(obs_var, obs_covar, pred_var,
 
   for (b in 1:B) {
     bin_idx <- which(breaks[b] <= obs_covar & obs_covar < breaks[b + 1])
- 
+
     if (length(bin_idx)) {
       bin_pred_medians <- sapply(1:S, function(s) median(pred_var[s, bin_idx]))
       cred[,b] <- quantile(bin_pred_medians, probs=probs) - median(obs_var[bin_idx])
@@ -5292,22 +5302,22 @@ plot_line_hist(data$X[,1], -6, 9, 1, "x1")
 plot_line_hist(data$X[,2], -6, 9, 1, "x2")
 plot_line_hist(data$X[,3], -6, 9, 1, "x3")
 
-plot(data$X[,1], data$X[,2], pch=16, cex=1.5, col="black",
+plot(data$X[,1], data$X[,2], pch=16, cex=1.0, col="black",
      main="", xlim=c(-6, 9), xlab="x1", ylim=c(-6, 9), ylab="x2")
 
-plot(data$X[,1], data$X[,3], pch=16, cex=1.5, col="black",
+plot(data$X[,1], data$X[,3], pch=16, cex=1.0, col="black",
      main="", xlim=c(-6, 9), xlab="x1", ylim=c(-6, 9), ylab="x3")
 
-plot(data$X[,2], data$X[,3], pch=16, cex=1.5, col="black",
+plot(data$X[,2], data$X[,3], pch=16, cex=1.0, col="black",
      main="", xlim=c(-6, 9), xlab="x2", ylim=c(-6, 9), ylab="x3")
 
-plot(data$X[,1], data$y, pch=16, cex=1.5, col="black",
+plot(data$X[,1], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(-6, 9), xlab="x1", ylim=c(-50, 225), ylab="y")
 
-plot(data$X[,2], data$y, pch=16, cex=1.5, col="black",
+plot(data$X[,2], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(-6, 9), xlab="x2", ylim=c(-50, 225), ylab="y")
 
-plot(data$X[,3], data$y, pch=16, cex=1.5, col="black",
+plot(data$X[,3], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(-6, 9), xlab="x3", ylim=c(-50, 225), ylab="y")
 ```
 
@@ -5517,18 +5527,18 @@ second-order model the intercept contribution and variability scale no longer
 have to contort themselves as they had to in the first-order model.
 
 ```{r}
-par(mfrow=c(3, 2), mar = c(5, 1, 3, 1))
+par(mfrow=c(2, 2), mar = c(5, 1, 3, 1))
 
-plot_marginal(samples_linear$alpha, "alpha", c(10, 40))
+plot_marginal(samples_linear$alpha, "alpha", c(15, 40))
 title("Linear Model")
 
-plot_marginal(samples_quad$alpha, "alpha", c(10, 40))
+plot_marginal(samples_quad$alpha, "alpha", c(15, 40))
 title("Quadratic Model")
 
-plot_marginal(samples_linear$sigma, "sigma", c(0, 20))
+plot_marginal(samples_linear$sigma, "sigma", c(0, 30))
 title("Linear Model")
 
-plot_marginal(samples_quad$sigma, "sigma", c(0, 20))
+plot_marginal(samples_quad$sigma, "sigma", c(0, 30))
 title("Quadratic Model")
 ```
 
@@ -5858,22 +5868,22 @@ plot_line_hist(data$X[,1], -9, 9, 1, "x1")
 plot_line_hist(data$X[,2], -9, 9, 1, "x2")
 plot_line_hist(data$X[,3], -9, 9, 1, "x3")
 
-plot(data$X[,1], data$X[,2], pch=16, cex=1.5, col="black",
+plot(data$X[,1], data$X[,2], pch=16, cex=1.0, col="black",
      main="", xlim=c(-9, 9), xlab="x1", ylim=c(-9, 9), ylab="x2")
 
-plot(data$X[,1], data$X[,3], pch=16, cex=1.5, col="black",
+plot(data$X[,1], data$X[,3], pch=16, cex=1.0, col="black",
      main="", xlim=c(-9, 9), xlab="x1", ylim=c(-9, 9), ylab="x3")
 
-plot(data$X[,2], data$X[,3], pch=16, cex=1.5, col="black",
+plot(data$X[,2], data$X[,3], pch=16, cex=1.0, col="black",
      main="", xlim=c(-9, 9), xlab="x2", ylim=c(-9, 9), ylab="x3")
 
-plot(data$X[,1], data$y, pch=16, cex=1.5, col="black",
+plot(data$X[,1], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(-9, 9), xlab="x1", ylim=c(-25, 325), ylab="y")
 
-plot(data$X[,2], data$y, pch=16, cex=1.5, col="black",
+plot(data$X[,2], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(-9, 9), xlab="x2", ylim=c(-25, 325), ylab="y")
 
-plot(data$X[,3], data$y, pch=16, cex=1.5, col="black",
+plot(data$X[,3], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(-9, 9), xlab="x3", ylim=c(-25, 325), ylab="y")
 ```
 
@@ -6069,22 +6079,22 @@ plot_line_hist(data$X[,1], -1, 3, 0.1, "x1")
 plot_line_hist(data$X[,2], -3, 1, 0.1, "x2")
 plot_line_hist(data$X[,3],  1, 5, 0.1, "x3")
 
-plot(data$X[,1], data$X[,2], pch=16, cex=1.5, col="black",
+plot(data$X[,1], data$X[,2], pch=16, cex=1.0, col="black",
      main="", xlim=c(-1, 3), xlab="x1", ylim=c(-3, 1), ylab="x2")
 
-plot(data$X[,1], data$X[,3], pch=16, cex=1.5, col="black",
+plot(data$X[,1], data$X[,3], pch=16, cex=1.0, col="black",
      main="", xlim=c(-1, 3), xlab="x1", ylim=c(1, 5), ylab="x3")
 
-plot(data$X[,2], data$X[,3], pch=16, cex=1.5, col="black",
+plot(data$X[,2], data$X[,3], pch=16, cex=1.0, col="black",
      main="", xlim=c(-3, 1), xlab="x2", ylim=c(1, 5), ylab="x3")
 
-plot(data$X[,1], data$y, pch=16, cex=1.5, col="black",
+plot(data$X[,1], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(-1, 3), xlab="x1", ylim=c(-75, 75), ylab="y")
 
-plot(data$X[,2], data$y, pch=16, cex=1.5, col="black",
+plot(data$X[,2], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(-3, 1), xlab="x2", ylim=c(-75, 75), ylab="y")
 
-plot(data$X[,3], data$y, pch=16, cex=1.5, col="black",
+plot(data$X[,3], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(1, 5), xlab="x3", ylim=c(-75, 75), ylab="y")
 ```
 
@@ -6731,7 +6741,7 @@ contour(x1, x2, exact_f_evals, nlevels=50,
         xlab="x1", xlim=c(-20, 20),
         ylab="x2", ylim=c(-20, 20),
         drawlabels = FALSE, col = c_dark, lwd = 2)
-     
+    
 points(x_star[1], x_star[2], pch=18, cex=1.25, col=c_dark_teal)
 ```
 
@@ -6745,7 +6755,7 @@ Complete observations then inform the behavior of the objective function in the
 local neighborhood of the observed covariates.  If we have some control over the
 covariates then we can interrogate the system behavior in different
 neighborhoods to guide our search.  Let's say that we can only weakly control
-the covariates in the sense that we can approximately fix their centrality andn
+the covariates in the sense that we can approximately fix their centrality and
 breadth but not their particular values.
 
 Here we'll initialize our search with covariate configurations clustered around
@@ -7385,7 +7395,7 @@ points(samples$x_star[, 1][max_idx], samples$x_star[, 2][max_idx],
 
 points(x_star[1], x_star[2], pch=18, cex=2.0, col="white")
 points(x_star[1], x_star[2], pch=18, cex=1.25, col=c_dark_teal)
-    
+   
 # Saddle Points
 contour(x1, x2, exact_f_evals, nlevels=25,
         main="Location Function (Saddle Points)",
@@ -8145,7 +8155,7 @@ points(samples4$x_star[, 1][min_idx], samples4$x_star[, 2][min_idx],
 plot(data4$X[,1], data4$X[,2], pch=16, cex=0.5, col="black",
      main="Updated Search (Maxima)",
      xlab="x1", xlim=c(-30, 10), ylab="x2", ylim=c(-5, 30))
-  
+ 
 max_idx <- samples4$det_beta2 > 0 & samples4$beta2_d[, 1] < 0
 points(samples4$x_star[, 1][max_idx], samples4$x_star[, 2][max_idx],
        pch=18, cex=0.75, col=c_mid_teal)
@@ -8154,7 +8164,7 @@ points(samples4$x_star[, 1][max_idx], samples4$x_star[, 2][max_idx],
 plot(data4$X[,1], data4$X[,2], pch=16, cex=0.5, col="black",
      main="Updated Search (Saddle Points)",
      xlab="x1", xlim=c(-30, 10), ylab="x2", ylim=c(-5, 30))
-  
+ 
 sdl_idx <- samples4$det_beta2 < 0
 points(samples4$x_star[, 1][sdl_idx], samples4$x_star[, 2][sdl_idx],
       pch=18, cex=0.75, col=c_light)
@@ -8939,7 +8949,7 @@ few cases link to more comprehensive discussions.
 Recall that a first-order Taylor approximation to the location function can be
 interpreted as a plane oriented around the baseline input.  With enough complete
 observations that plane will be _overdetermined_, and none of its configuration
-will exactly intersect _every_ observed variate-covariate pair at the same time. 
+will exactly intersect _every_ observed variate-covariate pair at the same time.
 The consistent configurations of the plane will be limited to only those that
 interpolate through all of the observations reasonably well.  This results in a
 weakly degenerate likelihood function, and hence a well-behaved posterior
@@ -9112,13 +9122,13 @@ particularly heuristic regression models, however, there is often a question
 of which component variables might meaningfully influence the location behavior
 and hence be incorporated into the covariate space of the model.  Because this
 question of _feature selection_ is so vague there is little opportunity for
-theory to guide its answer. 
+theory to guide its answer.
 
 One approach is to treat different choices of covariate spaces as the basis for
 different models in which case deciding between them becomes a
 _model comparison_ problem.  To formalize this approach we would need explicitly
 define a utility function that defines the consequences of choosing one model
-over another. 
+over another.
 
 Often people fall back to implicit predictive performance metrics, although as I
 discuss in my
