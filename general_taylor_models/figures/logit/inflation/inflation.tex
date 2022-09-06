@@ -1,0 +1,119 @@
+\documentclass{standalone}
+\usepackage{graphicx}	
+\usepackage{amssymb, amsmath, amsthm}
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{intersections, backgrounds, math}
+
+\definecolor{light}{RGB}{220, 188, 188}
+\definecolor{mid}{RGB}{185, 124, 124}
+\definecolor{dark}{RGB}{143, 39, 39}
+\definecolor{highlight}{RGB}{180, 31, 180}
+\definecolor{darkteal}{RGB}{29, 79, 79}
+\definecolor{darkolive}{RGB}{97, 123, 45}
+\definecolor{gray10}{gray}{0.1}
+\definecolor{gray20}{gray}{0.2}
+\definecolor{gray30}{gray}{0.3}
+\definecolor{gray40}{gray}{0.4}
+\definecolor{gray60}{gray}{0.6}
+\definecolor{gray70}{gray}{0.7}
+\definecolor{gray80}{gray}{0.8}
+\definecolor{gray90}{gray}{0.9}
+\definecolor{gray95}{gray}{0.95}
+
+\tikzmath{
+  function normal(\x) {
+    return exp(-0.5 * \x * \x);
+  };
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=1.0, thick]
+  
+  
+  \pgfmathsetmacro{\s}{0.1}
+  
+  \begin{scope}[shift={(0, 0)}]
+    \draw[white] (-4, -1) rectangle (4, 5);
+
+    \draw[domain={-2.8:2.8}, smooth, samples=100, line width=1, variable=\x, color=dark] 
+      plot ({\x},{0.4 * normal(\x / \s) / \s});
+  
+    \draw [<->, >=stealth, line width=1] (-3, 0) -- (3, 0);
+    \node at (0, -0.5) { $w = \alpha_{0} + \sum_{j = 1}^{J} \alpha_{j}$ };
+    \fill[white] (-0.25, -1) rectangle (2, -0.1);
+  \end{scope}
+  
+  \pgfmathsetmacro{\s}{0.1 * 5}
+  
+  \begin{scope}[shift={(8, 0)}]
+    \draw[white] (-4, -1) rectangle (4, 5);
+
+    \draw[domain={0.01:0.99}, smooth, samples=50, line width=1, variable=\x, color=dark] 
+      plot ({6 * \x - 3},{0.4 * normal( (ln(\x)  - ln(1 - \x)) * (1 / \s) ) / (\s * \x * (1 - \x))});
+
+    \draw [->, >=stealth, line width=1] (-3, 0) -- (-3, 4);
+    \draw [->, >=stealth, line width=1] (3, 0) -- (3, 4);
+    \draw [-, >=stealth, line width=1] (-3, 0) -- (3, 0);
+    \node at (0, -0.5) { $v = \mathrm{logistic}(w)$ };
+  \end{scope}
+
+  \pgfmathsetmacro{\s}{0.1 * sqrt(2)}
+  
+  \begin{scope}[shift={(0, -6)}]
+    \draw[white] (-4, -1) rectangle (4, 5);
+
+    \draw[domain={-2.8:2.8}, smooth, samples=100, line width=1, variable=\x, color=dark] 
+      plot ({\x},{0.4 * normal(\x / \s) / \s});
+  
+    \draw [<->, >=stealth, line width=1] (-3, 0) -- (3, 0);
+    \node at (0, -0.5) { $w = \alpha_{0} + \sum_{j = 1}^{J} \alpha_{j}$ };
+    \fill[white] (0.1, -1) rectangle (2, -0.1);
+    \node at (1.245, -0.545) { $\alpha_{1}$ };
+  \end{scope}
+  
+  \pgfmathsetmacro{\s}{0.1 * sqrt(2) * 5}
+  
+  \begin{scope}[shift={(8, -6)}]
+    \draw[white] (-4, -1) rectangle (4, 5);
+
+    \draw[domain={0.01:0.99}, smooth, samples=50, line width=1, variable=\x, color=dark] 
+      plot ({6 * \x - 3},{0.4 * normal( (ln(\x)  - ln(1 - \x)) * (1 / \s) ) / (\s * \x * (1 - \x))});
+  
+    \draw [->, >=stealth, line width=1] (-3, 0) -- (-3, 4);
+    \draw [->, >=stealth, line width=1] (3, 0) -- (3, 4);
+    \draw [-, >=stealth, line width=1] (-3, 0) -- (3, 0);
+    \node at (0, -0.5) { $v = \mathrm{logistic}(w)$ };
+  \end{scope}
+
+  \pgfmathsetmacro{\s}{1.0}
+  
+  \begin{scope}[shift={(0, -12)}]
+    \draw[white] (-4, -1) rectangle (4, 5);
+
+    \draw[domain={-2.8:2.8}, smooth, samples=100, line width=1, variable=\x, color=dark] 
+      plot ({\x},{0.4 * normal(\x / \s) / \s});
+  
+    \draw [<->, >=stealth, line width=1] (-3, 0) -- (3, 0);
+    \node at (0, -0.5) { $w = \alpha_{0} + \sum_{j = 1}^{J} \alpha_{j}$ };
+  \end{scope}
+  
+  \pgfmathsetmacro{\s}{5.0}
+  
+  \begin{scope}[shift={(8, -12)}]
+    \draw[white] (-4, -1) rectangle (4, 5);
+
+    \draw[domain={0.0145:0.9855}, smooth, samples=50, line width=1, variable=\x, color=dark] 
+      plot ({6 * \x - 3},{0.4 * normal( (ln(\x)  - ln(1 - \x)) * (1 / \s) ) / (\s * \x * (1 - \x))});
+  
+    \draw [->, >=stealth, line width=1] (-3, 0) -- (-3, 4);
+    \draw [->, >=stealth, line width=1] (3, 0) -- (3, 4);
+    \draw [-, >=stealth, line width=1] (-3, 0) -- (3, 0);
+    \node at (0, -0.5) { $v = \mathrm{logistic}(w)$ };
+  \end{scope}
+    
+\end{tikzpicture}
+
+\end{document}  
