@@ -494,15 +494,18 @@ within the interval
 $$
 - \log 2 \lessapprox \beta \, (x - x_{0}) \lessapprox \log 2.
 $$
-If environmental temperatures can vary by at most ten degrees Celsius then this
-finally implies
+If environmental temperatures can vary by at most ten degrees Celsius
+$$
+| x - x_{0} | \le 10 \, C
+$$
+then
 $$
 \begin{align*}
-- \frac{\log 2}{10} &\lessapprox
-\beta \, (x - x_{0}) \lessapprox
-\frac{\log 2}{10}
+- \frac{\log 2}{10 \, C} &\lessapprox
+\beta \lessapprox
+\frac{\log 2}{10 \, C}
 \\
-- 0.069 &\lessapprox \beta \, (x - x_{0}) \lessapprox 0.069.
+- 0.069 \, C^{-1} &\lessapprox \beta \lessapprox 0.069 \, C^{-1}.
 \end{align*}
 $$
 Contrast this to the $\text{normal}(0, 1)$ or even $\text{normal}(0, 100)$
@@ -527,9 +530,9 @@ When environmental temperatures can vary by at most ten degrees Celsius the
 reasonable values for the slope would have to concentrate in the interval
 $$
 \begin{align*}
-- \frac{0.1}{10} &\lessapprox \beta \, (x - x_{0}) \lessapprox \frac{0.1}{10}
+- \frac{0.1}{10 \, C} &\lessapprox \beta \lessapprox \frac{0.1}{10 \, C}
 \\
-- 0.01 & \lessapprox \beta \, (x - x_{0}) \lessapprox 0.01
+- 0.01 \, C^{-1} & \lessapprox \beta \lessapprox 0.01 \, C^{-1}
 \end{align*}
 $$
 which, despite the relatively weak domain expertise that we have elicited, is
@@ -1088,7 +1091,7 @@ To really critique our model, however, we need to consider retrodictive checks.
 Unfortunately the retrodictive behavior of the marginal variate distribution
 leaves something to be desired.  The retrodictive variate distribution not only
 spills below zero but also doesn't match the asymmetric shape of the observed
-data.  Ultimatley it doesn't look like the observed variates are not far enough
+data.  Ultimately it doesn't look like the observed variates are not far enough
 away from the positivity boundary for that boundary to be ignorable.
 
 ```{r}
@@ -1383,7 +1386,8 @@ $$
 become
 $$
 \begin{align*}
-\log 13.35 &\lessapprox \alpha \lessapprox  \log36.65
+\log 13.35 &\lessapprox \alpha \lessapprox  \log 36.65
+\\
 2.59 &\lessapprox \alpha \lessapprox 3.60.
 \end{align*}
 $$
@@ -1800,7 +1804,7 @@ functions of this form, but here we'll consider the _logistic unit_ or _logit_
 function [@Berkson:1944],
 $$
 \begin{alignat*}{6}
-\mathrm{logit} :\; &[0, 1]]& &\rightarrow& \; &\mathbb{R}&
+\mathrm{logit} :\; &[0, 1]& &\rightarrow& \; &\mathbb{R}&
 \\
 &v& &\mapsto& &\log \frac{v}{1 - v}&.
 \end{alignat*}
@@ -2051,13 +2055,17 @@ v(x)
 &= \mathrm{logisic} \left( (\mathrm{logit} \circ f)_{I}(x; x_{0}) \right)
 \\
 &=
-\frac{1}{1 + \exp \left( (\mathrm{logit} \circ f)_{I}(x; x_{0}) \right) }.
+\frac{1}{1 + \exp \left( - (\mathrm{logit} \circ f)_{I}(x; x_{0}) \right) }
+\\
+&=
+\frac{\exp \left( (\mathrm{logit} \circ f)_{I}(x; x_{0}) \right)}
+{1 + \exp \left( (\mathrm{logit} \circ f)_{I}(x; x_{0}) \right) }.
 \end{align*}
 $$
 Comparing to this to the previous equation for the interval-constrained output
 as a function of the odds,
 $$
-v(x) = \frac{1}{1 + o(x)},
+v(x) = \frac{o(x)}{1 + o(x)},
 $$
 we can equate the odds with the exponential of the latent Taylor approximation,
 $$
@@ -2159,7 +2167,7 @@ $$
 $$
 Diving through by the perturbation
 $$
-\Delta x =  x - x_{0} = 20 \text{ minutes}
+\Delta x = x - x_{0} = 20 \text{ minutes}
 $$
 gives
 $$
@@ -2179,7 +2187,7 @@ at most only 10% more infected individuals after that twenty minute exposure
 then we would have
 $$
 \begin{align*}
-- \log 1.1 &\lessapprox | \beta | \, 20 \text{minutes} \lessapprox \log 1.1.
+- \log 1.1 &\lessapprox | \beta | \, 20 \text{ minutes} \lessapprox \log 1.1.
 \\
 - \frac{ \log 1.1 }{ 20 \text{ minutes} } &\lessapprox
 \beta \lessapprox
@@ -2281,23 +2289,23 @@ model might provide some useful insights.
 par(mfrow=c(3, 3), mar = c(5, 5, 2, 1))
 
 plot_line_hist(data$X[,1], -3, 1, 0.2, "x1")
-plot_line_hist(data$X[,2], -4, 4, 0.2, "x2")
+plot_line_hist(data$X[,2], -5, 5, 0.2, "x2")
 plot_line_hist(data$X[,3], -2, 4, 0.2, "x3")
 
 plot(data$X[,1], data$X[,2], pch=16, cex=1.0, col="black",
-     main="", xlim=c(-3, 1), xlab="x1", ylim=c(-4, 4), ylab="x2")
+     main="", xlim=c(-3, 1), xlab="x1", ylim=c(-5, 5), ylab="x2")
 
 plot(data$X[,1], data$X[,3], pch=16, cex=1.0, col="black",
      main="", xlim=c(-3, 1), xlab="x1", ylim=c(-2, 4), ylab="x3")
 
 plot(data$X[,2], data$X[,3], pch=16, cex=1.0, col="black",
-     main="", xlim=c(-4, 4), xlab="x2", ylim=c(-2, 4), ylab="x3")
+     main="", xlim=c(-5, 5), xlab="x2", ylim=c(-2, 4), ylab="x3")
 
 plot(data$X[,1], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(-3, 1), xlab="x1", ylim=c(0, 1), ylab="y")
 
 plot(data$X[,2], data$y, pch=16, cex=1.0, col="black",
-     main="", xlim=c(-4, 4), xlab="x2", ylim=c(0, 1), ylab="y")
+     main="", xlim=c(-5, 5), xlab="x2", ylim=c(0, 1), ylab="y")
 
 plot(data$X[,3], data$y, pch=16, cex=1.0, col="black",
      main="", xlim=c(-2, 4), xlab="x3", ylim=c(0, 1), ylab="y")
@@ -2349,7 +2357,7 @@ text(-1.25, 75, cex=1.25, label="y=0", pos=4, col="black")
 text(0, 70, cex=1.25, label="y=1", pos=4, col=c_mid_teal)
 
 plot_line_hist_comp(data$X[,2][data$y == 0], data$X[,2][data$y == 1],
-                    -4, 4, 8 / 20, "x1", "", "black", c_mid_teal)
+                    -5, 5, 8 / 20, "x1", "", "black", c_mid_teal)
 plot_line_hist_comp(data$X[,3][data$y == 0], data$X[,3][data$y == 1],
                     -2, 4, 6 / 20, "x1", "", "black", c_mid_teal)
 ```
@@ -2678,13 +2686,14 @@ par(mfrow=c(1, 3), mar = c(5, 5, 2, 1))
 conditional_location_median(data$X[,1], "x1",
                             samples$p, "p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
-                            samples$p, "p", -4, 4, 20)
+                            samples$p, "p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             samples$p, "p", -2, 4, 20)
 ```
 
-Confusing stubborness with thoroughness let's push ahead to the posterior
-analysis of the linear probability model in spite of the awkard prior behaviors.
+Confusing stubbornness with thoroughness let's push ahead to the posterior
+analysis of the linear probability model in spite of the awkward prior
+behaviors.
 
 ```{r}
 writeLines(readLines("stan_programs/bernoulli_linear.stan"))
@@ -2790,14 +2799,14 @@ text(-1.25, 75, cex=1.25, label="y=0", pos=4, col="black")
 text(0, 70, cex=1.25, label="y=1", pos=4, col=c_mid_teal)
 
 plot_line_hist_comp(data$X[,2][data$y == 0], data$X[,2][data$y == 1],
-                    -4, 4, 8 / 20, "x1", "", "black", c_mid_teal)
+                    -5, 5, 8 / 20, "x1", "", "black", c_mid_teal)
 plot_line_hist_comp(data$X[,3][data$y == 0], data$X[,3][data$y == 1],
                     -2, 4, 6 / 20, "x1", "", "black", c_mid_teal)
 
 conditional_location_median(data$X[,1], "x1",
                             samples$p, "p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
-                            samples$p, "p", -4, 4, 20)
+                            samples$p, "p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             samples$p, "p", -2, 4, 20)
 ```
@@ -2817,7 +2826,7 @@ conditional_e_prob_retro(data$X[,1], data$y,
                          samples$y_pred, -3, 1, 4 / 20,
                          "x1", "", "black")
 conditional_e_prob_retro(data$X[,2], data$y,
-                         samples$y_pred, -4, 4, 8 / 20,
+                         samples$y_pred, -5, 5, 8 / 20,
                          "x2", "", "black")
 conditional_e_prob_retro(data$X[,3], data$y,
                          samples$y_pred, -2, 4, 6 / 20,
@@ -2827,7 +2836,7 @@ conditional_e_prob_retro_residual(data$X[,1], data$y,
                                   samples$y_pred, -3, 1, 4 / 20,
                                   "x1", "", "black")
 conditional_e_prob_retro_residual(data$X[,2], data$y,
-                                  samples$y_pred, -4, 4, 8 / 20,
+                                  samples$y_pred, -5, 5, 8 / 20,
                                   "x2", "", "black")
 conditional_e_prob_retro_residual(data$X[,3], data$y,
                                   samples$y_pred, -2, 4, 6 / 20,
@@ -2902,7 +2911,7 @@ conditional_location_median(data$X[,1], "x1",
                             "logit_p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
                             samples$logit_p,
-                            "logit_p", -4, 4, 20)
+                            "logit_p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             samples$logit_p,
                             "logit_p", -2, 4, 20)
@@ -2912,7 +2921,7 @@ conditional_location_median(data$X[,1], "x1",
                             "p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
                             logistic(samples$logit_p),
-                            "p", -4, 4, 20)
+                            "p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             logistic(samples$logit_p),
                             "p", -2, 4, 20)
@@ -2974,7 +2983,7 @@ text(-1.25, 75, cex=1.25, label="y=0", pos=4, col="black")
 text(0, 70, cex=1.25, label="y=1", pos=4, col=c_mid_teal)
 
 plot_line_hist_comp(data$X[,2][data$y == 0], data$X[,2][data$y == 1],
-                    -4, 4, 8 / 20, "x1", "", "black", c_mid_teal)
+                    -5, 5, 8 / 20, "x1", "", "black", c_mid_teal)
 plot_line_hist_comp(data$X[,3][data$y == 0], data$X[,3][data$y == 1],
                     -2, 4, 6 / 20, "x1", "", "black", c_mid_teal)
 
@@ -2983,7 +2992,7 @@ conditional_location_median(data$X[,1], "x1",
                             "logit_p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
                             linear_samples$logit_p,
-                            "logit_p", -4, 4, 20)
+                            "logit_p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             linear_samples$logit_p,
                             "logit_p", -2, 4, 20)
@@ -2993,7 +3002,7 @@ conditional_location_median(data$X[,1], "x1",
                             "p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
                             logistic(linear_samples$logit_p),
-                            "p", -4, 4, 20)
+                            "p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             logistic(linear_samples$logit_p),
                             "p", -2, 4, 20)
@@ -3017,7 +3026,7 @@ conditional_e_prob_retro(data$X[,1], data$y,
                          linear_samples$y_pred, -3, 1, 4 / 20,
                          "x1", "", "black")
 conditional_e_prob_retro(data$X[,2], data$y,
-                         linear_samples$y_pred, -4, 4, 8 / 20,
+                         linear_samples$y_pred, -5, 5, 8 / 20,
                          "x2", "", "black")
 conditional_e_prob_retro(data$X[,3], data$y,
                          linear_samples$y_pred, -2, 4, 6 / 20,
@@ -3027,7 +3036,7 @@ conditional_e_prob_retro_residual(data$X[,1], data$y,
                                   linear_samples$y_pred, -3, 1, 4 / 20,
                                   "x1", "", "black")
 conditional_e_prob_retro_residual(data$X[,2], data$y,
-                                  linear_samples$y_pred, -4, 4, 8 / 20,
+                                  linear_samples$y_pred, -5, 5, 8 / 20,
                                   "x2", "", "black")
 conditional_e_prob_retro_residual(data$X[,3], data$y,
                                   linear_samples$y_pred, -2, 4, 6 / 20,
@@ -3077,7 +3086,7 @@ conditional_location_median(data$X[,1], "x1",
                             "logit_p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
                             samples$logit_p,
-                            "logit_p", -4, 4, 20)
+                            "logit_p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             samples$logit_p,
                             "logit_p", -2, 4, 20)
@@ -3087,7 +3096,7 @@ conditional_location_median(data$X[,1], "x1",
                             "p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
                             logistic(samples$logit_p),
-                            "p", -4, 4, 20)
+                            "p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             logistic(samples$logit_p),
                             "p", -2, 4, 20)
@@ -3175,7 +3184,7 @@ text(-1.25, 75, cex=1.25, label="y=0", pos=4, col="black")
 text(0, 70, cex=1.25, label="y=1", pos=4, col=c_mid_teal)
 
 plot_line_hist_comp(data$X[,2][data$y == 0], data$X[,2][data$y == 1],
-                    -4, 4, 8 / 20, "x1", "", "black", c_mid_teal)
+                    -5, 5, 8 / 20, "x1", "", "black", c_mid_teal)
 plot_line_hist_comp(data$X[,3][data$y == 0], data$X[,3][data$y == 1],
                     -2, 4, 6 / 20, "x1", "", "black", c_mid_teal)
 
@@ -3184,7 +3193,7 @@ conditional_location_median(data$X[,1], "x1",
                             "logit_p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
                             quad_samples$logit_p,
-                            "logit_p", -4, 4, 20)
+                            "logit_p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             quad_samples$logit_p,
                             "logit_p", -2, 4, 20)
@@ -3194,7 +3203,7 @@ conditional_location_median(data$X[,1], "x1",
                             "p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
                             logistic(quad_samples$logit_p),
-                            "p", -4, 4, 20)
+                            "p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             logistic(quad_samples$logit_p),
                             "p", -2, 4, 20)
@@ -3212,7 +3221,7 @@ conditional_location_median(data$X[,1], "x1",
                             "p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
                             logistic(linear_samples$logit_p),
-                            "p", -4, 4, 20)
+                            "p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             logistic(linear_samples$logit_p),
                             "p", -2, 4, 20)
@@ -3222,7 +3231,7 @@ conditional_location_median(data$X[,1], "x1",
                             "p", -3, 1, 20)
 conditional_location_median(data$X[,2], "x2",
                             logistic(quad_samples$logit_p),
-                            "p", -4, 4, 20)
+                            "p", -5, 5, 20)
 conditional_location_median(data$X[,3], "x3",
                             logistic(quad_samples$logit_p),
                             "p", -2, 4, 20)
@@ -3245,7 +3254,7 @@ conditional_e_prob_retro(data$X[,1], data$y,
                          "x1", "", "black")
 conditional_e_prob_retro(data$X[,2], data$y,
                          quad_samples$y_pred,
-                         -4, 4, 8 / 20,
+                         -5, 5, 8 / 20,
                          "x2", "", "black")
 conditional_e_prob_retro(data$X[,3], data$y,
                          quad_samples$y_pred,
@@ -3258,7 +3267,7 @@ conditional_e_prob_retro_residual(data$X[,1], data$y,
                                   "x1", "", "black")
 conditional_e_prob_retro_residual(data$X[,2], data$y,
                                   quad_samples$y_pred,
-                                  -4, 4, 8 / 20,
+                                  -5, 5, 8 / 20,
                                   "x2", "", "black")
 conditional_e_prob_retro_residual(data$X[,3], data$y,
                                   quad_samples$y_pred,
@@ -3436,6 +3445,10 @@ $$
 \frac{ \exp( w_{m} ) }{ \sum_{m' = 1}^{M} \exp( w_{m'} ) }
 \\
 &=
+\frac{\exp(\alpha)}{\exp(\alpha)} \,
+\frac{ \exp( w_{m} ) }{ \sum_{m' = 1}^{M} \exp( w_{m'} ) }
+\\
+&=
 \frac{ \exp( w_{m} + \alpha ) }{ \sum_{m' = 1}^{M} \exp( w_{m'} + \alpha ) }
 \\
 &=
@@ -3490,7 +3503,7 @@ g^{-1}(w_{1}, \ldots, w_{m}, \ldots, w_{M - 1})
 \left\{
 \begin{array}{rr}
 \frac{ 1 }
-{ 1 + \sum_{m = 1}^{M - 1} \exp( w_{m'} }, & m = 1 \\
+{ 1 + \sum_{m = 1}^{M - 1} \exp( w_{m'} ) }, & m = 1 \\
 \frac{ \exp( w_{m} ) }
 { 1 + \sum_{m' = 1}^{M - 1} \exp( w_{m'} ) }, & m > 1
 \end{array}
@@ -3586,6 +3599,60 @@ Taylor approximation we might model it more globally with a gaussian process,
 spline, or other functional model that extends to all inputs.  Applying the
 inverse link function to this latent model then insures that the output
 constraints will never be violated.
+
+# Acknowledgements
+
+A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
+Abhinav Katoch, Adam Bartonicek, Adam Fleischhacker, Adan, Adriano Yoshino,
+Alan Chang, Alan O'Donnell, Alessandro Varacca, Alexander Bartik,
+Alexander Noll, Alexander Rosteck, Anders Valind, Andrea Serafino,
+Andrew Mascioli, Andrew Rouillard, Andrew Vigotsky, Angie_Hyunji Moon,
+Ara Winter, asif zubair, Austin Rochford, Austin Rochford, Avraham Adler,
+Ben Matthews, Ben Swallow, Benoit Essiambre, Bertrand Wilden, Bryan Yu,
+Brynjolfur Gauti Jónsson, Cameron Smith, Camron, Canaan Breiss, Cat Shark,
+Charles Naylor, Chase Dwelle, Chris Jones, Chris Zawora, Christopher Mehrvarzi,
+Christopher Peters, Chuck Carlson, Cole Monnahan, Colin Carroll,
+Colin McAuliffe, Cruz, Damien Mannion, Damon Bayer, dan mackinlay, Dan Muck,
+Dan W Joyce, Dan Waxman, Dan Weitzenfeld, Daniel, Daniel Edward Marthaler,
+Daniel Rowe, Darshan Pandit, Darthmaluus , David Burdelski, David Galley,
+David Humeau, David Wurtz, dilsher singh dhillon, Doug Rivers, Dr. Jobo,
+Dr. Omri Har Shemesh, Dylan Murphy, Ed Cashin, Ed Henry, Edgar Merkle,
+edith darin, Eric LaMotte, Erik Banek, Ero Carrera, Eugene O'Friel, Evan Cater,
+Fabio Pereira, Fabio Zottele, Felipe González, Fergus Chadwick, Finn Lindgren,
+Florian Wellmann, Francesco Corona, Geoff Rollins, George Ho,
+Granville Matheson, Greg Sutcliffe, Guido Biele, Hamed Bastan-Hagh, Haonan Zhu,
+Harrison Katz, Hector Munoz, Henri Wallen, Hugo Botha, Huib Meulenbelt,
+Håkan Johansson, Ian , idontgetoutmuch, Ignacio Vera, Ilaria Prosdocimi,
+Isaac S, Isaac Vock, J, J Michael Burgess, Jair Andrade, James McInerney,
+James Wade, Janek Berger, Jason Martin, Jason Pekos, Jeff Dotson, Jeff Helzner,
+Jeff Stulberg, Jeffrey Burnett, Jeffrey Erlich, Jesse Wolfhagen, Jessica Graves,
+Joe Wagner, John Flournoy, Jon , Jonathan H. Morgan, Jonathan St-onge,
+Jonathon Vallejo, Joran Jongerling, Joseph Despres, Josh Weinstock,
+Joshua Duncan, Joshua Griffith, Josué Mendoza, JU, Justin Bois, Karim Naguib,
+Karim Osman, Keith O'Rourke, Kejia Shi, Kevin Foley, Kristian Gårdhus Wichmann,
+Kádár András, lizzie , LOU ODETTE, Luiz Pessoa, Marc Dotson,
+Marc Trunjer Kusk Nielsen, Marcel Lüthi, Marek Kwiatkowski, Mario Becerra,
+Mark Donoghoe, Mark Worrall, Markus P., Martin Modrák, Matthew,
+Matthew Hawthorne, Matthew Kay, Matthew T Stern, Matthieu LEROY,
+Maurits van der Meer, Maxim Kesin, Merlin Noel Heidemanns, Michael Colaresi,
+Michael DeWitt, Michael Dillon, Michael Lerner, Mick Cooney, Mikael,
+Mike Lawrence, Márton Vaitkus, N Sanders, Name, Nathaniel Burbank, Nic Fishman,
+Nicholas Clark, Nicholas Cowie, Nicholas Erskine, Nicholas Ursa, Nick S,
+Nicolas Frisby, Octavio Medina, Ole Rogeberg, Oliver Crook, Olivier Ma,
+Pablo León Villagrá, Patrick  Kelley, Patrick Boehnke, Pau Pereira Batlle,
+Peter Smits, Pieter van den Berg , ptr, Putra Manggala,
+Ramiro Barrantes Reynolds, Ravin Kumar, Raúl Peralta Lozada, Riccardo Fusaroli,
+Richard Nerland, Robert Frost, Robert Goldman, Robert kohn, Robert Mitchell V,
+Robin East, Robin Taylor, Rong Lu, Ross McCullough, Ryan Grossman, Ryan Wesslen,
+Rémi , S Hong, Scott Block, Scott Brown, Sean Pinkney, Sean Wilson, Serena,
+Seth Axen, shira, Simon Duane, Simon Lilburn, Srivatsa Srinath, sssz, Stan_user,
+Stefan, Stephanie Fitzgerald, Stephen Lienhard, Steve Bertolani, Stone Chen,
+Sus, Susan Holmes, Svilup, Sören Berg, Tagir Akhmetshin, Tao Ye, Tate Tunstall,
+Tatsuo Okubo, Teresa Ortiz, Thiago  de Paula Oliveira, Thomas Kealy,
+Thomas Lees, Thomas Vladeck, Tiago Cabaço, Tim Radtke, Tobychev , Tom Knowles,
+Tom McEwen, Tomáš Frýda, Tony Wuersch, Virginia Fisher, Vitaly Druker,
+Vladimir Markov, Wil Yegelwel, Will Farr, Will Kurt, Will Tudor-Evans,
+woejozney, yolhaj, yureq, Zach A, Zad Rafi, and Zhengchen Cai.
 
 # Appendix A: Hyperbolic Geometry {-#sec:appendix}
 #### The Legend of Zelda: The Hyperbolic Adventure of Link {-}
@@ -4176,7 +4243,7 @@ l
 g(p)
 \\
 &=
-\alpha \mathrm{arctanh} \! \left(2 \, p - 1 \right)
+\alpha \, \mathrm{arctanh} \! \left(2 \, p - 1 \right)
 \\
 &=
 \frac{\alpha}{2} \log \frac{ 1 + 2 \, p - 1 }{ 1 - 2 \, p + 1 }
@@ -4362,13 +4429,13 @@ $$
 \begin{align*}
 p &= o \, (1 - p)
 \\
-\frac{ N_{\text{successes}} }{ N }
+\frac{ \left< N_{\text{success}} \right> }{ N }
 &=
-o \, \frac{ N_{\text{failures}} }{ N }
+o \, \frac{ \left< N_{\text{failures}} \right> }{ N }
 \\
-N_{\text{successes}}
+\left< N_{\text{success}} \right>
 &=
-o \, N_{\text{failures}}
+o \, \left< N_{\text{failures}} \right>
 \end{align*}
 $$
 In other words the odds is the slope between the expected number of failures
@@ -4437,60 +4504,6 @@ probabilities.  Alternatively this connection makes it clear that understanding
 logit probabilities is as subtle and complex as understanding special
 relativity, which may help set the proper expectations when approaching this
 material!
-
-# Acknowledgements
-
-A very special thanks to everyone supporting me on Patreon: Aapeli Nevala,
-Abhinav Katoch, Adam Bartonicek, Adam Fleischhacker, Adan, Adriano Yoshino,
-Alan Chang, Alan O'Donnell, Alessandro Varacca, Alexander Bartik,
-Alexander Noll, Alexander Rosteck, Anders Valind, Andrea Serafino,
-Andrew Mascioli, Andrew Rouillard, Andrew Vigotsky, Angie_Hyunji Moon,
-Ara Winter, asif zubair, Austin Rochford, Austin Rochford, Avraham Adler,
-Ben Matthews, Ben Swallow, Benoit Essiambre, Bertrand Wilden, Bryan Yu,
-Brynjolfur Gauti Jónsson, Cameron Smith, Camron, Canaan Breiss, Cat Shark,
-Charles Naylor, Chase Dwelle, Chris Jones, Chris Zawora, Christopher Mehrvarzi,
-Christopher Peters, Chuck Carlson, Cole Monnahan, Colin Carroll,
-Colin McAuliffe, Cruz, Damien Mannion, Damon Bayer, dan mackinlay, Dan Muck,
-Dan W Joyce, Dan Waxman, Dan Weitzenfeld, Daniel, Daniel Edward Marthaler,
-Daniel Rowe, Darshan Pandit, Darthmaluus , David Burdelski, David Galley,
-David Humeau, David Wurtz, dilsher singh dhillon, Doug Rivers, Dr. Jobo,
-Dr. Omri Har Shemesh, Dylan Murphy, Ed Cashin, Ed Henry, Edgar Merkle,
-edith darin, Eric LaMotte, Erik Banek, Ero Carrera, Eugene O'Friel, Evan Cater,
-Fabio Pereira, Fabio Zottele, Felipe González, Fergus Chadwick, Finn Lindgren,
-Florian Wellmann, Francesco Corona, Geoff Rollins, George Ho,
-Granville Matheson, Greg Sutcliffe, Guido Biele, Hamed Bastan-Hagh, Haonan Zhu,
-Harrison Katz, Hector Munoz, Henri Wallen, Hugo Botha, Huib Meulenbelt,
-Håkan Johansson, Ian , idontgetoutmuch, Ignacio Vera, Ilaria Prosdocimi,
-Isaac S, Isaac Vock, J, J Michael Burgess, Jair Andrade, James McInerney,
-James Wade, Janek Berger, Jason Martin, Jason Pekos, Jeff Dotson, Jeff Helzner,
-Jeff Stulberg, Jeffrey Burnett, Jeffrey Erlich, Jesse Wolfhagen, Jessica Graves,
-Joe Wagner, John Flournoy, Jon , Jonathan H. Morgan, Jonathan St-onge,
-Jonathon Vallejo, Joran Jongerling, Joseph Despres, Josh Weinstock,
-Joshua Duncan, Joshua Griffith, Josué Mendoza, JU, Justin Bois, Karim Naguib,
-Karim Osman, Keith O'Rourke, Kejia Shi, Kevin Foley, Kristian Gårdhus Wichmann,
-Kádár András, lizzie , LOU ODETTE, Luiz Pessoa, Marc Dotson,
-Marc Trunjer Kusk Nielsen, Marcel Lüthi, Marek Kwiatkowski, Mario Becerra,
-Mark Donoghoe, Mark Worrall, Markus P., Martin Modrák, Matthew,
-Matthew Hawthorne, Matthew Kay, Matthew T Stern, Matthieu LEROY,
-Maurits van der Meer, Maxim Kesin, Merlin Noel Heidemanns, Michael Colaresi,
-Michael DeWitt, Michael Dillon, Michael Lerner, Mick Cooney, Mikael,
-Mike Lawrence, Márton Vaitkus, N Sanders, Name, Nathaniel Burbank, Nic Fishman,
-Nicholas Clark, Nicholas Cowie, Nicholas Erskine, Nicholas Ursa, Nick S,
-Nicolas Frisby, Octavio Medina, Ole Rogeberg, Oliver Crook, Olivier Ma,
-Pablo León Villagrá, Patrick  Kelley, Patrick Boehnke, Pau Pereira Batlle,
-Peter Smits, Pieter van den Berg , ptr, Putra Manggala,
-Ramiro Barrantes Reynolds, Ravin Kumar, Raúl Peralta Lozada, Riccardo Fusaroli,
-Richard Nerland, Robert Frost, Robert Goldman, Robert kohn, Robert Mitchell V,
-Robin East, Robin Taylor, Rong Lu, Ross McCullough, Ryan Grossman, Ryan Wesslen,
-Rémi , S Hong, Scott Block, Scott Brown, Sean Pinkney, Sean Wilson, Serena,
-Seth Axen, shira, Simon Duane, Simon Lilburn, Srivatsa Srinath, sssz, Stan_user,
-Stefan, Stephanie Fitzgerald, Stephen Lienhard, Steve Bertolani, Stone Chen,
-Sus, Susan Holmes, Svilup, Sören Berg, Tagir Akhmetshin, Tao Ye, Tate Tunstall,
-Tatsuo Okubo, Teresa Ortiz, Thiago  de Paula Oliveira, Thomas Kealy,
-Thomas Lees, Thomas Vladeck, Tiago Cabaço, Tim Radtke, Tobychev , Tom Knowles,
-Tom McEwen, Tomáš Frýda, Tony Wuersch, Virginia Fisher, Vitaly Druker,
-Vladimir Markov, Wil Yegelwel, Will Farr, Will Kurt, Will Tudor-Evans,
-woejozney, yolhaj, yureq, Zach A, Zad Rafi, and Zhengchen Cai.
 
 # References {-}
 
