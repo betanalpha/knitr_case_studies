@@ -7,12 +7,12 @@ data {
 }
 
 parameters {
-  // Horseshoe parameters
+  // Location parameters
   vector[K] theta;
 }
 
 model {
-  // Horseshoe prior model
+  // Prior model
   theta ~ normal(0, 10);
   
   // Observational model

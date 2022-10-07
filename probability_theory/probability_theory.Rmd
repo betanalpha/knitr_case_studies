@@ -51,7 +51,7 @@ confuse the reader, but rather a consequence of the fact that we cannot
 explicitly construct abstract probability distributions in any meaningful sense.
 Instead we must utilize problem-specific _representations_ of abstract
 probability distributions which means that concrete examples will have to wait
-until we introduce these representations in Section 3.
+until we introduce these representations in Section 4.
 
 # Setting A Foundation {#sec:foundation}
 
@@ -533,7 +533,7 @@ $$
 >
 \mathbb{P}_{\pi} [ \cup_{n = 1}^{N} \mathfrak{A}_{n} ],
 $$
-even when $\mathfrak{A}_{n} \cap \mathfrak{A}_{m} = 0, n \ne m$.  We can also
+even when $\mathfrak{A}_{n} \cap \mathfrak{A}_{m} = \emptyset, n \ne m$.  We can also
 combine a finite number of different non-constructible subsets to achieve
 _super-additivity_,
 $$
@@ -569,7 +569,7 @@ $$
 \sum_{n = 1}^{\infty} \mathbb{P}_{\pi} [ A_{n} ],
 $$
 $$
-A_{n} \cap A_{m} = 0, \, n \ne m.
+A_{n} \cap A_{m} = \emptyset, \, n \ne m.
 $$
 
 The more familiar rules of probability theory can all be derived from these
@@ -904,7 +904,7 @@ corresponding interval in the full real line.
 ![](figures/embeddings/interval/interval.png)
 <br><br>
 
-If our target space is itself the real line then the identify function serves
+If our target space is itself the real line then the identity function serves
 as an appropriate embedding.
 
 <br><br>
@@ -1523,7 +1523,7 @@ To demonstrate a probability density function consider the ubiquitous
  _Gaussian_ probability density functions which allocate probabilities across 
 real line, $X = \mathbb{R}$, 
 $$
-\pi(x \mid \mu, \sigma) = \frac{1}{\sqrt{2 \pi}}
+\pi(x \mid \mu, \sigma) = \frac{1}{\sqrt{2 \pi} \sigma}
 \exp \left( - \frac{1}{2} \left(\frac{x - \mu}{\sigma} \right)^{2} \right).
 $$
 Each Gaussian probability density function is specified by a location parameter,
@@ -1590,7 +1590,7 @@ plot_norm_probs(mu, sigma, -8, B1_min)
 plot_norm_probs(mu, sigma, B1_max, 8)
 ```
 
-We can compute it using the cumulative probability function,
+We can compute it using the cumulative distribution function,
 ```{r}
 (1 - pnorm(B1_max, mu, sigma)) + pnorm(B1_min, mu, sigma)
 ```
@@ -1653,7 +1653,7 @@ norm_prob(B_union_min, B_union_max, mu, sigma)
 
 ### Computing Expectations
 
-The real line has a unique embedding into the real line -- the identify 
+The real line has a unique embedding into the real line -- the identity 
 function -- so means and variances are well-defined for the Gaussian family of
 probability density functions.  In line with their names, the mean of any
 member is given by the location parameter,
@@ -2105,7 +2105,7 @@ This is consistent with the exact computation,
 ```{r}
 poisson_prob(A1, l)
 ```
-And we an readily visualize how the Monte Carlo estimator converges to the exact 
+And we readily visualize how the Monte Carlo estimator converges to the exact 
 value as the size of the sample increases.  The bands here in red cover the 
 Monte Carlo estimator plus/minus 1, 2, and 3 standard errors to demonstrate the 
 variation expected from the Monte Carlo Central Limit Theorem.
@@ -2138,7 +2138,7 @@ plot_mc_evo <- function(iter, mc_stats, truth) {
 plot_mc_evo(iter, mc_stats, poisson_prob(A1, l))
 ```
 
-Now we can apply this machinery to any desired probabilist computation.  The 
+Now we can apply this machinery to any desired probabilistic computation.  The 
 probability of the complement of $A_{1}$?
 ```{r}
 pushforward_samples = sapply(stan_samples, function(x) 1 - indicator(x, A1))

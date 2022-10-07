@@ -7,12 +7,12 @@ data {
 }
 
 parameters {
-  // Horseshoe parameters
+  // Laplace parameters
   vector[K] theta;
 }
 
 model {
-  // Horseshoe prior model
+  // Laplace prior model
   theta ~ double_exponential(0, 0.1);
 
   // Observational model
